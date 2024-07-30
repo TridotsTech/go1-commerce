@@ -1,0 +1,437 @@
+{% extends layout_template %}
+{% block loader %}
+{% include "/templates/pages/listpageloader.html" %}
+{% endblock %}
+{% block breadcrumb %}
+<div class="title-breadcrumb">
+    <div class="{%if theme_settings.boxed_layout ==1%}container{%else%}container-fluid{%endif%}" style="padding:0">
+        <div class="row" style="margin: 0;">
+            <div class="col-md-12 col-sm-12 col-xs-12" style="{%if theme_settings.boxed_layout ==1%} padding: 0 5px; {%endif%}">
+                <ol class="breadcrumb">
+                    <li><a href="/">Home</a></li>
+                    {%for item in parents%} 
+                    <li><a href="/{{item.route}}">{{item.name}}</a></li>
+                    {%endfor%}
+                    <li><a>{{category_name}}</a></li>
+                </ol>
+            </div>
+
+            <div class="col-md-12 col-sm-12 col-xs-12" style="position: relative;{%if theme_settings.boxed_layout ==1%}padding: 0 5px; {%endif%}">
+                <h3>{{category_name}}</h3>
+                {% if products %}
+                {% if catalog_settings.sort_view == "List" %}
+                <div class="product-title product-sort-options hidden-xs" style="{%if theme_settings.boxed_layout ==1%}right:20px;{%endif%}">
+                    <div class="sortType">
+                        <label>Sort By</label>
+                        <ul>
+                            <li><a class="dropdown-item" data-id="relevance" onclick="sortProducts(this)">Relevance</a></li>
+                            <li><a class="dropdown-item" data-id="name_asc" onclick="sortProducts(this)">Name: A-Z</a></li>
+                            <li><a class="dropdown-item" data-id="name_desc" onclick="sortProducts(this)">Name: Z-A</a></li>
+                            <li><a class="dropdown-item" data-id="price_asc" onclick="sortProducts(this)">Price: Low to High
+                                </a></li>
+                            <li><a class="dropdown-item" data-id="price_desc" onclick="sortProducts(this)">Price: High to Low
+                                </a></li>
+                        </ul>
+                    </div>
+                </div>
+                {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block content %}
+<input type="hidden" name="hdnAttributeFilter" id="hdnAttributeFilter" value="">
+<input type="hidden" name="hdnModeFilter" id="hdnModeFilter" value="{%if model_filter%}{{model_filter}}{%endif%}">
+<input type="hidden" name="hdnList" id="hdnList" value="{% if views %}{{views}}{% endif %}">
+<input type="hidden" name="hdnviews" id="hdnviews" value="{% if views %}{{views}}{% endif %}">
+<input type="hidden" name="hdnPage" id="hdnPage" value="{% if page_no %}{{page_no}}{% endif %}">
+<input type="hidden" name="hdnCategory" id="hdnCategory" value="{{current_category.name}}" />
+<input type="hidden" name="hdnBrand1" id="hdnBrand1" value="{% if products %}{%for item in products%}{{item.product_brand}}{% endfor %}{% endif %}" />
+<input type="hidden" name="hdnBrandFilter" id="hdnBrandFilter" value="{% if brand_filter %}{{brand_filter}}{% endif %}">
+<input type="hidden" name="hdnPriceRange" id="hdnPriceRange" value="{% if product_price %}{{product_price}}{% endif %}" />
+<input type="hidden" name="hdnCustomPrice" id="hdnCustomPrice" value="{% if maxPrice %}{{maxPrice}}{% endif %}" />
+<input type="hidden" name="hdnMinFilter" id="hdnMinFilter" value="{% if minPrice %}{{minPrice}}{% endif %}" />
+<input type="hidden" name="hdnMaxFilter" id="hdnMaxFilter" value="{% if maxPrice %}{{maxPrice}}{% endif %}" />
+<input type="hidden" name="hdnSortFilter" id="hdnSortFilter" value="{% if sort %}{{sort}}{% endif %}">
+<input type="hidden" name="hdnRatings" id="hdnRatings" value="{% if rating %}{{rating}}{% endif %}">
+{% if attribute %}{% for item in attribute %}
+<input type="hidden" name="hdnAttrFilter" id="hdnAttrFilter" data-attribute="{{item.attribute}}" value="{{item.value}}">
+{% endfor %}{% else %}
+<input type="hidden" name="hdnAttrFilter" id="hdnAttrFilter" value="">{% endif %}
+<div class="filter-slide">
+    <div id="FiltersList" data-off-canvas="filter-slider left overlay">
+        <div class="mobile-filters"></div>
+    </div>
+</div>
+<section class="page-title-area" style="display:none">
+    <div class="page-title-overlay">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="page-title">
+                        <h3>{{title}}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<div class="product-list-area section-padding">
+    {% if products %}
+    <div class="mob-filters">
+        <div style="border-right: 1px solid #eee;">
+            <a class="btn-block" onclick="show_mobile_filters()"><i class="fa fa-filter"></i>Filters</a>
+        </div>
+        <div>
+            <a class="btn-block" onclick="show_mobile_sort_options()"><i class="fa fa-sort"></i>Sort</a>
+        </div>
+    </div>
+    {%endif%}
+    <div>
+        <div class="row  mobile-row">
+            {% if catalog_settings.filter_view == "Horizontal" %}
+            <div class="col-md-12 col-sm-12 col-xs-12 pad-0">
+                <div class="hole_class">
+                    <div class="red_class" style="background: #ddd;padding-bottom: 10px;padding-top: 10px;">
+                        <p style="margin-bottom: 0px;padding-left: 15px;">Filter</p></div>
+                <div class="HorizontalFilter sub_category"></div>
+                <div class="HorizontalFilter2 subchild_category"></div>
+                <div class="HorizontalFilter0 subchild_category1"></div>
+                <div class="HorizontalFilterBrand brand_filters"></div>
+                {% if catalog_settings.enable_model_finder == 1 %}
+                <div class="HorizontalFilterModel model_filters"></div>
+                 {% endif %}
+                <div class="AttributeFilter prod_attr_filter"></div>
+                <button class="btn btn-primary apply_btn" onclick="apply_horizontal_filter()">Apply</button>
+            </div>
+            </div>
+            {% endif %}
+            {% if catalog_settings.filter_view == "Vertical" %}
+            {% if enable_left_side_panel==1 %}
+            <div class="col-md-3 col-sm-3 col-xs-12 hidden-xs fff" id="ProductFilters">
+                 <!-- {% if catalog_settings.disable_category_filter == 0 %} -->
+                 <!-- {% endif %} -->
+                <!-- <div class="brands category-lists">
+                </div> -->
+                {% include "/templates/pages/ListPage/category_desk_list.html" %}
+                
+                 {% if catalog_settings.disable_price_filter == 0 %}
+                 <div class="filter">
+                     <h3>Price <span class="fa fa-chevron-up accr-action" onclick="accrod(this)"></span></h3>
+                      {% if product_price %}
+                      {% if product_price | length >5 %}
+                      {% set len = product_price | length - 5%}
+                      {% endif %}
+                      {% endif %}
+                        <div class="rating_list accr-items">
+                             {% if product_price %}
+                            {% for item_price in product_price | batch(5) | first %}
+                            <label class="radio-container old">
+                                <input type="radio" name="customPrice1" class="customPrice1" onclick="search_custom_price_range(this)" value="{{item_price}}">
+                                <span class="count">Up to {{currency}} {{item_price}}</span>
+                                <span class="checkmark"></span>
+                            </label>
+                            {% endfor %}
+                            {% for item_price in product_price[5:] %}
+                            <label class="radio-container new" style="display: none;">
+                                <input type="radio" name="customPrice1" class="customPrice1" onclick="search_custom_price_range(this)" value="{{item_price}}">
+                                <span class="count">Up to {{currency}} {{item_price}}</span>
+                                <span class="checkmark"></span>
+                            </label>
+                            {% endfor %}
+                             {% endif %}
+                            <div class="moreopt_div new" style="display: none;"><a class="load_option_btn" onclick="show_less_price(this)"> SHOW LESS</a></div>
+                             {% if len %}
+                    <div class="moreopt_div more_op" style="padding: 5px 10px;"><a class="load_option_btn" onclick="show_more_price(this)"> {{len}} MORE</a></div>
+                    {% endif %}
+                     <div class="customPrice">
+                            <div class="custom">
+                                <input type="number" name="minPrice" id="minPrice" placeholder="Min" value="{% if minPrice %}{{minPrice}}{% endif %}" />
+                            </div>
+                            <div class="custom">
+                                <input type="number" name="maxPrice" id="maxPrice" placeholder="Max" value="{% if maxPrice %}{{maxPrice}}{% endif %}" />
+                            </div>
+                            <div class="custom" style="margin-right:0px;">
+                                <input type="button" onclick="search_custom_price()" value="GO" class="btn btn-default">
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                      {% endif %}
+                       {% if catalog_settings.disable_brand_filter == 0 %}
+                <div class="filter">
+                    <div class="brand-title"> <h3>Brands <span class="fa fa-chevron-up accr-action" onclick="accrod(this)"></span></h3>
+                   </div>
+                    <div class="brand_list accr-items">
+                    </div>
+                    <div class="attribute-filter"></div>                
+                </div>
+               {% endif %}
+                 {% if catalog_settings.disable_ratings_filter == 0 %}
+                <div class="other-filters" style="float:left;width:100%">
+                    <div class="filter">
+                        <h3>Ratings <span class="fa fa-chevron-up accr-action" onclick="accrod(this)"></span></h3>
+                        <div class="rating_list accr-items">
+                            <label class="radio-container">
+                                <input type="radio" name="ratings" value="4" onclick="select_rating(this)">
+                                <span class="fa fa-star active"></span>
+                                <span class="fa fa-star active"></span>
+                                <span class="fa fa-star active"></span>
+                                <span class="fa fa-star active"></span>
+                                <span class="fa fa-star"></span>
+                                <span class="txt">&amp; more</span>
+                                <span class="checkmark"></span>
+                            </label>
+                            <label class="radio-container">
+                                <input type="radio" name="ratings" value="3" onclick="select_rating(this)">
+                                <span class="fa fa-star active"></span>
+                                <span class="fa fa-star active"></span>
+                                <span class="fa fa-star active"></span>
+                                <span class="fa fa-star "></span>
+                                <span class="fa fa-star"></span>
+                                <span class="txt">&amp; more</span>
+                                <span class="checkmark"></span>
+                            </label>
+                            <label class="radio-container">
+                                <input type="radio" name="ratings" value="2" onclick="select_rating(this)">
+                                <span class="fa fa-star active"></span>
+                                <span class="fa fa-star active"></span>
+                                <span class="fa fa-star "></span>
+                                <span class="fa fa-star "></span>
+                                <span class="fa fa-star"></span>
+                                <span class="txt">&amp; more</span>
+                                <span class="checkmark"></span>
+                            </label>
+                            <label class="radio-container">
+                                <input type="radio" name="ratings" value="1" onclick="select_rating(this)">
+                                <span class="fa fa-star active"></span>
+                                <span class="fa fa-star "></span>
+                                <span class="fa fa-star "></span>
+                                <span class="fa fa-star "></span>
+                                <span class="fa fa-star"></span>
+                                <span class="txt">&amp; more</span>
+                                <span class="checkmark"></span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                </div>
+                 {% endif %}
+            </div>
+            {% endif %}
+            {% endif %}
+            <div class="{% if catalog_settings.filter_view == "Vertical" and enable_left_side_panel==1 %}col-md-9 col-sm-9{% else %}col-md-12 col-sm-12{% endif %} col-xs-12 pad-0">
+              {% if catalog_settings.sort_view == "Dropdown" and device_type== "Desktop" %}
+                <div class="col-md-12 product-title product-sort-options1 hidden-xs dropdown-sort" style="{%if theme_settings.boxed_layout ==1%}right:20px;{%endif%}">
+                    <div class="sortType">
+                        <label>Sort By</label>
+                        <ul class="sort-div" style="list-style: none;">
+                            <li>
+                                <span class="orderby-current active"></span>
+                                <ul class="dropdown1 sort_filter" style="display: none;">
+                                    <li><a class="dropdown-item" data-id="relevance" data-name="Relevance" onclick="sortProducts(this)">Relevance</a></li>
+                                    <li><a class="dropdown-item" data-id="name_asc" data-name="Name: A-Z" onclick="sortProducts(this)">Name: A-Z</a></li>
+                                    <li><a class="dropdown-item" data-id="name_desc" data-name="Name: Z-A" onclick="sortProducts(this)">Name: Z-A</a></li>
+                                    <li><a class="dropdown-item" data-id="price_asc" data-name="Price: Low to High" onclick="sortProducts(this)">Price: Low to High
+                                        </a></li>
+                                    <li><a class="dropdown-item" data-id="price_desc" data-name="Price: High to Low" onclick="sortProducts(this)">Price: High to Low
+                                        </a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                 </div>
+                 {% endif %}
+                <div style="padding: 0 20px 0 5px;float:left;width:100%;" class="productlist">
+
+                   <!--  <div class="child-categories-mobile visible-xs">
+                    </div> -->
+<!--                       <div class="child-categories hidden-xs">
+                    </div> -->
+                    {% include "/templates/pages/ListPage/category_mobile_list.html" %}
+                    {% include "/templates/pages/ListPage/childcategory_desk_list.html" %}
+                  
+                    <div class="row applied-filters">
+                        {%for brand in brandslist%}
+                        <a class="active-filter" onclick="RemoveFilter('brand','{{brand.unique_name}}')">
+                            <span class="active-filter-label"> {{brand.name}}</span>
+                        </a>
+                        {%endfor%}
+                        {%for model in modellist%}
+                        <a class="active-filter" onclick="RemoveFilter('model','{{model.unique_name}}')">
+                            <span class="active-filter-label"> {{model.name}}</span>
+                        </a>
+                        {%endfor%}
+                        {%if rating%}
+                        <a class="active-filter" onclick="RemoveFilter('rating','{{rating}}')">
+                            <span class="active-filter-label"> {{rating}} stars & more</span>
+                        </a>
+                        {%endif%}
+                        {%for attribute in attributelist%}
+                        <a class="active-filter" onclick="RemoveFilter('{{attribute.attribute}}','{{attribute.unique_name}}')">
+                            <span class="active-filter-label"> {{attribute.name}}</span>
+                        </a>
+                        {%endfor%}
+                        {%if minPrice%}
+                        {%if maxPrice%}
+                        <a class="active-filter" onclick="RemovePriceFilter()">
+                            <span class="active-filter-label">{{minPrice}} - {{maxPrice}}</span>
+                        </a>
+                        {%else%}
+                        <a class="active-filter" onclick="RemoveFilter('min','{{minPrice}}')">
+                            <span class="active-filter-label">From {{minPrice}}</span>
+                        </a>
+                        {%endif%}
+                        {%else%}
+                        {%if maxPrice%}
+                        <a class="active-filter" onclick="RemoveFilter('max','{{maxPrice}}')">
+                            <span class="active-filter-label">Upto {{maxPrice}}</span>
+                        </a>
+                        {%endif%}
+                        {%endif%}
+                        {%if brandslist or rating or attributelist%}
+                        <a class="active-filter remove-filter" onclick="RemoveAllFilter()">
+                            <span class="active-filter-label"> Remove all filters</span>
+                        </a>
+                        {%endif%}
+                    </div>
+
+<div id="attribute_modal" class="modal fade" role="dialog">
+</div>
+<!-- Call back - Enquiry -->
+<div id="video_modal" class="modal fade" role="dialog">
+   
+</div>
+                    {% if products %}
+                    
+                    {% if product_box %}
+                     <div class="row" id="products-list">
+                        {% if catalog_settings.show_category_description ==1 %}
+                        {% if catalog_settings.description_position == "Top" %}
+                            {%if full_description%}
+                                <div class="category-desc">
+                                    {{full_description}}
+                                </div>
+                            {%endif%}
+                        {%endif%}
+
+                     {%endif%}
+                        {% if products %}
+                    {% include product_box %}
+                    {% else %}
+                    <div id="products-list-otr">
+                        <div class="no-res">
+                            {% if catalog_settings.list_empty_image %}<img src="{{catalog_settings.list_empty_image}}">{% endif %}
+                            <div>Oops! No data found, We will provide soon.</div>
+                        </div>
+                   </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div style="
+                        width: 250px;
+                        text-align: center;
+                        margin: 0px auto;
+                    "><a class="btn load-more default" onclick="loadmore()" style="width: 250px;margin-top: 25px;">Load More
+                    </a></div>
+                    {% endif %}
+                    {% set length_cat = catalog_settings.no_of_records_per_page %}
+                    {% if product_count %}
+                    {% set length_pro = product_count | length %}
+                    {% if  length_pro > length_cat%}
+                      <div id="list_pagination" style="height: 10%; float: right;padding: 0px 10px"></div>
+                      {% endif %}
+                       {% endif %}
+                {% else %}
+            <div class="col-md-12 col-sm-12 col-xs-12 mobile-row auto-width-list" style="padding-right: 0;padding-left: 15px;width:100%;">
+                    <div id="products-list-otr">
+                        <div class="no-res">
+                            {% if catalog_settings.list_empty_image %}<img src="{{catalog_settings.list_empty_image}}">{% endif %}
+                            <div>Oops! No data found, We will provide soon.</div>
+                        </div>
+                   </div>
+                </div>
+                        {% endif %}
+                </div>
+                {% if catalog_settings.show_category_description ==1 %}
+                        {% if catalog_settings.description_position == "Bottom" %}
+                            {%if full_description%}
+                                <div class="category-desc">
+                                    <h3 class="description-title">About {{category_name}}</h3>
+                                    {{full_description}}
+                                </div>
+                            {%endif%}
+                        {%endif%}
+
+                     {%endif%}
+            </div>
+           
+        </div>
+    </div>
+    <style type="text/css">
+    .applied-filters{margin-left:1px;margin-top:10px}#list_pagination .btn-info{color:#333;background-color:#fff;border-color:#ddd}#list_pagination{text-align:center;margin-top:40px;width:100%;margin-bottom:40px}#list_pagination .btn-default{background:#fff!important;color:#333!important;border-color:#ddd!important;border-radius:0!important}#list_pagination .btn-info.active{color:#fff;background-color:#31b0d5;border-color:#269abc}button.btn.btn-default.next{margin-left:10px}#list_pagination i.lnr.lnr-chevron-left{margin-right:5px;font-size:11px;margin-left:-5px;color:#000;font-weight:700}#list_pagination i.lnr.lnr-chevron-right{margin-left:2px;font-size:11px;margin-right:-5px;color:#000;font-weight:700}.no-res{min-height:250px;font-size:18px;text-align:center;color:#222;margin: 0 auto;padding: 6% 6%;}.no-res img{width:250px}.listview{border:1px solid transparent;border-color:#ced4da;float:right}.gridview{border:1px solid transparent;border-color:#ced4da;float:right}.fa-list{color:#22262a}.fa-th{color:#22262a}.ListViewBox{display:none}.art-name a{font-family:'Nunito Sans',sans-serif;color:#5c5c67;font-weight:500}.art-price{color:#ed1c24!important}.list-discount-badge1{margin-left:30px;position:absolute;top:16px;left:0;padding:2px 10px;font-size:13px;min-width:60px;text-align:center;border-radius:0 20px 20px 0}.list-discount-badge1{background:#335bd3;color:#fff!important}.art{display:-webkit-box;display:-ms-flexbox;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-15px;margin-left:-15px;margin-left:0;margin-right:0;padding-left:0;padding-right:0;border-bottom-color:#ddd}.art{position:relative;min-height:1px;width:100%;-webkit-box-flex:0;-ms-flex:0 0 100%;flex:0 0 100%;padding:15px;border:1px solid transparent;background:transparent;margin-top:-1px;margin-left:-1px;border-collapse:collapse}.art-picture-block{position:relative;margin-bottom:.8rem;overflow:hidden}.img-center-container{display:block;position:relative;height:0;width:100%;padding-top:100%;text-decoration:none!important;outline:none!important}.img-center-container>img{position:absolute;max-width:100%;max-height:100%;left:0;top:0;right:0;bottom:0;margin:auto}.art-data-block{display:-webkit-box;display:-ms-flexbox;display:flex;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-15px;margin-left:-15px;padding-left:20px;padding-right:0;margin-left:0;margin-right:0;-ms-flex-preferred-size:0;flex-basis:0%;-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;max-width:100%}.art-info-block{display:block;position:relative;min-height:1px;-ms-flex-preferred-size:0;flex-basis:0%;-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;max-width:100%}.art-name{font-size:1rem;margin-bottom:.5em}.art-name{-webkit-box-sizing:content-box;box-sizing:content-box;font-size:.875rem;font-weight:600;margin-bottom:.25rem;line-height:1.3}.art-description{margin-bottom:1rem}.art-description{font-size:.8125rem;color:#8d9ba9;margin-bottom:.4rem}.art-actions-block{padding-left:20px}.art-price-block{position:relative;margin-top:.5rem}.art-price{font-size:1.6rem;font-weight:500;display:block;margin-bottom:.25rem}.art-price.art-price--offer{color:#f44336}.btn:not(:disabled):not(.disabled){cursor:pointer}.art-btn-group .art-btn{display:block;border-radius:0;border:none;-webkit-box-shadow:none;box-shadow:none;-webkit-transition:none;transition:none;padding:.65rem 0}@media (min-width:768px){.d-md-block{display:block!important}}@media (min-width:768px){.d-md-none{display:none!important}}.cartlist{margin-top:20px!important}.art-price-block span{font-size:16px;margin-right:20px;padding-top:5px;text-decoration:none;font-weight:600;padding-right:10px;margin-top:0}.art{background:#fff}.art{margin-bottom:20px;border:1px solid #dedfe3}.art:hover{box-shadow:0 4px 15px rgba(153,153,153,.3)}@media screen and (max-width:767px){.art{min-width:0}.d-none{display:none!important}.art-name{margin-top:0}.art-actions-block{margin-left:0}.d-md-none{margin-top:17px}.btn-primary{padding:6px 20px!important}.width-wish{width:0px!important}.width-cart{width:0}.cartlist .fa{margin-left:-6px}.cartlist{margin-top:0px!important}.d-md-none .fa{margin-left:-6px}.cart-link{padding:6px 20px;}}.wish-list{position:absolute;top:0;border-radius:50%!important;padding:6px 20px!important;margin-top:5px!important}.wish-list .fa{margin-left:-6px}.compare-list{position:absolute;bottom:0;left:0}.top_heading{font-weight:600}input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;appearance:none;margin:0}.col5{width:20%}.wishlist-img{left:40px!important}@media screen and (max-width:767px){.col5{width:50%}.wishlist-img{left:34px!important}}.load-more{width:100%;float:left;text-align:center;width:250px;margin-top:25px;display:none}.listview{display:none}.selectBox{position:relative}.selectBox select{width:100%;font-weight:700}.overSelect{position:absolute;left:0;right:0;top:0;bottom:0}.checkboxes{display:none;border:1px #dadada solid}.checkboxes label{display:block}.checkboxes{position:absolute;width:184px;z-index:9}.checkboxes label{padding-left:10px}.checkboxes label{font-weight:400}.select_attribute{border:1px solid #dcdcdc;height:40px;padding:10px 10px;width:100%;color:var(--txt-color);font-family:inherit;font-size:1em;font-weight:400;border-radius:2px}.select_attribute::before{content:"\f078";font-family:FontAwesome;position:absolute;top:0;right:0;line-height:40px;width:20px;font-size:11px}.select_attribute1{font-size:12px}.apply_btn{padding:.094em 0.875em!important;font-size:1.25em;font-family:'Catamaran',sans-serif;font-weight:500;display:inline-block;vertical-align:bottom;height:40px!important;border:none;color:#fff;border-radius:4px;margin-top:20px;margin-left:10px}.hole_class{border:1px solid #ddd;margin-left:10px;margin-right:10px;padding-bottom:15px}
+    .sort_filter{margin:0;padding:17px 0 10px 0;display:none;width:180px;position:absolute;top:100%;left:0;z-index:5;backface-visibility:hidden;-webkit-backface-visibility:hidden}.sort_filter:before{background:#fff;position:absolute;content:"";top:7px;left:0;right:0;bottom:0;z-index:-1;box-shadow:0 2px 5px rgb(0 0 0 / 10%);border-radius:4px}.sort_filter li{list-style:none;position:relative;z-index:4;padding:0 15px}.sort_filter li a{padding:5px 0;display:block;background:0 0!important;border:0!important;color:#222!important}.dropdown-sort{min-height:40px;top:0}.orderby-current:after{content:"\f078";font-family:FontAwesome;font-size:10px;margin-left:6px;position:relative;top:-1px}.orderby-current{cursor:pointer;background-color:#f5f5f5;padding:7px 15px;margin-top:0;float:left}.sort_filter .selected-filter{color:red}.dropdown-sort .sortType label{margin-top:6px}.dropdown-sort .sortType ul.dropdown1.sort_filter{background-color:#fff}.dropdown-sort .sortType{position:absolute;right:15px}
+    </style>
+    
+    {% endblock %}
+    {% block script %}
+       <script src="/assets/cmswebsite/js/cart.js"></script>
+       <script src="/assets/cmswebsite/js/itemlist.js"></script>
+       
+    <script type="text/javascript">
+
+        $(document).on('click', function (event) {
+          if (!$(event.target).closest('.sortType').length) {
+            $('.sortType .opened').removeClass('opened');
+             $('.sort_filter').hide();
+          }
+        });
+        $('.orderby-current').click(function(){
+            if ($(".opened")[0]){
+                $(this).removeClass('opened');
+                $('.sort_filter').hide();
+            }
+            else{
+                $(this).addClass('opened');
+                $('.sort_filter').show();
+            }
+        })
+         function show_more_price(e){
+            $(e).parent().css('display','none')
+            $(e).parent().parent().find('.new').css('display','block')
+        }
+        function show_less_price(e){
+             $(e).parent().css('display','none')
+             $(e).parent().parent().find('.new').css('display','none')
+             $(e).parent().parent().find('.old').css('display','block')
+             $(e).parent().parent().parent().find('.more_op').css('display','block')
+        }
+        $('.gridview').click(function(){
+            $('#hdnList').val('List')
+            filters()
+            $('.gridview').hide();
+             $('.listview').show();
+
+        })
+         $('.listview').click(function(){
+            $('#hdnList').val('Grid')
+            filters()
+
+        })
+         var views = $('#hdnviews').val();
+         if (views=="List"){
+           
+            $('.gridview').hide();
+             $('.listview').show();
+         }
+         else{
+            
+            $('.gridview').show();
+             $('.listview').hide();
+         }
+         
+    </script>
+    {% endblock %}
+    <!-- this is a sample default web page template -->

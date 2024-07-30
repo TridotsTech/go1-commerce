@@ -1,0 +1,71 @@
+{
+ "autoname": "naming_series:",
+ "creation": "2020-04-30 18:04:37.722350",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "attribute_id",
+  "column_break_2",
+  "attribute_name",
+  "options_section",
+  "attribute_options",
+  "naming_series"
+ ],
+ "fields": [
+  {
+   "fieldname": "attribute_id",
+   "fieldtype": "Data",
+   "label": "Attribute Id"
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "attribute_name",
+   "fieldtype": "Data",
+   "label": "Attribute Name"
+  },
+  {
+   "fieldname": "options_section",
+   "fieldtype": "Section Break",
+   "label": "Options"
+  },
+  {
+   "fieldname": "attribute_options",
+   "fieldtype": "Table",
+   "label": "Attribute Options",
+   "options": "Attribute Option"
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Naming Series",
+   "options": "SAT-"
+  }
+ ],
+ "modified": "2020-05-01 13:34:53.530539",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Product Attribute Template",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "search_fields": "attribute_name",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

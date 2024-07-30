@@ -1,0 +1,57 @@
+{
+ "actions": [],
+ "creation": "2019-03-13 20:05:51.568434",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "category",
+  "category_name",
+  "display_order",
+  "childname"
+ ],
+ "fields": [
+  {
+   "fieldname": "category",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Category Id",
+   "options": "Product Category",
+   "read_only": 1,
+   "set_only_once": 1
+  },
+  {
+   "fetch_from": "category.category_name",
+   "fieldname": "category_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Category Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "display_order",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "label": "Display Order"
+  },
+  {
+   "fieldname": "childname",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Childname"
+  }
+ ],
+ "istable": 1,
+ "links": [],
+ "modified": "2023-05-26 15:34:42.489089",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Product Category Mapping",
+ "owner": "Administrator",
+ "permissions": [],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

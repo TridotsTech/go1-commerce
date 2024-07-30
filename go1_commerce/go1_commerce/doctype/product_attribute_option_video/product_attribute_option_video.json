@@ -1,0 +1,60 @@
+{
+ "autoname": "naming_series:",
+ "creation": "2020-01-24 17:34:11.242049",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "option_id",
+  "youtube_video_id",
+  "video_type",
+  "naming_series"
+ ],
+ "fields": [
+  {
+   "fieldname": "option_id",
+   "fieldtype": "Data",
+   "label": "Option Id"
+  },
+  {
+   "fieldname": "youtube_video_id",
+   "fieldtype": "Data",
+   "label": "Video Url"
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Naming Series",
+   "options": "PAV-"
+  },
+  {
+   "default": "Youtube",
+   "fieldname": "video_type",
+   "fieldtype": "Select",
+   "label": "Type",
+   "options": "Youtube\nVimeo\nOther"
+  }
+ ],
+ "modified": "2021-10-04 17:49:30.920468",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Product Attribute Option Video",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

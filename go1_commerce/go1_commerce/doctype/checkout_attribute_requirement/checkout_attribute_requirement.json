@@ -1,0 +1,77 @@
+{
+ "creation": "2021-03-05 02:04:43.685520",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "requirement_type",
+  "amount_to_be_spent",
+  "min_amount",
+  "max_amount",
+  "assign_items",
+  "column_break_4",
+  "assign_products_html",
+  "items_list"
+ ],
+ "fields": [
+  {
+   "fieldname": "requirement_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Requirement Type",
+   "options": "Spend x amount\nSpecific price range\nLimit to role\nSpecific Shipping Method\nSpecific Payment Method",
+   "reqd": 1,
+   "set_only_once": 1
+  },
+  {
+   "depends_on": "eval:doc.discount_requirement==\"Spend x amount\"",
+   "fieldname": "amount_to_be_spent",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Amount to be spent",
+   "precision": "2"
+  },
+  {
+   "fieldname": "min_amount",
+   "fieldtype": "Currency",
+   "label": "Min amount"
+  },
+  {
+   "fieldname": "max_amount",
+   "fieldtype": "Currency",
+   "label": "Max amount"
+  },
+  {
+   "depends_on": "eval:doc.discount_requirement!=\"Spend x amount\"",
+   "fieldname": "assign_items",
+   "fieldtype": "Button",
+   "label": "Assign Items"
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "assign_products_html",
+   "fieldtype": "HTML",
+   "label": "Assign Products Html"
+  },
+  {
+   "depends_on": "eval:doc.discount_requirement!=\"Spend x amount\"",
+   "fieldname": "items_list",
+   "fieldtype": "Code",
+   "hidden": 1,
+   "label": "Items List"
+  }
+ ],
+ "istable": 1,
+ "modified": "2021-03-05 02:04:43.685520",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Checkout Attribute Requirement",
+ "owner": "Administrator",
+ "permissions": [],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

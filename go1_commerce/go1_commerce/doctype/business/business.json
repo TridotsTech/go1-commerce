@@ -1,0 +1,324 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2019-02-20 19:03:42.492242",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "personal_details_tab",
+  "first_name",
+  "phone",
+  "email",
+  "column_break_xyow",
+  "last_name",
+  "alternate_mobile_number",
+  "address_section",
+  "address_map",
+  "address",
+  "latitude",
+  "longitude",
+  "column_break_vvzp",
+  "country",
+  "state",
+  "city",
+  "zipcode",
+  "password_section",
+  "set_new_password",
+  "new_password",
+  "naming_series",
+  "business_details_tab",
+  "business_name",
+  "business_address",
+  "business_landmark",
+  "column_break_8lut",
+  "business_email",
+  "business_country",
+  "business_state",
+  "business_city",
+  "business_zip_code",
+  "business_latitude",
+  "business_longitude",
+  "search_engine_optimisation_seo_tab",
+  "meta_title",
+  "column_break_q4et",
+  "meta_description",
+  "column_break_1nfo",
+  "meta_keywords",
+  "route"
+ ],
+ "fields": [
+  {
+   "fieldname": "latitude",
+   "fieldtype": "Data",
+   "label": "Latitude"
+  },
+  {
+   "fieldname": "longitude",
+   "fieldtype": "Data",
+   "label": "Longitude"
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Naming Series",
+   "options": "BS-"
+  },
+  {
+   "fieldname": "route",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Route"
+  },
+  {
+   "fieldname": "meta_title",
+   "fieldtype": "Data",
+   "label": "Meta Title"
+  },
+  {
+   "fieldname": "personal_details_tab",
+   "fieldtype": "Tab Break",
+   "label": "Personal Details"
+  },
+  {
+   "fieldname": "first_name",
+   "fieldtype": "Data",
+   "label": "First Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "phone",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Mobile Number",
+   "options": "Phone",
+   "reqd": 1
+  },
+  {
+   "fieldname": "email",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "E-Mail",
+   "options": "Email",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_xyow",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "last_name",
+   "fieldtype": "Data",
+   "label": "Last Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "alternate_mobile_number",
+   "fieldtype": "Data",
+   "label": "Alternate Mobile Number",
+   "options": "Phone"
+  },
+  {
+   "fieldname": "address_section",
+   "fieldtype": "Section Break",
+   "label": "Address"
+  },
+  {
+   "fieldname": "address_map",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Address Map"
+  },
+  {
+   "fieldname": "address",
+   "fieldtype": "Small Text",
+   "label": "Address",
+   "reqd": 1
+  },
+  {
+   "fieldname": "state",
+   "fieldtype": "Link",
+   "label": "State",
+   "options": "State",
+   "reqd": 1
+  },
+  {
+   "fieldname": "zipcode",
+   "fieldtype": "Data",
+   "label": "Zipcode",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_vvzp",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "city",
+   "fieldtype": "Link",
+   "label": "City",
+   "options": "City",
+   "reqd": 1
+  },
+  {
+   "fieldname": "country",
+   "fieldtype": "Link",
+   "label": "Country",
+   "options": "Country",
+   "reqd": 1
+  },
+  {
+   "fieldname": "password_section",
+   "fieldtype": "Section Break",
+   "label": "Password"
+  },
+  {
+   "fieldname": "set_new_password",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Set New Password"
+  },
+  {
+   "fieldname": "new_password",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "New Password"
+  },
+  {
+   "fieldname": "business_details_tab",
+   "fieldtype": "Tab Break",
+   "label": "Business Details"
+  },
+  {
+   "fieldname": "business_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Business Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "business_address",
+   "fieldtype": "Small Text",
+   "label": "Business Address",
+   "reqd": 1
+  },
+  {
+   "fieldname": "business_landmark",
+   "fieldtype": "Data",
+   "label": "Landmark"
+  },
+  {
+   "fieldname": "column_break_8lut",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "business_country",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Country",
+   "options": "Country",
+   "reqd": 1
+  },
+  {
+   "fieldname": "business_state",
+   "fieldtype": "Link",
+   "label": "State",
+   "options": "State",
+   "reqd": 1
+  },
+  {
+   "fieldname": "business_city",
+   "fieldtype": "Link",
+   "label": "City",
+   "options": "City",
+   "reqd": 1
+  },
+  {
+   "fieldname": "business_zip_code",
+   "fieldtype": "Data",
+   "label": "Zip Code",
+   "reqd": 1
+  },
+  {
+   "fieldname": "business_latitude",
+   "fieldtype": "Data",
+   "label": "Latitude"
+  },
+  {
+   "fieldname": "business_longitude",
+   "fieldtype": "Data",
+   "label": "Longitude"
+  },
+  {
+   "fieldname": "search_engine_optimisation_seo_tab",
+   "fieldtype": "Tab Break",
+   "label": "Search Engine Optimisation (SEO)"
+  },
+  {
+   "fieldname": "column_break_q4et",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "meta_description",
+   "fieldtype": "Small Text",
+   "label": "Meta Description"
+  },
+  {
+   "fieldname": "column_break_1nfo",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "meta_keywords",
+   "fieldtype": "Small Text",
+   "label": "Meta Keywords"
+  },
+  {
+   "fieldname": "business_email",
+   "fieldtype": "Data",
+   "label": "E-mail",
+   "options": "Email",
+   "reqd": 1
+  }
+ ],
+ "has_web_view": 1,
+ "icon": "fa fa-store",
+ "links": [],
+ "modified": "2024-04-13 13:36:15.510373",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Business",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "permlevel": 1,
+   "read": 1,
+   "role": "System Manager",
+   "write": 1
+  },
+  {
+   "export": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Vendor"
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

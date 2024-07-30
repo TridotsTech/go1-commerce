@@ -1,0 +1,100 @@
+{
+ "creation": "2019-02-21 16:28:33.818394",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "order",
+  "order_required_date",
+  "delivery_status",
+  "column_break_4",
+  "order_created_on",
+  "order_required_time",
+  "posted_date",
+  "drivers",
+  "driver_assigned"
+ ],
+ "fields": [
+  {
+   "fieldname": "order",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Order",
+   "options": "Order",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "order.order_date",
+   "fieldname": "order_required_date",
+   "fieldtype": "Date",
+   "label": "Order Required Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "delivery_status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Delivery Status",
+   "options": "Pending\nDriver Assigned\nDelivered\nCancelled"
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "order.creation",
+   "fieldname": "order_created_on",
+   "fieldtype": "Datetime",
+   "label": "Order Created On",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "order.order_time",
+   "fieldname": "order_required_time",
+   "fieldtype": "Data",
+   "label": "Order Required Time",
+   "read_only": 1
+  },
+  {
+   "default": "Today",
+   "fieldname": "posted_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Posted Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "drivers",
+   "fieldtype": "Section Break",
+   "label": "Drivers"
+  },
+  {
+   "fieldname": "driver_assigned",
+   "fieldtype": "Table",
+   "label": "Driver Assigned",
+   "options": "Driver Assigned"
+  }
+ ],
+ "modified": "2020-01-29 19:41:31.133309",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Delivery",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

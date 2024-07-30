@@ -1,0 +1,51 @@
+{
+ "creation": "2018-11-01 12:37:46.291192",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "order_id",
+  "order_total",
+  "customer",
+  "date_range"
+ ],
+ "fields": [
+  {
+   "fieldname": "order_id",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Order Id",
+   "options": "Order"
+  },
+  {
+   "fetch_from": "order_id.total_amount",
+   "fieldname": "order_total",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Order Total",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "order_id.customer",
+   "fieldname": "customer",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Customer"
+  },
+  {
+   "fieldname": "date_range",
+   "fieldtype": "Small Text",
+   "label": "Discount Date Range"
+  }
+ ],
+ "istable": 1,
+ "modified": "2021-01-21 23:12:55.304181",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Discount Usage History",
+ "owner": "Administrator",
+ "permissions": [],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

@@ -1,0 +1,332 @@
+{
+ "actions": [],
+ "creation": "2018-08-03 12:07:34.331181",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "item",
+  "item_name",
+  "varaint_txt",
+  "attribute",
+  "item_sku",
+  "weight",
+  "attribute_description",
+  "checkout_attributes",
+  "attribute_ids",
+  "quantity",
+  "price",
+  "old_price",
+  "special_instruction",
+  "is_free_item",
+  "is_gift_card",
+  "sender_name",
+  "sender_email",
+  "recipient_name",
+  "recipient_email",
+  "sender_message",
+  "item_image",
+  "column_break_2",
+  "amount",
+  "discount",
+  "discount_name",
+  "d_amount",
+  "pre_total",
+  "tax",
+  "shipping_charges",
+  "t_amount",
+  "shipping_status",
+  "shipped_date",
+  "tracking_number",
+  "tracking_link",
+  "delivery_status",
+  "delivery_date",
+  "return_created",
+  "is_scanned",
+  "base_price",
+  "discount_coupon"
+ ],
+ "fields": [
+  {
+   "allow_on_submit": 1,
+   "columns": 2,
+   "fieldname": "item",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Item",
+   "options": "Product"
+  },
+  {
+   "allow_on_submit": 1,
+   "columns": 2,
+   "fetch_from": "item.item",
+   "fieldname": "item_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Item Name"
+  },
+  {
+   "allow_on_submit": 1,
+   "depends_on": "eval:doc.order_item_type==\"Product\"",
+   "fieldname": "item_sku",
+   "fieldtype": "Data",
+   "label": "Item Sku"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "attribute_description",
+   "fieldtype": "Text Editor",
+   "label": "Attribute Description"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "attribute_ids",
+   "fieldtype": "Small Text",
+   "hidden": 1,
+   "label": "Attribute Ids"
+  },
+  {
+   "allow_on_submit": 1,
+   "columns": 1,
+   "fieldname": "quantity",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Qty",
+   "reqd": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "columns": 2,
+   "fieldname": "price",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Price",
+   "reqd": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "special_instruction",
+   "fieldtype": "Small Text",
+   "label": "Special Instruction"
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "0",
+   "fieldname": "is_free_item",
+   "fieldtype": "Check",
+   "label": "Is Free Item"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "item_image",
+   "fieldtype": "Attach",
+   "label": "Item Image"
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "columns": 1,
+   "fieldname": "amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Amount"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "discount",
+   "fieldtype": "Link",
+   "label": "Discount",
+   "options": "Discounts"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "discount_name",
+   "fieldtype": "Data",
+   "label": "Discount Name"
+  },
+  {
+   "allow_on_submit": 1,
+   "columns": 1,
+   "fieldname": "d_amount",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Discount Amount"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "pre_total",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Pre Total"
+  },
+  {
+   "allow_on_submit": 1,
+   "columns": 1,
+   "fieldname": "tax",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Tax Amount"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "shipping_charges",
+   "fieldtype": "Currency",
+   "label": "Shipping Charges"
+  },
+  {
+   "allow_on_submit": 1,
+   "columns": 1,
+   "fieldname": "t_amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Total Amount"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "shipping_status",
+   "fieldtype": "Select",
+   "label": "Shipping Status",
+   "options": "Pending\nPacked\nShipped\nDelivered\nIn Process\nReady to Ship\nApproved"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "shipped_date",
+   "fieldtype": "Data",
+   "label": "Shipped Date"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "tracking_number",
+   "fieldtype": "Data",
+   "label": "Tracking Number"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "tracking_link",
+   "fieldtype": "Data",
+   "label": "Tracking Link"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "delivery_status",
+   "fieldtype": "Data",
+   "label": "Delivery Status",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "delivery_date",
+   "fieldtype": "Date",
+   "label": "Delivery Date",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "0",
+   "fieldname": "return_created",
+   "fieldtype": "Check",
+   "label": "Return Created",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "0",
+   "fieldname": "is_scanned",
+   "fieldtype": "Check",
+   "label": "Is Scanned"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "checkout_attributes",
+   "fieldtype": "Text Editor",
+   "label": "Checkout Attributes"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "weight",
+   "fieldtype": "Data",
+   "label": "Weight"
+  },
+  {
+   "fieldname": "base_price",
+   "fieldtype": "Currency",
+   "label": "Base Price"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_gift_card",
+   "fieldtype": "Check",
+   "label": " Is Gift Card"
+  },
+  {
+   "depends_on": "eval:doc.is_gift_card==1",
+   "fieldname": "sender_name",
+   "fieldtype": "Data",
+   "label": "Sender Name"
+  },
+  {
+   "depends_on": "eval:doc.is_gift_card==1",
+   "fieldname": "sender_email",
+   "fieldtype": "Data",
+   "label": "Sender Email"
+  },
+  {
+   "depends_on": "eval:doc.is_gift_card==1",
+   "fieldname": "recipient_name",
+   "fieldtype": "Data",
+   "label": "Recipient Name"
+  },
+  {
+   "depends_on": "eval:doc.is_gift_card==1",
+   "fieldname": "recipient_email",
+   "fieldtype": "Data",
+   "label": "Recipient Email"
+  },
+  {
+   "fieldname": "sender_message",
+   "fieldtype": "Small Text",
+   "label": "Sender Message",
+   "mandatory_depends_on": "eval:doc.is_gift_card==1"
+  },
+  {
+   "fieldname": "discount_coupon",
+   "fieldtype": "Data",
+   "label": "Discount Coupon"
+  },
+  {
+   "fieldname": "attribute",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "in_list_view": 1,
+   "label": "Variant"
+  },
+  {
+   "fieldname": "old_price",
+   "fieldtype": "Currency",
+   "label": "Old Price"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "varaint_txt",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Variants"
+  }
+ ],
+ "istable": 1,
+ "links": [],
+ "modified": "2024-01-27 14:01:00.563343",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Order Item",
+ "owner": "Administrator",
+ "permissions": [],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

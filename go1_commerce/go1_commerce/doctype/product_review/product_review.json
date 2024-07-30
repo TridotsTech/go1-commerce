@@ -1,0 +1,184 @@
+{
+ "actions": [],
+ "autoname": "naming_series:",
+ "creation": "2019-04-01 14:06:17.113310",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "product",
+  "product_name",
+  "business",
+  "contact_email",
+  "column_break_2",
+  "customer",
+  "email",
+  "section_break_5",
+  "review_title",
+  "column_break_7",
+  "review_message",
+  "column_break_9",
+  "rating",
+  "section_break_11",
+  "is_approved",
+  "review_image",
+  "img_html",
+  "review_images",
+  "naming_series"
+ ],
+ "fields": [
+  {
+   "description": "The product for which the review is given",
+   "fieldname": "product",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Product",
+   "options": "Product",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "product.item",
+   "fieldname": "product_name",
+   "fieldtype": "Data",
+   "label": "Product Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "business",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Business",
+   "options": "Business"
+  },
+  {
+   "fieldname": "contact_email",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Contact Email",
+   "options": "Email"
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "Name of the customer who gave the review",
+   "fieldname": "customer",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Name",
+   "reqd": 1
+  },
+  {
+   "description": "Email-Id of the customer",
+   "fieldname": "email",
+   "fieldtype": "Data",
+   "label": "Email",
+   "options": "Email"
+  },
+  {
+   "fieldname": "section_break_5",
+   "fieldtype": "Section Break"
+  },
+  {
+   "description": "Review title which was given by the customer",
+   "fieldname": "review_title",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Review Title",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_7",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "Customer opinion about the product",
+   "fieldname": "review_message",
+   "fieldtype": "Small Text",
+   "label": "Review Message"
+  },
+  {
+   "fieldname": "column_break_9",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "Number of stars given for this product (out of 5)",
+   "fieldname": "rating",
+   "fieldtype": "Rating",
+   "in_list_view": 1,
+   "label": "Rating",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_11",
+   "fieldtype": "Section Break"
+  },
+  {
+   "default": "0",
+   "description": "Only the approved reviews will be displayed on the product detail page",
+   "fieldname": "is_approved",
+   "fieldtype": "Check",
+   "label": "Is Approved"
+  },
+  {
+   "description": "Images added by the customer",
+   "fieldname": "review_image",
+   "fieldtype": "Section Break",
+   "label": "Review Image"
+  },
+  {
+   "fieldname": "img_html",
+   "fieldtype": "HTML"
+  },
+  {
+   "fieldname": "review_images",
+   "fieldtype": "Table",
+   "hidden": 1,
+   "label": "Review Images",
+   "options": "Review Image"
+  },
+  {
+   "default": "RVW-",
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Naming Series",
+   "options": "RVW-"
+  }
+ ],
+ "links": [],
+ "modified": "2023-11-01 16:52:37.903124",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Product Review",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "export": 1,
+   "read": 1,
+   "role": "Vendor",
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

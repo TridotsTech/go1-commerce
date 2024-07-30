@@ -1,0 +1,17 @@
+		
+[
+		{"doctype": "Order Status", "shipping_status":"Pending", "display_order": 0},
+		{"doctype": "Order Status", "shipping_status":"Cancelled", "display_order": 0},
+		{"doctype": "Order Status", "shipping_status":"Placed", "display_order": 0},
+		{"doctype": "Order Status", "shipping_status":"Partially Packed", "display_order": 1},
+		{"doctype": "Order Status", "shipping_status":"Packed", "display_order": 2},
+		{"doctype": "Order Status", "shipping_status":"Partially Shipped", "display_order": 3},
+		{"doctype": "Order Status", "shipping_status":"Shipped", "display_order": 4},
+		{"doctype": "Order Status", "shipping_status":"Picked Up", "display_order": 6},
+		{"doctype": "Order Status", "shipping_status":"Delivered", "display_order": 7},
+		{"doctype": "Order Status", "shipping_status":"Completed", "display_order": 8},
+		{"doctype": "Order Status", "shipping_status":"Parially Paid", "display_order": 9},
+		{"doctype": "Order Status", "shipping_status":"Confirmed", "display_order": 9},
+		{"doctype": "Order Status", "shipping_status":"Dispatched", "display_order": 9},
+		{"doctype": "Order Status","shipping_status": "Ready","display_order": 1}
+	]

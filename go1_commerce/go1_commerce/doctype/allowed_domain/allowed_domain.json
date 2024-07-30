@@ -1,0 +1,28 @@
+{
+ "creation": "2021-08-16 14:12:38.067919",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "domain"
+ ],
+ "fields": [
+  {
+   "fieldname": "domain",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Domain",
+   "reqd": 1
+  }
+ ],
+ "istable": 1,
+ "modified": "2021-08-16 17:04:42.969140",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Allowed Domain",
+ "owner": "Administrator",
+ "permissions": [],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

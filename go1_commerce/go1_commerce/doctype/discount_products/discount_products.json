@@ -1,0 +1,70 @@
+{
+ "creation": "2018-11-01 12:19:35.503977",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "items",
+  "column_break_5",
+  "item_name",
+  "parent_requirement",
+  "section_break_5",
+  "product_attribute_html",
+  "product_attribute_json"
+ ],
+ "fields": [
+  {
+   "fieldname": "items",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Product",
+   "options": "Product",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "items.item",
+   "fieldname": "item_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Product Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "parent_requirement",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Parent Requirement"
+  },
+  {
+   "fieldname": "product_attribute_html",
+   "fieldtype": "HTML",
+   "label": "Product Attribute"
+  },
+  {
+   "default": "[]",
+   "fieldname": "product_attribute_json",
+   "fieldtype": "Code",
+   "hidden": 1,
+   "label": "Product Attribute"
+  },
+  {
+   "fieldname": "column_break_5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_5",
+   "fieldtype": "Section Break"
+  }
+ ],
+ "istable": 1,
+ "modified": "2021-07-13 15:19:07.679113",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Discount Products",
+ "owner": "Administrator",
+ "permissions": [],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

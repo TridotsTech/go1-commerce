@@ -1,0 +1,71 @@
+{
+ "actions": [],
+ "creation": "2019-04-08 21:42:55.216998",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "attribute",
+  "specification_attribute",
+  "spec_group_name1",
+  "spec_group_name",
+  "options",
+  "childname"
+ ],
+ "fields": [
+  {
+   "fieldname": "attribute",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Specification Attribute Id",
+   "options": "Specification Attribute",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "attribute.attribute_name",
+   "fieldname": "specification_attribute",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Specification Attribute",
+   "reqd": 1
+  },
+  {
+   "fieldname": "options",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "label": "Options"
+  },
+  {
+   "fetch_from": "spec_group_name1.specification_group_name",
+   "fieldname": "spec_group_name",
+   "fieldtype": "Data",
+   "label": "Specification Group"
+  },
+  {
+   "fieldname": "spec_group_name1",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Specification Group Name",
+   "options": "Specification Group"
+  },
+  {
+   "fieldname": "childname",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Childname"
+  }
+ ],
+ "istable": 1,
+ "links": [],
+ "modified": "2024-02-20 16:33:35.140376",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Product Specification Attribute Mapping",
+ "owner": "Administrator",
+ "permissions": [],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

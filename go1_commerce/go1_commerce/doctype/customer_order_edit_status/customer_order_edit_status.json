@@ -1,0 +1,28 @@
+{
+ "creation": "2020-06-26 07:46:43.110851",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "status"
+ ],
+ "fields": [
+  {
+   "fieldname": "status",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Status",
+   "options": "Order Status"
+  }
+ ],
+ "istable": 1,
+ "modified": "2020-06-26 07:53:25.401426",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Customer Order Edit Status",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

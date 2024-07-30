@@ -1,0 +1,7 @@
+[
+	{"doctype":"Specification Attribute", "attribute_name":"Color", "display_order":0},
+	{"doctype":"Specification Attribute", "attribute_name":"Quantity", "display_order":1},
+	{"doctype":"Specification Attribute", "attribute_name":"Size", "display_order":2},
+	{"doctype":"Specification Attribute", "attribute_name":"Weight", "display_order":3},
+	{"doctype":"Specification Attribute", "attribute_name":"Dimensions", "display_order":4}
+]

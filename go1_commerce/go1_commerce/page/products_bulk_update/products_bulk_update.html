@@ -1,0 +1,340 @@
+<!-- <link rel="stylesheet" type="text/css" href="/assets/dashboard/js/frappe-datatable/frappe-datatable.min.css"> -->
+<link href="assets/go1_commerce/plugins/datatable/datatable.min.css" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="assets/go1_commerce/js/uppy.min.css">
+<link href="/assets/go1_commerce/css/lightgallery.css" rel="stylesheet">
+<div class="maindiv">
+	<div class="row">
+		<div class="col-md-12">
+			<!-- <a class="btn btn-primary update-btn" onclick="updatemenuitems()">Update</a> -->
+			<div id="listing" ></div>
+      <!-- <div class="list-paging-area"> -->
+    <!-- <div class="row">
+      <div class="col-xs-6">
+        <div class="btn-group btn-group-paging">
+          <button type="button" class="btn btn-default btn-sm btn-info" data-value="20">20</button>
+          <button type="button" class="btn btn-default btn-sm" data-value="100">100</button>
+          <button type="button" class="btn btn-default btn-sm" data-value="500">500</button>
+        </div>
+      </div>
+    </div> -->
+    <div class="list-paging-area level">
+        <div class="level-left">
+          <div class="btn-group">
+            <button type="button" class="btn btn-default btn-sm btn-paging btn-info" data-value="20">20</button>
+            <button type="button" class="btn btn-default btn-sm btn-paging" data-value="100">100</button>
+            <button type="button" class="btn btn-default btn-sm btn-paging" data-value="500">500</button>
+          </div>
+        </div>
+        <div class="level-right">
+          <button class="btn btn-default btn-more btn-sm">
+            More...
+          </button>
+        </div>
+      </div>
+  <!-- </div> -->
+      <!-- <a class="btn btn-primary load-btn" onclick="loadMoreRows()">Load More</a> -->
+		</div>
+	</div>
+</div>
+<div id="myModal" class="modal modal1">
+  <span class="close" onclick="closePopup()">&times;</span>
+  <img class="modal-content modal-content1" id="img01">
+  <div id="caption"></div>
+</div>
+
+<style type="text/css">
+/*.datatable-instance-1 .data-table-cell .edit-cell{
+	height: 0px !important;
+}*/
+.col-md-4.popup {
+    margin-right: 10px;
+}
+td[data-col-index="4"] input{
+  width: 48px !important;
+}
+/*tr[data-indent="0"] td[data-col-index="1"]{
+  background: #9cc7ff !important;
+}
+tr[data-indent="1"] td[data-col-index="1"]{
+  background: #ff9eb7 !important;
+}*/
+.popup{
+  width: 26.333333% !important;
+}
+/*.data-table input{
+  border-color: transparent;
+}*/
+.data-table-cell.editing .edit-cell{
+  border: 0px !important;
+}
+.data-table-cell.editing .edit-cell {
+    border: 2px solid transparent !important;
+    border-style: inherit !important;
+    }
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+.dt-row {
+    height: 40px;
+}
+.dt-cell__edit {
+    border: transparent !important;
+  }
+  .dt-cell__edit input {
+    border: 0px !important;
+}
+/*.data-table table tr[data-indent="1"]{
+	background: #ddd;
+}*/
+.slider.round {
+    border-radius: 28px !important;
+}
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+.slider.round:before {
+    border-radius: 50%;
+}
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 45px;
+    height: 28px;
+}
+input.popupCheckBox:checked + .slider:before {
+    -webkit-transform: translateX(20px);
+    -ms-transform: translateX(20px);
+    transform: translateX(20px);
+}
+input.popupCheckBox:checked + .slider {
+    background-color: #2196F3;
+}
+input[type="number"] {
+    width: 62px;
+}
+.dt-cell--focus .dt-cell__content {
+    border-color: transparent !important;
+    }
+ .tree-node .toggle{
+ 	left: -5px !important;
+    font-size: 13px;
+    padding-top: 1px;
+ }
+.dt-scrollable {
+    height: 28vw !important;
+    }
+    .dt-row-header .dt-cell--header{
+    	background: rgb(247, 247, 247);
+    }
+.dt-row:last-child:not(.dt-row-filter)
+{
+	border-bottom:none !important;
+}
+.dt-row-filter{
+	display: flex !important;
+} 
+	.table thead tr{
+		background: #e2e2e2;
+	}
+	.table thead tr th{
+		border-bottom: 0;
+		text-transform: capitalize;
+	}
+	#listing .row{
+		margin-left: 0;
+		margin-right: 0;
+	}
+	.dt-cell__content{
+		padding: 7px !important;
+	}
+	.dt-row:last-child:not(.dt-row-filter) .dt-cell__content{
+		height: 35px;
+		padding: 6px !important;
+		border-bottom: 1px solid #d1d8dd;
+	}
+	.datatable-instance-1 .data-table-cell .content{
+		height: 100%;
+	}
+	.data-table table{
+		height: 220px !important;
+	}
+	.body-scrollable {
+	    max-height: 400px !important;
+	}
+	.dt-row-header .dt-cell__content {
+		text-transform: capitalize;
+	}
+	.dt-row-header{
+		border-bottom: 0 !important;
+	}
+	.dt-cell__content .btn-primary{
+		border: none;
+	    padding: 5px 15px;
+	    margin-top: -4px;
+	    font-size: 12px;
+	}
+	.update-btn {
+    float: right;
+    margin-bottom: 15px;
+    margin-right: 15px;
+    position: absolute;
+    right: 10px;
+    top: -45px;
+    z-index: 99999;
+}
+#listing
+{
+
+    float: left;
+    width: calc(100% - 1px);
+    /*margin-left: 15px;*/
+    /*margin-right: 15px;*/
+
+}
+.update-btn
+{
+	float: right;
+	 margin-bottom: 15px;
+    margin-right: 15px;
+}
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    margin: 0; 
+}
+
+#myImg {
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+#myImg:hover {opacity: 0.7;}
+
+/* The Modal (background) */
+.modal1 {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  padding-top: 150px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.9); /* Black w/ opacity */
+}
+
+/* Modal Content (image) */
+.modal-content1 {
+  margin: auto;
+  display: block;
+  /*width: 80%;*/
+  /*max-width: 700px;*/
+}
+
+/* Caption of Modal Image */
+#caption {
+  margin: auto;
+  display: block;
+  width: 80%;
+  max-width: 700px;
+  text-align: center;
+  color: #ccc;
+  padding: 10px 0;
+  height: 150px;
+}
+
+/* Add Animation */
+.modal-content1, #caption {  
+  -webkit-animation-name: zoom;
+  -webkit-animation-duration: 0.6s;
+  animation-name: zoom;
+  animation-duration: 0.6s;
+}
+
+@-webkit-keyframes zoom {
+  from {-webkit-transform:scale(0)} 
+  to {-webkit-transform:scale(1)}
+}
+
+@keyframes zoom {
+  from {transform:scale(0)} 
+  to {transform:scale(1)}
+}
+
+/* The Close Button */
+.close {
+  /*position: absolute;*/
+  top: 15px;
+  right: 35px;
+  color: #fff;
+  font-size: 40px;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.close:hover,
+.close:focus {
+  color: #bbb;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* 100% Image Width on Smaller Screens */
+@media only screen and (max-width: 700px){
+  .modal-content1 {
+    width: 100%;
+  }
+}
+</style>
+
+<script>
+// Get the modal
+var modal = document.getElementById("myModal");
+
+// Get the image and insert it inside the modal - use its "alt" text as a caption
+var img = document.getElementById("myImg");
+var modalImg = document.getElementById("img01");
+function showPopup(e){
+	modal.style.display = "block";
+  modalImg.src = this.src;
+}
+// img.onclick = function(){
+//   modal.style.display = "block";
+//   modalImg.src = this.src;
+//   captionText.innerHTML = this.alt;
+// }
+
+// Get the <span> element that closes the modal
+var span = document.getElementsByClassName("close")[0];
+
+// When the user clicks on <span> (x), close the modal
+span.onclick = function() { 
+  modal.style.display = "none";
+}
+</script>

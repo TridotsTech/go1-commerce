@@ -1,0 +1,92 @@
+{
+ "actions": [],
+ "autoname": "ATR.#####",
+ "creation": "2019-03-13 21:03:22.078047",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "attribute_name",
+  "column_break_2",
+  "allow_filtering",
+  "unique_name",
+  "column_break_4",
+  "search_filter_ui_type"
+ ],
+ "fields": [
+  {
+   "description": "Name of the attribute",
+   "fieldname": "attribute_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Attribute Name",
+   "reqd": 1
+  },
+  {
+   "description": "A unique name is given for this attribute. This value will be used for filtering products based on attribute values",
+   "fieldname": "unique_name",
+   "fieldtype": "Data",
+   "label": "Unique Name"
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "1",
+   "fieldname": "allow_filtering",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Allow Filtering"
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Checkboxes",
+   "fieldname": "search_filter_ui_type",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Search Filter UI Type",
+   "options": "Checkboxes\nRadio Buttons"
+  }
+ ],
+ "links": [],
+ "modified": "2024-01-27 13:57:15.990313",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Product Attribute",
+ "naming_rule": "Expression (old style)",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "export": 1,
+   "read": 1,
+   "role": "Vendor",
+   "write": 1
+  }
+ ],
+ "quick_entry": 1,
+ "search_fields": "attribute_name",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "attribute_name",
+ "track_changes": 1
+}

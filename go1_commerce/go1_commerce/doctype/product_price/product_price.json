@@ -1,0 +1,270 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "naming_series:naming_series",
+ "creation": "2024-02-17 17:38:24.659803",
+ "default_view": "List",
+ "description": "Multiple product prices.",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "product",
+  "attribute_id",
+  "business",
+  "column_break_2",
+  "product_name",
+  "attribute_description",
+  "attribute_html",
+  "vendor_name",
+  "price_list_section",
+  "price_list",
+  "customer",
+  "column_break_7",
+  "buying",
+  "selling",
+  "section_break_9",
+  "price_model",
+  "packing_unit",
+  "currency",
+  "column_break_14",
+  "old_price",
+  "uom",
+  "column_break_16",
+  "price",
+  "sec1",
+  "package_pricing",
+  "section_break_22",
+  "pricing",
+  "section_break_19",
+  "graduated_pricing",
+  "section_break_10",
+  "valid_from",
+  "column_break_12",
+  "valid_upto",
+  "naming_series"
+ ],
+ "fields": [
+  {
+   "fieldname": "product",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Product",
+   "options": "Product",
+   "reqd": 1
+  },
+  {
+   "fieldname": "attribute_id",
+   "fieldtype": "Select",
+   "label": "Attribute ID"
+  },
+  {
+   "fieldname": "business",
+   "fieldtype": "Link",
+   "label": "Seller",
+   "options": "Business"
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "product.item",
+   "fieldname": "product_name",
+   "fieldtype": "Data",
+   "label": "Product Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "attribute_description",
+   "fieldtype": "Code",
+   "hidden": 1,
+   "label": "Attribute Description",
+   "read_only": 1
+  },
+  {
+   "fieldname": "attribute_html",
+   "fieldtype": "HTML",
+   "label": "Attribute Html"
+  },
+  {
+   "fieldname": "vendor_name",
+   "fieldtype": "Data",
+   "label": "Seller Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "price_list_section",
+   "fieldtype": "Section Break",
+   "label": "Price List"
+  },
+  {
+   "fieldname": "price_list",
+   "fieldtype": "Link",
+   "label": "Price List",
+   "options": "Price List",
+   "reqd": 1
+  },
+  {
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Customer",
+   "options": "Customers"
+  },
+  {
+   "fieldname": "column_break_7",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fetch_from": "price_list.buying",
+   "fieldname": "buying",
+   "fieldtype": "Check",
+   "label": "Buying"
+  },
+  {
+   "default": "0",
+   "fetch_from": "price_list.selling",
+   "fieldname": "selling",
+   "fieldtype": "Check",
+   "label": "Selling"
+  },
+  {
+   "fieldname": "section_break_9",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "price_model",
+   "fieldtype": "Select",
+   "label": "Price Model",
+   "options": "Standard Pricing\nPackage Pricing\nGraduated Pricing\nVolume Pricing"
+  },
+  {
+   "depends_on": "eval:((doc.price_model==\"Standard Pricing\"))",
+   "fieldname": "packing_unit",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "label": "Packing Unit"
+  },
+  {
+   "fieldname": "currency",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Currency",
+   "options": "Currency"
+  },
+  {
+   "fieldname": "column_break_14",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "old_price",
+   "fieldtype": "Currency",
+   "label": "MRP"
+  },
+  {
+   "fieldname": "uom",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "UOM",
+   "options": "UOM"
+  },
+  {
+   "fieldname": "column_break_16",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:((doc.price_model==\"Standard Pricing\"))",
+   "fieldname": "price",
+   "fieldtype": "Currency",
+   "label": "Price"
+  },
+  {
+   "depends_on": "eval:((doc.price_model==\"Package Pricing\"))",
+   "fieldname": "sec1",
+   "fieldtype": "Section Break",
+   "label": "Package Pricing"
+  },
+  {
+   "fieldname": "package_pricing",
+   "fieldtype": "Table",
+   "label": "Package Pricing",
+   "options": "Pricing Package Unit"
+  },
+  {
+   "depends_on": "eval:((doc.price_model==\"Volume Pricing\"))",
+   "fieldname": "section_break_22",
+   "fieldtype": "Section Break",
+   "label": "Volume Pricing"
+  },
+  {
+   "fieldname": "pricing",
+   "fieldtype": "Table",
+   "label": "Volume Pricing",
+   "options": "Product Price Detail"
+  },
+  {
+   "depends_on": "eval:((doc.price_model==\"Graduated Pricing\"))",
+   "fieldname": "section_break_19",
+   "fieldtype": "Section Break",
+   "label": "Graduated Pricing"
+  },
+  {
+   "fieldname": "graduated_pricing",
+   "fieldtype": "Table",
+   "label": "Graduated Pricing",
+   "options": "Product Graduated Pricing"
+  },
+  {
+   "fieldname": "section_break_10",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "valid_from",
+   "fieldtype": "Date",
+   "label": "Valid From"
+  },
+  {
+   "fieldname": "column_break_12",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "valid_upto",
+   "fieldtype": "Date",
+   "label": "Valid Upto"
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Naming Series",
+   "options": "PP."
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-02-17 17:38:24.659803",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Product Price",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

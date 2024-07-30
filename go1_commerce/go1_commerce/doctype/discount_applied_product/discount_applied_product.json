@@ -1,0 +1,100 @@
+{
+ "creation": "2021-06-28 19:49:20.858747",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "product",
+  "product_attribute_html",
+  "product_attribute_json",
+  "column_break_4",
+  "qty",
+  "product_attribute",
+  "product_attribute_id",
+  "attribute_id",
+  "discount_type",
+  "discount_amount",
+  "discount_percentage"
+ ],
+ "fields": [
+  {
+   "fieldname": "product",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Product",
+   "options": "Product"
+  },
+  {
+   "fieldname": "product_attribute",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Product Attribute"
+  },
+  {
+   "fieldname": "qty",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Qty"
+  },
+  {
+   "fieldname": "product_attribute_id",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Product Attribute Id"
+  },
+  {
+   "fieldname": "attribute_id",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Attribute Id"
+  },
+  {
+   "fieldname": "discount_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Discount",
+   "options": "\nDiscount Percentage\nDiscount Amount"
+  },
+  {
+   "depends_on": "eval:((doc.discount_type==\"Discount Amount\"))",
+   "fieldname": "discount_amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Discount Amount"
+  },
+  {
+   "depends_on": "eval:((doc.discount_type==\"Discount Percentage\"))",
+   "fieldname": "discount_percentage",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Discount Percentage"
+  },
+  {
+   "fieldname": "product_attribute_html",
+   "fieldtype": "HTML",
+   "label": "Product Attribute"
+  },
+  {
+   "default": "[]",
+   "fieldname": "product_attribute_json",
+   "fieldtype": "Code",
+   "hidden": 1,
+   "label": "Product Attribute"
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  }
+ ],
+ "istable": 1,
+ "modified": "2021-07-08 10:32:13.560025",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Discount Applied Product",
+ "owner": "Administrator",
+ "permissions": [],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

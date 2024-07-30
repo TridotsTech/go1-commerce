@@ -1,0 +1,46 @@
+{
+ "actions": [],
+ "creation": "2019-12-07 15:50:26.352848",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "search_keywords",
+  "search_route",
+  "childname"
+ ],
+ "fields": [
+  {
+   "fieldname": "search_keywords",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Search Kewords",
+   "options": "Search Keyword"
+  },
+  {
+   "fetch_from": "search_keywords.route",
+   "fieldname": "search_route",
+   "fieldtype": "Data",
+   "label": "Search Route"
+  },
+  {
+   "fieldname": "childname",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Childname"
+  }
+ ],
+ "istable": 1,
+ "links": [],
+ "modified": "2023-05-26 15:51:18.305276",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Product Search Keyword",
+ "owner": "Administrator",
+ "permissions": [],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

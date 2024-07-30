@@ -1,0 +1,1164 @@
+{
+ "actions": [],
+ "autoname": "Order Settings",
+ "creation": "2024-02-12 19:15:07.837096",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_1",
+  "submit_order",
+  "enable_checkout_as_guest",
+  "show_gift_card_box",
+  "enable_wallet",
+  "allow_customer_to_add_wallet",
+  "enable_scoket",
+  "send_notification_admin",
+  "column_break_2",
+  "allow_cancel_order",
+  "allow_customer_print_order",
+  "auto_customer_approval",
+  "allow_multiple_address",
+  "customer_business_kyc",
+  "customer_print_format",
+  "cancel_order_days",
+  "enable_tracking_order",
+  "column_break_6",
+  "default_print_format",
+  "default_vendor_order_print_format",
+  "invoice_section",
+  "enable_invoice",
+  "column_break_14",
+  "automate_invoice_creation",
+  "column_break_16",
+  "invoice_creation_status",
+  "section_break_2",
+  "is_re_order_allowed",
+  "customer_orders_display",
+  "column_break_7",
+  "terms_of_service",
+  "min_order_sub_total_amount",
+  "column_break_4",
+  "disable_order_completed_page",
+  "generate_barcode_for_order",
+  "generate_qrcode_for_order",
+  "notification",
+  "enable_driver_notification",
+  "clbr",
+  "enable_notification_for_admin_website",
+  "onesignal_notification_section",
+  "enable_onesignal_notification",
+  "return_request",
+  "enable_returns_system",
+  "all_eligible_products_return",
+  "return_amount_credited_to_wallet",
+  "collecting_the_bank_details",
+  "column_break_10",
+  "return_request_period",
+  "return_based_on",
+  "section_break_13",
+  "free_shipping_enabled",
+  "amount_to_be_ordered",
+  "column_break_28",
+  "shipment_by",
+  "column_break_33",
+  "enable_driver_for_shipment",
+  "section_break_17",
+  "enable_map",
+  "enable_zipcode",
+  "column_break_19",
+  "enable_map_in_checkout_screen",
+  "billing_address_map",
+  "restrict_delivery_distance",
+  "column_break_21",
+  "restrict_distance_by",
+  "column_break_23",
+  "max_delivery_distance",
+  "distance_unit",
+  "restrict_region_by",
+  "reward_points",
+  "enabled",
+  "exchange_reward_point",
+  "disable_points_inweb",
+  "column_break_60",
+  "loyalty_labeling",
+  "enable_referral",
+  "enable_eq_amount",
+  "disable_points",
+  "earning_reward_points",
+  "points_for_registration",
+  "points_for_product_review",
+  "point_for_purchases",
+  "account_settings",
+  "enable_gender",
+  "is_gender_required",
+  "is_lastname_required",
+  "enable_dob",
+  "dob_required",
+  "column_break_56",
+  "enable_state",
+  "is_state_required",
+  "enable_house_type",
+  "is_house_type_required",
+  "column_break_41",
+  "enable_country",
+  "is_country_required",
+  "column_break_44",
+  "enable_landmark",
+  "is_landmark_required",
+  "column_break_47",
+  "enable_door_no",
+  "is_door_no_required",
+  "column_break_63",
+  "enable_unit_number",
+  "is_unit_number_required",
+  "pincode_validation_section",
+  "pincode",
+  "column_break_83",
+  "min_pincode_length",
+  "max_pincode_length",
+  "sec_login",
+  "login_type",
+  "column_break_111",
+  "email_req",
+  "phone_req",
+  "phonem_emailo",
+  "emailm_phoneo",
+  "emailm_phonem",
+  "column_break_109",
+  "otp_required",
+  "login_with_password",
+  "max_retry",
+  "firebase_settings_section",
+  "apikey",
+  "authdomain",
+  "appid",
+  "column_break_120",
+  "databaseurl",
+  "projectid",
+  "storagebucket",
+  "column_break_124",
+  "messagingsenderid",
+  "measurementid",
+  "validations",
+  "enable_phone_validation",
+  "min_phone_length",
+  "max_phone_length",
+  "column_break_53",
+  "password_policy",
+  "min_password_length",
+  "order_edit_setting_section",
+  "impersonate_customer",
+  "allow_user_to_edit_order",
+  "customer_edit_order",
+  "allow_admin_to_edit_order",
+  "allow_admin_to_create_order",
+  "price_calculated_based_on_weight",
+  "admin_order_edit_status",
+  "admin_order_template",
+  "show_flow_chart",
+  "enable_refund_option",
+  "pre_order_setting_section",
+  "enable_preorder",
+  "column_break_125",
+  "pre_order_not_allow_cart",
+  "franchise_customer_settings_section",
+  "franchise_role",
+  "defaults_section",
+  "sales",
+  "selling_price_list",
+  "column_break_x0kt9",
+  "role_based_pricing",
+  "enable_price_list",
+  "otp_tab",
+  "otp_length",
+  "column_break_aaz0",
+  "otp_expiry"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_1",
+   "fieldtype": "Section Break",
+   "label": "General"
+  },
+  {
+   "default": "1",
+   "fieldname": "submit_order",
+   "fieldtype": "Check",
+   "label": "Submit Order When Placed"
+  },
+  {
+   "default": "0",
+   "description": "Enabling checkout as guest option",
+   "fieldname": "enable_checkout_as_guest",
+   "fieldtype": "Check",
+   "label": "Allow Anonymous User To Place Order?"
+  },
+  {
+   "default": "0",
+   "fieldname": "show_gift_card_box",
+   "fieldtype": "Check",
+   "label": "Show gift card box"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_wallet",
+   "fieldtype": "Check",
+   "label": "Enable Wallet"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_customer_to_add_wallet",
+   "fieldtype": "Check",
+   "label": "Allow Customer To Add Wallet"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_scoket",
+   "fieldtype": "Check",
+   "label": "Enable Socket For Order Updates"
+  },
+  {
+   "default": "0",
+   "fieldname": "send_notification_admin",
+   "fieldtype": "Check",
+   "label": "Send App Notification To Admin For Order"
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_cancel_order",
+   "fieldtype": "Check",
+   "label": "Allow Customer To Cancel Order?"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_customer_print_order",
+   "fieldtype": "Check",
+   "label": "Allow Customer To Print Order?"
+  },
+  {
+   "default": "0",
+   "fieldname": "auto_customer_approval",
+   "fieldtype": "Check",
+   "label": "Auto Customer Approved"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_multiple_address",
+   "fieldtype": "Check",
+   "label": "Allow Multiple Address"
+  },
+  {
+   "default": "0",
+   "fieldname": "customer_business_kyc",
+   "fieldtype": "Check",
+   "label": "Allow Get Business and KYC From Customer?"
+  },
+  {
+   "depends_on": "eval:doc.allow_customer_print_order == 1",
+   "fieldname": "customer_print_format",
+   "fieldtype": "Link",
+   "label": "Deafault Customer Order Print Format",
+   "options": "Print Format"
+  },
+  {
+   "depends_on": "eval:  doc.allow_cancel_order == 1 ",
+   "fieldname": "cancel_order_days",
+   "fieldtype": "Int",
+   "label": "No. of Days That Customer Can Cancel Order"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_tracking_order",
+   "fieldtype": "Check",
+   "label": "Enable Tracking Order"
+  },
+  {
+   "fieldname": "column_break_6",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "default_print_format",
+   "fieldtype": "Link",
+   "label": "Default Order Print Format",
+   "options": "Print Format"
+  },
+  {
+   "fieldname": "default_vendor_order_print_format",
+   "fieldtype": "Link",
+   "label": "Default Vendor Order Print Format",
+   "options": "Print Format"
+  },
+  {
+   "fieldname": "invoice_section",
+   "fieldtype": "Section Break",
+   "label": "Invoice"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_invoice",
+   "fieldtype": "Check",
+   "label": "Enable Invoice"
+  },
+  {
+   "fieldname": "column_break_14",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "1",
+   "depends_on": "eval:((doc.enable_invoice==1))",
+   "fieldname": "automate_invoice_creation",
+   "fieldtype": "Check",
+   "label": "Automate Invoice Creation"
+  },
+  {
+   "fieldname": "column_break_16",
+   "fieldtype": "Section Break"
+  },
+  {
+   "depends_on": "eval:((doc.enable_invoice==1 && doc.automate_invoice_creation==1))",
+   "fieldname": "invoice_creation_status",
+   "fieldtype": "Table",
+   "label": "Order Status to Create Invoice",
+   "options": "Auto Invoice Creation Status"
+  },
+  {
+   "fieldname": "section_break_2",
+   "fieldtype": "Section Break"
+  },
+  {
+   "default": "1",
+   "fieldname": "is_re_order_allowed",
+   "fieldtype": "Check",
+   "label": "Is Re Order Allowed"
+  },
+  {
+   "default": "10",
+   "fieldname": "customer_orders_display",
+   "fieldtype": "Int",
+   "label": "Number Of Displayed Orders Per Page"
+  },
+  {
+   "fieldname": "column_break_7",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "terms_of_service",
+   "fieldtype": "Check",
+   "label": "Terms Of Service"
+  },
+  {
+   "default": "0",
+   "fieldname": "min_order_sub_total_amount",
+   "fieldtype": "Float",
+   "label": "Min Order Sub Total Amount"
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "disable_order_completed_page",
+   "fieldtype": "Check",
+   "label": "Disable Order Completed Page"
+  },
+  {
+   "default": "0",
+   "fieldname": "generate_barcode_for_order",
+   "fieldtype": "Check",
+   "label": "Generate Barcode for Order"
+  },
+  {
+   "default": "0",
+   "fieldname": "generate_qrcode_for_order",
+   "fieldtype": "Check",
+   "label": "Generate QRcode for Order"
+  },
+  {
+   "fieldname": "notification",
+   "fieldtype": "Section Break",
+   "label": "Notification"
+  },
+  {
+   "default": "0",
+   "description": "Trigger app notification for drivers when order placed.",
+   "fieldname": "enable_driver_notification",
+   "fieldtype": "Check",
+   "label": "Enable Notification For Driver"
+  },
+  {
+   "fieldname": "clbr",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_notification_for_admin_website",
+   "fieldtype": "Check",
+   "label": "Enable Notification For Admin Website"
+  },
+  {
+   "fieldname": "onesignal_notification_section",
+   "fieldtype": "Section Break",
+   "label": "OneSignal Notification"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_onesignal_notification",
+   "fieldtype": "Check",
+   "label": "Enable Onesignal Notification"
+  },
+  {
+   "default": "1",
+   "description": "Enabling return of the items sold",
+   "fieldname": "return_request",
+   "fieldtype": "Section Break",
+   "label": "Return Request"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_returns_system",
+   "fieldtype": "Check",
+   "label": "Enable Returns System"
+  },
+  {
+   "default": "0",
+   "fieldname": "all_eligible_products_return",
+   "fieldtype": "Check",
+   "label": " All Products Eligible For Return?"
+  },
+  {
+   "default": "0",
+   "fieldname": "return_amount_credited_to_wallet",
+   "fieldtype": "Check",
+   "label": "Return Amount Credited To Wallet"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval: doc.enable_returns_system == 1",
+   "fieldname": "collecting_the_bank_details",
+   "fieldtype": "Check",
+   "label": "Collecting The Bank Details"
+  },
+  {
+   "fieldname": "column_break_10",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "14",
+   "fieldname": "return_request_period",
+   "fieldtype": "Int",
+   "label": "Number Of Days That The Return Request Is Available"
+  },
+  {
+   "fieldname": "return_based_on",
+   "fieldtype": "Select",
+   "label": "Return Based On",
+   "options": "Delivery Date\nOrder Date"
+  },
+  {
+   "fieldname": "section_break_13",
+   "fieldtype": "Section Break",
+   "label": "Shipping"
+  },
+  {
+   "default": "0",
+   "fieldname": "free_shipping_enabled",
+   "fieldtype": "Check",
+   "label": "Free Shipping Enabled"
+  },
+  {
+   "depends_on": "free_shipping_enabled",
+   "fieldname": "amount_to_be_ordered",
+   "fieldtype": "Data",
+   "label": "Amount To Be Ordered"
+  },
+  {
+   "fieldname": "column_break_28",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "shipment_by",
+   "fieldtype": "Select",
+   "label": "Shipment By",
+   "options": "Service Provider\nVendor"
+  },
+  {
+   "fieldname": "column_break_33",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_driver_for_shipment",
+   "fieldtype": "Check",
+   "label": "Enable Driver Allocation For Delivery?"
+  },
+  {
+   "fieldname": "section_break_17",
+   "fieldtype": "Section Break",
+   "label": "Checkout Settings"
+  },
+  {
+   "default": "0",
+   "description": "To make customer to pick their location & proceed further with their ordering process.",
+   "fieldname": "enable_map",
+   "fieldtype": "Check",
+   "label": "Enable Map Based Location"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_zipcode",
+   "fieldtype": "Check",
+   "label": "Enable Zipcode While Checkout"
+  },
+  {
+   "fieldname": "column_break_19",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_map_in_checkout_screen",
+   "fieldtype": "Check",
+   "label": "Enable Map In Checkout Screen"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:doc.enable_map_in_checkout_screen == 1",
+   "fieldname": "billing_address_map",
+   "fieldtype": "Check",
+   "label": "Enable Map For Billing Address"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:doc.enable_map==1",
+   "description": "If enabled, the delivery will be restricted to a certain distance.",
+   "fieldname": "restrict_delivery_distance",
+   "fieldtype": "Check",
+   "label": "Restrict Delivery Distance?"
+  },
+  {
+   "fieldname": "column_break_21",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.enable_map==1 && doc.restrict_delivery_distance == 1",
+   "fieldname": "restrict_distance_by",
+   "fieldtype": "Select",
+   "label": "Restrict Distance By?",
+   "options": "Distance\nRegion"
+  },
+  {
+   "fieldname": "column_break_23",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.restrict_delivery_distance==1 && doc.restrict_distance_by == 'Distance'",
+   "description": "Maximum distance upto which the delivery is enabled.<br>This is calculated based on the customer's address &amp; the business location.",
+   "fieldname": "max_delivery_distance",
+   "fieldtype": "Float",
+   "label": "Maximum Delivery Distance"
+  },
+  {
+   "depends_on": "eval:doc.restrict_delivery_distance==1 && doc.restrict_distance_by == 'Distance'",
+   "fieldname": "distance_unit",
+   "fieldtype": "Select",
+   "label": "Distance Unit",
+   "options": "Km\nMeter\nMile"
+  },
+  {
+   "depends_on": "eval:doc.restrict_delivery_distance==1 && doc.restrict_distance_by == 'Region'",
+   "fieldname": "restrict_region_by",
+   "fieldtype": "Select",
+   "label": "Restrict Region By",
+   "options": "\nCountry\nState\nCity"
+  },
+  {
+   "description": "Enabling Reward points system for the customer based on their activity.",
+   "fieldname": "reward_points",
+   "fieldtype": "Section Break",
+   "label": "Reward Points"
+  },
+  {
+   "default": "0",
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enabled"
+  },
+  {
+   "depends_on": "eval:doc.enabled==1",
+   "fieldname": "exchange_reward_point",
+   "fieldtype": "Int",
+   "label": "Exchange Reward Point"
+  },
+  {
+   "default": "0",
+   "fieldname": "disable_points_inweb",
+   "fieldtype": "Check",
+   "label": "Disable Reward Points in Website"
+  },
+  {
+   "fieldname": "column_break_60",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "Instead of \"Point\" we can give some other label. ex: \"Coin\"",
+   "fieldname": "loyalty_labeling",
+   "fieldtype": "Data",
+   "label": "Labeling"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_referral",
+   "fieldtype": "Check",
+   "label": "Enable Referral in website"
+  },
+  {
+   "default": "0",
+   "description": "Enable Equivalent Amount in website Dashboard",
+   "fieldname": "enable_eq_amount",
+   "fieldtype": "Check",
+   "label": "Enable Equivalent Amount"
+  },
+  {
+   "default": "0",
+   "fieldname": "disable_points",
+   "fieldtype": "Check",
+   "label": "Disable available Points in Website"
+  },
+  {
+   "depends_on": "eval:doc.enabled==1",
+   "description": "Reward points earning rules",
+   "fieldname": "earning_reward_points",
+   "fieldtype": "Section Break",
+   "label": "Earning Reward Points"
+  },
+  {
+   "depends_on": "eval:doc.enabled==1",
+   "fieldname": "points_for_registration",
+   "fieldtype": "Data",
+   "label": "Points for registration"
+  },
+  {
+   "depends_on": "eval:doc.enabled==1",
+   "fieldname": "points_for_product_review",
+   "fieldtype": "Data",
+   "label": "Points for Product Review"
+  },
+  {
+   "depends_on": "eval:doc.enabled==1",
+   "fieldname": "point_for_purchases",
+   "fieldtype": "Data",
+   "label": "Point for Purchases"
+  },
+  {
+   "fieldname": "account_settings",
+   "fieldtype": "Section Break",
+   "label": "Account Settings"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_gender",
+   "fieldtype": "Check",
+   "label": "Enable Gender?"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:doc.enable_gender == 1",
+   "fieldname": "is_gender_required",
+   "fieldtype": "Check",
+   "label": "Is Gender Required?"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_lastname_required",
+   "fieldtype": "Check",
+   "label": "Is Lastname Required?"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_dob",
+   "fieldtype": "Check",
+   "label": "Enable Date of Birth"
+  },
+  {
+   "default": "0",
+   "fieldname": "dob_required",
+   "fieldtype": "Check",
+   "label": "Is DOB Required?"
+  },
+  {
+   "fieldname": "column_break_56",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_state",
+   "fieldtype": "Check",
+   "label": "Enable State?"
+  },
+  {
+   "default": "1",
+   "depends_on": "eval:  doc.enable_state == 1 ",
+   "fieldname": "is_state_required",
+   "fieldtype": "Check",
+   "label": "Is State Required?"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_house_type",
+   "fieldtype": "Check",
+   "label": "Enable House Type"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:  doc.enable_house_type == 1 ",
+   "fieldname": "is_house_type_required",
+   "fieldtype": "Check",
+   "label": "Is House Type Required"
+  },
+  {
+   "fieldname": "column_break_41",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_country",
+   "fieldtype": "Check",
+   "label": "Enable Country?"
+  },
+  {
+   "default": "1",
+   "depends_on": "eval:  doc.enable_country == 1 ",
+   "fieldname": "is_country_required",
+   "fieldtype": "Check",
+   "label": "Is Country Required?"
+  },
+  {
+   "fieldname": "column_break_44",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_landmark",
+   "fieldtype": "Check",
+   "label": "Enable Landmark?"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:  doc.enable_landmark == 1 ",
+   "fieldname": "is_landmark_required",
+   "fieldtype": "Check",
+   "label": "Is Landmark Required?"
+  },
+  {
+   "fieldname": "column_break_47",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_door_no",
+   "fieldtype": "Check",
+   "label": "Enable Block Number?"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:  doc.enable_door_no == 1 ",
+   "fieldname": "is_door_no_required",
+   "fieldtype": "Check",
+   "label": "Is Block Number Required?"
+  },
+  {
+   "fieldname": "column_break_63",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_unit_number",
+   "fieldtype": "Check",
+   "label": "Enable Unit Number?"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:  doc.enable_unit_number == 1 ",
+   "fieldname": "is_unit_number_required",
+   "fieldtype": "Check",
+   "label": "Is Unit Number Required?"
+  },
+  {
+   "fieldname": "pincode_validation_section",
+   "fieldtype": "Section Break",
+   "label": "Pincode Validation"
+  },
+  {
+   "default": "Any",
+   "fieldname": "pincode",
+   "fieldtype": "Select",
+   "label": "Pincode",
+   "options": "Only Number\nNumber, Letters\nAny"
+  },
+  {
+   "fieldname": "column_break_83",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "6",
+   "fieldname": "min_pincode_length",
+   "fieldtype": "Int",
+   "label": "Min Pincode Length"
+  },
+  {
+   "default": "6",
+   "fieldname": "max_pincode_length",
+   "fieldtype": "Int",
+   "label": "Max Pincode Length"
+  },
+  {
+   "fieldname": "sec_login",
+   "fieldtype": "Section Break",
+   "label": "Login & Registration"
+  },
+  {
+   "fieldname": "login_type",
+   "fieldtype": "Select",
+   "label": "Login Type",
+   "options": "Email Only\nPhone Only\nPhone & Email(Optional)\nEmail & Phone(Optional)\nEmail & Phone & UserName"
+  },
+  {
+   "fieldname": "column_break_111",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "email_req",
+   "fieldtype": "Check",
+   "label": "Email Only"
+  },
+  {
+   "default": "0",
+   "fieldname": "phone_req",
+   "fieldtype": "Check",
+   "label": "Phone Only"
+  },
+  {
+   "default": "0",
+   "fieldname": "phonem_emailo",
+   "fieldtype": "Check",
+   "label": "Phone & Email(Optional)"
+  },
+  {
+   "default": "0",
+   "fieldname": "emailm_phoneo",
+   "fieldtype": "Check",
+   "label": "Email & Phone(Optional)"
+  },
+  {
+   "default": "0",
+   "fieldname": "emailm_phonem",
+   "fieldtype": "Check",
+   "label": "Email & Phone & UserName"
+  },
+  {
+   "fieldname": "column_break_109",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "otp_required",
+   "fieldtype": "Check",
+   "label": "OTP Verfication Required"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:((doc.otp_required==1))",
+   "fieldname": "login_with_password",
+   "fieldtype": "Check",
+   "label": "Enable Login using Password"
+  },
+  {
+   "depends_on": "eval:((doc.otp_required==1))",
+   "fieldname": "max_retry",
+   "fieldtype": "Int",
+   "label": "Max Retry(worng otp)"
+  },
+  {
+   "fieldname": "firebase_settings_section",
+   "fieldtype": "Section Break",
+   "label": "Firebase Settings"
+  },
+  {
+   "fieldname": "apikey",
+   "fieldtype": "Data",
+   "label": "Api Key"
+  },
+  {
+   "fieldname": "authdomain",
+   "fieldtype": "Data",
+   "label": "Auth Domain"
+  },
+  {
+   "fieldname": "appid",
+   "fieldtype": "Data",
+   "label": "AppId"
+  },
+  {
+   "fieldname": "column_break_120",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "databaseurl",
+   "fieldtype": "Data",
+   "label": "Database URL"
+  },
+  {
+   "fieldname": "projectid",
+   "fieldtype": "Data",
+   "label": "Project ID"
+  },
+  {
+   "fieldname": "storagebucket",
+   "fieldtype": "Data",
+   "label": "Storage Bucket"
+  },
+  {
+   "fieldname": "column_break_124",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "messagingsenderid",
+   "fieldtype": "Data",
+   "label": "Messaging Sender ID"
+  },
+  {
+   "fieldname": "measurementid",
+   "fieldtype": "Data",
+   "label": "Measurement ID"
+  },
+  {
+   "description": "Phone number & password validations",
+   "fieldname": "validations",
+   "fieldtype": "Section Break",
+   "label": "Validations"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_phone_validation",
+   "fieldtype": "Check",
+   "label": "Enable Phone Number Validation"
+  },
+  {
+   "default": "10",
+   "depends_on": "eval:  doc.enable_phone_validation == 1 ",
+   "fieldname": "min_phone_length",
+   "fieldtype": "Int",
+   "label": "Min Length For Phone Number"
+  },
+  {
+   "default": "10",
+   "depends_on": "eval:  doc.enable_phone_validation == 1 ",
+   "fieldname": "max_phone_length",
+   "fieldtype": "Int",
+   "label": "Max Length For Phone Number"
+  },
+  {
+   "fieldname": "column_break_53",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Upper Case, Special Character, Number",
+   "fieldname": "password_policy",
+   "fieldtype": "Select",
+   "label": "Password Validation Policy",
+   "options": "Upper Case, Special Character, Number\nUpper Case, Number\nUpper Case, Special Character\nNumber, Special Character\nUpper Case, Letters\nSpecial Character, Letters\nNumber, Letters\nOnly Upper Case\nOnly Number\nOnly Special Character\nAny"
+  },
+  {
+   "default": "8",
+   "fieldname": "min_password_length",
+   "fieldtype": "Int",
+   "label": "Min Password Length"
+  },
+  {
+   "fieldname": "order_edit_setting_section",
+   "fieldtype": "Section Break",
+   "label": "Order Edit Setting"
+  },
+  {
+   "default": "0",
+   "fieldname": "impersonate_customer",
+   "fieldtype": "Check",
+   "label": "Allow Admin To Impersonate Customer"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_user_to_edit_order",
+   "fieldtype": "Check",
+   "label": "Allow User To Edit Order"
+  },
+  {
+   "depends_on": "eval: doc.allow_user_to_edit_order == 1",
+   "fieldname": "customer_edit_order",
+   "fieldtype": "Table",
+   "label": "Order Status",
+   "options": "Customer Order Edit Status"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_admin_to_edit_order",
+   "fieldtype": "Check",
+   "label": "Allow Admin To Edit Order"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_admin_to_create_order",
+   "fieldtype": "Check",
+   "label": "Allow Admin To Create Order"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:doc.allow_admin_to_edit_order==1",
+   "fieldname": "price_calculated_based_on_weight",
+   "fieldtype": "Check",
+   "label": "Price Calculated Based on Weight?"
+  },
+  {
+   "depends_on": "eval:doc.allow_admin_to_edit_order==1",
+   "fieldname": "admin_order_edit_status",
+   "fieldtype": "Table",
+   "label": "Admin Order Edit Status",
+   "options": "Admin Order Edit Status"
+  },
+  {
+   "default": "Default Template",
+   "fieldname": "admin_order_template",
+   "fieldtype": "Select",
+   "label": "Admin Order Template",
+   "options": "Default Template\nOrder Template with Progress"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:  doc.admin_order_template == 'Order Template with Progress' ",
+   "fieldname": "show_flow_chart",
+   "fieldtype": "Check",
+   "label": "Show Flow Chart"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_refund_option",
+   "fieldtype": "Check",
+   "label": "Enable Mark as Refund Option in Order"
+  },
+  {
+   "fieldname": "pre_order_setting_section",
+   "fieldtype": "Section Break",
+   "label": "Pre Order Setting"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_preorder",
+   "fieldtype": "Check",
+   "label": "Enable Preorder"
+  },
+  {
+   "fieldname": "column_break_125",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:doc.enable_preorder == 1",
+   "fieldname": "pre_order_not_allow_cart",
+   "fieldtype": "Check",
+   "label": " Pre Order Items To Be Seperate In Cart"
+  },
+  {
+   "fieldname": "franchise_customer_settings_section",
+   "fieldtype": "Section Break",
+   "label": "Franchise Customer Settings "
+  },
+  {
+   "fieldname": "franchise_role",
+   "fieldtype": "Link",
+   "label": "Franchise Role",
+   "options": "Role"
+  },
+  {
+   "fieldname": "defaults_section",
+   "fieldtype": "Section Break",
+   "label": "Defaults"
+  },
+  {
+   "fieldname": "sales",
+   "fieldtype": "Heading",
+   "label": "Sales"
+  },
+  {
+   "fieldname": "selling_price_list",
+   "fieldtype": "Link",
+   "label": "Selling Price List",
+   "options": "Price List"
+  },
+  {
+   "fieldname": "column_break_x0kt9",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "role_based_pricing",
+   "fieldtype": "Check",
+   "label": "Enable Role Based Pricing(In Product)"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_price_list",
+   "fieldtype": "Check",
+   "label": "Enable Price List"
+  },
+  {
+   "fieldname": "otp_tab",
+   "fieldtype": "Tab Break",
+   "label": "OTP"
+  },
+  {
+   "fieldname": "otp_length",
+   "fieldtype": "Int",
+   "label": "OTP Length"
+  },
+  {
+   "fieldname": "column_break_aaz0",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "otp_expiry",
+   "fieldtype": "Int",
+   "label": "OTP Expiry ( In Seconds)"
+  }
+ ],
+ "issingle": 1,
+ "links": [],
+ "modified": "2024-05-27 12:00:22.704500",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Order Settings",
+ "naming_rule": "Expression (old style)",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

@@ -1,0 +1,218 @@
+{
+ "actions": [],
+ "creation": "2019-03-26 11:30:28.989729",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "product",
+  "product_name",
+  "quantity",
+  "price",
+  "old_price",
+  "total",
+  "tax",
+  "tax_breakup",
+  "shipping_charges",
+  "is_free_item",
+  "is_sub_item",
+  "is_gift_card",
+  "sender_name",
+  "sender_email",
+  "recipient_name",
+  "recipient_email",
+  "sender_message",
+  "certificate_type",
+  "certificate_occasion",
+  "column_break_6",
+  "attribute_description",
+  "checkout_attributes",
+  "attribute_ids",
+  "special_instruction",
+  "discount_rule",
+  "device_type",
+  "business",
+  "business_name",
+  "is_fl_store_item"
+ ],
+ "fields": [
+  {
+   "fieldname": "product",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Product",
+   "options": "Product",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "product.item",
+   "fieldname": "product_name",
+   "fieldtype": "Data",
+   "label": "Product Name"
+  },
+  {
+   "fieldname": "quantity",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Quantity",
+   "reqd": 1
+  },
+  {
+   "fieldname": "price",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Price"
+  },
+  {
+   "fieldname": "total",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Total"
+  },
+  {
+   "fieldname": "tax",
+   "fieldtype": "Currency",
+   "label": "Tax"
+  },
+  {
+   "fieldname": "tax_breakup",
+   "fieldtype": "Small Text",
+   "ignore_xss_filter": 1,
+   "label": "Tax Breakup",
+   "read_only": 1
+  },
+  {
+   "fieldname": "shipping_charges",
+   "fieldtype": "Currency",
+   "label": "Shipping Charges",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "is_free_item",
+   "fieldtype": "Check",
+   "label": "Is Free Item"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_sub_item",
+   "fieldtype": "Check",
+   "label": "Is Subscription Item"
+  },
+  {
+   "fieldname": "column_break_6",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "attribute_description",
+   "fieldtype": "Text Editor",
+   "label": "Attribute Description"
+  },
+  {
+   "fieldname": "attribute_ids",
+   "fieldtype": "Small Text",
+   "hidden": 1,
+   "label": "Attribute Ids"
+  },
+  {
+   "depends_on": "",
+   "fieldname": "special_instruction",
+   "fieldtype": "Small Text",
+   "label": "Special Instruction"
+  },
+  {
+   "fieldname": "discount_rule",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Discount Rule",
+   "options": "Discounts"
+  },
+  {
+   "fieldname": "checkout_attributes",
+   "fieldtype": "Text Editor",
+   "label": "Checkout Attributes"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_gift_card",
+   "fieldtype": "Check",
+   "label": "Is Gift Card"
+  },
+  {
+   "fieldname": "sender_name",
+   "fieldtype": "Data",
+   "label": "Sender Name"
+  },
+  {
+   "fieldname": "sender_email",
+   "fieldtype": "Data",
+   "label": "Sender Email"
+  },
+  {
+   "fieldname": "recipient_name",
+   "fieldtype": "Data",
+   "label": "Recipient Name"
+  },
+  {
+   "fieldname": "recipient_email",
+   "fieldtype": "Data",
+   "label": "Recipient Email"
+  },
+  {
+   "fieldname": "sender_message",
+   "fieldtype": "Small Text",
+   "label": "Sender Message"
+  },
+  {
+   "fieldname": "device_type",
+   "fieldtype": "Select",
+   "label": "Device Type",
+   "options": "Website\nAndroid Mobile App\nIOS Mobile App\nPOS"
+  },
+  {
+   "fieldname": "certificate_type",
+   "fieldtype": "Data",
+   "label": "Certificate Type"
+  },
+  {
+   "fieldname": "certificate_occasion",
+   "fieldtype": "Data",
+   "label": "Certificate Occasion"
+  },
+  {
+   "fieldname": "business",
+   "fieldtype": "Link",
+   "label": "Business",
+   "options": "Business"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_fl_store_item",
+   "fieldtype": "Check",
+   "label": "Is FL Store Item?"
+  },
+  {
+   "fieldname": "business_name",
+   "fieldtype": "Data",
+   "label": "Business Name"
+  },
+  {
+   "fieldname": "old_price",
+   "fieldtype": "Currency",
+   "label": "Old Price"
+  }
+ ],
+ "istable": 1,
+ "links": [],
+ "modified": "2023-05-16 14:40:23.781889",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Cart Items",
+ "owner": "Administrator",
+ "permissions": [],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

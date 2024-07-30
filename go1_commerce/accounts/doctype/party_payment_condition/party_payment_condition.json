@@ -1,0 +1,61 @@
+{
+ "creation": "2020-05-26 12:25:58.060824",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "condition",
+  "is_formula_based",
+  "formula",
+  "amount",
+  "column_break_5",
+  "condition_formula_help"
+ ],
+ "fields": [
+  {
+   "fieldname": "condition",
+   "fieldtype": "Code",
+   "in_list_view": 1,
+   "label": "Condition"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_formula_based",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Is Formula Based?"
+  },
+  {
+   "depends_on": "eval: doc.is_formula_based != 1",
+   "fieldname": "amount",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Amount"
+  },
+  {
+   "depends_on": "eval: doc.is_formula_based == 1",
+   "fieldname": "formula",
+   "fieldtype": "Code",
+   "in_list_view": 1,
+   "label": "Formula"
+  },
+  {
+   "fieldname": "column_break_5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "condition_formula_help",
+   "fieldtype": "HTML"
+  }
+ ],
+ "istable": 1,
+ "modified": "2020-05-26 12:32:40.260735",
+ "modified_by": "Administrator",
+ "module": "Accounts",
+ "name": "Party Payment Condition",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

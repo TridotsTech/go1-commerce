@@ -1,0 +1,114 @@
+{
+ "creation": "2020-04-30 18:03:35.449132",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "attribute",
+  "attribute_id",
+  "option_value",
+  "display_order",
+  "price_adjustment",
+  "weight_adjustment",
+  "parent_option",
+  "attribute_color",
+  "unique_name",
+  "product_title",
+  "is_pre_selected",
+  "disable",
+  "available_datetime"
+ ],
+ "fields": [
+  {
+   "fieldname": "attribute",
+   "fieldtype": "Link",
+   "label": "Attribute",
+   "options": "Product Attribute"
+  },
+  {
+   "fieldname": "attribute_id",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Attribute Id"
+  },
+  {
+   "fieldname": "option_value",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Option Value",
+   "reqd": 1
+  },
+  {
+   "fieldname": "display_order",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Display Order",
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "price_adjustment",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Price Adjustment",
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "weight_adjustment",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Weight Adjustment"
+  },
+  {
+   "fieldname": "parent_option",
+   "fieldtype": "Data",
+   "label": "Parent Option"
+  },
+  {
+   "fieldname": "attribute_color",
+   "fieldtype": "Color",
+   "in_list_view": 1,
+   "label": "Attribute Color"
+  },
+  {
+   "fieldname": "unique_name",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Unique Name"
+  },
+  {
+   "fieldname": "product_title",
+   "fieldtype": "Data",
+   "label": "Product Title"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_pre_selected",
+   "fieldtype": "Check",
+   "label": "Is Pre Selected"
+  },
+  {
+   "default": "0",
+   "fieldname": "disable",
+   "fieldtype": "Check",
+   "label": "Disable"
+  },
+  {
+   "fieldname": "available_datetime",
+   "fieldtype": "Datetime",
+   "label": "Available DateTime"
+  }
+ ],
+ "istable": 1,
+ "modified": "2020-05-23 13:03:16.344846",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Attribute Option",
+ "owner": "Administrator",
+ "permissions": [],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

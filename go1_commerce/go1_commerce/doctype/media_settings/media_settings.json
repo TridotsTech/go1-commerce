@@ -1,0 +1,179 @@
+{
+ "actions": [],
+ "autoname": "Media Settings",
+ "creation": "2024-02-12 19:01:44.833551",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "business",
+  "section_break_2",
+  "list_thumbnail_size",
+  "detail_image_size",
+  "manufacturer_thumbnail_size",
+  "column_break_4",
+  "detail_thumbnail_size",
+  "mini_cart_image_size",
+  "enable_picture_zoom",
+  "column_break_8",
+  "email_thumbnail_size",
+  "cart_thumbnail_size",
+  "image_section",
+  "default_image",
+  "mini_cart_thumbnail",
+  "cart_thumbnail",
+  "column_break_15",
+  "detail_thumbnail",
+  "list_thumbnail",
+  "email_thumbnail"
+ ],
+ "fields": [
+  {
+   "fieldname": "business",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Business",
+   "options": "Business"
+  },
+  {
+   "fieldname": "section_break_2",
+   "fieldtype": "Section Break"
+  },
+  {
+   "default": "250",
+   "fieldname": "list_thumbnail_size",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Product Thumbnail Image Size (List)",
+   "reqd": 1
+  },
+  {
+   "default": "500",
+   "fieldname": "detail_image_size",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Product Detail Image Size",
+   "reqd": 1
+  },
+  {
+   "default": "150",
+   "fieldname": "manufacturer_thumbnail_size",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Manufacturer Thumbnail Image Size",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "100",
+   "fieldname": "detail_thumbnail_size",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Product Thumbnail Image Size (Detail)",
+   "reqd": 1
+  },
+  {
+   "default": "100",
+   "fieldname": "mini_cart_image_size",
+   "fieldtype": "Int",
+   "label": "Mini-shopping Cart Thumbnail Image Size"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_picture_zoom",
+   "fieldtype": "Check",
+   "label": "Enable Picture Zoom"
+  },
+  {
+   "fieldname": "column_break_8",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "100",
+   "fieldname": "email_thumbnail_size",
+   "fieldtype": "Int",
+   "label": "Thumbnail Size Of Products In Emails",
+   "reqd": 1
+  },
+  {
+   "default": "100",
+   "fieldname": "cart_thumbnail_size",
+   "fieldtype": "Int",
+   "label": "Cart/wishlist Thumbnail Image Size",
+   "reqd": 1
+  },
+  {
+   "fieldname": "image_section",
+   "fieldtype": "Section Break",
+   "label": "Image Section"
+  },
+  {
+   "fieldname": "default_image",
+   "fieldtype": "Attach Image",
+   "label": "Default Image"
+  },
+  {
+   "fieldname": "mini_cart_thumbnail",
+   "fieldtype": "Attach Image",
+   "hidden": 1,
+   "label": "Mini Cart  Thumbnail Image"
+  },
+  {
+   "fieldname": "cart_thumbnail",
+   "fieldtype": "Attach Image",
+   "hidden": 1,
+   "label": "Cart / Wishlist Thumbnail Image"
+  },
+  {
+   "fieldname": "column_break_15",
+   "fieldtype": "Column Break",
+   "hidden": 1
+  },
+  {
+   "fieldname": "detail_thumbnail",
+   "fieldtype": "Attach Image",
+   "hidden": 1,
+   "label": "Detail Thumbnail Image"
+  },
+  {
+   "fieldname": "list_thumbnail",
+   "fieldtype": "Attach Image",
+   "hidden": 1,
+   "label": "List Thumbnail Image"
+  },
+  {
+   "fieldname": "email_thumbnail",
+   "fieldtype": "Attach Image",
+   "hidden": 1,
+   "label": "Email Thumbnail Image"
+  }
+ ],
+ "issingle": 1,
+ "links": [],
+ "modified": "2024-02-12 19:01:44.833551",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Media Settings",
+ "naming_rule": "Expression (old style)",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

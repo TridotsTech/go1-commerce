@@ -1,0 +1,44 @@
+{
+ "creation": "2020-05-18 11:14:28.911227",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "slot_label",
+  "from_time",
+  "to_time"
+ ],
+ "fields": [
+  {
+   "fieldname": "slot_label",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Slot Label",
+   "reqd": 1
+  },
+  {
+   "fieldname": "from_time",
+   "fieldtype": "Time",
+   "in_list_view": 1,
+   "label": "From Time",
+   "reqd": 1
+  },
+  {
+   "fieldname": "to_time",
+   "fieldtype": "Time",
+   "in_list_view": 1,
+   "label": "To Time",
+   "reqd": 1
+  }
+ ],
+ "istable": 1,
+ "modified": "2020-05-18 11:14:28.911227",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Delivery Slot",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

@@ -1,0 +1,130 @@
+{
+ "creation": "2019-04-15 12:34:35.947439",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "user_name",
+  "email",
+  "phone",
+  "column_break_4",
+  "product",
+  "product_name",
+  "is_approved",
+  "business",
+  "business_email_id",
+  "section_break_7",
+  "question",
+  "section_break_9",
+  "enquiry_answers"
+ ],
+ "fields": [
+  {
+   "description": "Name of the customer who raised for an enquiry",
+   "fieldname": "user_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Name",
+   "reqd": 1
+  },
+  {
+   "description": "Customer email id",
+   "fieldname": "email",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Email",
+   "options": "Email",
+   "reqd": 1
+  },
+  {
+   "description": "Customer phone/mobile number",
+   "fieldname": "phone",
+   "fieldtype": "Data",
+   "label": "Phone"
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "Product for which the customer raised an enquiry",
+   "fieldname": "product",
+   "fieldtype": "Link",
+   "label": "Product",
+   "options": "Product"
+  },
+  {
+   "fetch_from": "product.item",
+   "fieldname": "product_name",
+   "fieldtype": "Data",
+   "label": "Product Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "business",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Business",
+   "options": "Business"
+  },
+  {
+   "fieldname": "business_email_id",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Business Email Id",
+   "options": "Email"
+  },
+  {
+   "fieldname": "section_break_7",
+   "fieldtype": "Section Break"
+  },
+  {
+   "description": "Question asked by the customer",
+   "fieldname": "question",
+   "fieldtype": "Text",
+   "in_list_view": 1,
+   "label": "Question",
+   "reqd": 1
+  },
+  {
+   "description": "Answers that are given for the customer's question",
+   "fieldname": "section_break_9",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "enquiry_answers",
+   "fieldtype": "Table",
+   "label": "Enquiry Answers",
+   "options": "Product Enquiry Answers"
+  },
+  {
+   "default": "0",
+   "description": "Only the approved enquiries will be displayed on the product detail page",
+   "fieldname": "is_approved",
+   "fieldtype": "Check",
+   "label": "Is Approved"
+  }
+ ],
+ "modified": "2020-11-27 05:28:37.234673",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Product Enquiry",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

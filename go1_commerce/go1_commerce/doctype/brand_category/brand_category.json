@@ -1,0 +1,39 @@
+{
+ "allow_rename": 1,
+ "creation": "2020-08-24 07:02:41.338982",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "category",
+  "category_name"
+ ],
+ "fields": [
+  {
+   "fieldname": "category",
+   "fieldtype": "Link",
+   "in_global_search": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Category ID",
+   "options": "Product Category",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "category.category_name",
+   "fieldname": "category_name",
+   "fieldtype": "Data",
+   "label": "Category Name",
+   "read_only": 1
+  }
+ ],
+ "istable": 1,
+ "modified": "2020-08-24 07:08:52.610557",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Brand Category",
+ "nsm_parent_field": "parent_product_category",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_order": "ASC"
+}

@@ -1,0 +1,68 @@
+{
+ "actions": [],
+ "autoname": "field:payment_type",
+ "creation": "2018-08-21 18:32:54.560019",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "payment_type",
+  "payment_method",
+  "column_break_13rz",
+  "is_attachment_required"
+ ],
+ "fields": [
+  {
+   "fieldname": "payment_type",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Payment Type",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "payment_method",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Payment Method",
+   "options": "Payment Method",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_13rz",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_attachment_required",
+   "fieldtype": "Check",
+   "label": "Is Attachment Required?"
+  }
+ ],
+ "links": [],
+ "modified": "2023-06-02 19:11:37.246302",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Mode Of Payments",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

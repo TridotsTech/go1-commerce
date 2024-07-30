@@ -1,0 +1,29 @@
+[
+	{
+		"shipping_by_weight_charges":[],
+		"display_order":0,
+		"is_active":0,
+		"shipping_rate_method":"Shipping By Total",
+		"shipping_by_total":[],
+		"doctype":"Shipping Rate Method",
+		"shipping_by_fixed_rate":[]
+	},
+	{
+		"shipping_by_weight_charges":[],
+		"display_order":0,
+		"is_active":0,
+		"shipping_rate_method":"Fixed Rate Shipping",
+		"shipping_by_total":[],
+		"doctype":"Shipping Rate Method",
+		"shipping_by_fixed_rate":[]
+	},
+	{
+		"shipping_by_weight_charges":[],
+		"display_order":0,
+		"is_active":0,
+		"shipping_rate_method":"Shipping By Weight",
+		"shipping_by_total":[],
+		"doctype":"Shipping Rate Method",
+		"shipping_by_fixed_rate":[]
+	}
+]

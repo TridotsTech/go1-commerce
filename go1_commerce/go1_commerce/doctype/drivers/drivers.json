@@ -1,0 +1,306 @@
+{
+ "actions": [],
+ "autoname": "field:driver_email",
+ "creation": "2018-09-18 20:17:59.083048",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "driver_name",
+  "driver_email",
+  "driver_phone",
+  "select_all_business",
+  "add__edit_business",
+  "mapped_business",
+  "column_break_3",
+  "driver_status",
+  "address",
+  "more_information",
+  "gender",
+  "location",
+  "resident_status",
+  "column_break_10",
+  "birth_date",
+  "sin",
+  "shift_preference",
+  "postal_code_preference",
+  "column_break_18",
+  "delivery_service_preference",
+  "column_break_20",
+  "shift_availability_preference",
+  "sec_3",
+  "license_number",
+  "licence_image",
+  "column_break_12",
+  "issuing_date",
+  "column_break_14",
+  "expiry_date",
+  "vehicle_details_section",
+  "vehicle_registration_number",
+  "vehicle_registration_image",
+  "column_break_32",
+  "vehicle_insurance_number",
+  "vehicle_insurance_image",
+  "column_break_35",
+  "insurance_expiry_date",
+  "insurance_expiry_image",
+  "change_password",
+  "new_password",
+  "set_new_password",
+  "latitude",
+  "longitude",
+  "player_id"
+ ],
+ "fields": [
+  {
+   "fieldname": "driver_name",
+   "fieldtype": "Data",
+   "label": "Driver Name"
+  },
+  {
+   "fieldname": "driver_email",
+   "fieldtype": "Data",
+   "label": "Driver Email",
+   "unique": 1
+  },
+  {
+   "fieldname": "driver_phone",
+   "fieldtype": "Data",
+   "label": "Driver Phone"
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "driver_status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Driver Status",
+   "options": "Online\nOffline"
+  },
+  {
+   "fieldname": "more_information",
+   "fieldtype": "Section Break",
+   "label": "More Information"
+  },
+  {
+   "fieldname": "gender",
+   "fieldtype": "Link",
+   "label": "Gender",
+   "options": "Gender"
+  },
+  {
+   "fieldname": "location",
+   "fieldtype": "Data",
+   "label": "Location"
+  },
+  {
+   "fieldname": "column_break_10",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "birth_date",
+   "fieldtype": "Date",
+   "label": "Birth Date"
+  },
+  {
+   "fieldname": "sec_3",
+   "fieldtype": "Section Break",
+   "label": "LICENSE DETAILS"
+  },
+  {
+   "fieldname": "license_number",
+   "fieldtype": "Data",
+   "label": "License Number"
+  },
+  {
+   "fieldname": "column_break_12",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "issuing_date",
+   "fieldtype": "Date",
+   "label": "Issuing Date"
+  },
+  {
+   "fieldname": "column_break_14",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "expiry_date",
+   "fieldtype": "Date",
+   "label": "Expiry Date"
+  },
+  {
+   "fieldname": "change_password",
+   "fieldtype": "Section Break",
+   "label": "Change Password"
+  },
+  {
+   "fieldname": "new_password",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Set New Password"
+  },
+  {
+   "fieldname": "set_new_password",
+   "fieldtype": "Data",
+   "label": "Set New Password"
+  },
+  {
+   "fieldname": "latitude",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Latitude"
+  },
+  {
+   "fieldname": "longitude",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Longitude"
+  },
+  {
+   "fieldname": "player_id",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Player Id"
+  },
+  {
+   "fieldname": "address",
+   "fieldtype": "Data",
+   "label": "Address"
+  },
+  {
+   "fieldname": "sin",
+   "fieldtype": "Data",
+   "label": "Social Insurance Number (SIN)"
+  },
+  {
+   "fieldname": "resident_status",
+   "fieldtype": "Data",
+   "label": "Resident Status"
+  },
+  {
+   "fieldname": "shift_preference",
+   "fieldtype": "Section Break",
+   "label": "Shift Preference"
+  },
+  {
+   "fieldname": "postal_code_preference",
+   "fieldtype": "Data",
+   "label": "Postal Code Preference"
+  },
+  {
+   "fieldname": "column_break_18",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "delivery_service_preference",
+   "fieldtype": "Data",
+   "label": "Delivery Service Preference"
+  },
+  {
+   "fieldname": "column_break_20",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "shift_availability_preference",
+   "fieldtype": "Data",
+   "label": "ShiftAvailability Preference"
+  },
+  {
+   "fieldname": "licence_image",
+   "fieldtype": "Attach Image",
+   "label": "Licence Image"
+  },
+  {
+   "fieldname": "vehicle_details_section",
+   "fieldtype": "Section Break",
+   "label": "VEHICLE DETAILS"
+  },
+  {
+   "fieldname": "vehicle_registration_number",
+   "fieldtype": "Data",
+   "label": "Vehicle Registration Number"
+  },
+  {
+   "fieldname": "vehicle_registration_image",
+   "fieldtype": "Attach Image",
+   "label": "Vehicle Registration Number(Attach Image)"
+  },
+  {
+   "fieldname": "column_break_32",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "vehicle_insurance_number",
+   "fieldtype": "Data",
+   "label": "Vehicle Insurance Number"
+  },
+  {
+   "fieldname": "vehicle_insurance_image",
+   "fieldtype": "Attach Image",
+   "label": "Vehicle Insurance Number (Attach Image)"
+  },
+  {
+   "fieldname": "column_break_35",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "insurance_expiry_date",
+   "fieldtype": "Date",
+   "label": "Vehicle Insurance Expiry Date"
+  },
+  {
+   "fieldname": "insurance_expiry_image",
+   "fieldtype": "Attach Image",
+   "label": "Vehicle Insurance Expiry Date (Attach Insurance copies)"
+  },
+  {
+   "default": "0",
+   "fieldname": "select_all_business",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Select All Business"
+  },
+  {
+   "fieldname": "mapped_business",
+   "fieldtype": "Small Text",
+   "label": "Business",
+   "read_only": 1
+  },
+  {
+   "fieldname": "add__edit_business",
+   "fieldtype": "Button",
+   "label": "Add / Edit Business"
+  }
+ ],
+ "links": [],
+ "modified": "2024-03-14 17:04:57.743626",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Drivers",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "search_fields": "driver_name",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

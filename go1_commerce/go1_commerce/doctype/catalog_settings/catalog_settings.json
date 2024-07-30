@@ -1,0 +1,987 @@
+{
+ "actions": [],
+ "autoname": "Catalog Settings",
+ "creation": "2024-02-12 18:56:40.752906",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "business",
+  "general",
+  "website_logo",
+  "login_image",
+  "email_logo",
+  "print_format_logo",
+  "cart_empty_image",
+  "wishlist_empty_image",
+  "default_sharing_logo",
+  "column_break_3",
+  "show_sku",
+  "display_weight",
+  "generate_barcode_for_product",
+  "site_name",
+  "brand_page_title",
+  "column_break_5",
+  "compare_products_enabled",
+  "google_map_location",
+  "column_break_7",
+  "default_currency",
+  "default_currency_symbol",
+  "tax_settings",
+  "included_tax",
+  "display_tax_suffix",
+  "shipping_is_taxable",
+  "shipping_price_includes_tax",
+  "shipping_tax_class",
+  "column_break_22",
+  "hide_zero_tax",
+  "show_tax_information_in_product_list",
+  "show_tax_information_in_product_detail_page",
+  "product_list",
+  "display_subcategories",
+  "no_of_records_per_page",
+  "products_per_row",
+  "show_category_description",
+  "description_position",
+  "disable_category_filter",
+  "disable_price_filter",
+  "disable_brand_filter",
+  "disable_ratings_filter",
+  "column_break_30",
+  "include_products_from_subcategories",
+  "products_per_row_in_grid",
+  "enable_list_view_product_box",
+  "column_break_9",
+  "show_short_description",
+  "default_product_sort_order",
+  "enable_pagination",
+  "list_empty_image",
+  "column_break_11",
+  "no_stock_products",
+  "show_quantity_box",
+  "show_brand",
+  "hide_buy_button",
+  "filter_view",
+  "sort_view",
+  "enable_model_finder",
+  "product_box",
+  "column_break_51",
+  "product_detail",
+  "product_reviews_to_be_approved",
+  "wishlist_icon",
+  "detail_page_template",
+  "product_thumbnail_image_position",
+  "column_break_19",
+  "allow_anonymous_users_to_write_product_reviews",
+  "question_icon",
+  "enable_question_and_answers",
+  "other_products_count",
+  "column_break_21",
+  "email_a_friend_enabled",
+  "email_icon",
+  "check_delivery",
+  "weight_disclaimer",
+  "weight_units",
+  "enable_product_video",
+  "enable_size_chart",
+  "whatsapp_chat_mobile",
+  "display_custom_fields",
+  "whatsapp_number",
+  "spc_cb",
+  "enable_sidebar",
+  "show_specifications_under_the_short_description",
+  "show_vendor",
+  "enable_related_products",
+  "enable_recetly_viewed_products",
+  "enable_best_sellers",
+  "customers_who_bought",
+  "show_video_gallery_separately",
+  "upload_review_images",
+  "search_settings",
+  "enable_full_text_search",
+  "column_break_101",
+  "disable_search_keyword",
+  "column_break_103",
+  "enable_blog_search",
+  "column_break_rvsz",
+  "enable_whoosh_search",
+  "section_break_105",
+  "search_fields",
+  "megamenu_setting",
+  "enable_megamenu",
+  "menu_height",
+  "no_of_columns_display",
+  "column_break_62",
+  "include_all_categories",
+  "enable_brand",
+  "is_image_enable",
+  "image_position",
+  "sms_settings",
+  "send_sms_on_registration",
+  "send_sms_on_order_placed",
+  "column_break_73",
+  "send_sms_on_packed",
+  "send_sms_on_shipped",
+  "column_break_76",
+  "send_sms_on_delivered",
+  "additional_menus",
+  "additional_menu",
+  "enable_donation",
+  "captcha_settings_section",
+  "enable_captcha",
+  "contact_us",
+  "email_a_friend",
+  "register_page",
+  "column_break_112",
+  "login_page",
+  "review_popup",
+  "qsn_a_product",
+  "vendor_registration",
+  "column_break_117",
+  "public_key",
+  "private_key",
+  "default_meta_information",
+  "meta_title",
+  "column_break_38",
+  "meta_description",
+  "column_break_56",
+  "meta_keywords"
+ ],
+ "fields": [
+  {
+   "fieldname": "business",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Business",
+   "options": "Business"
+  },
+  {
+   "fieldname": "general",
+   "fieldtype": "Section Break",
+   "label": "General"
+  },
+  {
+   "fieldname": "website_logo",
+   "fieldtype": "Attach Image",
+   "label": "Website Logo"
+  },
+  {
+   "fieldname": "login_image",
+   "fieldtype": "Attach Image",
+   "label": "Login Image"
+  },
+  {
+   "fieldname": "email_logo",
+   "fieldtype": "Attach Image",
+   "label": "Email Logo"
+  },
+  {
+   "fieldname": "print_format_logo",
+   "fieldtype": "Attach Image",
+   "label": "Print Format Logo"
+  },
+  {
+   "fieldname": "cart_empty_image",
+   "fieldtype": "Attach",
+   "label": "Cart Empty image"
+  },
+  {
+   "fieldname": "wishlist_empty_image",
+   "fieldtype": "Attach",
+   "label": "Wishlist Empty Image"
+  },
+  {
+   "fieldname": "default_sharing_logo",
+   "fieldtype": "Attach Image",
+   "label": "Default Sharing Logo"
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "description": "If enabled, SKU of the product will be displayed to the customer in product detail page",
+   "fieldname": "show_sku",
+   "fieldtype": "Check",
+   "label": "Show SKU"
+  },
+  {
+   "default": "0",
+   "description": "If enabled, weight of the product will be displayed in product detail page.",
+   "fieldname": "display_weight",
+   "fieldtype": "Check",
+   "label": "Display weight"
+  },
+  {
+   "default": "0",
+   "description": "Enable to generate barcode for all products",
+   "fieldname": "generate_barcode_for_product",
+   "fieldtype": "Check",
+   "label": "Generate Barcode for Product"
+  },
+  {
+   "description": "The site name to be displayed in the website",
+   "fieldname": "site_name",
+   "fieldtype": "Data",
+   "label": "Site Name"
+  },
+  {
+   "description": "Title for brands page",
+   "fieldname": "brand_page_title",
+   "fieldtype": "Data",
+   "label": "Brand Page Title"
+  },
+  {
+   "fieldname": "column_break_5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "description": "To allow customer to compare one or more products in website.",
+   "fieldname": "compare_products_enabled",
+   "fieldtype": "Check",
+   "label": "Compare Products Enabled"
+  },
+  {
+   "description": "Google map url of the organisation to be shown in contact page.",
+   "fieldname": "google_map_location",
+   "fieldtype": "Small Text",
+   "label": "Google Map Url"
+  },
+  {
+   "fieldname": "column_break_7",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "Default currency to be used in the system for transaction purpose",
+   "fieldname": "default_currency",
+   "fieldtype": "Link",
+   "label": "Default Currency",
+   "options": "Currency"
+  },
+  {
+   "fieldname": "default_currency_symbol",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Default Currency Symbol"
+  },
+  {
+   "fieldname": "tax_settings",
+   "fieldtype": "Section Break",
+   "label": "Tax Settings"
+  },
+  {
+   "default": "0",
+   "description": "If checked, then the tax value will not be added to the order subtotal",
+   "fieldname": "included_tax",
+   "fieldtype": "Check",
+   "label": "Is Price Included Tax?"
+  },
+  {
+   "default": "0",
+   "fieldname": "display_tax_suffix",
+   "fieldtype": "Check",
+   "label": "Display Tax Suffix"
+  },
+  {
+   "default": "0",
+   "fieldname": "shipping_is_taxable",
+   "fieldtype": "Check",
+   "label": "Shipping Is Taxable"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:doc.shipping_is_taxable",
+   "fieldname": "shipping_price_includes_tax",
+   "fieldtype": "Check",
+   "label": "Shipping Price Includes Tax"
+  },
+  {
+   "depends_on": "eval:doc.shipping_is_taxable",
+   "fieldname": "shipping_tax_class",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Shipping Tax Class",
+   "options": "Product Tax Template"
+  },
+  {
+   "fieldname": "column_break_22",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "hide_zero_tax",
+   "fieldtype": "Check",
+   "label": "Hide Zero Tax"
+  },
+  {
+   "default": "0",
+   "fieldname": "show_tax_information_in_product_list",
+   "fieldtype": "Check",
+   "label": "Show Tax Information In Product List Page"
+  },
+  {
+   "default": "0",
+   "fieldname": "show_tax_information_in_product_detail_page",
+   "fieldtype": "Check",
+   "label": "Show Tax Information In Product Detail Page"
+  },
+  {
+   "description": "Common settings for products list page.",
+   "fieldname": "product_list",
+   "fieldtype": "Section Break",
+   "label": "Product List"
+  },
+  {
+   "default": "0",
+   "fieldname": "display_subcategories",
+   "fieldtype": "Check",
+   "label": "Display Subcategories"
+  },
+  {
+   "default": "24",
+   "fieldname": "no_of_records_per_page",
+   "fieldtype": "Int",
+   "label": "No of Records Per Page"
+  },
+  {
+   "fieldname": "products_per_row",
+   "fieldtype": "Select",
+   "label": "Products Per Row",
+   "options": "1\n2\n3\n4\n5"
+  },
+  {
+   "default": "0",
+   "fieldname": "show_category_description",
+   "fieldtype": "Check",
+   "label": "Show Category Description"
+  },
+  {
+   "default": "Bottom",
+   "depends_on": "eval:doc.show_category_description==1",
+   "fieldname": "description_position",
+   "fieldtype": "Select",
+   "label": "Category Description Position",
+   "options": "Top\nBottom"
+  },
+  {
+   "default": "0",
+   "fieldname": "disable_category_filter",
+   "fieldtype": "Check",
+   "label": "Disable Category Filter"
+  },
+  {
+   "default": "0",
+   "fieldname": "disable_price_filter",
+   "fieldtype": "Check",
+   "label": "Disable Price Filter"
+  },
+  {
+   "default": "0",
+   "fieldname": "disable_brand_filter",
+   "fieldtype": "Check",
+   "label": "Disable Brand Filter"
+  },
+  {
+   "default": "0",
+   "fieldname": "disable_ratings_filter",
+   "fieldtype": "Check",
+   "label": "Disable Ratings Filter"
+  },
+  {
+   "fieldname": "column_break_30",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "include_products_from_subcategories",
+   "fieldtype": "Check",
+   "label": "Include Products From Subcategories"
+  },
+  {
+   "fieldname": "products_per_row_in_grid",
+   "fieldtype": "Int",
+   "label": "Products Per Row In Grid"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_list_view_product_box",
+   "fieldtype": "Check",
+   "label": "Enable List View Product Box"
+  },
+  {
+   "fieldname": "column_break_9",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "show_short_description",
+   "fieldtype": "Check",
+   "label": "Show short description"
+  },
+  {
+   "fieldname": "default_product_sort_order",
+   "fieldtype": "Select",
+   "label": "Default Product Sort Order",
+   "options": "Relevance\nName: A to Z\nName: Z to A\nPrice: Low to High\nPrice: High to Low\nNewest Arrivals\nDate: Oldest first"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_pagination",
+   "fieldtype": "Check",
+   "label": "Enable Pagination"
+  },
+  {
+   "fieldname": "list_empty_image",
+   "fieldtype": "Attach Image",
+   "label": "List Empty Image"
+  },
+  {
+   "fieldname": "column_break_11",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "no_stock_products",
+   "fieldtype": "Check",
+   "label": "Show Products Without Stock?"
+  },
+  {
+   "default": "0",
+   "fieldname": "show_quantity_box",
+   "fieldtype": "Check",
+   "label": "Show Quantity Box "
+  },
+  {
+   "default": "0",
+   "fieldname": "show_brand",
+   "fieldtype": "Check",
+   "label": "Show brand"
+  },
+  {
+   "default": "0",
+   "fieldname": "hide_buy_button",
+   "fieldtype": "Check",
+   "label": "Hide Buy Button"
+  },
+  {
+   "fieldname": "filter_view",
+   "fieldtype": "Select",
+   "label": "Filter View",
+   "options": "Vertical\nHorizontal"
+  },
+  {
+   "default": "List",
+   "fieldname": "sort_view",
+   "fieldtype": "Select",
+   "label": "Sort View",
+   "options": "List\nDropdown"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:((doc.filter_view==\"Horizontal\"))",
+   "fieldname": "enable_model_finder",
+   "fieldtype": "Check",
+   "label": "Enable Model Finder"
+  },
+  {
+   "fieldname": "product_box",
+   "fieldtype": "Section Break",
+   "hidden": 1,
+   "label": "Product Box"
+  },
+  {
+   "fieldname": "column_break_51",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "Common settings for product detail page.",
+   "fieldname": "product_detail",
+   "fieldtype": "Section Break",
+   "label": "Product Detail"
+  },
+  {
+   "default": "0",
+   "fieldname": "product_reviews_to_be_approved",
+   "fieldtype": "Check",
+   "label": "Product Reviews To Be Approved"
+  },
+  {
+   "fieldname": "wishlist_icon",
+   "fieldtype": "Attach",
+   "label": "Wishlist Icon"
+  },
+  {
+   "fieldname": "detail_page_template",
+   "fieldtype": "Select",
+   "label": "Detail Page Template",
+   "options": "Default Layout\nTwo Column Layout\nThree Column Layout\nMeat Layout"
+  },
+  {
+   "default": "Vertical",
+   "fieldname": "product_thumbnail_image_position",
+   "fieldtype": "Select",
+   "label": "Product Thumbnail Image Position",
+   "options": "Horizontal\nVertical"
+  },
+  {
+   "fieldname": "column_break_19",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_anonymous_users_to_write_product_reviews",
+   "fieldtype": "Check",
+   "label": "Allow Anonymous Users To Write Product Reviews"
+  },
+  {
+   "fieldname": "question_icon",
+   "fieldtype": "Attach",
+   "label": "Question Icon"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_question_and_answers",
+   "fieldtype": "Check",
+   "label": "Enable Question And Answers"
+  },
+  {
+   "default": "6",
+   "fieldname": "other_products_count",
+   "fieldtype": "Select",
+   "label": "Product List Count",
+   "options": "3\n4\n5\n6\n7\n8"
+  },
+  {
+   "fieldname": "column_break_21",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "email_a_friend_enabled",
+   "fieldtype": "Check",
+   "label": "Email A Friend Enabled"
+  },
+  {
+   "fieldname": "email_icon",
+   "fieldtype": "Attach",
+   "label": "Email Icon"
+  },
+  {
+   "default": "0",
+   "fieldname": "check_delivery",
+   "fieldtype": "Check",
+   "label": "Check Delivery"
+  },
+  {
+   "default": "0",
+   "fieldname": "weight_disclaimer",
+   "fieldtype": "Check",
+   "label": "Display Weight Disclaimer"
+  },
+  {
+   "default": "kg",
+   "depends_on": "eval:doc.weight_disclaimer==1",
+   "fieldname": "weight_units",
+   "fieldtype": "Select",
+   "label": "Weight Units",
+   "options": "kg\ngm\nlb\nton"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_product_video",
+   "fieldtype": "Check",
+   "label": "Enable Video For Products"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_size_chart",
+   "fieldtype": "Check",
+   "label": "Enable Size Chart"
+  },
+  {
+   "default": "0",
+   "fieldname": "whatsapp_chat_mobile",
+   "fieldtype": "Check",
+   "label": "Enable Whatsapp Chat in Mobile"
+  },
+  {
+   "default": "0",
+   "fieldname": "display_custom_fields",
+   "fieldtype": "Check",
+   "label": "Display Custom Fields"
+  },
+  {
+   "depends_on": "eval:doc.whatsapp_chat_mobile==1",
+   "fieldname": "whatsapp_number",
+   "fieldtype": "Data",
+   "label": "Whatsapp Number"
+  },
+  {
+   "fieldname": "spc_cb",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_sidebar",
+   "fieldtype": "Check",
+   "label": "Enable Sidebar"
+  },
+  {
+   "default": "0",
+   "fieldname": "show_specifications_under_the_short_description",
+   "fieldtype": "Check",
+   "label": "Show Specifications under the short description"
+  },
+  {
+   "default": "0",
+   "fieldname": "show_vendor",
+   "fieldtype": "Check",
+   "label": "Show Vendor Name?"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_related_products",
+   "fieldtype": "Check",
+   "label": "Enable Related Products"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_recetly_viewed_products",
+   "fieldtype": "Check",
+   "label": "Enable Recently Viewed Products"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_best_sellers",
+   "fieldtype": "Check",
+   "label": "Enable Best Sellers"
+  },
+  {
+   "default": "0",
+   "fieldname": "customers_who_bought",
+   "fieldtype": "Check",
+   "label": "Enable Customers Who Bought"
+  },
+  {
+   "default": "0",
+   "fieldname": "show_video_gallery_separately",
+   "fieldtype": "Check",
+   "label": "Show Video Gallery Separately"
+  },
+  {
+   "default": "0",
+   "fieldname": "upload_review_images",
+   "fieldtype": "Check",
+   "label": "Upload Review Images"
+  },
+  {
+   "fieldname": "search_settings",
+   "fieldtype": "Section Break",
+   "label": "Search Settings"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_full_text_search",
+   "fieldtype": "Check",
+   "label": "Enable Full Text Search"
+  },
+  {
+   "fieldname": "column_break_101",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "disable_search_keyword",
+   "fieldtype": "Check",
+   "label": "Disable Search Keyword"
+  },
+  {
+   "fieldname": "column_break_103",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_blog_search",
+   "fieldtype": "Check",
+   "label": "Enable Blog Search"
+  },
+  {
+   "fieldname": "column_break_rvsz",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_whoosh_search",
+   "fieldtype": "Check",
+   "label": "Enable Whoosh Search?"
+  },
+  {
+   "fieldname": "section_break_105",
+   "fieldtype": "Section Break",
+   "label": "Search Fields"
+  },
+  {
+   "fieldname": "search_fields",
+   "fieldtype": "Table",
+   "options": "Product Search Fields"
+  },
+  {
+   "fieldname": "megamenu_setting",
+   "fieldtype": "Section Break",
+   "label": "Megamenu Setting"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_megamenu",
+   "fieldtype": "Check",
+   "label": "Enable Megamenu"
+  },
+  {
+   "depends_on": "eval:doc.enable_megamenu==1",
+   "fieldname": "menu_height",
+   "fieldtype": "Int",
+   "label": "Menu Height"
+  },
+  {
+   "depends_on": "eval:doc.enable_megamenu==1",
+   "fieldname": "no_of_columns_display",
+   "fieldtype": "Data",
+   "label": "No Of Columns Display"
+  },
+  {
+   "fieldname": "column_break_62",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "include_all_categories",
+   "fieldtype": "Check",
+   "label": "Include All Categories"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:doc.enable_megamenu==1",
+   "fieldname": "enable_brand",
+   "fieldtype": "Check",
+   "label": "Enable Brand"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:doc.enable_megamenu==1",
+   "fieldname": "is_image_enable",
+   "fieldtype": "Check",
+   "label": "Is Image Enabled"
+  },
+  {
+   "depends_on": "eval:doc.is_image_enable==1",
+   "fieldname": "image_position",
+   "fieldtype": "Select",
+   "label": "Image Position",
+   "options": "Left\nRight"
+  },
+  {
+   "fieldname": "sms_settings",
+   "fieldtype": "Section Break",
+   "hidden": 1,
+   "label": "SMS Settings"
+  },
+  {
+   "default": "0",
+   "fieldname": "send_sms_on_registration",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Send SMS on Registration"
+  },
+  {
+   "default": "0",
+   "fieldname": "send_sms_on_order_placed",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Send SMS on Order Placed"
+  },
+  {
+   "fieldname": "column_break_73",
+   "fieldtype": "Column Break",
+   "hidden": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "send_sms_on_packed",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Send SMS on Packed"
+  },
+  {
+   "default": "0",
+   "fieldname": "send_sms_on_shipped",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Send SMS on Shipped"
+  },
+  {
+   "fieldname": "column_break_76",
+   "fieldtype": "Column Break",
+   "hidden": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "send_sms_on_delivered",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Send SMS on Delivered"
+  },
+  {
+   "fieldname": "additional_menus",
+   "fieldtype": "Section Break",
+   "label": "Additional Menus"
+  },
+  {
+   "fieldname": "additional_menu",
+   "fieldtype": "Table",
+   "label": "Additional Menu",
+   "options": "Additional Menu"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_donation",
+   "fieldtype": "Check",
+   "label": "Enable Donation In Profile Page"
+  },
+  {
+   "description": "Enable captcha for the forms that are being used in the system.",
+   "fieldname": "captcha_settings_section",
+   "fieldtype": "Section Break",
+   "label": "Captcha Settings"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_captcha",
+   "fieldtype": "Check",
+   "label": "Enable Captcha"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:doc.enable_captcha==1",
+   "fieldname": "contact_us",
+   "fieldtype": "Check",
+   "label": "Enable In Contact Us Page"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:doc.enable_captcha==1",
+   "fieldname": "email_a_friend",
+   "fieldtype": "Check",
+   "label": "Enable In Email A Friend Page"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:doc.enable_captcha==1",
+   "fieldname": "register_page",
+   "fieldtype": "Check",
+   "label": "Enable In Register Page"
+  },
+  {
+   "fieldname": "column_break_112",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:doc.enable_captcha==1",
+   "fieldname": "login_page",
+   "fieldtype": "Check",
+   "label": "Enable In Login Page"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:doc.enable_captcha==1",
+   "fieldname": "review_popup",
+   "fieldtype": "Check",
+   "label": "Enable In Review"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:doc.enable_captcha==1",
+   "fieldname": "qsn_a_product",
+   "fieldtype": "Check",
+   "label": "Enable In Question A Product"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:doc.enable_captcha==1",
+   "fieldname": "vendor_registration",
+   "fieldtype": "Check",
+   "label": "Enable In Vendor Registration"
+  },
+  {
+   "fieldname": "column_break_117",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.enable_captcha==1",
+   "fieldname": "public_key",
+   "fieldtype": "Data",
+   "label": "Public Key"
+  },
+  {
+   "depends_on": "eval:doc.enable_captcha==1",
+   "fieldname": "private_key",
+   "fieldtype": "Data",
+   "label": "Private Key"
+  },
+  {
+   "fieldname": "default_meta_information",
+   "fieldtype": "Section Break",
+   "label": "Default Meta Information"
+  },
+  {
+   "fieldname": "meta_title",
+   "fieldtype": "Data",
+   "label": "Meta Title"
+  },
+  {
+   "fieldname": "column_break_38",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "meta_description",
+   "fieldtype": "Small Text",
+   "label": "Meta Description"
+  },
+  {
+   "fieldname": "column_break_56",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "meta_keywords",
+   "fieldtype": "Small Text",
+   "label": "Meta Keywords"
+  }
+ ],
+ "issingle": 1,
+ "links": [],
+ "modified": "2024-02-13 19:38:06.669289",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Catalog Settings",
+ "naming_rule": "Expression (old style)",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

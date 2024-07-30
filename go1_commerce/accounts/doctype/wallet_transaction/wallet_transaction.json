@@ -1,0 +1,218 @@
+{
+ "actions": [],
+ "autoname": "naming_series:",
+ "creation": "2019-07-09 16:01:15.648296",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "type",
+  "party_type",
+  "party",
+  "reference",
+  "amount",
+  "balance_amount",
+  "start_date",
+  "end_date",
+  "notes",
+  "column_break_3",
+  "transaction_type",
+  "status",
+  "transaction_date",
+  "party_name",
+  "order_type",
+  "order_id",
+  "total_value",
+  "naming_series",
+  "amended_from",
+  "is_settlement_paid",
+  "is_fund_added",
+  "disabled",
+  "fund_reference"
+ ],
+ "fields": [
+  {
+   "fieldname": "type",
+   "fieldtype": "Link",
+   "in_standard_filter": 1,
+   "label": "Party Type",
+   "options": "Party Type"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "party_type",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Party Type",
+   "options": "DocType"
+  },
+  {
+   "depends_on": "eval:((doc.type!=\"Service Provider\"))",
+   "fieldname": "party",
+   "fieldtype": "Dynamic Link",
+   "label": "Party ",
+   "options": "party_type"
+  },
+  {
+   "fieldname": "reference",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Reference",
+   "options": "Reference"
+  },
+  {
+   "fieldname": "amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Amount"
+  },
+  {
+   "depends_on": "eval:((doc.start_date))",
+   "fieldname": "start_date",
+   "fieldtype": "Date",
+   "label": "Start Date"
+  },
+  {
+   "depends_on": "eval:((doc.end_date))",
+   "fieldname": "end_date",
+   "fieldtype": "Date",
+   "label": "End Date"
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Small Text",
+   "label": "Notes"
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Pay",
+   "fieldname": "transaction_type",
+   "fieldtype": "Select",
+   "in_standard_filter": 1,
+   "label": "Transaction Type",
+   "options": "\nPay\nReceive"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "options": "\nPending\nLocked\nCredited\nDebited\nApproved\nCancelled"
+  },
+  {
+   "default": "Now",
+   "fieldname": "transaction_date",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Creation"
+  },
+  {
+   "depends_on": "eval:((doc.type!=\"Service Provider\"))",
+   "fieldname": "party_name",
+   "fieldtype": "Data",
+   "label": "Party Name"
+  },
+  {
+   "depends_on": "eval:((doc.reference!=\"Other\"||doc.reference!=\"Commission\"))",
+   "fieldname": "order_type",
+   "fieldtype": "Link",
+   "label": "Order Type",
+   "options": "DocType"
+  },
+  {
+   "depends_on": "eval:((doc.order_type))",
+   "fieldname": "order_id",
+   "fieldtype": "Dynamic Link",
+   "label": "Order ID",
+   "options": "order_type"
+  },
+  {
+   "depends_on": "eval:((doc.order_type))",
+   "fieldname": "total_value",
+   "fieldtype": "Currency",
+   "label": "Total Value"
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Naming Series",
+   "options": "WE-.YYYY.-"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Wallet Transaction",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "is_settlement_paid",
+   "fieldtype": "Check",
+   "label": "Is Settlement Paid"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:((doc.transaction_type==\"Receive\"))",
+   "fieldname": "is_fund_added",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Is Fund Added"
+  },
+  {
+   "default": "0",
+   "fieldname": "disabled",
+   "fieldtype": "Check",
+   "label": "Disabled"
+  },
+  {
+   "depends_on": "eval:((doc.transaction_type==\"Receive\"))",
+   "fieldname": "fund_reference",
+   "fieldtype": "Data",
+   "label": "Fund Reference",
+   "read_only": 1
+  },
+  {
+   "fieldname": "balance_amount",
+   "fieldtype": "Currency",
+   "hidden": 1,
+   "label": "Balance Amount"
+  }
+ ],
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2023-06-22 16:08:31.020129",
+ "modified_by": "Administrator",
+ "module": "Accounts",
+ "name": "Wallet Transaction",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

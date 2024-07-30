@@ -1,0 +1,14 @@
+[
+	{
+		"doctype":"Shipping Method", 
+		"shipping_method_name":"Delivery", 
+		"display_order":0, 
+		"show_in_website": 0
+	},
+	{
+		"doctype":"Shipping Method", 
+		"shipping_method_name":"Pickup", 
+		"display_order":1, 
+		"show_in_website": 0
+	}
+]

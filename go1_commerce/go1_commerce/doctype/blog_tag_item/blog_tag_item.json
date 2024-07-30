@@ -1,0 +1,36 @@
+{
+ "creation": "2020-07-03 06:21:05.246291",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "blog_tag",
+  "tag_route"
+ ],
+ "fields": [
+  {
+   "fieldname": "blog_tag",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Blog Tag",
+   "options": "Blog Tag"
+  },
+  {
+   "fetch_from": "blog_tag.route",
+   "fieldname": "tag_route",
+   "fieldtype": "Data",
+   "label": "Route"
+  }
+ ],
+ "istable": 1,
+ "modified": "2020-07-03 08:46:35.059236",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Blog Tag Item",
+ "owner": "Administrator",
+ "permissions": [],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

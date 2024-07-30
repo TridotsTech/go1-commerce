@@ -1,0 +1,449 @@
+{
+ "actions": [],
+ "autoname": "naming_series:",
+ "creation": "2018-08-28 15:20:52.582951",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_1",
+  "choose_template",
+  "section_break_2",
+  "name1",
+  "discount_type",
+  "price_or_product_discount",
+  "priority",
+  "column_break_2",
+  "discount_products",
+  "discount_categories",
+  "section_break_21",
+  "start_date",
+  "end_date",
+  "current_date_range",
+  "column_break_7",
+  "min_qty",
+  "max_qty",
+  "section_break_8",
+  "limitations",
+  "column_break_10",
+  "limitation_count",
+  "discount_info",
+  "percent_or_amount",
+  "column_break_6",
+  "discount_amount",
+  "discount_percentage",
+  "column_break_24",
+  "max_discount_amount",
+  "product_discount_scheme",
+  "same_product",
+  "free_product",
+  "free_qty",
+  "discount_applied_product",
+  "cashback_details_section",
+  "cashback_type",
+  "set_cashback_expiry",
+  "column_break_37",
+  "cashback_percentage",
+  "cashback_amount",
+  "expires_after",
+  "column_break_40",
+  "max_cashback_amount",
+  "section_break_13",
+  "requires_coupon_code",
+  "column_break_15",
+  "coupon_code",
+  "naming_series",
+  "requirements",
+  "discount_requirements",
+  "discount_requirements_html",
+  "discount_usage_history",
+  "discount_history",
+  "discount_history_html",
+  "requirement_id",
+  "section_break_41",
+  "help_text",
+  "is_birthday_club_discount"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_1",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "choose_template",
+   "fieldtype": "Button",
+   "label": "Choose From Template"
+  },
+  {
+   "fieldname": "section_break_2",
+   "fieldtype": "Section Break"
+  },
+  {
+   "description": "Title of the discount",
+   "fieldname": "name1",
+   "fieldtype": "Data",
+   "label": "Name",
+   "reqd": 1
+  },
+  {
+   "description": "It specifies the type of discount like product discount, category discount, order total discount, etc.",
+   "fieldname": "discount_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Discount Type",
+   "options": "Assigned to Products\nAssigned to Categories\nAssigned to Sub Total\nAssigned to Delivery Charges",
+   "reqd": 1
+  },
+  {
+   "description": "It specifies whether to apply a discount for the product or giving a free product",
+   "fieldname": "price_or_product_discount",
+   "fieldtype": "Select",
+   "label": "Price or Product Discount",
+   "options": "Price\nProduct\nCashback",
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "description": "Higher the number, higher the priority",
+   "fieldname": "priority",
+   "fieldtype": "Int",
+   "label": "Priority"
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.discount_type==\"Assigned to Products\"",
+   "description": "Map the products for which this discount should apply",
+   "fieldname": "discount_products",
+   "fieldtype": "Table",
+   "label": "Discount Products",
+   "options": "Discount Products"
+  },
+  {
+   "depends_on": "eval:doc.discount_type==\"Assigned to Categories\"",
+   "description": "Map the categories for which this discount should apply",
+   "fieldname": "discount_categories",
+   "fieldtype": "Table",
+   "label": "Discount Categories",
+   "options": "Discount Categories"
+  },
+  {
+   "fieldname": "section_break_21",
+   "fieldtype": "Section Break"
+  },
+  {
+   "default": "Today",
+   "description": "Start date of the discount. This discount will apply on or after this date.",
+   "fieldname": "start_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Valid From"
+  },
+  {
+   "description": "End date of the discount. This discount will apply on or before this date.",
+   "fieldname": "end_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Valid Till"
+  },
+  {
+   "fieldname": "column_break_7",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "1",
+   "description": "Minimum quantity of products required to use this discount (optional)",
+   "fieldname": "min_qty",
+   "fieldtype": "Int",
+   "label": "Min Qty"
+  },
+  {
+   "description": "Maximum quantity of products required to use this discount (optional)",
+   "fieldname": "max_qty",
+   "fieldtype": "Int",
+   "label": "Max Qty"
+  },
+  {
+   "fieldname": "section_break_8",
+   "fieldtype": "Section Break"
+  },
+  {
+   "default": "Unlimited",
+   "description": "To limit this discount usage based on count like number of usages or number of usages per customer",
+   "fieldname": "limitations",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Limitations",
+   "options": "Unlimited\nN times only\nN times per user"
+  },
+  {
+   "fieldname": "column_break_10",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.limitations!=\"Unlimited\"",
+   "description": "Based on this count, the discount will be limited",
+   "fieldname": "limitation_count",
+   "fieldtype": "Int",
+   "label": "Limitation Count"
+  },
+  {
+   "depends_on": "eval:doc.price_or_product_discount == \"Price\"",
+   "fieldname": "discount_info",
+   "fieldtype": "Section Break",
+   "label": "Discount Info"
+  },
+  {
+   "description": "Determines whether to apply this discount as percentage or amount",
+   "fieldname": "percent_or_amount",
+   "fieldtype": "Select",
+   "label": "Percentage or Amount",
+   "options": "Discount Percentage\nDiscount Amount"
+  },
+  {
+   "fieldname": "column_break_6",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.percent_or_amount==\"Discount Amount\"",
+   "description": "Specifies the amount that must be given as discount",
+   "fieldname": "discount_amount",
+   "fieldtype": "Data",
+   "label": "Discount Amount"
+  },
+  {
+   "depends_on": "eval:doc.percent_or_amount==\"Discount Percentage\"",
+   "description": "Specifies the percentage of the amount that must be given as discount",
+   "fieldname": "discount_percentage",
+   "fieldtype": "Data",
+   "label": "Discount Percentage"
+  },
+  {
+   "fieldname": "column_break_24",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.discount_type==\"Assigned to Sub Total\" && doc.percent_or_amount==\"Discount Percentage\"",
+   "description": "To restrict the maximum discount amount. \nFor e.g., if the discount amount 50.00 and the max discount amount is 30.00, then the max discount amount will be applied.",
+   "fieldname": "max_discount_amount",
+   "fieldtype": "Currency",
+   "label": "Max Discount Amount"
+  },
+  {
+   "depends_on": "eval:doc.price_or_product_discount == \"Product\"",
+   "fieldname": "product_discount_scheme",
+   "fieldtype": "Section Break",
+   "label": "PRODUCT DISCOUNT SCHEME"
+  },
+  {
+   "default": "0",
+   "description": "If enabled, then the same product will be given as a free product",
+   "fieldname": "same_product",
+   "fieldtype": "Check",
+   "label": "Same Product"
+  },
+  {
+   "depends_on": "eval:doc.same_product != 1",
+   "description": "Map the product, that must be given as free for the listed products.",
+   "fieldname": "free_product",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Free Product",
+   "options": "Product"
+  },
+  {
+   "depends_on": "eval:((doc.same_product==1))",
+   "description": "The number of products that must be given as free",
+   "fieldname": "free_qty",
+   "fieldtype": "Int",
+   "label": "Free Qty"
+  },
+  {
+   "depends_on": "eval:doc.discount_type==\"Assigned to Sub Total\" || doc.discount_type==\"Assigned to Delivery Charges\" ",
+   "fieldname": "section_break_13",
+   "fieldtype": "Section Break",
+   "label": "Coupon Code"
+  },
+  {
+   "default": "0",
+   "description": "If enabled, then this discount will be applied only if the customer enters the specified coupon code",
+   "fieldname": "requires_coupon_code",
+   "fieldtype": "Check",
+   "label": "Requires Coupon Code"
+  },
+  {
+   "fieldname": "column_break_15",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:((doc.requires_coupon_code==1))",
+   "description": "Code required to apply this discount",
+   "fieldname": "coupon_code",
+   "fieldtype": "Data",
+   "label": "Coupon Code"
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Naming Series",
+   "options": "D-"
+  },
+  {
+   "fieldname": "requirements",
+   "fieldtype": "Section Break",
+   "label": "Requirements"
+  },
+  {
+   "fieldname": "discount_requirements",
+   "fieldtype": "Table",
+   "hidden": 1,
+   "label": "Discount Requirements",
+   "options": "Discount Requirements"
+  },
+  {
+   "fieldname": "discount_requirements_html",
+   "fieldtype": "HTML",
+   "label": "Requirements Html"
+  },
+  {
+   "fieldname": "discount_usage_history",
+   "fieldtype": "Section Break",
+   "label": "Discount Usage History"
+  },
+  {
+   "fieldname": "discount_history",
+   "fieldtype": "Table",
+   "hidden": 1,
+   "label": "Discount History",
+   "no_copy": 1,
+   "options": "Discount Usage History"
+  },
+  {
+   "fieldname": "requirement_id",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Requirement Id"
+  },
+  {
+   "fieldname": "section_break_41",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "help_text",
+   "fieldtype": "HTML",
+   "label": "Help Text"
+  },
+  {
+   "depends_on": "eval:doc.price_or_product_discount == \"Cashback\"",
+   "fieldname": "cashback_details_section",
+   "fieldtype": "Section Break",
+   "label": "Cashback Details"
+  },
+  {
+   "description": "Determines whether to apply the cashback as percentage or amount",
+   "fieldname": "cashback_type",
+   "fieldtype": "Select",
+   "label": "Percentage or Amount",
+   "options": "Percentage\nAmount"
+  },
+  {
+   "fieldname": "column_break_37",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval: doc.cashback_type == \"Percentage\"",
+   "description": "Specifies the percentage of the amount that must be given as cashback",
+   "fieldname": "cashback_percentage",
+   "fieldtype": "Float",
+   "label": "Cashback Percentage"
+  },
+  {
+   "depends_on": "eval: doc.cashback_type == \"Amount\"",
+   "description": "Specifies the amount that must be given as cashback",
+   "fieldname": "cashback_amount",
+   "fieldtype": "Float",
+   "label": "Cashback Amount"
+  },
+  {
+   "fieldname": "column_break_40",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval: doc.cashback_type == \"Percentage\"",
+   "description": "To restrict the maximum cashback amount. For e.g., if the cashback amount is 50.00 and the max cashback amount is 30.00, then the max cashback amount will be applied.",
+   "fieldname": "max_cashback_amount",
+   "fieldtype": "Float",
+   "label": "Max Cashback Amount"
+  },
+  {
+   "default": "0",
+   "description": "If enabled, an expiry date will be set for the cashback amount. Which means, the customer should use this cashback amount within the specified date",
+   "fieldname": "set_cashback_expiry",
+   "fieldtype": "Check",
+   "label": "Set Expiry For Cashback"
+  },
+  {
+   "depends_on": "eval: doc.set_cashback_expiry == 1",
+   "description": "Specify the expiry date of the cashback amount in days. This expiry will be based on the date on which the amount is credited to the customer wallet.",
+   "fieldname": "expires_after",
+   "fieldtype": "Data",
+   "label": "Expires After (In Days)"
+  },
+  {
+   "fieldname": "current_date_range",
+   "fieldtype": "Small Text",
+   "hidden": 1,
+   "label": "Current Date Range"
+  },
+  {
+   "fieldname": "discount_history_html",
+   "fieldtype": "HTML",
+   "label": "Discount History HTML"
+  },
+  {
+   "depends_on": "eval:((doc.same_product!=1))",
+   "fieldname": "discount_applied_product",
+   "fieldtype": "Table",
+   "label": "Discount Applied Product",
+   "options": "Discount Applied Product"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_birthday_club_discount",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Is Birthday Club Discount"
+  }
+ ],
+ "links": [],
+ "modified": "2024-01-27 17:03:31.196903",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Discounts",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "search_fields": "name1",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "name1",
+ "track_changes": 1
+}

@@ -1,0 +1,36 @@
+<!-- {% if orders%}
+{% for n in orders %}
+<div class="col-sm-12" style="padding:5px;"><a href="#Form/Order/{{n.name}}">{{n.name}}</a><span>{{n.company}}</span></div>
+{% endfor%}
+{% endif %} -->
+<a class="btn btn-primary btn-sm primary-action{% if button_enable==0%} hidden {% endif%}"  id="{{order}}" onclick="goto_expense($(this))" ><i class="visible-xs octicon octicon-check"></i><span class="hidden-xs">Make Expense</span></a>
+<table class="table table-bordered">
+    <thead style="background-color: #e5e9ef;">
+        <th>Payment ID#</th>
+        <th>Payment Date</th>
+        <th>Paid Amount</th>
+        <th>Outstanding Amount</th>
+    </thead>
+    <tbody>
+       
+            {% if payments.length >0%}
+           
+            {% for n in payments %}
+            
+          
+        <tr>
+        <td><a href="#Form/Payment Entry/{{n.name}}">{{n.name}}</a></td>
+        <td>{{moment(n.posting_date).format("MM/DD/YYYY")}}</td>
+        <td>{{n.paid_amount}}</td>
+    <td>{{n.outstanding_amount}}</td>
+   
+</tr>
+
+{% endfor%}
+{% else%}
+<tr>
+        <td colspan="7">No records found!</td>
+        </tr>
+{% endif %}
+</tbody>
+</table>

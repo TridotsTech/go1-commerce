@@ -1,0 +1,4 @@
+[
+		{"doctype":"Account", "account_type": "Receivable", "account_name": "Creditors"},
+		{"doctype":"Account", "account_type": "Payable", "account_name": "Debitors"}
+	]

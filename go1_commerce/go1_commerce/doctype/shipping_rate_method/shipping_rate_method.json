@@ -1,0 +1,261 @@
+{
+ "actions": [],
+ "autoname": "SRM.#####",
+ "creation": "2019-03-12 19:20:51.911880",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "title",
+  "is_active",
+  "column_break_2",
+  "shipping_rate_method",
+  "column_break_5",
+  "column_break_3",
+  "display_order",
+  "description",
+  "column_break_4",
+  "shipping_by_weight_config",
+  "shipping_by_weight_charges",
+  "shipping_by_total_config",
+  "shipping_by_total",
+  "shipping_fixed_rate_config",
+  "shipping_by_fixed_rate",
+  "distance_section",
+  "distance_unit",
+  "shipping_charges_by_distance",
+  "distance_total_section",
+  "distance_total_unit",
+  "charges_by_distance_and_total",
+  "dis_and_weight_section",
+  "charges_by_distance_and_weight",
+  "distance_or_weight",
+  "charges_per_km",
+  "charges_per_kg",
+  "sh_by_gp_by_ds_weight",
+  "charges_per_kg_gp",
+  "shipping_by_weight_charges_gp",
+  "charges_per_km_gp",
+  "shipping_charges_by_distance_gp"
+ ],
+ "fields": [
+  {
+   "fieldname": "shipping_rate_method",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Shipping Rate Method",
+   "options": "Fixed Rate Shipping\nShipping By Total\nShipping By Weight\nShipping By Distance\nShipping By Distance and Total\nShipping By Distance and Weight\nShipping By Distance / Weight\nShipping By Group By Distance and Weight",
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "is_active",
+   "fieldtype": "Check",
+   "label": "Is Active"
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "display_order",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "label": "Display Order"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "hidden": 1,
+   "label": "Description"
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:(doc.shipping_rate_method==\"Shipping By Weight\")",
+   "fieldname": "shipping_by_weight_config",
+   "fieldtype": "Section Break",
+   "label": "Configuration"
+  },
+  {
+   "fieldname": "shipping_by_weight_charges",
+   "fieldtype": "Table",
+   "label": "Shipping By Weight Charges",
+   "options": "Shipping By Weight Charges"
+  },
+  {
+   "depends_on": "eval:(doc.shipping_rate_method==\"Shipping By Total\")",
+   "fieldname": "shipping_by_total_config",
+   "fieldtype": "Section Break",
+   "label": "Configuration"
+  },
+  {
+   "fieldname": "shipping_by_total",
+   "fieldtype": "Table",
+   "label": "Shipping By Total",
+   "options": "Shipping By Total Charges"
+  },
+  {
+   "depends_on": "eval:(doc.shipping_rate_method==\"Fixed Rate Shipping\")",
+   "fieldname": "shipping_fixed_rate_config",
+   "fieldtype": "Section Break",
+   "label": "Configuration"
+  },
+  {
+   "fieldname": "shipping_by_fixed_rate",
+   "fieldtype": "Table",
+   "label": "Shipping By Fixed Rate",
+   "options": "Shipping By Fixed Rate Charges"
+  },
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Title"
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Section Break",
+   "hidden": 1
+  },
+  {
+   "fieldname": "column_break_5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:(doc.shipping_rate_method==\"Shipping By Distance\")",
+   "fieldname": "distance_section",
+   "fieldtype": "Section Break",
+   "label": "Configuration"
+  },
+  {
+   "default": "Kilometers",
+   "fieldname": "distance_unit",
+   "fieldtype": "Select",
+   "label": "Distance Unit",
+   "options": "Kilometers\nMiles"
+  },
+  {
+   "fieldname": "shipping_charges_by_distance",
+   "fieldtype": "Table",
+   "label": "Shipping Charges By Distance",
+   "options": "Shipping Charges By Distance"
+  },
+  {
+   "depends_on": "eval:(doc.shipping_rate_method==\"Shipping By Distance and Total\")",
+   "fieldname": "distance_total_section",
+   "fieldtype": "Section Break",
+   "label": "Configuration"
+  },
+  {
+   "fieldname": "distance_total_unit",
+   "fieldtype": "Select",
+   "label": "Distance Unit",
+   "options": "Kilometers\nMiles"
+  },
+  {
+   "fieldname": "charges_by_distance_and_total",
+   "fieldtype": "Table",
+   "label": "Charges By Distance and Total",
+   "options": "Shipping Charges By Distance and Total"
+  },
+  {
+   "depends_on": "eval:(doc.shipping_rate_method==\"Shipping By Distance and Weight\")",
+   "fieldname": "charges_by_distance_and_weight",
+   "fieldtype": "Table",
+   "label": "Charges By Distance and Weight",
+   "options": "Shipping Charges By Distance And Weight"
+  },
+  {
+   "depends_on": "eval:(doc.shipping_rate_method==\"Shipping By Distance and Weight\")",
+   "fieldname": "dis_and_weight_section",
+   "fieldtype": "Section Break",
+   "label": "Configuration"
+  },
+  {
+   "depends_on": "eval:(doc.shipping_rate_method==\"Shipping By Distance / Weight\")",
+   "fieldname": "distance_or_weight",
+   "fieldtype": "Section Break",
+   "label": "Configuration"
+  },
+  {
+   "fieldname": "charges_per_km",
+   "fieldtype": "Currency",
+   "label": "Charges Per Km"
+  },
+  {
+   "fieldname": "charges_per_kg",
+   "fieldtype": "Currency",
+   "label": "Charges Per Kg"
+  },
+  {
+   "depends_on": "eval:doc.shipping_rate_method==\"Shipping By Group By Distance and Weight\"",
+   "fieldname": "sh_by_gp_by_ds_weight",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "charges_per_kg_gp",
+   "fieldtype": "Currency",
+   "label": "Charges Per Kg"
+  },
+  {
+   "fieldname": "shipping_by_weight_charges_gp",
+   "fieldtype": "Table",
+   "label": "Shipping By Weight Charges",
+   "options": "Shipping By Weight Charges"
+  },
+  {
+   "fieldname": "charges_per_km_gp",
+   "fieldtype": "Currency",
+   "label": "Charges Per Km"
+  },
+  {
+   "fieldname": "shipping_charges_by_distance_gp",
+   "fieldtype": "Table",
+   "label": "Shipping Charges By Distance",
+   "options": "Shipping Charges By Distance"
+  }
+ ],
+ "links": [],
+ "modified": "2024-02-17 18:07:24.041736",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Shipping Rate Method",
+ "naming_rule": "Expression (old style)",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "export": 1,
+   "read": 1,
+   "role": "Vendor",
+   "write": 1
+  },
+  {
+   "export": 1,
+   "read": 1,
+   "role": "Admin",
+   "write": 1
+  }
+ ],
+ "search_fields": "shipping_rate_method",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "title",
+ "track_changes": 1
+}

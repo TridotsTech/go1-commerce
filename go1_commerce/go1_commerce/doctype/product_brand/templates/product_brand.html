@@ -1,0 +1,244 @@
+{% extends layout_template %}
+
+{% block loader %}
+<!-- {% include "/templates/pages/homepageloader.html" %} -->
+{% endblock %}
+
+{% block content %}
+    <input type="hidden" name="hdnBrand" id="hdnBrand" value="{{brand_name.name}}" />
+    <input type="hidden" name="hdnBrandFilter" id="hdnBrandFilter" value="{% if brand_filter %}{{brand_filter}}{% endif %}">
+    <input type="hidden" name="hdnMinFilter" id="hdnMinFilter" value="{% if minPrice %}{{minPrice}}{% endif %}" />
+    <input type="hidden" name="hdnMaxFilter" id="hdnMaxFilter" value="{% if maxPrice %}{{maxPrice}}{% endif %}" />
+    <input type="hidden" name="hdnSortFilter" id="hdnSortFilter" value="{% if sort %}{{sort}}{% endif %}">
+    <input type="hidden" name="hdnRatings" id="hdnRatings" value="{% if rating %}{{rating}}{% endif %}">
+     {% if attribute %}{% for item in attribute %}
+    <input type="hidden" name="hdnAttrFilter" id="hdnAttrFilter" data-attribute="{{item.attribute}}" value="{{item.value}}">
+    {% endfor %}{% else %}
+    <input type="hidden" name="hdnAttrFilter" id="hdnAttrFilter" value="">{% endif %}
+     <div class="filter-slide">
+        <div id="FiltersList" data-off-canvas="filter-slider left overlay">
+            <div class="mobile-filters"></div>
+        </div>
+    </div>
+    
+<section class="page-title-area" style="display:none" >
+        <div class="page-title-overlay">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-xs-12">
+                        <div class="page-title">
+                            <h3>{{title}}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+<div class="title-breadcrumb">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <ol class="breadcrumb">
+                    <li><a href="/"><img class="icon-width" src="/assets/cmswebsite/images/home.svg"></a></li>
+                    {%for item in parents%}
+                     <li><a href="/{{item.route}}">{{item.name}}</a></li>
+                    {%endfor%}
+                    <li><a >{{title}}</a></li>
+                </ol>
+            </div>
+            <div class="col-md-12 col-sm-12 col-xs-12" style="position: relative;">
+                 <h3 >{{title}}</h3>
+                    <div class="product-title product-sort-options hidden-xs">
+                        <div class="sortType">
+                            <label>Sort By</label>
+                         <ul>
+                              <li><a class="dropdown-item" data-id="relevance" onclick="sortProducts(this)">Relevance</a></li>
+                                    <li><a class="dropdown-item" data-id="name_asc" onclick="sortProducts(this)">Name: A-Z</a></li>
+                                    <li><a class="dropdown-item" data-id="name_desc" onclick="sortProducts(this)">Name: Z-A</a></li>
+                                    <li><a class="dropdown-item" data-id="price_asc" onclick="sortProducts(this)">Price: Low to High</a></li>
+                                    <li><a class="dropdown-item" data-id="price_desc" onclick="sortProducts(this)">Price: High to Low</a></li>
+                         </ul>
+                    
+                        </div>
+                   
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
+ <div class="product-list-area section-padding">
+        <div class="mob-filters">
+            <div style="border-right: 1px solid #eee;">
+                <a class="btn-block" onclick="show_mobile_filters()"><i class="fa fa-filter"></i>Filters</a>
+            </div>
+            <div>
+                <a class="btn-block" onclick="show_mobile_sort_options()"><i class="fa fa-sort"></i>Sort</a>
+          
+            </div>
+        </div>
+          <div >
+          	
+            <div class="row  mobile-row">
+                <div class="col-md-3 col-sm-3 col-xs-12 hidden-xs" id="ProductFilters">
+                   
+                     
+                    <div class="other-filters" style="float:left">
+                       <div class="filter">
+                        <h3>Custom Price Range</h3>
+                        <div class="customPrice">
+                            <div class="custom">
+                                <input type="number" name="minPrice" id="minPrice" placeholder="Min" value="{% if minPrice %}{{minPrice}}{% endif %}" />
+                            </div>
+                            <div class="custom">
+                                <input type="number" name="maxPrice" id="maxPrice" placeholder="Max" value="{% if maxPrice %}{{maxPrice}}{% endif %}" />
+                            </div>
+                            <div class="custom">
+                                <input type="button" onclick="search_custom_price()" value="GO" class="btn btn-default">
+                            </div>                     
+                        </div>
+                    </div> 
+                         <div class="filter">
+                        <h3>Ratings <span class="fa fa-chevron-up accr-action" onclick="accrod(this)"></span></h3>
+                        <div class="rating_list accr-items">
+                            <label class="radio-container">
+                                <input type="radio" name="ratings" value="4" onclick="select_rating(this)">
+                                <span class="fa fa-star active"></span> 
+                                <span class="fa fa-star active"></span> 
+                                <span class="fa fa-star active"></span> 
+                                <span class="fa fa-star active"></span> 
+                                <span class="fa fa-star"></span> 
+                                <span class="txt">&amp; more</span>
+                                <span class="checkmark"></span>
+                            </label>
+                            <label class="radio-container">
+                                <input type="radio" name="ratings" value="3" onclick="select_rating(this)">
+                                <span class="fa fa-star active"></span> 
+                                <span class="fa fa-star active"></span> 
+                                <span class="fa fa-star active"></span> 
+                                <span class="fa fa-star "></span> 
+                                <span class="fa fa-star"></span> 
+                                <span class="txt">&amp; more</span>
+                                <span class="checkmark"></span>
+                            </label>
+                            <label class="radio-container">
+                                <input type="radio" name="ratings" value="2" onclick="select_rating(this)">
+                                <span class="fa fa-star active"></span> 
+                                <span class="fa fa-star active"></span> 
+                                <span class="fa fa-star "></span> 
+                                <span class="fa fa-star "></span> 
+                                <span class="fa fa-star"></span> 
+                                <span class="txt">&amp; more</span>
+                                <span class="checkmark"></span>
+                            </label>
+                            <label class="radio-container">
+                                <input type="radio" name="ratings" value="1" onclick="select_rating(this)">
+                                <span class="fa fa-star active"></span> 
+                                <span class="fa fa-star "></span> 
+                                <span class="fa fa-star "></span> 
+                                <span class="fa fa-star "></span> 
+                                <span class="fa fa-star"></span> 
+                                <span class="txt">&amp; more</span>
+                                <span class="checkmark"></span>
+                            </label>
+                        </div>
+                    
+                    </div>
+                    </div>
+                </div>
+                  <div class="col-md-9 col-sm-9 col-xs-12 pad-0">
+                    <div style="padding: 0 20px 0 5px;float:left;width:100%;">
+                       
+                     <div class="child-categories-mobile visible-xs">
+                      
+                    </div>
+                     <div class="child-categories hidden-xs">
+                      
+                    </div>
+                  
+                    <div class="row applied-filters">
+                      {%for brand in brandslist%}
+                      <a class="active-filter" onclick="RemoveFilter('brand','{{brand.unique_name}}')">
+                       <span class="active-filter-label">  {{brand.name}}</span>
+                      </a>
+                      {%endfor%}
+                      {%if rating%}
+                      <a class="active-filter" onclick="RemoveFilter('rating','{{rating}}')">
+                       <span class="active-filter-label">  {{rating}} stars & more</span>
+                      </a>
+                      {%endif%}
+                       {%for attribute in attributelist%}
+                      <a class="active-filter" onclick="RemoveFilter('{{attribute.attribute}}','{{attribute.unique_name}}')">
+                       <span class="active-filter-label">  {{attribute.name}}</span>
+                      </a>
+                      {%endfor%}
+                      {%if minPrice%}
+                      {%if maxPrice%}
+                      <a class="active-filter" onclick="RemovePriceFilter()">
+                       <span class="active-filter-label">{{minPrice}} - {{maxPrice}}</span>
+                      </a>
+                      {%else%}
+                       <a class="active-filter" onclick="RemoveFilter('min','{{minPrice}}')">
+                       <span class="active-filter-label">From {{minPrice}}</span>
+                      </a>
+                      {%endif%}
+                      {%else%}
+                      {%if maxPrice%}
+                        <a class="active-filter" onclick="RemoveFilter('max','{{maxPrice}}')">
+                       <span class="active-filter-label">Upto {{maxPrice}}</span>
+                      </a>
+                        {%endif%}
+                      {%endif%}
+                       {%if brandslist or rating or attributelist%}
+                        <a class="active-filter remove-filter" onclick="RemoveAllFilter()">
+                       <span class="active-filter-label"> Remove all filters</span>
+                      </a>
+                       {%endif%}
+                    </div>
+                       <div class="row" id="products-list" >
+                        {% if products %}
+                            {% if product_box %}
+                            {% include product_box %}
+                            {% endif %}
+                        {% else %}
+                        <div class="no-res" style="margin-right:0 !important">
+                            <div>Sorry! No results found.</div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                  
+            </div>
+            </div>
+ </div>
+
+
+<style type="text/css">
+  
+  input[type=number]::-webkit-inner-spin-button, 
+  input[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none;
+    appearance: none;
+    margin: 0; 
+  }
+</style>
+
+<style type="text/css">
+   .col5{
+    width: 20%;
+   }
+   @media screen and (max-width: 767px){
+   .col5 {
+    width: 50%;
+}
+}
+ </style>
+{% endblock %}
+{% block script %}
+<script type="text/javascript" src="/assets/js/socketio.js"></script>
+<script src="/assets/cmswebsite/js/cart.js"></script>
+<script src="/assets/cmswebsite/js/itemlist.js"></script>
+<!-- <script type="text/javascript" src="/assets/cmswebsite/js/jQuery.2.1.4.js"></script> -->
+
+{% endblock %}
+<!-- this is a sample default web page template -->
+

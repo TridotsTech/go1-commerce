@@ -1,0 +1,112 @@
+{
+ "actions": [],
+ "autoname": "SH.#####",
+ "creation": "2019-03-12 19:17:33.052947",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "shipping_method_name",
+  "customer_address",
+  "is_deliverable",
+  "column_break_2",
+  "display_order",
+  "show_in_website",
+  "section_break_4",
+  "description"
+ ],
+ "fields": [
+  {
+   "description": "Name of the shipping method",
+   "fieldname": "shipping_method_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Shipping Method Name",
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "customer_address",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Get Customer Address While Placing Order?"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_deliverable",
+   "fieldtype": "Check",
+   "label": "Is Deliverable"
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "The sequence in which this method will be displayed",
+   "fieldname": "display_order",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Display Order",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_4",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Text Editor",
+   "label": "Description"
+  },
+  {
+   "default": "0",
+   "description": "If disabled, this method cannot be used by the end-customer on any purchase.",
+   "fieldname": "show_in_website",
+   "fieldtype": "Check",
+   "label": "Show In Website?"
+  }
+ ],
+ "links": [],
+ "modified": "2024-01-27 12:37:20.738720",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Shipping Method",
+ "naming_rule": "Expression (old style)",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "export": 1,
+   "read": 1,
+   "role": "Admin",
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "export": 1,
+   "read": 1,
+   "role": "Vendor",
+   "write": 1
+  }
+ ],
+ "search_fields": "shipping_method_name",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "shipping_method_name",
+ "track_changes": 1
+}

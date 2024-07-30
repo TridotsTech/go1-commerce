@@ -1,0 +1,76 @@
+{
+ "actions": [],
+ "creation": "2019-03-13 20:56:23.936404",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "brand",
+  "brand_name",
+  "unique_name",
+  "model_details_section",
+  "model_html",
+  "model_json",
+  "childname"
+ ],
+ "fields": [
+  {
+   "fieldname": "brand",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Brand Id",
+   "options": "Product Brand",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "brand.brand_name",
+   "fieldname": "brand_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Brand Name",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "brand.unique_name",
+   "fieldname": "unique_name",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Unique Name"
+  },
+  {
+   "fieldname": "model_details_section",
+   "fieldtype": "Section Break",
+   "label": "Model Details"
+  },
+  {
+   "fieldname": "model_html",
+   "fieldtype": "HTML",
+   "label": "Model HTML"
+  },
+  {
+   "fieldname": "model_json",
+   "fieldtype": "Code",
+   "hidden": 1,
+   "label": "Model JSON"
+  },
+  {
+   "fieldname": "childname",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Childname"
+  }
+ ],
+ "istable": 1,
+ "links": [],
+ "modified": "2023-05-26 15:36:05.893954",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Product Brand Mapping",
+ "owner": "Administrator",
+ "permissions": [],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

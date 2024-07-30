@@ -1,0 +1,90 @@
+{
+ "creation": "2019-04-15 12:53:16.911667",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "user_email",
+  "friend_email",
+  "column_break_4",
+  "product",
+  "product_name",
+  "business",
+  "section_break_7",
+  "personal_message"
+ ],
+ "fields": [
+  {
+   "fieldname": "user_email",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Email",
+   "options": "Email",
+   "reqd": 1
+  },
+  {
+   "fieldname": "friend_email",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Friend Email",
+   "options": "Email",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "product",
+   "fieldtype": "Link",
+   "label": "Product",
+   "options": "Product"
+  },
+  {
+   "fetch_from": "product.item",
+   "fieldname": "product_name",
+   "fieldtype": "Data",
+   "label": "Product Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_7",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "personal_message",
+   "fieldtype": "Text",
+   "label": "Personal Message"
+  },
+  {
+   "fetch_from": "product.restaurant",
+   "fieldname": "business",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Business",
+   "options": "Business"
+  }
+ ],
+ "modified": "2020-02-15 19:33:38.431255",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Email Friend",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

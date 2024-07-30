@@ -1,0 +1,192 @@
+{
+ "actions": [],
+ "creation": "2019-07-10 11:22:14.029605",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "wallet_settings",
+  "enable_wallet",
+  "disable_locked_in",
+  "credit_period",
+  "enable_settlement",
+  "enable_approval",
+  "column_break_2",
+  "tab_settings",
+  "enable_auto_debit",
+  "column_break_9",
+  "app_pay_label",
+  "counter_pay_label",
+  "column_break_12",
+  "app_pay_icon",
+  "counter_pay_icon",
+  "sec_1212",
+  "enable_customer_wallet",
+  "customer_auto_debit",
+  "sec_12",
+  "role_commission",
+  "sec_1",
+  "document_type",
+  "sec_13",
+  "party_splitup"
+ ],
+ "fields": [
+  {
+   "default": "1",
+   "fieldname": "enable_wallet",
+   "fieldtype": "Check",
+   "label": "Enable Vendor Wallet"
+  },
+  {
+   "fieldname": "wallet_settings",
+   "fieldtype": "Section Break",
+   "label": "Wallet Settings"
+  },
+  {
+   "depends_on": "eval:((doc.disable_locked_in==0))",
+   "fieldname": "credit_period",
+   "fieldtype": "Int",
+   "label": "Lock-in Period (in days)"
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Enable Both",
+   "description": "Settings for enable and disable App Pay and Counter Pay",
+   "fieldname": "tab_settings",
+   "fieldtype": "Select",
+   "label": "App Pay and Counter Pay Settings",
+   "options": "Only App Pay\nOnly Counter Pay\nEnable Both\nDisable Both"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_auto_debit",
+   "fieldtype": "Check",
+   "label": "Enabled Auto Debit Option from Wallet(Vendor)"
+  },
+  {
+   "fieldname": "sec_1212",
+   "fieldtype": "Section Break",
+   "label": "Customer Wallet Settings"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_customer_wallet",
+   "fieldtype": "Check",
+   "label": "Enable customer wallet"
+  },
+  {
+   "default": "0",
+   "fieldname": "customer_auto_debit",
+   "fieldtype": "Check",
+   "label": "Enabled Auto Debit Option from Wallet (customer)"
+  },
+  {
+   "depends_on": "eval:((doc.enable_wallet==1))",
+   "fieldname": "sec_12",
+   "fieldtype": "Section Break",
+   "label": "Commission Split up"
+  },
+  {
+   "fieldname": "role_commission",
+   "fieldtype": "Table",
+   "label": "Role Based Commission",
+   "options": "Role Based Commission"
+  },
+  {
+   "fieldname": "sec_1",
+   "fieldtype": "Section Break",
+   "label": "Doc Settings"
+  },
+  {
+   "fieldname": "document_type",
+   "fieldtype": "Link",
+   "label": "Document Type",
+   "options": "DocType"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_settlement",
+   "fieldtype": "Check",
+   "label": "Enable Settlement Option"
+  },
+  {
+   "default": "0",
+   "fieldname": "disable_locked_in",
+   "fieldtype": "Check",
+   "label": "Disable Locked In Option"
+  },
+  {
+   "default": "App Pay",
+   "fieldname": "app_pay_label",
+   "fieldtype": "Data",
+   "label": "App Pay Label"
+  },
+  {
+   "default": "Counter Pay",
+   "fieldname": "counter_pay_label",
+   "fieldtype": "Data",
+   "label": "Counter Pay Label"
+  },
+  {
+   "fieldname": "column_break_9",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_12",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "app_pay_icon",
+   "fieldtype": "Data",
+   "label": "App Pay Icon"
+  },
+  {
+   "fieldname": "counter_pay_icon",
+   "fieldtype": "Data",
+   "label": "Counter Pay Icon"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_approval",
+   "fieldtype": "Check",
+   "label": "Enable Transaction Approval"
+  },
+  {
+   "fieldname": "sec_13",
+   "fieldtype": "Section Break",
+   "label": "Wallet Source"
+  },
+  {
+   "fieldname": "party_splitup",
+   "fieldtype": "Table",
+   "options": "Party Splitup"
+  }
+ ],
+ "issingle": 1,
+ "links": [],
+ "modified": "2024-02-26 15:03:16.194283",
+ "modified_by": "Administrator",
+ "module": "Accounts",
+ "name": "Wallet Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

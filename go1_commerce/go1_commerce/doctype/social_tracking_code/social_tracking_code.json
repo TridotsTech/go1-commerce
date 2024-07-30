@@ -1,0 +1,138 @@
+{
+ "creation": "2020-02-14 15:24:30.606017",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "business",
+  "column_break_2",
+  "google_site_verification",
+  "section_break_2",
+  "google_analytics_code",
+  "column_break_4",
+  "tag_manager_snippet",
+  "section_break_6",
+  "pixel_code",
+  "column_break_8",
+  "live_chat_snippet",
+  "section_break_10",
+  "whatsapp_snippet",
+  "others",
+  "column_break_12",
+  "facebook_messenger",
+  "facebook_page_id",
+  "header_script"
+ ],
+ "fields": [
+  {
+   "fieldname": "business",
+   "fieldtype": "Link",
+   "label": "Business",
+   "options": "Business"
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "google_site_verification",
+   "fieldtype": "Data",
+   "label": "Google Site Verification"
+  },
+  {
+   "fieldname": "section_break_2",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "google_analytics_code",
+   "fieldtype": "Small Text",
+   "ignore_xss_filter": 1,
+   "label": "Google Analytics Code"
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "tag_manager_snippet",
+   "fieldtype": "Small Text",
+   "ignore_xss_filter": 1,
+   "label": "Tag Manager Snippet"
+  },
+  {
+   "fieldname": "section_break_6",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "pixel_code",
+   "fieldtype": "Small Text",
+   "ignore_xss_filter": 1,
+   "label": "Facebook Pixel Code"
+  },
+  {
+   "fieldname": "column_break_8",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "live_chat_snippet",
+   "fieldtype": "Small Text",
+   "ignore_xss_filter": 1,
+   "label": "Live Chat Snippet"
+  },
+  {
+   "fieldname": "section_break_10",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "whatsapp_snippet",
+   "fieldtype": "Small Text",
+   "ignore_xss_filter": 1,
+   "label": "WhatsApp Snippet"
+  },
+  {
+   "fieldname": "column_break_12",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "facebook_messenger",
+   "fieldtype": "Small Text",
+   "ignore_xss_filter": 1,
+   "label": "Facebook Messenger"
+  },
+  {
+   "fieldname": "facebook_page_id",
+   "fieldtype": "Data",
+   "label": "Facebook Page Id"
+  },
+  {
+   "fieldname": "others",
+   "fieldtype": "Small Text",
+   "label": "Others"
+  },
+  {
+   "fieldname": "header_script",
+   "fieldtype": "Long Text",
+   "ignore_xss_filter": 1,
+   "label": "Header Script"
+  }
+ ],
+ "modified": "2021-06-29 19:07:39.232368",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Social Tracking Code",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

@@ -1,0 +1,37 @@
+{
+ "creation": "2020-12-05 02:36:46.721857",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "category",
+  "category_name"
+ ],
+ "fields": [
+  {
+   "fieldname": "category",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Category",
+   "options": "Product Category"
+  },
+  {
+   "fetch_from": "category.category_name",
+   "fieldname": "category_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Category Name"
+  }
+ ],
+ "istable": 1,
+ "modified": "2021-05-10 13:54:23.063864",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Delivery Slot Category",
+ "owner": "Administrator",
+ "permissions": [],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

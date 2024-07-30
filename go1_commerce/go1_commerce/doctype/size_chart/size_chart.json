@@ -1,0 +1,68 @@
+{
+ "autoname": "SC.#####",
+ "creation": "2020-03-07 14:34:27.144342",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "title",
+  "size_chart_image",
+  "column_break_3",
+  "chart_content_section",
+  "size_chart"
+ ],
+ "fields": [
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Title",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "size_chart_image",
+   "fieldtype": "Attach Image",
+   "label": "Size Chart Image"
+  },
+  {
+   "fieldname": "chart_content_section",
+   "fieldtype": "Section Break",
+   "label": "Chart Content"
+  },
+  {
+   "fieldname": "size_chart",
+   "fieldtype": "Table",
+   "label": "Size Chart",
+   "options": "Size Chart Content"
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  }
+ ],
+ "modified": "2020-03-12 14:20:51.633565",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Size Chart",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "search_fields": "title",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "title_field": "title",
+ "track_changes": 1
+}

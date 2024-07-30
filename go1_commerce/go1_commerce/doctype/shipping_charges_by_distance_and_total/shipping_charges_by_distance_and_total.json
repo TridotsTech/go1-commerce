@@ -1,0 +1,92 @@
+{
+ "actions": [],
+ "creation": "2023-04-29 15:48:28.341868",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "shipping_method",
+  "shipping_method_name",
+  "order_total_from",
+  "order_total_to",
+  "from_distance",
+  "to_distance",
+  "charge_amount",
+  "use_percentage",
+  "charge_percentage"
+ ],
+ "fields": [
+  {
+   "fieldname": "shipping_method",
+   "fieldtype": "Link",
+   "label": "Shipping Method",
+   "options": "Shipping Method"
+  },
+  {
+   "fetch_from": "shipping_method.shipping_method_name",
+   "fieldname": "shipping_method_name",
+   "fieldtype": "Data",
+   "label": "Shipping Method Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "order_total_from",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Order Total From",
+   "reqd": 1
+  },
+  {
+   "fieldname": "order_total_to",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Order Total To",
+   "reqd": 1
+  },
+  {
+   "fieldname": "from_distance",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "From Distance",
+   "reqd": 1
+  },
+  {
+   "fieldname": "to_distance",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "To Distance",
+   "reqd": 1
+  },
+  {
+   "depends_on": "eval:doc.use_percentage!=1",
+   "fieldname": "charge_amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Charge Amount"
+  },
+  {
+   "default": "0",
+   "fieldname": "use_percentage",
+   "fieldtype": "Check",
+   "label": "Use Percentage"
+  },
+  {
+   "depends_on": "eval:doc.use_percentage==1",
+   "fieldname": "charge_percentage",
+   "fieldtype": "Percent",
+   "label": "Charge Percentage"
+  }
+ ],
+ "istable": 1,
+ "links": [],
+ "modified": "2023-04-29 15:53:43.119108",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Shipping Charges By Distance and Total",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

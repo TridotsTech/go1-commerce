@@ -1,0 +1,61 @@
+{
+ "actions": [],
+ "autoname": "field:reason",
+ "creation": "2019-05-14 17:05:51.560796",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "reason",
+  "description",
+  "enable_unsful_dc_order"
+ ],
+ "fields": [
+  {
+   "description": "Reason for return request",
+   "fieldname": "reason",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Reason",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "label": "Description"
+  },
+  {
+   "allow_in_quick_entry": 1,
+   "default": "0",
+   "fieldname": "enable_unsful_dc_order",
+   "fieldtype": "Check",
+   "label": "Enable For Unsuccessful Delivery"
+  }
+ ],
+ "links": [],
+ "modified": "2023-10-14 15:27:44.120660",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Return Request Reasons",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

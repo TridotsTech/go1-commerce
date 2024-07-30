@@ -1,0 +1,68 @@
+{
+ "allow_rename": 1,
+ "creation": "2019-04-11 16:24:36.719119",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "title",
+  "column_break_2",
+  "business",
+  "section_break_4",
+  "tax_rates"
+ ],
+ "fields": [
+  {
+   "description": "Tax template title (for identification purpose)",
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Title",
+   "reqd": 1
+  },
+  {
+   "fieldname": "tax_rates",
+   "fieldtype": "Table",
+   "label": "Tax Rates",
+   "options": "Tax Rates",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "business",
+   "fieldtype": "Link",
+   "label": "Business",
+   "options": "Business",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_4",
+   "fieldtype": "Section Break"
+  }
+ ],
+ "modified": "2020-11-27 04:38:57.500962",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Product Tax Template",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

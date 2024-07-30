@@ -1,0 +1,61 @@
+{
+ "creation": "2019-03-13 17:13:37.784034",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "category",
+  "category_name",
+  "discount_value",
+  "is_child",
+  "parent_category"
+ ],
+ "fields": [
+  {
+   "fieldname": "category",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Category",
+   "options": "Product Category",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "category.category_name",
+   "fieldname": "category_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Category Name",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "is_child",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Is Child"
+  },
+  {
+   "fieldname": "parent_category",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Parent Category"
+  },
+  {
+   "fieldname": "discount_value",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Discount Value"
+  }
+ ],
+ "istable": 1,
+ "modified": "2021-09-24 20:50:44.428207",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Discount Categories",
+ "owner": "Administrator",
+ "permissions": [],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

@@ -1,0 +1,178 @@
+{
+ "actions": [],
+ "autoname": "DH.#####",
+ "creation": "2021-04-23 20:40:00.138975",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "enable",
+  "column_break_2",
+  "sec_2",
+  "slot_shipping_method",
+  "sec_1",
+  "delivery_slot_category",
+  "delivery_slots_section",
+  "enable_future_dates",
+  "no_of_future_dates",
+  "enable_start_date",
+  "no_of_dates_start_from",
+  "enable_block_day",
+  "enable_day",
+  "slot_for_current_date",
+  "min_time",
+  "restrict_slot",
+  "max_booking_slot",
+  "delivery_slots"
+ ],
+ "fields": [
+  {
+   "fieldname": "delivery_slots_section",
+   "fieldtype": "Section Break",
+   "label": "Delivery Slots"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_future_dates",
+   "fieldtype": "Check",
+   "label": "Enable Slot Selection For Future Dates?"
+  },
+  {
+   "default": "10",
+   "depends_on": "eval: doc.enable_future_dates == 1",
+   "fieldname": "no_of_future_dates",
+   "fieldtype": "Int",
+   "label": "No. of Future Dates Allowed"
+  },
+  {
+   "default": "0",
+   "fieldname": "slot_for_current_date",
+   "fieldtype": "Check",
+   "label": "Allow Slot Selection For Current Date?"
+  },
+  {
+   "depends_on": "eval: doc.slot_for_current_date == 1",
+   "fieldname": "min_time",
+   "fieldtype": "Int",
+   "label": "Minimum Time Required Before Each Slot (In minutes)"
+  },
+  {
+   "default": "0",
+   "fieldname": "restrict_slot",
+   "fieldtype": "Check",
+   "label": " Restrict Bookings Per Slot"
+  },
+  {
+   "depends_on": "eval:((doc.restrict_slot==1))",
+   "fieldname": "max_booking_slot",
+   "fieldtype": "Int",
+   "label": "Maximum Bookings Per Time Slot"
+  },
+  {
+   "fieldname": "delivery_slots",
+   "fieldtype": "Table",
+   "label": "Delivery Slots",
+   "options": "Delivery Slot"
+  },
+  {
+   "fieldname": "sec_1",
+   "fieldtype": "Section Break",
+   "label": "Restrict to Product Categories"
+  },
+  {
+   "fieldname": "sec_2",
+   "fieldtype": "Section Break",
+   "label": "Shipping Method"
+  },
+  {
+   "fieldname": "delivery_slot_category",
+   "fieldtype": "Table MultiSelect",
+   "label": "Delivery Slot Category",
+   "options": "Delivery Slot Category"
+  },
+  {
+   "fieldname": "slot_shipping_method",
+   "fieldtype": "Table MultiSelect",
+   "label": "Shipping Method",
+   "options": "Delivery Slot Shipping Method",
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "enable",
+   "fieldtype": "Check",
+   "label": "Enable"
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_start_date",
+   "fieldtype": "Check",
+   "label": "Enable Start Date"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval: doc.enable_start_date == 1",
+   "fieldname": "no_of_dates_start_from",
+   "fieldtype": "Int",
+   "label": "No. of Dates From Start"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_block_day",
+   "fieldtype": "Check",
+   "label": "Enable Block Day"
+  },
+  {
+   "depends_on": "eval: doc.enable_block_day == 1",
+   "fieldname": "enable_day",
+   "fieldtype": "Table MultiSelect",
+   "label": "Enable Day",
+   "options": "Delivery Day Block"
+  }
+ ],
+ "links": [],
+ "modified": "2023-11-27 11:06:28.319928",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Delivery Setting",
+ "naming_rule": "Expression (old style)",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "export": 1,
+   "read": 1,
+   "role": "Admin",
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "export": 1,
+   "read": 1,
+   "role": "Vendor",
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

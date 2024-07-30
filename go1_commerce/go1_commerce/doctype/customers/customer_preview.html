@@ -1,0 +1,48 @@
+{%if data.email%}
+<div style="padding: 15px;">
+	<!-- {% if data.image %}
+	<img class="responsive" src={{ data.image }}>
+	<hr style="margin: 15px -15px;">
+	{% endif %} -->
+	<div class="col-sm-6 hidden-xs">
+			<h5 style="font-weight: bold;">
+		{{ __("First Name") }}
+	</h5 style="font-weight: bold;">
+	<div style="padding-bottom: 10px;">
+		{{ data.full_name }}
+	</div>
+	<h5 style="font-weight: bold;">
+		{{ __("Email ID") }}
+	</h5 style="font-weight: bold;">
+	<div style="padding-bottom: 10px;">
+		{{ data.email }}
+	</div>
+	</div>
+<div class="col-sm-6 hidden-xs">
+	<h5 style="font-weight: bold;">
+		{{ __("Last Name") }}
+	</h5 style="font-weight: bold;">
+	<div style="padding-bottom: 10px;">
+		{{ data.last_name }}
+	</div>
+	
+	<h5 style="font-weight: bold;">
+		{{ __("Phone") }}
+	</h5 style="font-weight: bold;">
+	<div style="padding-bottom: 10px;">
+		{{ data.phone }}
+	</div>
+</div>
+	<hr style="margin: 15px -15px;">
+	<p>
+		{% if data.value %}
+		<a style="margin-right: 7px; margin-bottom: 7px" class="btn btn-default btn-xs" href="#Form/Customers/{{ data.value }}">
+			{{ __("Open Cusomer {0}", [data.value.bold()]) }}</a>
+		{% endif %}
+		<!-- {% if data.name %}
+		<a class="btn btn-default btn-xs" href="#Form/Order/{{ data.name }}">
+			{{ __("Open Orders {0}", [data.name.bold()]) }}</a>
+		{% endif %} -->
+	</p>
+</div>
+{%endif%}

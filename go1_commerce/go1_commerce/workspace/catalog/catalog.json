@@ -1,0 +1,114 @@
+{
+ "charts": [],
+ "content": "[{\"id\":\"7OZU5FrcXo\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Quick Links</b></span>\",\"col\":12}},{\"id\":\"w-c8ePd8zH\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Products\",\"col\":3}},{\"id\":\"ZFOYEr_jMB\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Product Enquiry\",\"col\":3}},{\"id\":\"AR-F9rrH6_\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Categories\",\"col\":3}},{\"id\":\"CjStBo5j3h\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Brands\",\"col\":3}},{\"id\":\"Itcziubt7Z\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Attributes\",\"col\":3}},{\"id\":\"xgTw3yR2bz\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Specification Attributes\",\"col\":3}},{\"id\":\"ZG0WUjqY53\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Product Review\",\"col\":3}},{\"id\":\"4lpdWIIHED\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Availability Notifications\",\"col\":3}},{\"id\":\"7ACXCH1aiO\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Return Policy\",\"col\":3}},{\"id\":\"QC5VLW005s\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Replacement Policies\",\"col\":3}},{\"id\":\"UfI0dazTI1\",\"type\":\"paragraph\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Tax Details</span>\",\"col\":12}},{\"id\":\"Bqo1z2kZJD\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Tax Templates\",\"col\":3}},{\"id\":\"1qnCrlllWM\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Warranties\",\"col\":3}},{\"id\":\"wEGimx-N1W\",\"type\":\"spacer\",\"data\":{\"col\":12}}]",
+ "creation": "2023-04-15 14:08:35.163130",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "stock",
+ "idx": 0,
+ "indicator_color": "",
+ "is_hidden": 0,
+ "label": "Catalog",
+ "links": [],
+ "modified": "2024-07-27 19:31:03.319296",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Catalog",
+ "number_cards": [],
+ "owner": "Administrator",
+ "parent_page": "Go1 Commerce",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [],
+ "sequence_id": 4.0,
+ "shortcuts": [
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Replacement Policies",
+   "link_to": "Replacement Policy",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Products",
+   "link_to": "Product",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Product Enquiry",
+   "link_to": "Product Enquiry",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Brands",
+   "link_to": "Product Brand",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Product Review",
+   "link_to": "Product Review",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Categories",
+   "link_to": "Product Category",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Specification Attributes",
+   "link_to": "Specification Attribute",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Attributes",
+   "link_to": "Product Attribute",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Availability Notifications",
+   "link_to": "Product Availability Notification",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Return Policy",
+   "link_to": "Return Policy",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Tax Templates",
+   "link_to": "Product Tax Template",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Warranties",
+   "link_to": "Product Warranty",
+   "type": "DocType"
+  }
+ ],
+ "title": "Catalog"
+}

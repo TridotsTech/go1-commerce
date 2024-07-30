@@ -1,0 +1,301 @@
+{
+ "actions": [],
+ "autoname": "Shopping Cart Settings",
+ "creation": "2024-02-12 19:10:32.368729",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_2",
+  "display_cart",
+  "short_desc_cart",
+  "mini_cart_images",
+  "column_break_4",
+  "show_cart_images",
+  "product_weight_cart",
+  "show_discount_box",
+  "allow_anonymous_user_to_addtocart",
+  "always_ask_login",
+  "column_break_8",
+  "max_cart_items",
+  "mini_cart",
+  "get_instructions",
+  "show_bestsellers_in_shopping_cart",
+  "checkout_weight_disclaimer",
+  "section_break_11",
+  "enable_ship_addr",
+  "enable_delivery_slot",
+  "disable_address_dialogbox",
+  "column_break_22",
+  "hide_delivery_method",
+  "cl8",
+  "checkout_page",
+  "checkout_page_logo",
+  "checkout_page_header_bg",
+  "section_break_16",
+  "enable_cashback",
+  "section_break_19",
+  "enable_recurring_order",
+  "available_days",
+  "recurring_order_template",
+  "shipment_bag_settings_section",
+  "enable_shipment_bag",
+  "shipment_title",
+  "payment_method",
+  "column_break_34",
+  "shipment_description"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_2",
+   "fieldtype": "Section Break"
+  },
+  {
+   "default": "0",
+   "description": "If enabled, on adding each item to cart, the minicart will be shown. Otherwise, minicart will not be shown on adding an item to cart.",
+   "fieldname": "display_cart",
+   "fieldtype": "Check",
+   "label": "Display Cart  After Adding Product"
+  },
+  {
+   "default": "1",
+   "description": "If enabled, product's short description will be displayed in cart.",
+   "fieldname": "short_desc_cart",
+   "fieldtype": "Check",
+   "label": "Display Product Short Description"
+  },
+  {
+   "default": "1",
+   "description": "If enabled, product images will be shown in minicart.",
+   "fieldname": "mini_cart_images",
+   "fieldtype": "Check",
+   "label": "Show Product Images In Mini Shopping Cart"
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "1",
+   "description": "If enabled, product's image will be shown in the cart page.",
+   "fieldname": "show_cart_images",
+   "fieldtype": "Check",
+   "label": "Show Product Images On Cart"
+  },
+  {
+   "default": "0",
+   "description": "If enabled, product's wight will be displayed in the cart page.",
+   "fieldname": "product_weight_cart",
+   "fieldtype": "Check",
+   "label": "Show Product Weight in Shopping Cart"
+  },
+  {
+   "default": "1",
+   "fieldname": "show_discount_box",
+   "fieldtype": "Check",
+   "label": "Show Discount Box"
+  },
+  {
+   "default": "1",
+   "fieldname": "allow_anonymous_user_to_addtocart",
+   "fieldtype": "Check",
+   "label": " Allow Anonymous User To Addtocart"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:doc.allow_anonymous_user_to_addtocart == 0",
+   "fieldname": "always_ask_login",
+   "fieldtype": "Check",
+   "label": "Always ask login"
+  },
+  {
+   "fieldname": "column_break_8",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "1000",
+   "description": "The maximum number of products that a customer can hold in his/her cart.",
+   "fieldname": "max_cart_items",
+   "fieldtype": "Int",
+   "label": "Maximum Shopping Cart Items"
+  },
+  {
+   "default": "1",
+   "description": "Enable or disable mini cart",
+   "fieldname": "mini_cart",
+   "fieldtype": "Check",
+   "label": "Show Mini Shopping Cart"
+  },
+  {
+   "default": "0",
+   "description": "If enabled, for each item, an optional field to enter any special instruction for individual item will be provided while adding the item to the cart.",
+   "fieldname": "get_instructions",
+   "fieldtype": "Check",
+   "label": "Get Special Instructions For Products"
+  },
+  {
+   "default": "0",
+   "fieldname": "show_bestsellers_in_shopping_cart",
+   "fieldtype": "Check",
+   "label": "Show Bestsellers in Shopping Cart"
+  },
+  {
+   "default": "0",
+   "fieldname": "checkout_weight_disclaimer",
+   "fieldtype": "Check",
+   "label": "Show Weight Disclaimer in Checkout"
+  },
+  {
+   "fieldname": "section_break_11",
+   "fieldtype": "Section Break",
+   "label": "Checkout Settings"
+  },
+  {
+   "default": "1",
+   "description": "If checked, the the customer have to pick billing address and shipping address separately. Else single address will be collected from the customer.",
+   "fieldname": "enable_ship_addr",
+   "fieldtype": "Check",
+   "label": "Enable Shipping Address"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_delivery_slot",
+   "fieldtype": "Check",
+   "label": "Enable Delivery Slots"
+  },
+  {
+   "default": "0",
+   "fieldname": "disable_address_dialogbox",
+   "fieldtype": "Check",
+   "label": "Disable default style for Address Section "
+  },
+  {
+   "fieldname": "column_break_22",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "description": "When only one delivery method is available and no slots are available, then the delivery method selection will be shown to the customer",
+   "fieldname": "hide_delivery_method",
+   "fieldtype": "Check",
+   "label": "Hide Delivery Option If One Delivery Method Is Available"
+  },
+  {
+   "fieldname": "cl8",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Default Checkout",
+   "fieldname": "checkout_page",
+   "fieldtype": "Select",
+   "label": "Checkout Page",
+   "options": "Default Checkout\nOnepage Checkout"
+  },
+  {
+   "depends_on": "eval:doc.checkout_page ==\"Onepage Checkout\"",
+   "fieldname": "checkout_page_logo",
+   "fieldtype": "Attach Image",
+   "label": "Checkout Page Logo"
+  },
+  {
+   "default": "#ffffff",
+   "depends_on": "eval:doc.checkout_page ==\"Onepage Checkout\"",
+   "fieldname": "checkout_page_header_bg",
+   "fieldtype": "Color",
+   "label": "Checkout Page Header BG"
+  },
+  {
+   "fieldname": "section_break_16",
+   "fieldtype": "Section Break"
+  },
+  {
+   "default": "0",
+   "description": "To enable cashback option to the customer on placing their orders.",
+   "fieldname": "enable_cashback",
+   "fieldtype": "Check",
+   "label": "Enable Cashback Option?"
+  },
+  {
+   "fieldname": "section_break_19",
+   "fieldtype": "Section Break"
+  },
+  {
+   "default": "0",
+   "description": "To enable recurring order option to the customer on placing their orders.",
+   "fieldname": "enable_recurring_order",
+   "fieldtype": "Check",
+   "label": "Enable Recurring Order"
+  },
+  {
+   "default": "[]",
+   "depends_on": "eval:((doc.enable_recurring_order==1))",
+   "fieldname": "available_days",
+   "fieldtype": "Code",
+   "label": "Available Days"
+  },
+  {
+   "default": "templates/pages/recurring_order.html",
+   "depends_on": "eval:((doc.enable_recurring_order==1))",
+   "fieldname": "recurring_order_template",
+   "fieldtype": "Data",
+   "label": "Recurring Order Template"
+  },
+  {
+   "fieldname": "shipment_bag_settings_section",
+   "fieldtype": "Section Break",
+   "label": "Shipment Bag Settings"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_shipment_bag",
+   "fieldtype": "Check",
+   "label": "Enable Shipment Bag"
+  },
+  {
+   "depends_on": "eval:((doc.enable_shipment_bag))",
+   "fieldname": "shipment_title",
+   "fieldtype": "Data",
+   "label": "Title"
+  },
+  {
+   "fieldname": "payment_method",
+   "fieldtype": "Link",
+   "label": "Payment Method",
+   "options": "Payment Method"
+  },
+  {
+   "fieldname": "column_break_34",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:((doc.enable_shipment_bag))",
+   "fieldname": "shipment_description",
+   "fieldtype": "Small Text",
+   "label": "Description"
+  }
+ ],
+ "issingle": 1,
+ "links": [],
+ "modified": "2024-02-12 19:10:43.389063",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Shopping Cart Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

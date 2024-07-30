@@ -1,0 +1,51 @@
+{
+ "creation": "2020-05-21 11:46:31.666623",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "option_value",
+  "display_order",
+  "price_adjustment",
+  "is_pre_selected"
+ ],
+ "fields": [
+  {
+   "fieldname": "option_value",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Option Value",
+   "reqd": 1
+  },
+  {
+   "fieldname": "price_adjustment",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Price Adjustment"
+  },
+  {
+   "fieldname": "display_order",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Display Order",
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "is_pre_selected",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Is Pre Selected"
+  }
+ ],
+ "istable": 1,
+ "modified": "2020-08-19 00:30:59.387214",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Checkout Attributes Options",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

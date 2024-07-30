@@ -1,0 +1,106 @@
+{
+ "actions": [],
+ "autoname": "field:email",
+ "creation": "2021-05-12 20:48:52.514917",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "full_name",
+  "phone_number",
+  "column_break_3",
+  "email",
+  "address",
+  "zones_section",
+  "zone_template",
+  "password_section",
+  "set_new_password",
+  "new_password"
+ ],
+ "fields": [
+  {
+   "fieldname": "full_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Full Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "phone_number",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Phone Number",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "email",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Email",
+   "options": "Email",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "address",
+   "fieldtype": "Data",
+   "label": "Address"
+  },
+  {
+   "fieldname": "zones_section",
+   "fieldtype": "Section Break",
+   "label": "Zones"
+  },
+  {
+   "fieldname": "zone_template",
+   "fieldtype": "Link",
+   "label": "Zone Template",
+   "options": "Zone",
+   "reqd": 1
+  },
+  {
+   "fieldname": "password_section",
+   "fieldtype": "Section Break",
+   "label": "Password"
+  },
+  {
+   "fieldname": "set_new_password",
+   "fieldtype": "Data",
+   "label": "Set New Password"
+  },
+  {
+   "fieldname": "new_password",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Set New Password"
+  }
+ ],
+ "links": [],
+ "modified": "2023-04-08 18:50:48.657338",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Zone User",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

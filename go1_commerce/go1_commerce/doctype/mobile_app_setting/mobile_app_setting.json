@@ -1,0 +1,425 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-05-24 17:03:14.845380",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "business_info_section",
+  "address",
+  "column_break_1jf5k",
+  "about_us",
+  "column_break_nyjvd",
+  "business_email",
+  "business_phone",
+  "app_store_links_section",
+  "ios_store_icon",
+  "ios_url",
+  "column_break_x2ejj",
+  "play_store_icon",
+  "play_store_url",
+  "general_section",
+  "website_logo",
+  "column_break_718ni",
+  "login_image",
+  "column_break_hfikw",
+  "email_logo",
+  "favicon",
+  "column_break_8pdpx",
+  "default_sharing_logo",
+  "header_and_footer_section",
+  "default_header",
+  "column_break_zzppc",
+  "default_footer",
+  "setting_section",
+  "business",
+  "website_url",
+  "column_break_ebpfx",
+  "static_pb",
+  "column_break_xna4z",
+  "default_state",
+  "color_codes_section",
+  "primary_color",
+  "column_break_r0apr",
+  "secondary_color",
+  "column_break_evy0b",
+  "default_color",
+  "image_icon_section",
+  "cart_icon",
+  "wishlist_icon",
+  "list_wishlist",
+  "list_wishlist_filled",
+  "user_icon",
+  "header_search_icon",
+  "column_break_nnh3n",
+  "share_icon",
+  "no_login",
+  "no_order",
+  "header_location_icon",
+  "column_break_1lq0o",
+  "nofound_img",
+  "no_wishlist",
+  "no_cart",
+  "no_filters",
+  "social_link_section",
+  "facebook_link",
+  "twitter_link",
+  "instagram_link",
+  "column_break_izj5q",
+  "youtube_link",
+  "pinterest_link",
+  "delivery_app_settings_tab",
+  "default_shipping_status"
+ ],
+ "fields": [
+  {
+   "fieldname": "business_info_section",
+   "fieldtype": "Section Break",
+   "label": "Business Info"
+  },
+  {
+   "fieldname": "address",
+   "fieldtype": "Small Text",
+   "label": "Address"
+  },
+  {
+   "fieldname": "column_break_1jf5k",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "about_us",
+   "fieldtype": "Small Text",
+   "label": "About Us"
+  },
+  {
+   "fieldname": "column_break_nyjvd",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "business_email",
+   "fieldtype": "Data",
+   "label": "Business Email",
+   "options": "Email"
+  },
+  {
+   "fieldname": "business_phone",
+   "fieldtype": "Data",
+   "label": "Business Phone",
+   "options": "Phone"
+  },
+  {
+   "fieldname": "app_store_links_section",
+   "fieldtype": "Section Break",
+   "hidden": 1,
+   "label": "App Store Links"
+  },
+  {
+   "fieldname": "ios_store_icon",
+   "fieldtype": "Attach Image",
+   "label": "IOS Store Icon"
+  },
+  {
+   "fieldname": "ios_url",
+   "fieldtype": "Data",
+   "label": "Ios Url "
+  },
+  {
+   "fieldname": "column_break_x2ejj",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "play_store_icon",
+   "fieldtype": "Attach Image",
+   "label": "Play Store Icon"
+  },
+  {
+   "fieldname": "play_store_url",
+   "fieldtype": "Data",
+   "label": "Play Store Url"
+  },
+  {
+   "fieldname": "general_section",
+   "fieldtype": "Section Break",
+   "label": "General"
+  },
+  {
+   "fieldname": "website_logo",
+   "fieldtype": "Attach Image",
+   "label": "Website Logo"
+  },
+  {
+   "fieldname": "column_break_718ni",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "login_image",
+   "fieldtype": "Attach Image",
+   "label": "Login Image"
+  },
+  {
+   "fieldname": "column_break_hfikw",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "email_logo",
+   "fieldtype": "Attach Image",
+   "hidden": 1,
+   "label": "Email Logo"
+  },
+  {
+   "fieldname": "favicon",
+   "fieldtype": "Attach Image",
+   "label": "Favicon"
+  },
+  {
+   "fieldname": "column_break_8pdpx",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "default_sharing_logo",
+   "fieldtype": "Attach Image",
+   "label": "Default Sharing Logo"
+  },
+  {
+   "fieldname": "header_and_footer_section",
+   "fieldtype": "Section Break",
+   "label": "Header and Footer"
+  },
+  {
+   "fieldname": "default_header",
+   "fieldtype": "Link",
+   "label": "Default Header",
+   "options": "Header Component"
+  },
+  {
+   "fieldname": "column_break_zzppc",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "default_footer",
+   "fieldtype": "Link",
+   "label": "Default Footer",
+   "options": "Footer Component"
+  },
+  {
+   "fieldname": "setting_section",
+   "fieldtype": "Section Break",
+   "hidden": 1,
+   "label": "Mobile App Setting"
+  },
+  {
+   "fieldname": "business",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Business",
+   "options": "Business"
+  },
+  {
+   "fieldname": "website_url",
+   "fieldtype": "Data",
+   "label": "Website Url"
+  },
+  {
+   "fieldname": "column_break_ebpfx",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "static_pb",
+   "fieldtype": "Attach Image",
+   "label": "Static Pages Background Images"
+  },
+  {
+   "fieldname": "column_break_xna4z",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "default_state",
+   "fieldtype": "Link",
+   "label": "Default State",
+   "options": "State"
+  },
+  {
+   "fieldname": "color_codes_section",
+   "fieldtype": "Section Break",
+   "hidden": 1,
+   "label": "Color Codes"
+  },
+  {
+   "fieldname": "primary_color",
+   "fieldtype": "Data",
+   "label": "Primary Color"
+  },
+  {
+   "fieldname": "column_break_r0apr",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "secondary_color",
+   "fieldtype": "Data",
+   "label": "Secondary Color"
+  },
+  {
+   "fieldname": "column_break_evy0b",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "default_color",
+   "fieldtype": "Data",
+   "label": "Default Color "
+  },
+  {
+   "fieldname": "image_icon_section",
+   "fieldtype": "Section Break",
+   "label": "Images & Icons"
+  },
+  {
+   "fieldname": "cart_icon",
+   "fieldtype": "Attach Image",
+   "label": "Cart Icon"
+  },
+  {
+   "fieldname": "wishlist_icon",
+   "fieldtype": "Attach Image",
+   "label": "Wishlist Icon"
+  },
+  {
+   "fieldname": "list_wishlist",
+   "fieldtype": "Attach",
+   "label": "List Wishlist Icon"
+  },
+  {
+   "fieldname": "list_wishlist_filled",
+   "fieldtype": "Attach",
+   "label": "List Wishlist Filled Icon"
+  },
+  {
+   "fieldname": "user_icon",
+   "fieldtype": "Attach Image",
+   "label": "User icon"
+  },
+  {
+   "fieldname": "header_search_icon",
+   "fieldtype": "Attach",
+   "label": "Header Search Icon"
+  },
+  {
+   "fieldname": "column_break_nnh3n",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "share_icon",
+   "fieldtype": "Attach Image",
+   "label": "Share Icon"
+  },
+  {
+   "fieldname": "no_login",
+   "fieldtype": "Attach",
+   "label": "No Login"
+  },
+  {
+   "fieldname": "no_order",
+   "fieldtype": "Attach",
+   "label": "No Orders Icon"
+  },
+  {
+   "fieldname": "header_location_icon",
+   "fieldtype": "Attach",
+   "label": "Header Location Icon"
+  },
+  {
+   "fieldname": "column_break_1lq0o",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "nofound_img",
+   "fieldtype": "Attach Image",
+   "label": "Not Found Image"
+  },
+  {
+   "fieldname": "no_wishlist",
+   "fieldtype": "Attach",
+   "label": "No Wishlist"
+  },
+  {
+   "fieldname": "no_cart",
+   "fieldtype": "Attach",
+   "label": "No Cart"
+  },
+  {
+   "fieldname": "no_filters",
+   "fieldtype": "Attach",
+   "label": "No Filters"
+  },
+  {
+   "fieldname": "social_link_section",
+   "fieldtype": "Section Break",
+   "hidden": 1,
+   "label": "Social Media Links"
+  },
+  {
+   "fieldname": "facebook_link",
+   "fieldtype": "Data",
+   "label": "FaceBook "
+  },
+  {
+   "fieldname": "twitter_link",
+   "fieldtype": "Data",
+   "label": "Twitter"
+  },
+  {
+   "fieldname": "instagram_link",
+   "fieldtype": "Data",
+   "label": "Instagram"
+  },
+  {
+   "fieldname": "column_break_izj5q",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "youtube_link",
+   "fieldtype": "Data",
+   "label": "YouTube"
+  },
+  {
+   "fieldname": "pinterest_link",
+   "fieldtype": "Data",
+   "label": "Pinterest"
+  },
+  {
+   "fieldname": "delivery_app_settings_tab",
+   "fieldtype": "Tab Break",
+   "label": " Delivery App Settings"
+  },
+  {
+   "fieldname": "default_shipping_status",
+   "fieldtype": "Link",
+   "label": "Default Shipping Status",
+   "options": "Order Status"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2024-05-24 17:03:14.845380",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Mobile App Setting",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

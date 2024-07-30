@@ -1,0 +1,43 @@
+{
+ "actions": [],
+ "creation": "2019-04-11 16:23:57.154567",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "tax",
+  "rate"
+ ],
+ "fields": [
+  {
+   "description": "Name of the tax category. For e.g. VAT, GST, Service Tax, etc.",
+   "fetch_from": "account_head.account_name",
+   "fieldname": "tax",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Tax Title",
+   "reqd": 1
+  },
+  {
+   "description": "Percentage of tax",
+   "fetch_from": "account_head.tax_rate",
+   "fieldname": "rate",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Tax Percentage",
+   "reqd": 1
+  }
+ ],
+ "istable": 1,
+ "links": [],
+ "modified": "2023-06-03 16:51:03.177363",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Tax Rates",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

@@ -1,0 +1,198 @@
+{
+ "autoname": "naming_series:",
+ "creation": "2020-04-23 12:46:27.224216",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "business",
+  "question",
+  "short_description",
+  "column_break_3",
+  "is_active",
+  "options",
+  "is_group",
+  "group_title",
+  "parent_attribute",
+  "parent_attribute_option",
+  "column_break_6",
+  "is_required",
+  "control_type",
+  "charge_based_on_weight",
+  "naming_series",
+  "options_section",
+  "attribute_options",
+  "section_break_15",
+  "description",
+  "section_break_19",
+  "weight_based_charges",
+  "requirements_section",
+  "checkout_attribute_requirements",
+  "requirements_html"
+ ],
+ "fields": [
+  {
+   "fieldname": "business",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Business",
+   "options": "Business"
+  },
+  {
+   "fieldname": "question",
+   "fieldtype": "Small Text",
+   "label": "Question"
+  },
+  {
+   "fieldname": "control_type",
+   "fieldtype": "Select",
+   "label": "Control Type",
+   "options": "Dropdown List\nRadio Button List\nCheckbox List\nText Box\nMulti Line Text\nDate"
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_active",
+   "fieldtype": "Check",
+   "label": "Is Active"
+  },
+  {
+   "depends_on": "//eval:doc.control_type==\"Dropdown List\" ||doc.control_type==\"Radio Button List\" ||doc.control_type==\"Checkbox List\" ",
+   "description": " Options (Seperated by comma)",
+   "fieldname": "options",
+   "fieldtype": "Small Text",
+   "hidden": 1,
+   "label": "Options"
+  },
+  {
+   "fieldname": "column_break_6",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_required",
+   "fieldtype": "Check",
+   "label": "Is Required"
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Naming Series",
+   "options": "CA-"
+  },
+  {
+   "fieldname": "options_section",
+   "fieldtype": "Section Break",
+   "label": "Options"
+  },
+  {
+   "fieldname": "attribute_options",
+   "fieldtype": "Table",
+   "label": "Attribute Options",
+   "options": "Checkout Attributes Options"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_group",
+   "fieldtype": "Check",
+   "label": "Is Group"
+  },
+  {
+   "depends_on": "eval: doc.is_group != 1",
+   "fieldname": "parent_attribute",
+   "fieldtype": "Link",
+   "ignore_user_permissions": 1,
+   "label": "Parent Attribute",
+   "options": "Checkout Attributes"
+  },
+  {
+   "depends_on": "eval:  doc.is_group != 1 ",
+   "fieldname": "parent_attribute_option",
+   "fieldtype": "Select",
+   "label": "Parent Attribute Option"
+  },
+  {
+   "fieldname": "section_break_15",
+   "fieldtype": "Section Break",
+   "hidden": 1
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Long Text",
+   "label": "Description"
+  },
+  {
+   "depends_on": "eval: doc.is_group == 1",
+   "fieldname": "group_title",
+   "fieldtype": "Data",
+   "label": "Group Title"
+  },
+  {
+   "default": "0",
+   "fieldname": "charge_based_on_weight",
+   "fieldtype": "Check",
+   "label": "Charge Based On Weight?"
+  },
+  {
+   "collapsible_depends_on": "eval:doc.charge_based_on_weight==1",
+   "fieldname": "section_break_19",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "weight_based_charges",
+   "fieldtype": "Table",
+   "label": "Weight Based Charges",
+   "options": "Checkout Attribute Charges"
+  },
+  {
+   "fieldname": "requirements_section",
+   "fieldtype": "Section Break",
+   "label": "Requirements"
+  },
+  {
+   "fieldname": "checkout_attribute_requirements",
+   "fieldtype": "Table",
+   "hidden": 1,
+   "label": "Checkout Attribute Requirements",
+   "options": "Checkout Attribute Requirement"
+  },
+  {
+   "fieldname": "requirements_html",
+   "fieldtype": "HTML",
+   "label": "Requirements Html"
+  },
+  {
+   "fieldname": "short_description",
+   "fieldtype": "Small Text",
+   "label": "Short Description"
+  }
+ ],
+ "modified": "2021-03-05 04:15:08.211419",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Checkout Attributes",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "search_fields": "question",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "title_field": "question",
+ "track_changes": 1
+}

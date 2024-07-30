@@ -1,0 +1,139 @@
+{
+ "actions": [],
+ "autoname": "naming_series:",
+ "creation": "2018-08-22 18:10:41.908736",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "counter_html",
+  "section_break_1",
+  "user",
+  "name1",
+  "mobile_no",
+  "total_wallet_amount",
+  "current_wallet_amount",
+  "column_break_4",
+  "user_type",
+  "naming_series",
+  "locked_in_amount",
+  "last_updated",
+  "sec_12",
+  "transaction_history"
+ ],
+ "fields": [
+  {
+   "fieldname": "counter_html",
+   "fieldtype": "HTML"
+  },
+  {
+   "fieldname": "section_break_1",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "user",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "User",
+   "set_only_once": 1
+  },
+  {
+   "fieldname": "name1",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "mobile_no",
+   "fieldtype": "Data",
+   "label": "Mobile No",
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_wallet_amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Total Wallet Amount",
+   "read_only": 1
+  },
+  {
+   "fieldname": "current_wallet_amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Current Wallet Amount",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "user_type",
+   "fieldtype": "Link",
+   "label": "User Type",
+   "options": "Party Type",
+   "read_only": 1
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Naming Series",
+   "options": "W-"
+  },
+  {
+   "fieldname": "locked_in_amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Locked In amount",
+   "read_only": 1
+  },
+  {
+   "default": "Today",
+   "fieldname": "last_updated",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Last Updated"
+  },
+  {
+   "fieldname": "sec_12",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "transaction_history",
+   "fieldtype": "HTML",
+   "label": "Transaction History"
+  }
+ ],
+ "links": [],
+ "modified": "2024-07-27 18:34:45.764783",
+ "modified_by": "Administrator",
+ "module": "Accounts",
+ "name": "Wallet",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "user",
+ "track_changes": 1
+}

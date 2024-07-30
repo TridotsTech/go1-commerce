@@ -1,0 +1,47 @@
+{
+ "creation": "2020-06-30 08:15:04.766247",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "reference_doctype",
+  "reference_name",
+  "count",
+  "preference_type"
+ ],
+ "fields": [
+  {
+   "fieldname": "reference_doctype",
+   "fieldtype": "Link",
+   "label": "Reference Document",
+   "options": "DocType"
+  },
+  {
+   "fieldname": "reference_name",
+   "fieldtype": "Dynamic Link",
+   "label": "Reference Name",
+   "options": "reference_doctype"
+  },
+  {
+   "fieldname": "count",
+   "fieldtype": "Int",
+   "label": "Count"
+  },
+  {
+   "fieldname": "preference_type",
+   "fieldtype": "Select",
+   "label": "Preference Type",
+   "options": "Order\nSearch"
+  }
+ ],
+ "istable": 1,
+ "modified": "2020-06-30 08:15:04.766247",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Customer Preference",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

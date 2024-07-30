@@ -1,0 +1,73 @@
+{
+ "actions": [],
+ "autoname": "naming_series:",
+ "creation": "2019-08-06 19:45:46.201656",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "shipping_method",
+  "shipping_method_name",
+  "shipping_zone",
+  "column_break_2",
+  "charge_amount",
+  "naming_series"
+ ],
+ "fields": [
+  {
+   "fieldname": "shipping_method",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Shipping Method",
+   "options": "Shipping Method",
+   "reqd": 1
+  },
+  {
+   "fieldname": "shipping_zone",
+   "fieldtype": "Link",
+   "label": "Shipping Zone",
+   "options": "Shipping Zones"
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "charge_amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Charge Amount"
+  },
+  {
+   "default": "SBT-",
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Naming Series",
+   "options": "SBT-"
+  },
+  {
+   "fetch_from": "shipping_method.shipping_method_name",
+   "fieldname": "shipping_method_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Shipping Method Name",
+   "read_only": 1
+  }
+ ],
+ "istable": 1,
+ "links": [],
+ "modified": "2024-01-27 12:44:14.643902",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Shipping By Fixed Rate Charges",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "shipping_method",
+ "track_changes": 1
+}

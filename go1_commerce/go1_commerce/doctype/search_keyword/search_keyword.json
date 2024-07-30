@@ -1,0 +1,50 @@
+{
+ "autoname": "field:keyword",
+ "creation": "2019-12-12 13:40:34.893929",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "keyword",
+  "route"
+ ],
+ "fields": [
+  {
+   "fieldname": "keyword",
+   "fieldtype": "Data",
+   "label": "Keyword",
+   "unique": 1
+  },
+  {
+   "fieldname": "route",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Route"
+  }
+ ],
+ "modified": "2021-08-17 14:52:47.288062",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Search Keyword",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "route": "/",
+ "search_fields": "keyword",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "title_field": "keyword",
+ "track_changes": 1
+}

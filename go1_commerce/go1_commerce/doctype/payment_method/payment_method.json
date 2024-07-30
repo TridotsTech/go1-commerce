@@ -1,0 +1,175 @@
+{
+ "autoname": "PAY-M.#####",
+ "creation": "2018-08-21 18:36:20.201744",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "payment_method",
+  "display_name",
+  "display_order",
+  "column_break_2",
+  "logo",
+  "column_break_4",
+  "enable",
+  "redirect_controller",
+  "payment_type",
+  "section_break_6",
+  "additional_charge",
+  "column_break_8",
+  "use_additional_fee_percentage",
+  "column_break_12",
+  "additional_fee_percentage",
+  "section_break_16",
+  "display_text",
+  "section_break_20",
+  "payment_method_requirements",
+  "requirements_html",
+  "section_break_19",
+  "description"
+ ],
+ "fields": [
+  {
+   "fieldname": "payment_method",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Payment Method",
+   "reqd": 1
+  },
+  {
+   "fieldname": "display_name",
+   "fieldtype": "Data",
+   "label": "Display Name"
+  },
+  {
+   "fieldname": "display_order",
+   "fieldtype": "Int",
+   "label": "Display Order",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "logo",
+   "fieldtype": "Attach Image",
+   "label": "Logo"
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Enable"
+  },
+  {
+   "fieldname": "redirect_controller",
+   "fieldtype": "Data",
+   "label": "Redirect Controller"
+  },
+  {
+   "default": "Cash",
+   "fieldname": "payment_type",
+   "fieldtype": "Select",
+   "label": "Payment Type",
+   "options": "Cash\nOnline Payment"
+  },
+  {
+   "fieldname": "section_break_6",
+   "fieldtype": "Section Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "additional_charge",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Additional Charge"
+  },
+  {
+   "fieldname": "column_break_8",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "use_additional_fee_percentage",
+   "fieldtype": "Check",
+   "label": "Use Additional Fee Percentage"
+  },
+  {
+   "fieldname": "column_break_12",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval: doc.use_additional_fee_percentage == 1",
+   "fieldname": "additional_fee_percentage",
+   "fieldtype": "Float",
+   "label": "Additional Fee Percentage"
+  },
+  {
+   "depends_on": "",
+   "fieldname": "section_break_16",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "display_text",
+   "fieldtype": "Code",
+   "label": "Display Text"
+  },
+  {
+   "fieldname": "section_break_19",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "HTML Editor",
+   "label": "Description"
+  },
+  {
+   "fieldname": "section_break_20",
+   "fieldtype": "Section Break",
+   "label": "Requirements"
+  },
+  {
+   "fieldname": "payment_method_requirements",
+   "fieldtype": "Table",
+   "hidden": 1,
+   "label": "Payment Method Requirements",
+   "options": "Payment Method Requirement"
+  },
+  {
+   "fieldname": "requirements_html",
+   "fieldtype": "HTML",
+   "label": "Requirements Html"
+  }
+ ],
+ "modified": "2020-12-01 03:24:48.713081",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Payment Method",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "search_fields": "payment_method",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "title_field": "payment_method",
+ "track_changes": 1
+}

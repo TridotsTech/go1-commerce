@@ -1,0 +1,45 @@
+[
+	{
+		"doctype": "Catalog Settings",
+		"default_currency": "INR",
+		"no_of_new_arrivals_to_be_display": "5",
+		"no_of_brands_to_be_display": "10",
+		"display_featured_products": 1,
+		"no_of_featured_products": "20",
+		"product_carousel_border": 1,
+		"display_best_seller_products": 1,
+		"no_of_best_sellers": "20",
+		"enable_newsletter_subscription": 1,
+		"no_of_home_categories_display": "10",
+		"no_of_records_per_page": "24",
+		"products_per_row": "4",
+		"show_short_description": 1,
+		"show_brand": 1,
+		"product_boxes": "Grid view product box",
+		"email_a_friend_enabled": 1,
+		"detail_page_template": "Default Layout",
+		"enable_question_and_answers": 1,
+		"enable_related_products": 1,
+		"enable_recetly_viewed_products": 0,
+		"enable_best_sellers": 0,
+		"customers_who_bought": 0,
+		"enable_megamenu": 0,
+		"no_of_columns_display": 4,
+		"include_all_categories": 0,
+		"brand_page_title": "Brand",
+		"website_logo": "/assets/cmswebsite/images/logo-placeholder.png",
+		"include_products_from_subcategories": 1,
+		"search_fields":[{
+			"field": "Product Name", "fieldname": "item"
+		},{
+			"field": "Short Description", "fieldname": "short_description"
+		},{
+			"field": "Full Description", "fieldname": "full_description"
+		}],
+		"meta_title": "",
+		"meta_description": "",
+		"meta_keywords": "",
+		"site_name": "",
+		"disable_search_keyword": 1
+	}
+]

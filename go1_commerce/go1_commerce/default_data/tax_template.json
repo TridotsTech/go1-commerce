@@ -1,0 +1,18 @@
+[
+{
+    "title": "GST",
+    "business": null,
+    "name": "GST",
+    "doctype": "Product Tax Template",
+    "tax_rates": [
+    {
+        "idx": 1,
+        "rate": 9,
+        "tax": "CGST"
+    },
+    {
+        "idx": 1,
+        "rate": 9,
+        "tax": "SGST"
+    }]
+}]

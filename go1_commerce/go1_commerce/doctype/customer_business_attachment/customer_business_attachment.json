@@ -1,0 +1,41 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-05-27 13:37:46.332312",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "business_documents",
+  "document_attach"
+ ],
+ "fields": [
+  {
+   "fieldname": "business_documents",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Business KYC Document",
+   "options": "\nUdyam AADHAR\nGST Certificate\nFSSAI Registration\nShop & Establishment License"
+  },
+  {
+   "fieldname": "document_attach",
+   "fieldtype": "Attach",
+   "in_list_view": 1,
+   "in_preview": 1,
+   "in_standard_filter": 1,
+   "label": "Document Attachment"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2024-05-27 13:41:39.761635",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Customer Business Attachment",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

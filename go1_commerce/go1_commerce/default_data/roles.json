@@ -1,0 +1,8 @@
+[
+	{"doctype": "Role", "role_name": "Customer", "desk_access":0},
+	{"doctype": "Role", "role_name": "Admin", "desk_access":1},
+	{"doctype": "Role", "role_name": "Shipping Manager", "desk_access":1},
+	{"doctype": "Role", "role_name": "Sales Team", "desk_access":0},
+	{"doctype": "Role", "role_name": "Operation Manager", "desk_access":1},
+	{"doctype": "Role", "role_name": "Warehouse Manager", "desk_access":1}
+]

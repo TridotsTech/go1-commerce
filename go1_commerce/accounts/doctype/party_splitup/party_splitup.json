@@ -1,0 +1,29 @@
+{
+ "creation": "2021-06-04 17:03:41.835568",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "party"
+ ],
+ "fields": [
+  {
+   "fieldname": "party",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Party",
+   "options": "Service Provider\nBusiness\nDrivers\nCustomers"
+  }
+ ],
+ "istable": 1,
+ "modified": "2021-06-04 17:04:26.885579",
+ "modified_by": "Administrator",
+ "module": "Accounts",
+ "name": "Party Splitup",
+ "owner": "Administrator",
+ "permissions": [],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

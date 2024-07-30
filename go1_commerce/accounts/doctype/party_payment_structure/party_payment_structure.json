@@ -1,0 +1,58 @@
+{
+ "autoname": "PPS.#####",
+ "creation": "2020-05-26 12:31:18.051719",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "party_type",
+  "reference_doctype",
+  "condition_formula"
+ ],
+ "fields": [
+  {
+   "fieldname": "party_type",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Party Type",
+   "options": "Party Type",
+   "reqd": 1
+  },
+  {
+   "fieldname": "reference_doctype",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Reference DocType",
+   "options": "DocType",
+   "reqd": 1
+  },
+  {
+   "fieldname": "condition_formula",
+   "fieldtype": "Table",
+   "options": "Party Payment Condition",
+   "reqd": 1
+  }
+ ],
+ "modified": "2020-05-26 12:32:04.469524",
+ "modified_by": "Administrator",
+ "module": "Accounts",
+ "name": "Party Payment Structure",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

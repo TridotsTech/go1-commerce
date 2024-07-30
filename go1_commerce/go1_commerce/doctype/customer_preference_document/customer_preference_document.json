@@ -1,0 +1,47 @@
+{
+ "creation": "2020-06-30 09:23:43.531359",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "reference_document",
+  "based_on",
+  "no_of_records"
+ ],
+ "fields": [
+  {
+   "fieldname": "reference_document",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Reference Document",
+   "options": "DocType",
+   "reqd": 1
+  },
+  {
+   "fieldname": "based_on",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Based On",
+   "options": "Order\nSearch",
+   "reqd": 1
+  },
+  {
+   "default": "5",
+   "fieldname": "no_of_records",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "No. Of Records To Be Maintained"
+  }
+ ],
+ "istable": 1,
+ "modified": "2020-06-30 09:34:39.912140",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Customer Preference Document",
+ "owner": "Administrator",
+ "permissions": [],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

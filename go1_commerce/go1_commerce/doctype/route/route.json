@@ -1,0 +1,98 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:route_id",
+ "creation": "2023-04-08 12:27:43.233674",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "centre",
+  "route_name",
+  "column_break_rv7q",
+  "route_id",
+  "sub_area",
+  "sales_executive_section",
+  "route_se",
+  "se_names"
+ ],
+ "fields": [
+  {
+   "fieldname": "centre",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Centre",
+   "options": "Warehouse",
+   "reqd": 1
+  },
+  {
+   "fieldname": "route_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Route Name",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "column_break_rv7q",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "route_id",
+   "fieldtype": "Data",
+   "label": "Route ID",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "sub_area",
+   "fieldtype": "Table MultiSelect",
+   "label": "Sub Area",
+   "options": "Route Sub Areas"
+  },
+  {
+   "fieldname": "sales_executive_section",
+   "fieldtype": "Section Break",
+   "label": "Sales Executive"
+  },
+  {
+   "fieldname": "route_se",
+   "fieldtype": "Table",
+   "options": "Route SE"
+  },
+  {
+   "fieldname": "se_names",
+   "fieldtype": "Small Text",
+   "hidden": 1,
+   "in_list_view": 1,
+   "label": "Sales Executives"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2023-04-26 11:33:37.992682",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Route",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

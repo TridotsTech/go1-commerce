@@ -1,0 +1,474 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2019-02-20 20:57:00.635793",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "category_name",
+  "product_category_name",
+  "product_image_size",
+  "minimum_order_amount",
+  "products_per_row_in_list",
+  "business",
+  "business_name",
+  "column_break_2",
+  "display_order",
+  "default_view",
+  "mega_menu_column",
+  "enable_left_side_panel",
+  "products_per_row_for_mobile_app",
+  "column_break_4",
+  "is_active",
+  "display_on_home_page",
+  "show_attributes_inlist",
+  "badge_text",
+  "template_saved",
+  "type_of_category",
+  "section_break_9",
+  "category_image",
+  "category_thumbnail",
+  "column_break_7",
+  "menu_image",
+  "section_break_12",
+  "mobile_image",
+  "section_break_6",
+  "description",
+  "is_group",
+  "parent_product_category",
+  "parent_category_name",
+  "column_break_21",
+  "product_info",
+  "notes",
+  "full_description",
+  "section_break_8",
+  "discount",
+  "column_break_10",
+  "discount_name",
+  "availability_section",
+  "all_time",
+  "section_break_45",
+  "section_break_17",
+  "meta_title",
+  "meta_description",
+  "column_break_31",
+  "meta_image",
+  "meta_keywords",
+  "naming_series",
+  "route",
+  "disable_in_website",
+  "lft",
+  "rgt",
+  "old_parent",
+  "is_test_record",
+  "section_break_ccq3h",
+  "google_preview"
+ ],
+ "fields": [
+  {
+   "description": "Name of the category",
+   "fieldname": "category_name",
+   "fieldtype": "Data",
+   "in_global_search": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Category Name",
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "description": "Specify the size of the thumbnail image to be generated for the products under this category which will be shown on the product list page.",
+   "fieldname": "product_image_size",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "label": "Product Image Size (List)"
+  },
+  {
+   "fieldname": "business",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Seller",
+   "options": "Business"
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "The sequence in which this category will be displayed",
+   "fieldname": "display_order",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Display Order"
+  },
+  {
+   "default": "Grid View",
+   "description": "The default view of the products in this category page.",
+   "fieldname": "default_view",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Default View",
+   "options": "Grid View\nList View"
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "description": "This category will be listed on the website only if this is enabled.",
+   "fieldname": "is_active",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Is Active"
+  },
+  {
+   "default": "0",
+   "description": "If enabled, this category will be shown on the home page along with its products.",
+   "fieldname": "display_on_home_page",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Display On Home Page"
+  },
+  {
+   "fieldname": "type_of_category",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Type Of Category",
+   "options": "Sellable Product\nEnquiry Product"
+  },
+  {
+   "fieldname": "section_break_9",
+   "fieldtype": "Tab Break",
+   "label": "Images"
+  },
+  {
+   "description": "Default image of category",
+   "fieldname": "category_image",
+   "fieldtype": "Attach Image",
+   "label": "Category Image (Image Size - 40 X 40)"
+  },
+  {
+   "fieldname": "category_thumbnail",
+   "fieldtype": "Attach Image",
+   "hidden": 1,
+   "label": "Category Thumbnail"
+  },
+  {
+   "fieldname": "column_break_7",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "Image to be displayed in megamenu",
+   "fieldname": "menu_image",
+   "fieldtype": "Attach Image",
+   "label": "Menu Image (Image Size - 320 X 500)"
+  },
+  {
+   "fieldname": "section_break_12",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "Image displayed in mobile app",
+   "fieldname": "mobile_image",
+   "fieldtype": "Attach Image",
+   "label": "Mobile Image (Image Size - 40 X 40)"
+  },
+  {
+   "fieldname": "section_break_6",
+   "fieldtype": "Tab Break",
+   "label": "More Info"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "hidden": 1,
+   "label": "Description"
+  },
+  {
+   "default": "0",
+   "description": "If enabled, child categories can be added for this category",
+   "fieldname": "is_group",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Is Group"
+  },
+  {
+   "bold": 1,
+   "fieldname": "parent_product_category",
+   "fieldtype": "Link",
+   "label": "Parent Category",
+   "options": "Product Category"
+  },
+  {
+   "fetch_from": "parent_product_category.category_name",
+   "fieldname": "parent_category_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Parent Category Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_21",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "product_info",
+   "fieldtype": "Text Editor",
+   "hidden": 1,
+   "label": "Product Additional Info"
+  },
+  {
+   "fieldname": "section_break_8",
+   "fieldtype": "Section Break",
+   "hidden": 1
+  },
+  {
+   "fieldname": "discount",
+   "fieldtype": "Link",
+   "label": "Discount",
+   "options": "Discounts"
+  },
+  {
+   "fieldname": "column_break_10",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "discount.name1",
+   "fieldname": "discount_name",
+   "fieldtype": "Data",
+   "label": "Discount Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_17",
+   "fieldtype": "Section Break",
+   "label": "Seo"
+  },
+  {
+   "fieldname": "meta_title",
+   "fieldtype": "Data",
+   "label": "Meta Title"
+  },
+  {
+   "fieldname": "meta_keywords",
+   "fieldtype": "Small Text",
+   "label": "Meta Keywords"
+  },
+  {
+   "fieldname": "column_break_31",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "meta_description",
+   "fieldtype": "Small Text",
+   "label": "Meta Description"
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Naming Series",
+   "options": "MC-"
+  },
+  {
+   "fieldname": "route",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Route",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "description": "Check this if you want to disable in website",
+   "fieldname": "disable_in_website",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Disable in Website"
+  },
+  {
+   "fieldname": "lft",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "label": "Left",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "rgt",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "label": "Right",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "old_parent",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Old Parent",
+   "options": "Product Category"
+  },
+  {
+   "fieldname": "product_category_name",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Product Category Name"
+  },
+  {
+   "description": "The column in which this category will be displayed in the megamenu. For eg. If this value is 1, then this category & its associated child categories will be displayed in the first column.",
+   "fieldname": "mega_menu_column",
+   "fieldtype": "Select",
+   "label": "Mega Menu Column",
+   "options": "1\n2\n3\n4\n5"
+  },
+  {
+   "fetch_from": "business.restaurant_name",
+   "fieldname": "business_name",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Seller Name",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "template_saved",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Template Saved"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_test_record",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Is Test Record"
+  },
+  {
+   "default": "0",
+   "fieldname": "minimum_order_amount",
+   "fieldtype": "Float",
+   "label": "Minimum Order Amount",
+   "precision": "2"
+  },
+  {
+   "fieldname": "availability_section",
+   "fieldtype": "Section Break",
+   "hidden": 1,
+   "label": "Availability"
+  },
+  {
+   "default": "1",
+   "fieldname": "all_time",
+   "fieldtype": "Check",
+   "label": "Available at All Time"
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Small Text",
+   "hidden": 1,
+   "label": "Notes"
+  },
+  {
+   "default": "0",
+   "fieldname": "show_attributes_inlist",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Show Attributes in List Page"
+  },
+  {
+   "fieldname": "badge_text",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Badge Text"
+  },
+  {
+   "fieldname": "products_per_row_in_list",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Products Per Row",
+   "options": "\n1\n2\n3\n4\n5"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_left_side_panel",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Enable Left Side Panel"
+  },
+  {
+   "fieldname": "products_per_row_for_mobile_app",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Products Per Row For Mobile App",
+   "options": "\n1\n2"
+  },
+  {
+   "fieldname": "full_description",
+   "fieldtype": "Text Editor",
+   "label": "Description"
+  },
+  {
+   "fieldname": "section_break_45",
+   "fieldtype": "Tab Break",
+   "label": "SEO"
+  },
+  {
+   "fieldname": "meta_image",
+   "fieldtype": "Attach Image",
+   "label": "Meta Image"
+  },
+  {
+   "fieldname": "section_break_ccq3h",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "google_preview",
+   "fieldtype": "HTML",
+   "label": "Google Snippet Preview"
+  }
+ ],
+ "has_web_view": 1,
+ "is_published_field": "is_active",
+ "is_tree": 1,
+ "links": [],
+ "modified": "2024-02-15 11:49:05.956141",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Product Category",
+ "naming_rule": "By \"Naming Series\" field",
+ "nsm_parent_field": "parent_product_category",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "export": 1,
+   "read": 1,
+   "role": "Vendor",
+   "write": 1
+  }
+ ],
+ "route": "category_name",
+ "search_fields": "category_name, business_name",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "category_name",
+ "track_changes": 1
+}

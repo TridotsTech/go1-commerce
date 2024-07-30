@@ -1,0 +1,67 @@
+{
+ "autoname": "naming_series:",
+ "creation": "2020-07-04 02:15:31.394786",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "name1",
+  "email",
+  "comments",
+  "blog_name",
+  "naming_series"
+ ],
+ "fields": [
+  {
+   "fieldname": "name1",
+   "fieldtype": "Data",
+   "label": "Name"
+  },
+  {
+   "fieldname": "email",
+   "fieldtype": "Data",
+   "label": "Email"
+  },
+  {
+   "fieldname": "comments",
+   "fieldtype": "Small Text",
+   "label": "Comments"
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Naming Series",
+   "options": "BC-"
+  },
+  {
+   "fieldname": "blog_name",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Blog Name"
+  }
+ ],
+ "modified": "2020-07-04 03:43:35.206154",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Blog Comments",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

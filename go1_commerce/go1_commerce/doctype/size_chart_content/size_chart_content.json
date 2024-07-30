@@ -1,0 +1,57 @@
+{
+ "creation": "2020-03-07 14:32:10.820880",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "attribute_values",
+  "chart_title1",
+  "chart_title",
+  "chart_value",
+  "display_order"
+ ],
+ "fields": [
+  {
+   "fieldname": "attribute_values",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Attribute Value"
+  },
+  {
+   "fieldname": "chart_value",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Chart Value"
+  },
+  {
+   "fieldname": "display_order",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Display Order"
+  },
+  {
+   "fieldname": "chart_title1",
+   "fieldtype": "Link",
+   "label": "Chart Title",
+   "options": "Size Chart Header"
+  },
+  {
+   "fetch_from": "chart_title1.size_header",
+   "fieldname": "chart_title",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Chart Label"
+  }
+ ],
+ "istable": 1,
+ "modified": "2020-06-25 01:19:49.101614",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Size Chart Content",
+ "owner": "Administrator",
+ "permissions": [],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

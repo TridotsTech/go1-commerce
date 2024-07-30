@@ -1,0 +1,105 @@
+{
+ "actions": [],
+ "autoname": "field:area_code",
+ "creation": "2020-05-19 13:38:33.065393",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "area",
+  "zone",
+  "zone_name",
+  "column_break_gioh",
+  "area_code",
+  "city",
+  "state",
+  "zipcode"
+ ],
+ "fields": [
+  {
+   "fieldname": "area",
+   "fieldtype": "Data",
+   "label": "Area",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "zone.city",
+   "fieldname": "city",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "City",
+   "options": "City",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "zipcode",
+   "fieldtype": "Data",
+   "label": "Zipcode",
+   "reqd": 1
+  },
+  {
+   "fieldname": "area_code",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Area Code",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "zone",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Zone Code",
+   "options": "Zone",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "city.state",
+   "fieldname": "state",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "State",
+   "options": "State",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_gioh",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "zone.zone_name",
+   "fieldname": "zone_name",
+   "fieldtype": "Data",
+   "label": "Zone",
+   "read_only": 1
+  }
+ ],
+ "links": [],
+ "modified": "2024-02-26 11:25:40.686330",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Area",
+ "naming_rule": "By fieldname",
+ "nsm_parent_field": "parent_area",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "search_fields": "area",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

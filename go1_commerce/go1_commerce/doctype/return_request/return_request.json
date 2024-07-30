@@ -1,0 +1,486 @@
+{
+ "actions": [],
+ "autoname": "naming_series:",
+ "creation": "2023-10-10 15:03:50.930587",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "order_id",
+  "customer",
+  "customer_name",
+  "is_unsuccess_delivery",
+  "is_picked",
+  "column_break_3",
+  "type",
+  "order_item",
+  "customer_email",
+  "customer_phone",
+  "column_break_6",
+  "status",
+  "replacement_status",
+  "product",
+  "product_name",
+  "attribute_id",
+  "posted_on",
+  "attribute_description",
+  "attribute_html",
+  "section_break_qqmsx",
+  "items",
+  "section_break_9",
+  "quantity",
+  "next_status_level",
+  "column_break_12",
+  "reason_for_return",
+  "reason_for_replacement",
+  "requested_action",
+  "section_break_nhq2",
+  "attach_images",
+  "remarks",
+  "bank_details_section",
+  "bank_name",
+  "account_no",
+  "column_break_21",
+  "ifsc_no",
+  "account_holder_name",
+  "section_break_15",
+  "customer_comments",
+  "column_break_17",
+  "staff_comments",
+  "column_break_19",
+  "admin_comments",
+  "naming_series",
+  "amended_from",
+  "shipping_provider",
+  "driver",
+  "section_break_34",
+  "shipments",
+  "section_break_36",
+  "shipping_method_name",
+  "shipment_id",
+  "column_break_38",
+  "payment_method_name",
+  "section_break_41",
+  "product_price",
+  "column_break_42",
+  "product_amount",
+  "column_break_43",
+  "product_shipping_charge",
+  "column_break_45",
+  "order_shipping_charge"
+ ],
+ "fields": [
+  {
+   "description": "Return against order",
+   "fieldname": "order_id",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Order Id",
+   "options": "Order",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "order_id.customer",
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "label": "Customer",
+   "options": "Customers",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "order_id.customer_name",
+   "fieldname": "customer_name",
+   "fieldtype": "Data",
+   "label": "Customer Name",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "is_unsuccess_delivery",
+   "fieldtype": "Check",
+   "label": "Is Unsuccess Delivery"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_picked",
+   "fieldtype": "Check",
+   "label": "Is Picked"
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "type",
+   "fieldtype": "Select",
+   "label": "Type",
+   "options": "Return\nReplacement"
+  },
+  {
+   "fieldname": "order_item",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Order Item",
+   "options": "Order Item"
+  },
+  {
+   "fetch_from": "order_id.customer_email",
+   "fieldname": "customer_email",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Customer Email",
+   "options": "Email"
+  },
+  {
+   "fieldname": "customer_phone",
+   "fieldtype": "Data",
+   "label": "Customer Phone",
+   "options": "Phone",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_6",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "depends_on": "eval:doc.type==\"Return\"",
+   "description": "Current status of this return request",
+   "fieldname": "status",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Return request status",
+   "options": "Return Request Status",
+   "reqd": 1
+  },
+  {
+   "depends_on": "eval:doc.type==\"Replacement\"",
+   "description": "Current status of this Replacement request",
+   "fieldname": "replacement_status",
+   "fieldtype": "Link",
+   "label": "Replacement status",
+   "options": "Replacement Status"
+  },
+  {
+   "description": "Returning product",
+   "fieldname": "product",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Product",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "product.item",
+   "fieldname": "product_name",
+   "fieldtype": "Data",
+   "label": "Product Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "attribute_id",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Attribute ID",
+   "read_only": 1
+  },
+  {
+   "default": "Today",
+   "description": "Return request raised on",
+   "fieldname": "posted_on",
+   "fieldtype": "Date",
+   "hidden": 1,
+   "label": "Posted On"
+  },
+  {
+   "fieldname": "attribute_description",
+   "fieldtype": "Code",
+   "hidden": 1,
+   "label": "Attribute Description",
+   "read_only": 1
+  },
+  {
+   "fieldname": "attribute_html",
+   "fieldtype": "HTML",
+   "label": "Attribute Html"
+  },
+  {
+   "fieldname": "section_break_qqmsx",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "label": "Items",
+   "options": "Return Request Item",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_9",
+   "fieldtype": "Section Break"
+  },
+  {
+   "default": "0",
+   "description": "Quantity of product requested for return",
+   "fieldname": "quantity",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "label": "Quantity"
+  },
+  {
+   "default": "0",
+   "fieldname": "next_status_level",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "label": "Next Status Level"
+  },
+  {
+   "fieldname": "column_break_12",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "Reason selected by the customer for return",
+   "fieldname": "reason_for_return",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Reason for return",
+   "options": "Return Request Reasons"
+  },
+  {
+   "fieldname": "reason_for_replacement",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Reason for Replacement",
+   "options": "Replacement Request Reasons"
+  },
+  {
+   "description": "Action requested by the customer to do for this return",
+   "fieldname": "requested_action",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "in_list_view": 1,
+   "label": "Requested action",
+   "options": "Return Request Action"
+  },
+  {
+   "fieldname": "section_break_nhq2",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "attach_images",
+   "fieldtype": "Table",
+   "label": "Attach Images",
+   "options": "Return Replacement Images"
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Small Text",
+   "label": "Remarks"
+  },
+  {
+   "description": "Bank details of the customer to which the amount should be refunded",
+   "fieldname": "bank_details_section",
+   "fieldtype": "Section Break",
+   "hidden": 1,
+   "label": "Bank Details"
+  },
+  {
+   "fieldname": "bank_name",
+   "fieldtype": "Data",
+   "label": "Bank Name"
+  },
+  {
+   "fieldname": "account_no",
+   "fieldtype": "Data",
+   "label": "Account No"
+  },
+  {
+   "fieldname": "column_break_21",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "ifsc_no",
+   "fieldtype": "Data",
+   "label": "IFSC No"
+  },
+  {
+   "fieldname": "account_holder_name",
+   "fieldtype": "Data",
+   "label": "Account Holder Name"
+  },
+  {
+   "fieldname": "section_break_15",
+   "fieldtype": "Section Break",
+   "hidden": 1
+  },
+  {
+   "description": "Comments posted by the customer",
+   "fieldname": "customer_comments",
+   "fieldtype": "Text",
+   "label": "Customer Comments"
+  },
+  {
+   "fieldname": "column_break_17",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "Comments posted by the return handling staff/admin",
+   "fieldname": "staff_comments",
+   "fieldtype": "Text",
+   "label": "Staff Comments"
+  },
+  {
+   "fieldname": "column_break_19",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "Comments posted by the admin",
+   "fieldname": "admin_comments",
+   "fieldtype": "Text",
+   "label": "Admin Comments"
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Naming Series",
+   "options": "RR-\nRP-"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Return Request",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "shipping_provider",
+   "fieldtype": "Data",
+   "label": "Shipping Provider"
+  },
+  {
+   "fieldname": "driver",
+   "fieldtype": "Link",
+   "label": "Driver",
+   "options": "Drivers"
+  },
+  {
+   "fieldname": "section_break_34",
+   "fieldtype": "Section Break",
+   "hidden": 1
+  },
+  {
+   "fieldname": "shipments",
+   "fieldtype": "HTML",
+   "label": "Shipments"
+  },
+  {
+   "fieldname": "section_break_36",
+   "fieldtype": "Section Break",
+   "hidden": 1
+  },
+  {
+   "fieldname": "shipping_method_name",
+   "fieldtype": "Data",
+   "label": "Shipping Method Name"
+  },
+  {
+   "fieldname": "shipment_id",
+   "fieldtype": "Data",
+   "label": "Shipment ID",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_38",
+   "fieldtype": "Column Break",
+   "hidden": 1
+  },
+  {
+   "fieldname": "payment_method_name",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Payment Method Name"
+  },
+  {
+   "fieldname": "section_break_41",
+   "fieldtype": "Section Break",
+   "hidden": 1
+  },
+  {
+   "fieldname": "product_price",
+   "fieldtype": "Currency",
+   "label": "Product Price"
+  },
+  {
+   "fieldname": "column_break_42",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "product_amount",
+   "fieldtype": "Currency",
+   "label": "Amount",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_43",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "product_shipping_charge",
+   "fieldtype": "Currency",
+   "label": "Product Shipping Charge",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_45",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "order_shipping_charge",
+   "fieldtype": "Currency",
+   "hidden": 1,
+   "label": "Order Shipping Charge",
+   "read_only": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Return Request",
+   "print_hide": 1,
+   "read_only": 1
+  }
+ ],
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2024-02-01 13:16:40.749074",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Return Request",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

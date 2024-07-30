@@ -1,0 +1,48 @@
+{
+ "autoname": "SG.#####",
+ "creation": "2020-03-07 15:36:20.952935",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "specification_group_name",
+  "display_order"
+ ],
+ "fields": [
+  {
+   "fieldname": "specification_group_name",
+   "fieldtype": "Data",
+   "label": "Specification Group Name"
+  },
+  {
+   "fieldname": "display_order",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Display Order"
+  }
+ ],
+ "modified": "2020-03-12 14:43:43.707461",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Specification Group",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "search_fields": "specification_group_name",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "title_field": "specification_group_name",
+ "track_changes": 1
+}

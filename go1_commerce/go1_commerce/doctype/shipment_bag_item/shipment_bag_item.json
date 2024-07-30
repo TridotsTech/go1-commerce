@@ -1,0 +1,35 @@
+{
+ "creation": "2021-01-22 22:15:27.648085",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "order_id",
+  "shipping_charge"
+ ],
+ "fields": [
+  {
+   "fieldname": "order_id",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Order ID"
+  },
+  {
+   "fieldname": "shipping_charge",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Shipping Charge"
+  }
+ ],
+ "istable": 1,
+ "modified": "2021-01-22 22:15:27.648085",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Shipment Bag Item",
+ "owner": "Administrator",
+ "permissions": [],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

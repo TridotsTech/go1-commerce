@@ -1,0 +1,182 @@
+{
+ "actions": [],
+ "creation": "2024-02-15 12:21:51.729949",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_2",
+  "beneficiary_method",
+  "column_break_4",
+  "before_days",
+  "cl_br",
+  "after_days",
+  "discount_setting_section",
+  "discount_type",
+  "requires_coupon_code",
+  "column_break_6",
+  "discount_percentage",
+  "discount_amount",
+  "discount_id",
+  "coupon_code",
+  "wallet_setting_section",
+  "wallet_amount",
+  "loyalty_settings_section",
+  "loyalty_points",
+  "email_template_sec",
+  "email_template",
+  "column_break_22",
+  "sender"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_2",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "beneficiary_method",
+   "fieldtype": "Select",
+   "label": "Beneficiary Method",
+   "options": "Discount\nWallet\nLoyalty Points"
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "before_days",
+   "fieldtype": "Int",
+   "label": "No.Of Days Before Allow"
+  },
+  {
+   "fieldname": "cl_br",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:doc.beneficiary_method == \"Discount\"",
+   "fieldname": "after_days",
+   "fieldtype": "Int",
+   "label": "No.Of Days After Allow"
+  },
+  {
+   "depends_on": "eval:doc.beneficiary_method == \"Discount\"",
+   "fieldname": "discount_setting_section",
+   "fieldtype": "Section Break",
+   "label": "Discount Setting"
+  },
+  {
+   "fieldname": "discount_type",
+   "fieldtype": "Select",
+   "label": "Discount Type",
+   "options": "Discount Percentage\nDiscount Amount"
+  },
+  {
+   "default": "0",
+   "fieldname": "requires_coupon_code",
+   "fieldtype": "Check",
+   "label": "Requires Coupon Code"
+  },
+  {
+   "fieldname": "column_break_6",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:doc.discount_type==\"Discount Percentage\"",
+   "fieldname": "discount_percentage",
+   "fieldtype": "Float",
+   "label": "Discount Percentage"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:doc.discount_type==\"Discount Amount\"",
+   "fieldname": "discount_amount",
+   "fieldtype": "Float",
+   "label": "Discount Amount"
+  },
+  {
+   "fieldname": "discount_id",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Discount Id"
+  },
+  {
+   "depends_on": "eval:doc.requires_coupon_code==1",
+   "fieldname": "coupon_code",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Coupon Code"
+  },
+  {
+   "depends_on": "eval:doc.beneficiary_method == \"Wallet\"",
+   "fieldname": "wallet_setting_section",
+   "fieldtype": "Section Break",
+   "label": "Wallet Setting"
+  },
+  {
+   "fieldname": "wallet_amount",
+   "fieldtype": "Currency",
+   "label": "Wallet Amount"
+  },
+  {
+   "depends_on": "eval:doc.beneficiary_method == \"Loyalty Points\"",
+   "fieldname": "loyalty_settings_section",
+   "fieldtype": "Section Break",
+   "label": "Loyalty Settings"
+  },
+  {
+   "depends_on": "eval:doc.beneficiary_method == \"Loyalty Points\"",
+   "fieldname": "loyalty_points",
+   "fieldtype": "Int",
+   "label": "Loyalty Points"
+  },
+  {
+   "depends_on": "eval:frappe.user.has_role('System Manager')",
+   "fieldname": "email_template_sec",
+   "fieldtype": "Section Break",
+   "label": "Email Template"
+  },
+  {
+   "fieldname": "email_template",
+   "fieldtype": "Link",
+   "label": "Email Template",
+   "options": "Email Template"
+  },
+  {
+   "fieldname": "column_break_22",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "sender",
+   "fieldtype": "Link",
+   "label": "Sender",
+   "options": "Email Account"
+  }
+ ],
+ "issingle": 1,
+ "links": [],
+ "modified": "2024-02-15 12:21:51.729949",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "BirthDay Club Setting",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

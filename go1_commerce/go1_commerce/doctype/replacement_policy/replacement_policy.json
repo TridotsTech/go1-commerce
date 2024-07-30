@@ -1,0 +1,85 @@
+{
+ "actions": [],
+ "autoname": "RPP-.#####",
+ "creation": "2023-05-10 13:47:07.377173",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "heading",
+  "column_break_kiu1",
+  "eligible_for_replacement",
+  "section_break_u8xb",
+  "description"
+ ],
+ "fields": [
+  {
+   "description": "The title given for the Replacement policy (for identification purpose)",
+   "fieldname": "heading",
+   "fieldtype": "Data",
+   "label": "Heading",
+   "reqd": 1
+  },
+  {
+   "description": "Detailed information regarding the returns of the product. This will be displayed on the product detail page.",
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "label": "Description"
+  },
+  {
+   "fieldname": "column_break_kiu1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_replacement",
+   "fieldtype": "Check",
+   "label": "Eligible For Replacement"
+  },
+  {
+   "fieldname": "section_break_u8xb",
+   "fieldtype": "Section Break"
+  }
+ ],
+ "links": [],
+ "modified": "2023-06-21 19:53:38.317680",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Replacement Policy",
+ "naming_rule": "Expression (old style)",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Admin",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "search_fields": "heading",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "heading",
+ "track_changes": 1
+}

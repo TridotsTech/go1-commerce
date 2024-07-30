@@ -1,0 +1,172 @@
+{
+ "actions": [],
+ "autoname": "PB-.#####",
+ "creation": "2019-03-13 20:51:52.623299",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "brand_name",
+  "published",
+  "business",
+  "column_break_3",
+  "brand_logo",
+  "information",
+  "warranty_information",
+  "desc_section",
+  "description",
+  "column_break_7",
+  "route",
+  "column_break_9",
+  "unique_name",
+  "categories_section",
+  "category",
+  "column_break_16",
+  "category_name"
+ ],
+ "fields": [
+  {
+   "description": "Name of the brand",
+   "fieldname": "brand_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Brand Name",
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "description": "If enabled, the brand will be displayed on the website",
+   "fieldname": "published",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Published"
+  },
+  {
+   "fieldname": "business",
+   "fieldtype": "Link",
+   "label": "Seller",
+   "options": "Business"
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "Logo image of the brand.",
+   "fieldname": "brand_logo",
+   "fieldtype": "Attach Image",
+   "label": "Brand Logo"
+  },
+  {
+   "fieldname": "information",
+   "fieldtype": "Section Break",
+   "hidden": 1,
+   "label": "Warranty Information"
+  },
+  {
+   "description": "Specifies the warranty information of the particular brand. This will be shown on the product detail page of this particular brand's product page.",
+   "fieldname": "warranty_information",
+   "fieldtype": "Small Text",
+   "label": "Warranty Information"
+  },
+  {
+   "fieldname": "desc_section",
+   "fieldtype": "Section Break",
+   "hidden": 1,
+   "label": "Description"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Text Editor",
+   "label": "Description"
+  },
+  {
+   "fieldname": "column_break_7",
+   "fieldtype": "Section Break",
+   "hidden": 1
+  },
+  {
+   "description": "Url of the brand detail page. On this page, products mapped under this brand will be listed.",
+   "fieldname": "route",
+   "fieldtype": "Data",
+   "label": "Route",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_9",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "A unique name is given for this brand. This value will be used for filtering products based on brand",
+   "fieldname": "unique_name",
+   "fieldtype": "Data",
+   "label": "Unique Name",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "categories_section",
+   "fieldtype": "Section Break",
+   "hidden": 1,
+   "label": "Categories"
+  },
+  {
+   "description": "If a category is mapped, then this particular brand can be mapped only for the particular category products",
+   "fieldname": "category",
+   "fieldtype": "Link",
+   "label": "Category",
+   "options": "Product Category"
+  },
+  {
+   "fieldname": "column_break_16",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "category.category_name",
+   "fieldname": "category_name",
+   "fieldtype": "Data",
+   "label": "Category Name",
+   "read_only": 1
+  }
+ ],
+ "has_web_view": 1,
+ "image_field": "brand_logo",
+ "is_published_field": "published",
+ "links": [],
+ "modified": "2023-08-05 10:41:21.264238",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Product Brand",
+ "naming_rule": "Expression (old style)",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "export": 1,
+   "read": 1,
+   "role": "Vendor",
+   "write": 1
+  }
+ ],
+ "search_fields": "brand_name, category_name",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "brand_name",
+ "track_changes": 1
+}

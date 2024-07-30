@@ -1,0 +1,122 @@
+{% extends layout_template %}
+{% block loader %}
+{% include "/templates/pages/defaultpageloader.html" %}
+{% endblock %}
+    {% if not restaurant %}
+     {% block breadcrumb %}
+      <div class="title-breadcrumb">
+       <div class="{%if theme_settings.boxed_layout ==1%}container{%else%}container-fluid{%endif%}" style="padding:0 15px;">
+            <div class="row ">
+                <div class="col-md-12 col-sm-12 col-xs-12" >
+                    <ol class="breadcrumb">                        
+                      <li><a href="/">Home</a></li>
+                        <li><a href="#">{{page.page_title}}</a></li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endblock %}
+    {% endif %}   
+    {% block content %}  
+    <section id="welcome" class="padding pos-rel" >
+        <div class="container-fluid">
+            <div class="{% if page.include_right_sidebar %}col-md-9{%else%}col-md-12{% endif %} content"> 
+                <h3 style="margin-bottom: 15px;margin-top: -5px;">{{page.page_title}}</h3>
+                {% if content %}{{page.content}}{% endif %}
+            </div>
+            {% if page.include_right_sidebar %}
+            {% if recent_products %}
+                <div class="col-md-3 hide123">
+                    <div class="product1">
+                        <div class="headline" style="padding: 0px; margin: 0px;">
+                            <h2 style="font-size: 15px;">Recent products</h2>
+                        </div>
+                        <div class="row">
+                            {% for item in recent_products %}
+                            <div class="item1">
+                                <div class="pad-5 right-item">                                  
+                                    <div class="product-single-right" data-itemrate="150.0">
+                                        <a href="/{{item.route}}" class="img-link"><img alt="#" class="img-responsive lazyloaded" src="{% if item.detail_thumbnail %}{{item.detail_thumbnail}}{% else %}/assets/cmswebsite/images/no-image-800x511.png{% endif %}"></a>
+                                        <div class="itemTag"></div>
+                                        <div class="rating">
+                                            <div class="hot-wid-rating-right" data-item-name="parsely">
+                                                <div class="hiding">
+                                                    <h4><a href="/{{item.route}}"> {{item.item}}</a></h4>
+                                                </div>
+                                                <div class="product-wid-right-price clearfix">             
+                                                    <ins class="secondary-font-p">{{currency}} {{"%0.2f" % item.price | float}}</ins>
+                                                    <input type="hidden" id="hdnProductRate" value="74.25"> 
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            {% endif %}
+        </div>
+    </section> 
+
+<style type="text/css">
+
+  .content{
+    padding: 25px;
+    min-height: 350px;
+    margin-top: 18px;
+    margin-bottom: 18px;
+    background: #fff;
+  }  
+</style>
+<style type="text/css">
+    .product1{
+       margin-top: 18px;
+   padding: 15px 15px 0px 15px;
+    background: #fff;
+    border-top: 1px solid #eee;
+    border-left: 1px solid #eee;
+    border-right: 1px solid #eee;
+}
+@media screen and (max-width: 992px) {
+    .hide123{
+        display: none;
+    }
+}
+.hide123{
+  padding-right: 0px;
+}
+.best{
+    margin-top: 18px;
+}
+.hiding h4 a{ 
+  height: 18px;
+  width: 190px;
+  overflow: hidden;
+  position: relative;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+} 
+.rating .hot-wid-rating-right{
+    padding-left: 25px;
+}
+.item1 .right-item{
+  padding: 10px 15px;
+}
+.rating .product-wid-right-price ins{
+        color:#ff5500;
+}
+.item1 .product-single-right img {
+    width: 55px;
+}
+.item1 .product-single-right h4 {
+    font-size: 12px;
+    }
+
+</style>
+
+ {% endblock %}
+

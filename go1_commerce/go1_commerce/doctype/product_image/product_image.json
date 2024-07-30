@@ -1,0 +1,116 @@
+{
+ "actions": [],
+ "creation": "2019-03-13 19:34:29.708655",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "image_name",
+  "title",
+  "product_image",
+  "display_order",
+  "list_image",
+  "detail_thumbnail",
+  "detail_image",
+  "email_thumbnail",
+  "mini_cart",
+  "cart_thumbnail",
+  "is_primary",
+  "childname",
+  "list_images"
+ ],
+ "fields": [
+  {
+   "fieldname": "image_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Image Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "label": "Title"
+  },
+  {
+   "fieldname": "product_image",
+   "fieldtype": "Attach Image",
+   "label": "Product Image"
+  },
+  {
+   "default": "0",
+   "fieldname": "display_order",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Display Order",
+   "reqd": 1
+  },
+  {
+   "fieldname": "list_image",
+   "fieldtype": "Attach Image",
+   "hidden": 1,
+   "label": "List Image"
+  },
+  {
+   "fieldname": "detail_thumbnail",
+   "fieldtype": "Attach Image",
+   "hidden": 1,
+   "label": "Detail Thumbnail"
+  },
+  {
+   "fieldname": "detail_image",
+   "fieldtype": "Attach Image",
+   "hidden": 1,
+   "label": "Detail Image"
+  },
+  {
+   "fieldname": "email_thumbnail",
+   "fieldtype": "Attach Image",
+   "hidden": 1,
+   "label": "Email Thumbnail"
+  },
+  {
+   "fieldname": "mini_cart",
+   "fieldtype": "Attach Image",
+   "hidden": 1,
+   "label": "Mini Cart"
+  },
+  {
+   "fieldname": "cart_thumbnail",
+   "fieldtype": "Attach Image",
+   "hidden": 1,
+   "label": "Cart Thumbnail"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_primary",
+   "fieldtype": "Check",
+   "label": "Is Primary"
+  },
+  {
+   "fieldname": "childname",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Childname"
+  },
+  {
+   "fieldname": "list_images",
+   "fieldtype": "Image",
+   "hidden": 1,
+   "label": "List Images"
+  }
+ ],
+ "istable": 1,
+ "links": [],
+ "modified": "2024-01-24 14:07:44.620234",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Product Image",
+ "owner": "Administrator",
+ "permissions": [],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

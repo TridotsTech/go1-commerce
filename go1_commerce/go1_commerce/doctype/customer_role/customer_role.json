@@ -1,0 +1,30 @@
+{
+ "creation": "2020-08-03 11:25:16.335518",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "role"
+ ],
+ "fields": [
+  {
+   "fieldname": "role",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Role",
+   "options": "Role"
+  }
+ ],
+ "istable": 1,
+ "modified": "2020-08-04 01:29:34.167117",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Customer Role",
+ "owner": "Administrator",
+ "permissions": [],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

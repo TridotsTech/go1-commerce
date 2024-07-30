@@ -1,0 +1,250 @@
+{
+ "autoname": "naming_series:",
+ "creation": "2021-01-06 03:41:46.851130",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "restaurant",
+  "restaurant_name",
+  "contact_email",
+  "column_break_4",
+  "payment_status",
+  "date",
+  "customer_details_section",
+  "customer_name",
+  "column_break_9",
+  "customer_email",
+  "column_break_11",
+  "customer_phone",
+  "recipient_details_section",
+  "recipient_name",
+  "recipient_phone",
+  "message",
+  "column_break_17",
+  "recipient_email",
+  "restaurant_email",
+  "recipient_address",
+  "giftcart_coupon_code",
+  "is_recipient_notified",
+  "is_giftcard_used",
+  "payment_details_section",
+  "payment_type",
+  "payment_method",
+  "amount",
+  "naming_series",
+  "column_break_24",
+  "payment_gateway_charges",
+  "card_count",
+  "total_amount",
+  "transaction_id",
+  "order_reference"
+ ],
+ "fields": [
+  {
+   "fieldname": "restaurant",
+   "fieldtype": "Link",
+   "label": "Restaurant",
+   "options": "Business"
+  },
+  {
+   "fieldname": "restaurant_name",
+   "fieldtype": "Data",
+   "label": "Restaurant Name",
+   "options": "restaurant.restaurant_name"
+  },
+  {
+   "fieldname": "contact_email",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Contact Email",
+   "options": "Email"
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "payment_status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Payment Status",
+   "options": "Pending\nPaid\nCancelled"
+  },
+  {
+   "default": "Today",
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "label": "Date"
+  },
+  {
+   "fieldname": "customer_details_section",
+   "fieldtype": "Section Break",
+   "label": "Customer Details"
+  },
+  {
+   "fieldname": "customer_name",
+   "fieldtype": "Data",
+   "label": "Customer Name"
+  },
+  {
+   "fieldname": "column_break_9",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "customer_email",
+   "fieldtype": "Data",
+   "label": "Customer Email",
+   "options": "Email"
+  },
+  {
+   "fieldname": "column_break_11",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "customer_phone",
+   "fieldtype": "Data",
+   "label": "Customer Phone"
+  },
+  {
+   "fieldname": "recipient_details_section",
+   "fieldtype": "Section Break",
+   "label": "Recipient Details"
+  },
+  {
+   "fieldname": "recipient_name",
+   "fieldtype": "Data",
+   "label": "Recipient Name"
+  },
+  {
+   "fieldname": "recipient_phone",
+   "fieldtype": "Data",
+   "label": "Recipient Phone"
+  },
+  {
+   "fieldname": "message",
+   "fieldtype": "Small Text",
+   "label": "Message"
+  },
+  {
+   "fieldname": "column_break_17",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "recipient_email",
+   "fieldtype": "Data",
+   "label": "Recipient Email",
+   "options": "Email"
+  },
+  {
+   "fieldname": "recipient_address",
+   "fieldtype": "Data",
+   "label": "Recipient Address"
+  },
+  {
+   "fieldname": "payment_details_section",
+   "fieldtype": "Section Break",
+   "label": "Payment Details"
+  },
+  {
+   "fieldname": "payment_type",
+   "fieldtype": "Select",
+   "label": "Payment Type",
+   "options": "Cash\nCard"
+  },
+  {
+   "fieldname": "amount",
+   "fieldtype": "Currency",
+   "label": "Amount"
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Naming Series",
+   "options": "GF-"
+  },
+  {
+   "fieldname": "column_break_24",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "payment_gateway_charges",
+   "fieldtype": "Currency",
+   "hidden": 1,
+   "label": "Payment Gateway Charges"
+  },
+  {
+   "fieldname": "card_count",
+   "fieldtype": "Int",
+   "label": "Card Count"
+  },
+  {
+   "fieldname": "total_amount",
+   "fieldtype": "Currency",
+   "label": "Total Amount"
+  },
+  {
+   "fieldname": "transaction_id",
+   "fieldtype": "Data",
+   "label": "Transaction Id"
+  },
+  {
+   "fieldname": "giftcart_coupon_code",
+   "fieldtype": "Data",
+   "label": "Giftcart Coupon Code"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_recipient_notified",
+   "fieldtype": "Check",
+   "label": "Is recipient notified"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_giftcard_used",
+   "fieldtype": "Check",
+   "label": "Is Giftcard Used"
+  },
+  {
+   "fieldname": "order_reference",
+   "fieldtype": "Data",
+   "label": "Order Reference"
+  },
+  {
+   "fieldname": "restaurant_email",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Restaurant Email",
+   "options": "Email"
+  },
+  {
+   "fieldname": "payment_method",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Payment Method"
+  }
+ ],
+ "modified": "2021-01-12 02:38:11.929832",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Gift Card Order",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

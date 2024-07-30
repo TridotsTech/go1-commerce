@@ -1,0 +1,108 @@
+{
+ "actions": [],
+ "autoname": "RP-#####",
+ "creation": "2019-04-25 12:26:47.875748",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "business",
+  "heading",
+  "column_break_zzo8",
+  "eligible_for_return",
+  "section_break_9kvp",
+  "description",
+  "no_of_days",
+  "return_request_action"
+ ],
+ "fields": [
+  {
+   "description": "The title given for the return policy (for identification purpose)",
+   "fieldname": "heading",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Heading",
+   "reqd": 1
+  },
+  {
+   "description": "Detailed information regarding the returns of the product. This will be displayed on the product detail page.",
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "label": "Description"
+  },
+  {
+   "description": "This indicates the number of days up to which the product can be returned from the order date/order delivery date based on settings.",
+   "fieldname": "no_of_days",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "No Of Days ",
+   "reqd": 1
+  },
+  {
+   "fieldname": "business",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Seller",
+   "options": "Business"
+  },
+  {
+   "fieldname": "return_request_action",
+   "fieldtype": "Link",
+   "label": "Return Request Action",
+   "options": "Return Request Action"
+  },
+  {
+   "fieldname": "column_break_zzo8",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "eligible_for_return",
+   "fieldtype": "Check",
+   "label": "Eligible For Return"
+  },
+  {
+   "fieldname": "section_break_9kvp",
+   "fieldtype": "Section Break"
+  }
+ ],
+ "links": [],
+ "modified": "2023-06-23 16:59:04.662831",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Return Policy",
+ "naming_rule": "Expression (old style)",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Admin",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "search_fields": "heading",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

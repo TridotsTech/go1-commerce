@@ -1,0 +1,249 @@
+{% extends "templates/Layout/customweb.html" %}
+{% block content %}
+<section id="content" class="container-fluid drop-shadow lifted">
+    <div id="content-body" class="row" style="margin-top: 50px;">
+        {% if BlogCateogories %}
+        <div id="content-left" class="span5 col-md-3">
+            <div class="block block-bordered block-blog-archive">
+                <div class="block-title">
+                    CATEGORY
+                </div>
+                <div class="block-body listbox">
+                    <nav class="nav-category">
+                        <ul class="level-1">
+                            {% for list in BlogCateogories %}
+                            <li><a href="/{{list.route}}"><i class="fa fa-chevron-right" style="font-size: 12px; margin-right: 5px;"></i>{{list.name}}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% if BlogList %}
+        <div id="content-center" class="span19 omega col-md-9">
+            <!-- <img style="width: 100%; height: 250px;" src="/Media/Images/Recipe-Corner-Image.jpg"> -->
+            <div class="page blog-page">
+                <div class="sec-title text-center page-title">
+                    <h3 class="blog_header">Recipe Corner</h3>
+                </div>
+               <!--  <div class="page-title">
+                    <h1 class="blog_header" style="margin-top: 0px;font-size: 24px;">
+                        RECIPE CORNER
+                    </h1>
+                </div> -->
+                <div class="page-body">
+                    <div class="blogposts">
+                        {% for list in BlogList %}
+                         {% set blogcomments = frappe.db.get_all('Blog Comments',filters={'blog_name':list.name},fields=['*']) %}
+                        <article class="blogpost row-fluid">
+                            <div class="blogpost-info span6 pull-left">
+                                <a class="blogpost-comments" href="{{list.route}}" title="Comments {% if blogcomments | length >= 1%}({{blogcomments | length}}){% else %}(0){% endif %}" rel="tooltip">
+    								<span class="blogpost-comments-icon fa fa-comments"></span>
+                                    <span class="blogpost-comments-count">{% if blogcomments | length >= 1 %}{{blogcomments | length}}{% else %}0{% endif %}</span>
+                                </a>
+                                <div class="blogpost-date muted">
+                                    {{list.published_on.strftime('%d %b, %Y')}}
+                                </div>
+
+                                {% set blog_tag = frappe.db.get_all('Blog Tag Item',fields=['*'],filters={'parent':list.name}) %} 
+                                
+                                <div class="blogpost-tags well well-small">
+                                    <i class="fa fa-tags" title="Tags"></i>
+                                    {% for item in blog_tag %}
+                                    {% if not loop.last %}
+                                    <a class="blogpost-tag" href="{{item.tag_route}}">{{item.blog_tag}}, </a>
+                                    {% endif %}
+                                    {% if loop.last %}
+                                    <a class="blogpost-tag" href="{{item.tag_route}}">{{item.blog_tag}}</a>
+                                    {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="blogpost-content span18 pull-left">
+
+                                <h3 class="blogpost-title">
+                                    <a href="/{{list.route}}">
+                                        {{list.title}}
+                                    </a>
+                                </h3>
+
+                                <div class="blogpost-body">
+                                  {% if list.content_html %}
+                                  {{list.content_html}}
+                                  {% elif list.content %}
+                                  {{list.content}}
+                                  {% endif %}
+                                </div>  
+                            </div>
+                        </article>
+                        {% endfor %}
+                    </div>        
+                </div>
+            </div>   
+        </div>
+        {%else%}
+                <div class="downotwn-blog no-data">No Records Found</div>
+        {% endif %}
+    </div>
+</section>
+
+<style type="text/css">
+.blog-page .blogpost {
+    border-top: 1px solid #ddd;
+    padding: 20px 0;
+}
+.blog-page .blogpost:first-child {
+    border-top: none;
+}
+@media (min-width: 1200px){
+.row-fluid [class*="span"]:first-child {
+    margin-left: 0;
+}
+.row-fluid .span6 {
+    width: 23.07692308%;
+}
+}
+.blog-page .blogpost .blogpost-info .blogpost-comments {
+    position: relative;
+    display: block;
+    text-decoration: none;
+    font-weight: bold;
+    width: 50px;
+    height: 50px;
+    float: right;
+}
+.blog-page .blogpost .blogpost-info .blogpost-comments .blogpost-comments-icon {
+    position: absolute;
+    font-size: 50px;
+    line-height: 50px;
+    color: #f1f1f1;
+}
+.fa-comments:before {
+    content: "\f086";
+}
+.blog-page .blogpost .blogpost-info .blogpost-comments .blogpost-comments-count {
+    position: absolute;
+    top: 13px;
+    font-size: 13px;
+    line-height: 16px;
+    width: 38px;
+    text-align: center;
+    color: #c5c5c5;
+}
+.blog-page .blogpost .blogpost-info .blogpost-date {
+    clear: both;
+    float: right;
+    text-align: right;
+    margin-bottom: 8px;
+}
+.muted {
+    color: #9a9a9a;
+}
+@media (min-width: 1200px){
+.row-fluid .span18 {
+    width: 74.35897436%;
+}
+.row-fluid [class*="span"] {
+    display: block;
+    min-height: 34px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    float: left;
+    margin-left: 2.56410256%;
+}
+}
+.blog-page .blogpost .blogpost-content .blogpost-title {
+    font-family: 'Segoe UI Light','Segoe UI',Arial,Helvetica,'sans-serif';
+    font-weight: 100;
+    color: #3a87ad;
+    margin-top: 0;
+}
+h3 {
+    font-size: 24.5px;
+}
+.blog-page .blogpost .blogpost-content .blogpost-title a {
+    text-decoration: none;
+}
+#content-left .block.block-bordered .block-title {
+    border-radius: 0;
+    border-color: #252a2f;
+    font-size: 14px;
+    font-weight: normal;
+}
+.block.block-bordered .block-title {
+    background: none repeat scroll 0 0 #252a2f;
+    border-radius: 0;
+    color: #fff;
+    border-color: #252a2f;
+    padding: 8px 15px;
+    font-weight: normal;
+}
+#content-left .block.block-bordered .block-body {
+    float: left;
+    width: 100%;
+    background: #fff;
+    padding: 0;
+    margin-top: 10px;
+    border: 1px solid #e7e7e7;
+}
+
+#content-left .block.block-bordered .block-body {
+    border-radius: 0 0 2px 0;
+}
+.block.block-bordered ul {
+    margin: 0;
+}
+nav ul, nav li {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+}
+.block.block-bordered li {
+    list-style: none;
+}
+.nav-category .level-1 li, .block-account-navigation .listbox li {
+    border-bottom: 1px solid #e7e7e7;
+}
+.nav-category .level-1>li a, .block-account-navigation .listbox li a {
+    font-size: 15px;
+    padding: 10px 15px;
+    color: #555;
+    display: inline-block;
+}
+.well {
+    border: 1px solid #e5e5e5;
+    border-color: rgba(0,0,0,.1);
+    border-radius: 3px;
+    -webkit-box-shadow: inset 0 0 10px rgba(0,0,0,.05);
+    box-shadow: inset 0 0 10px rgba(0,0,0,.05);
+}
+.blog-page .blogpost .blogpost-info .blogpost-tags {
+    clear: both;
+}
+.well-small {
+    border-radius: 3px;
+}
+.well-small {
+    padding: 9px;
+}
+.blog-page .blogpost .blogpost-content .blogpost-title a {
+    text-decoration: none;
+    color: #08c;
+}
+
+
+.page.blog-page{background: #fff;
+    float: left;
+    width: 100%;
+    padding: 15px 15px;}
+
+#content-body .span19{background:transparent;}
+.blog-page .blog_header {
+    margin-top: 10px !important;
+    font-weight: 400 !important;
+}
+</style>
+
+{% endblock %}

@@ -1,0 +1,510 @@
+{
+ "actions": [],
+ "allow_import": 1,
+ "autoname": "naming_series:",
+ "creation": "2019-04-05 08:32:28.582510",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "type_of_payment",
+  "naming_series",
+  "payment_type",
+  "mode_of_payment",
+  "column_break_5",
+  "posting_date",
+  "source_from",
+  "cost_center",
+  "business",
+  "party_section",
+  "party_type",
+  "type",
+  "party_name",
+  "column_break_11",
+  "party",
+  "contact_email",
+  "contact_person",
+  "sec_11",
+  "paid_amount",
+  "source_exchange_rate",
+  "base_paid_amount",
+  "column_break_29",
+  "received_amount",
+  "target_exchange_rate",
+  "base_received_amount",
+  "section_break_14",
+  "allocate_payment_amount",
+  "column_break_k8ls",
+  "reference_image",
+  "section_break_ah4e",
+  "references",
+  "section_break_34",
+  "total_allocated_amount",
+  "base_total_allocated_amount",
+  "set_exchange_gain_loss",
+  "column_break_36",
+  "unallocated_amount",
+  "difference_amount",
+  "write_off_difference_amount",
+  "deductions_or_loss_section",
+  "deductions",
+  "transaction_references",
+  "reference_no",
+  "column_break_23",
+  "reference_date",
+  "clearance_date",
+  "section_break_12",
+  "remarks",
+  "column_break_16",
+  "reference_details_section",
+  "letter_head",
+  "print_heading",
+  "bank",
+  "title",
+  "bank_account_no",
+  "auto_repeat",
+  "amended_from",
+  "payment_order",
+  "ref_doctype",
+  "column_break_64",
+  "ref_docname"
+ ],
+ "fields": [
+  {
+   "fieldname": "type_of_payment",
+   "fieldtype": "Section Break",
+   "label": "Type of Payment"
+  },
+  {
+   "bold": 1,
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Series",
+   "options": "PAY-.YYYY.-",
+   "print_hide": 1,
+   "set_only_once": 1
+  },
+  {
+   "bold": 1,
+   "fieldname": "payment_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Payment Type",
+   "options": "Receive\nPay",
+   "print_hide": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "mode_of_payment",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Mode of Payment",
+   "options": "Mode Of Payments",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "bold": 1,
+   "default": "Today",
+   "fieldname": "posting_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Posting Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "cost_center",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Cost Center"
+  },
+  {
+   "depends_on": "eval:in_list([\"Receive\", \"Pay\"], doc.payment_type)",
+   "fieldname": "party_section",
+   "fieldtype": "Section Break",
+   "label": "Payment From / To"
+  },
+  {
+   "depends_on": "eval:in_list([\"Receive\", \"Pay\"], doc.payment_type) && doc.docstatus==0",
+   "fieldname": "party_type",
+   "fieldtype": "Link",
+   "in_standard_filter": 1,
+   "label": "Party Type",
+   "options": "DocType",
+   "print_hide": 1,
+   "search_index": 1
+  },
+  {
+   "depends_on": "eval:((!doc.party_type))",
+   "fieldname": "type",
+   "fieldtype": "Data",
+   "label": "Party",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "depends_on": "eval:in_list([\"Receive\", \"Pay\"], doc.payment_type) && doc.party_type",
+   "fieldname": "party_name",
+   "fieldtype": "Data",
+   "in_global_search": 1,
+   "label": "Party Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_11",
+   "fieldtype": "Column Break"
+  },
+  {
+   "bold": 1,
+   "depends_on": "eval:in_list([\"Receive\", \"Pay\"], doc.payment_type) && doc.party_type",
+   "fieldname": "party",
+   "fieldtype": "Dynamic Link",
+   "in_standard_filter": 1,
+   "label": "Party",
+   "options": "party_type"
+  },
+  {
+   "depends_on": "contact_person",
+   "fieldname": "contact_email",
+   "fieldtype": "Data",
+   "label": "Email",
+   "options": "Email",
+   "read_only": 1
+  },
+  {
+   "depends_on": "party",
+   "fieldname": "contact_person",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Contact",
+   "options": "Contact"
+  },
+  {
+   "fieldname": "sec_11",
+   "fieldtype": "Section Break",
+   "label": "Amount"
+  },
+  {
+   "bold": 1,
+   "fieldname": "paid_amount",
+   "fieldtype": "Currency",
+   "label": "Paid Amount",
+   "reqd": 1
+  },
+  {
+   "default": "1",
+   "fieldname": "source_exchange_rate",
+   "fieldtype": "Float",
+   "hidden": 1,
+   "label": "Exchange Rate",
+   "print_hide": 1
+  },
+  {
+   "depends_on": "eval:((doc.payment_type==\"Receive\"))",
+   "fieldname": "base_paid_amount",
+   "fieldtype": "Currency",
+   "hidden": 1,
+   "label": "Paid Amount ",
+   "print_hide": 1
+  },
+  {
+   "fieldname": "column_break_29",
+   "fieldtype": "Column Break"
+  },
+  {
+   "bold": 1,
+   "depends_on": "eval:((doc.payment_type==\"Pay\"))",
+   "fieldname": "received_amount",
+   "fieldtype": "Currency",
+   "hidden": 1,
+   "label": "Received Amount",
+   "print_hide": 1
+  },
+  {
+   "fieldname": "target_exchange_rate",
+   "fieldtype": "Float",
+   "hidden": 1,
+   "label": "Exchange Rate"
+  },
+  {
+   "depends_on": "eval:((doc.payment_type==\"Pay\"))",
+   "fieldname": "base_received_amount",
+   "fieldtype": "Currency",
+   "hidden": 1,
+   "label": "Received Amount ",
+   "print_hide": 1
+  },
+  {
+   "collapsible": 1,
+   "collapsible_depends_on": "references",
+   "fieldname": "section_break_14",
+   "fieldtype": "Section Break",
+   "label": "Reference"
+  },
+  {
+   "default": "1",
+   "fieldname": "allocate_payment_amount",
+   "fieldtype": "Check",
+   "label": "Allocate Payment Amount"
+  },
+  {
+   "fieldname": "references",
+   "fieldtype": "Table",
+   "label": "Payment References",
+   "options": "Payment Reference"
+  },
+  {
+   "fieldname": "section_break_34",
+   "fieldtype": "Section Break",
+   "hidden": 1,
+   "label": "Writeoff"
+  },
+  {
+   "bold": 1,
+   "depends_on": "eval:(doc.paid_amount && doc.received_amount && doc.references)",
+   "fieldname": "total_allocated_amount",
+   "fieldtype": "Currency",
+   "label": "Total Allocated Amount",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "base_total_allocated_amount",
+   "fieldtype": "Currency",
+   "label": "Total Allocated Amount ",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "set_exchange_gain_loss",
+   "fieldtype": "Button",
+   "label": "Set Exchange Gain / Loss"
+  },
+  {
+   "fieldname": "column_break_36",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:(doc.paid_amount && doc.received_amount && doc.references)",
+   "fieldname": "unallocated_amount",
+   "fieldtype": "Currency",
+   "hidden": 1,
+   "label": "Unallocated Amount",
+   "print_hide": 1
+  },
+  {
+   "bold": 1,
+   "depends_on": "eval:(doc.paid_amount && doc.received_amount)",
+   "fieldname": "difference_amount",
+   "fieldtype": "Currency",
+   "hidden": 1,
+   "label": "Difference Amount",
+   "print_hide": 1
+  },
+  {
+   "depends_on": "difference_amount",
+   "fieldname": "write_off_difference_amount",
+   "fieldtype": "Button",
+   "label": "Write Off Difference Amount"
+  },
+  {
+   "collapsible": 1,
+   "collapsible_depends_on": "deductions",
+   "depends_on": "eval:(doc.paid_amount && doc.received_amount)",
+   "fieldname": "deductions_or_loss_section",
+   "fieldtype": "Section Break",
+   "hidden": 1,
+   "label": "Deductions or Loss"
+  },
+  {
+   "fieldname": "deductions",
+   "fieldtype": "Table",
+   "label": "Payment Deductions or Loss",
+   "options": "Payment Deduction"
+  },
+  {
+   "fieldname": "transaction_references",
+   "fieldtype": "Section Break",
+   "label": "Transaction ID"
+  },
+  {
+   "bold": 1,
+   "fieldname": "reference_no",
+   "fieldtype": "Data",
+   "label": "Cheque/Reference No"
+  },
+  {
+   "fieldname": "column_break_23",
+   "fieldtype": "Column Break"
+  },
+  {
+   "bold": 1,
+   "fieldname": "reference_date",
+   "fieldtype": "Date",
+   "label": "Cheque/Reference Date",
+   "search_index": 1
+  },
+  {
+   "depends_on": "eval:doc.docstatus==1",
+   "fieldname": "clearance_date",
+   "fieldtype": "Date",
+   "label": "Clearance Date",
+   "no_copy": 1,
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "collapsible": 1,
+   "depends_on": "eval:(doc.paid_amount && doc.received_amount)",
+   "fieldname": "section_break_12",
+   "fieldtype": "Section Break",
+   "label": "More Information"
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Small Text",
+   "label": "Remarks",
+   "no_copy": 1
+  },
+  {
+   "fieldname": "column_break_16",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "reference_details_section",
+   "fieldtype": "Section Break",
+   "hidden": 1,
+   "label": "Reference Details"
+  },
+  {
+   "fieldname": "letter_head",
+   "fieldtype": "Link",
+   "label": "Letter Head",
+   "options": "Letter Head",
+   "print_hide": 1
+  },
+  {
+   "fieldname": "print_heading",
+   "fieldtype": "Link",
+   "label": "Print Heading",
+   "options": "Print Heading",
+   "print_hide": 1
+  },
+  {
+   "fieldname": "bank",
+   "fieldtype": "Read Only",
+   "label": "Bank"
+  },
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Title",
+   "print_hide": 1
+  },
+  {
+   "fieldname": "bank_account_no",
+   "fieldtype": "Read Only",
+   "label": "Bank Account No"
+  },
+  {
+   "fieldname": "auto_repeat",
+   "fieldtype": "Link",
+   "label": "Auto Repeat",
+   "options": "Auto Repeat"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Payment Entry",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "payment_order",
+   "fieldtype": "Data",
+   "label": "Payment Order",
+   "no_copy": 1,
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "ref_doctype",
+   "fieldtype": "Link",
+   "label": "Reference",
+   "options": "DocType"
+  },
+  {
+   "fieldname": "column_break_64",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "ref_docname",
+   "fieldtype": "Dynamic Link",
+   "label": "Reference Id",
+   "options": "ref_doctype"
+  },
+  {
+   "fieldname": "business",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Business",
+   "options": "Business"
+  },
+  {
+   "fieldname": "column_break_k8ls",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "reference_image",
+   "fieldtype": "Attach Image",
+   "label": "Reference Image"
+  },
+  {
+   "fieldname": "section_break_ah4e",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "source_from",
+   "fieldtype": "Data",
+   "label": "Source From",
+   "read_only": 1
+  }
+ ],
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2023-06-03 11:45:10.039657",
+ "modified_by": "Administrator",
+ "module": "Accounts",
+ "name": "Payment Entry",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "show_name_in_global_search": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "title",
+ "track_changes": 1
+}

@@ -1,0 +1,5 @@
+[
+	{"modified_by":"Administrator","display_order":0,"creation":"2020-01-31 14:48:11.019929","domain_based":0,"modified":"2020-01-31 14:48:11.019929","doctype":"Shipping Status","idx":0,"shipping_status":"Packed","owner":"Administrator","docstatus":0,"__last_sync_on":"2020-01-31T11:55:51.528Z"},
+	{"modified_by":"Administrator","display_order":1,"creation":"2020-01-31 14:48:28.724830","domain_based":0,"modified":"2020-01-31 14:48:28.724830","doctype":"Shipping Status","idx":0,"shipping_status":"Shipped","owner":"Administrator","docstatus":0,"__last_sync_on":"2020-01-31T11:56:18.242Z"},
+	{"modified_by":"Administrator","display_order":2,"creation":"2020-01-31 14:49:00.500928","domain_based":0,"modified":"2020-01-31 14:49:00.500928","doctype":"Shipping Status","idx":0,"shipping_status":"Delivered","owner":"Administrator","docstatus":0,"__last_sync_on":"2020-01-31T11:56:33.960Z"}
+]

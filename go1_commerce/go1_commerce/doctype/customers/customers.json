@@ -1,0 +1,424 @@
+{
+ "actions": [],
+ "autoname": "naming_series:",
+ "creation": "2018-09-18 19:42:55.615928",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "personal_details_tab",
+  "customer_dashboard",
+  "customer_section_break",
+  "customer_html",
+  "section_break_2",
+  "customer_status",
+  "customer_type",
+  "column_break_ehyzx",
+  "disable",
+  "section_break_1",
+  "naming_series",
+  "first_name",
+  "full_name",
+  "phone",
+  "alternate_phone",
+  "allow_multiple_address",
+  "user_id",
+  "business",
+  "column_break_3",
+  "last_name",
+  "email",
+  "dob",
+  "gender",
+  "no_of_employees",
+  "address_section",
+  "address",
+  "gst_in",
+  "landmark",
+  "latitude",
+  "column_break_js4ko",
+  "country",
+  "state",
+  "city",
+  "zipcode",
+  "longitude",
+  "sec_1",
+  "table_6",
+  "password_section",
+  "set_new_password",
+  "section_viewed_products",
+  "viewed_products",
+  "new_password",
+  "player_id",
+  "is_group",
+  "rgt",
+  "old_parent",
+  "parent_doctype",
+  "parent_level",
+  "customer_preference",
+  "customer_notes",
+  "sec_role",
+  "customer_role",
+  "column_break_2",
+  "help",
+  "orders_tab",
+  "recent_orders"
+ ],
+ "fields": [
+  {
+   "fieldname": "customer_html",
+   "fieldtype": "HTML",
+   "hidden": 1
+  },
+  {
+   "fieldname": "section_break_1",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Series",
+   "options": "CUST-\nGC-",
+   "set_only_once": 1
+  },
+  {
+   "fieldname": "first_name",
+   "fieldtype": "Data",
+   "label": "First name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "full_name",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "in_standard_filter": 1,
+   "label": "Full Name"
+  },
+  {
+   "fieldname": "phone",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Phone",
+   "reqd": 1
+  },
+  {
+   "fieldname": "user_id",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "User Id",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "business",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Seller",
+   "options": "Business"
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "last_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Last Name"
+  },
+  {
+   "fieldname": "email",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Email"
+  },
+  {
+   "depends_on": "eval:doc.allow_multiple_address==1",
+   "fieldname": "sec_1",
+   "fieldtype": "Section Break",
+   "label": "Customer Address"
+  },
+  {
+   "fieldname": "table_6",
+   "fieldtype": "Table",
+   "label": "Customer Address",
+   "options": "Customer Address"
+  },
+  {
+   "fieldname": "section_viewed_products",
+   "fieldtype": "Section Break",
+   "hidden": 1,
+   "label": "Viewed Products"
+  },
+  {
+   "fieldname": "viewed_products",
+   "fieldtype": "Table",
+   "label": "Viewed Products",
+   "options": "Customer Viewed Product"
+  },
+  {
+   "fieldname": "new_password",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Set New Password"
+  },
+  {
+   "fieldname": "player_id",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Player Id"
+  },
+  {
+   "fieldname": "rgt",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "label": "rgt"
+  },
+  {
+   "fieldname": "old_parent",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Old Parent"
+  },
+  {
+   "default": "Customers",
+   "fieldname": "parent_doctype",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Parent DocType",
+   "options": "DocType"
+  },
+  {
+   "fieldname": "parent_level",
+   "fieldtype": "Link",
+   "label": "Parent",
+   "options": "Customers"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_group",
+   "fieldtype": "Check",
+   "label": "Is Group"
+  },
+  {
+   "fieldname": "customer_preference",
+   "fieldtype": "Table",
+   "hidden": 1,
+   "label": "Customer Preference",
+   "options": "Customer Preference"
+  },
+  {
+   "fieldname": "gender",
+   "fieldtype": "Link",
+   "label": "Gender",
+   "options": "Gender"
+  },
+  {
+   "fieldname": "section_break_2",
+   "fieldtype": "Section Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "disable",
+   "fieldtype": "Check",
+   "label": "Disable"
+  },
+  {
+   "depends_on": "eval:((!doc.__islocal))",
+   "fieldname": "sec_role",
+   "fieldtype": "Section Break",
+   "hidden": 1,
+   "label": "Roles"
+  },
+  {
+   "fieldname": "customer_role",
+   "fieldtype": "Table MultiSelect",
+   "in_standard_filter": 1,
+   "label": "Roles",
+   "options": "Customer Role"
+  },
+  {
+   "fieldname": "recent_orders",
+   "fieldtype": "HTML",
+   "label": "Recent Orders"
+  },
+  {
+   "fieldname": "customer_dashboard",
+   "fieldtype": "HTML",
+   "label": "Customer Dashboard"
+  },
+  {
+   "fieldname": "customer_section_break",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "customer_type",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Customer Type",
+   "options": "\nCompany\nIndividual"
+  },
+  {
+   "depends_on": "eval: doc.customer_type == \"Company\"",
+   "fieldname": "no_of_employees",
+   "fieldtype": "Int",
+   "label": "No. of Employees",
+   "read_only": 1
+  },
+  {
+   "fieldname": "customer_notes",
+   "fieldtype": "Long Text",
+   "hidden": 1,
+   "label": "Customer Notes"
+  },
+  {
+   "fieldname": "dob",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Date Of Birth"
+  },
+  {
+   "fieldname": "landmark",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Landmark"
+  },
+  {
+   "fieldname": "country",
+   "fieldtype": "Link",
+   "label": "Country",
+   "options": "Country"
+  },
+  {
+   "fieldname": "state",
+   "fieldtype": "Link",
+   "label": "State",
+   "options": "State"
+  },
+  {
+   "fieldname": "help",
+   "fieldtype": "HTML",
+   "label": "Help"
+  },
+  {
+   "fieldname": "gst_in",
+   "fieldtype": "Data",
+   "label": "GSTIN"
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_ehyzx",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Waiting for Approval",
+   "fieldname": "customer_status",
+   "fieldtype": "Select",
+   "in_standard_filter": 1,
+   "label": "Status",
+   "options": "Waiting for Approval\nApproved\nRejected"
+  },
+  {
+   "fieldname": "alternate_phone",
+   "fieldtype": "Data",
+   "label": "Alternate Phone"
+  },
+  {
+   "fieldname": "latitude",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Latitude"
+  },
+  {
+   "fieldname": "longitude",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Longitude"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_multiple_address",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Allow Multiple Address"
+  },
+  {
+   "depends_on": "eval:doc.allow_multiple_address==0",
+   "fieldname": "address_section",
+   "fieldtype": "Section Break",
+   "label": "Customer Address"
+  },
+  {
+   "fieldname": "address",
+   "fieldtype": "Small Text",
+   "label": "Address"
+  },
+  {
+   "fieldname": "column_break_js4ko",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "city",
+   "fieldtype": "Link",
+   "in_standard_filter": 1,
+   "label": "City / Town",
+   "options": "City"
+  },
+  {
+   "fieldname": "zipcode",
+   "fieldtype": "Data",
+   "label": "Zipcode"
+  },
+  {
+   "fieldname": "personal_details_tab",
+   "fieldtype": "Tab Break",
+   "label": "Personal Details"
+  },
+  {
+   "fieldname": "set_new_password",
+   "fieldtype": "Data",
+   "label": "Set New Password"
+  },
+  {
+   "fieldname": "password_section",
+   "fieldtype": "Section Break",
+   "label": "Password"
+  },
+  {
+   "fieldname": "orders_tab",
+   "fieldtype": "Tab Break",
+   "label": "Orders"
+  }
+ ],
+ "links": [],
+ "modified": "2024-03-22 10:53:43.466754",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Customers",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "search_fields": "full_name,email,phone",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "full_name",
+ "track_changes": 1
+}

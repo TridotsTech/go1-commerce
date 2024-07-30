@@ -1,0 +1,1094 @@
+{
+ "actions": [],
+ "autoname": "naming_series:",
+ "creation": "2019-02-21 16:06:21.472500",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "components_section",
+  "customer_info_html",
+  "order_info_html",
+  "items_html",
+  "address_info_html",
+  "section_break_gzuc",
+  "order_detail_html",
+  "order_info",
+  "ec",
+  "customer_type",
+  "customer",
+  "col_br",
+  "customer_name",
+  "column_break_5",
+  "customer_email",
+  "sec_br",
+  "shipping_provider",
+  "pre_status",
+  "order_date",
+  "cancel_reason",
+  "shipping_method",
+  "payment_method",
+  "column_break_3",
+  "payment_status",
+  "shipping_method_name",
+  "payment_method_name",
+  "status",
+  "discount",
+  "column_break_2",
+  "delivery_date",
+  "delivery_slot",
+  "discount_coupon",
+  "shipping_status",
+  "section_break_13",
+  "payment_type",
+  "checkout_attributes",
+  "order_subtotal",
+  "order_subtotal_after_discount",
+  "column_break_20",
+  "delivery",
+  "shipments",
+  "column_break_21",
+  "shipping_charges",
+  "actual_shipping_charges",
+  "pickup_charge",
+  "total_driver_charges",
+  "dserf",
+  "total_tax_amount",
+  "cb",
+  "payment_gateway_charges",
+  "column_break_18",
+  "total_amount",
+  "advance_amount",
+  "tax_breakup",
+  "section_break_42",
+  "tax_splitup",
+  "sec_2",
+  "order_item",
+  "billing_section",
+  "billing_address",
+  "first_name",
+  "city",
+  "phone",
+  "cl1",
+  "last_name",
+  "state",
+  "address",
+  "business_phone",
+  "column_break_22",
+  "zipcode",
+  "country",
+  "landmark",
+  "shipping_section",
+  "shipping_address",
+  "latitude",
+  "longitude",
+  "shipping_first_name",
+  "shipping_city",
+  "shipping_phone",
+  "column_break_23",
+  "shipping_last_name",
+  "shipping_state",
+  "shipping_shipping_address",
+  "column_break_25",
+  "shipping_zipcode",
+  "shipping_country",
+  "shipping_landmark",
+  "payment_details",
+  "customer_payment",
+  "transaction_id",
+  "refund_id",
+  "refunded",
+  "paid_amount",
+  "paid_using_wallet",
+  "outstanding_amount",
+  "due_date",
+  "section_break_40",
+  "section_break_44",
+  "column_break_46",
+  "card_type",
+  "column_break_48",
+  "card_no",
+  "column_break_50",
+  "card_expiry",
+  "additional_information",
+  "customer_comments",
+  "section_break_84",
+  "barcode",
+  "column_break_110",
+  "qrcode",
+  "browser_details",
+  "browser",
+  "naming_series",
+  "amended_from",
+  "column_break_54",
+  "customer_ip",
+  "web_url",
+  "column_break_56",
+  "origin_type",
+  "order_from",
+  "is_printed",
+  "is_recurring_order",
+  "mail_status",
+  "is_shipment_bag_item",
+  "shipment_charge",
+  "sec_break",
+  "status_history",
+  "section_break_104",
+  "currency",
+  "currency_symbol",
+  "tax_json",
+  "is_viewed",
+  "is_gift_card_order",
+  "giftcard_coupon_code",
+  "gift_card_amount",
+  "is_custom_discount",
+  "cash_collected_mode",
+  "collected_payment_notes",
+  "preorder_email",
+  "order_additional_charges",
+  "uuid",
+  "included_tax",
+  "is_admin_order"
+ ],
+ "fields": [
+  {
+   "fieldname": "order_detail_html",
+   "fieldtype": "HTML"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "order_info",
+   "fieldtype": "Code",
+   "hidden": 1,
+   "label": "Order Info"
+  },
+  {
+   "fieldname": "ec",
+   "fieldtype": "Section Break",
+   "hidden": 1
+  },
+  {
+   "default": "Customers",
+   "fieldname": "customer_type",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Customer Type",
+   "options": "DocType"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "customer",
+   "fieldtype": "Dynamic Link",
+   "label": "Customer",
+   "options": "customer_type",
+   "reqd": 1
+  },
+  {
+   "fieldname": "col_br",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "customer_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Customer Name"
+  },
+  {
+   "fieldname": "column_break_5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "customer_email",
+   "fieldtype": "Data",
+   "in_standard_filter": 1,
+   "label": "Customer Email",
+   "options": "Email"
+  },
+  {
+   "fieldname": "sec_br",
+   "fieldtype": "Section Break",
+   "hidden": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "Placed",
+   "fieldname": "status",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "in_standard_filter": 1,
+   "label": "Order Status",
+   "options": "Order Status"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "pre_status",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Previous Order Status"
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "Today",
+   "fieldname": "order_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Order Date"
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "payment_status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Payment Status",
+   "options": "Pending\nPartially Paid\nPaid\nCancelled\nRefunded\nPartially Refunded\nAuthorized"
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "shipping_status",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Shipping Status",
+   "options": "Shipping Status"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "shipping_method",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Shipping Method",
+   "options": "Shipping Method"
+  },
+  {
+   "fieldname": "sec_2",
+   "fieldtype": "Section Break",
+   "hidden": 1,
+   "label": "Order items"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "order_item",
+   "fieldtype": "Table",
+   "label": "Order Items",
+   "options": "Order Item"
+  },
+  {
+   "fieldname": "section_break_13",
+   "fieldtype": "Section Break",
+   "hidden": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "payment_type",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Payment Type",
+   "options": "Cash\nOnline Payment"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "order_subtotal",
+   "fieldtype": "Currency",
+   "label": "Order Subtotal"
+  },
+  {
+   "fieldname": "column_break_20",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "discount",
+   "fieldtype": "Currency",
+   "label": "Discount"
+  },
+  {
+   "depends_on": "eval:doc.type=='Delivery'",
+   "fieldname": "delivery",
+   "fieldtype": "Data",
+   "label": "Delivery Charges ",
+   "set_only_once": 1
+  },
+  {
+   "fieldname": "column_break_21",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "0.00",
+   "depends_on": "eval:doc.shipping_method != 'Pickup'",
+   "fieldname": "shipping_charges",
+   "fieldtype": "Currency",
+   "label": "Shipping Charges"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:doc.shipping_method=='Pickup'",
+   "fieldname": "pickup_charge",
+   "fieldtype": "Currency",
+   "label": "Pickup Charges"
+  },
+  {
+   "fieldname": "dserf",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "total_tax_amount",
+   "fieldtype": "Currency",
+   "label": "Total Tax Amount"
+  },
+  {
+   "fieldname": "cb",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0.00",
+   "fieldname": "payment_gateway_charges",
+   "fieldtype": "Currency",
+   "label": "Payment Gateway Charges"
+  },
+  {
+   "fieldname": "column_break_18",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "total_amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Total Amount"
+  },
+  {
+   "fieldname": "tax_breakup",
+   "fieldtype": "Small Text",
+   "hidden": 1,
+   "label": "Tax Breakup",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "depends_on": "eval: doc.total_tax_amount > 0",
+   "fieldname": "section_break_42",
+   "fieldtype": "Section Break",
+   "hidden": 1,
+   "label": "Tax Breakup"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "tax_splitup",
+   "fieldtype": "HTML",
+   "label": "Tax Splitup"
+  },
+  {
+   "fieldname": "billing_section",
+   "fieldtype": "Section Break",
+   "hidden": 1,
+   "label": "Billing Address"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "billing_address",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Billing Address",
+   "options": "Customer Address"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "first_name",
+   "fieldtype": "Data",
+   "label": "First Name"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "city",
+   "fieldtype": "Data",
+   "label": "City"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "zipcode",
+   "fieldtype": "Data",
+   "label": "Zipcode"
+  },
+  {
+   "fieldname": "cl1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "last_name",
+   "fieldtype": "Data",
+   "label": "Last Name"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "state",
+   "fieldtype": "Data",
+   "label": "State"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "phone",
+   "fieldtype": "Data",
+   "label": "Phone",
+   "options": "Phone"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "business_phone",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Business Phone",
+   "options": "Phone"
+  },
+  {
+   "fieldname": "column_break_22",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "address",
+   "fieldtype": "Small Text",
+   "label": "Address"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "country",
+   "fieldtype": "Data",
+   "label": "Country"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "shipping_section",
+   "fieldtype": "Section Break",
+   "hidden": 1,
+   "label": "Shipping Address"
+  },
+  {
+   "fieldname": "shipping_address",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Shipping Address Id",
+   "options": "Customer Address"
+  },
+  {
+   "fieldname": "latitude",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Latitude"
+  },
+  {
+   "fieldname": "longitude",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Longitude"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "shipping_first_name",
+   "fieldtype": "Data",
+   "in_standard_filter": 1,
+   "label": "First Name"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "shipping_city",
+   "fieldtype": "Data",
+   "label": "City"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "shipping_zipcode",
+   "fieldtype": "Data",
+   "label": "Zipcode"
+  },
+  {
+   "fieldname": "column_break_23",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "shipping_last_name",
+   "fieldtype": "Data",
+   "label": "Last Name"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "shipping_state",
+   "fieldtype": "Data",
+   "label": "State"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "shipping_phone",
+   "fieldtype": "Data",
+   "label": "Phone",
+   "options": "Phone"
+  },
+  {
+   "fieldname": "column_break_25",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "shipping_shipping_address",
+   "fieldtype": "Small Text",
+   "label": "Address"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "shipping_country",
+   "fieldtype": "Data",
+   "label": "Country"
+  },
+  {
+   "depends_on": "doc.transaction_id",
+   "fieldname": "payment_details",
+   "fieldtype": "Section Break",
+   "label": "Payment Details"
+  },
+  {
+   "fieldname": "customer_payment",
+   "fieldtype": "HTML",
+   "hidden": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "transaction_id",
+   "fieldtype": "Data",
+   "label": "Transaction Id"
+  },
+  {
+   "fieldname": "refund_id",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Refund Id"
+  },
+  {
+   "default": "0",
+   "fieldname": "refunded",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Refunded"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "paid_amount",
+   "fieldtype": "Currency",
+   "hidden": 1,
+   "label": "Paid Amount"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "payment_method",
+   "fieldtype": "Link",
+   "label": "Payment Method",
+   "options": "Payment Method"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "outstanding_amount",
+   "fieldtype": "Currency",
+   "hidden": 1,
+   "label": "Outstanding Amount"
+  },
+  {
+   "fieldname": "due_date",
+   "fieldtype": "Date",
+   "hidden": 1,
+   "label": "Due Date"
+  },
+  {
+   "fieldname": "section_break_40",
+   "fieldtype": "Section Break",
+   "hidden": 1
+  },
+  {
+   "fieldname": "section_break_44",
+   "fieldtype": "Section Break",
+   "hidden": 1,
+   "label": "Payment Info"
+  },
+  {
+   "fieldname": "column_break_46",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "card_type",
+   "fieldtype": "Data",
+   "label": "Card Type",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_48",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "card_no",
+   "fieldtype": "Data",
+   "label": "Card No",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_50",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "card_expiry",
+   "fieldtype": "Data",
+   "label": "Card Expiry",
+   "read_only": 1
+  },
+  {
+   "fieldname": "additional_information",
+   "fieldtype": "Section Break",
+   "hidden": 1,
+   "label": "Additional Information"
+  },
+  {
+   "fieldname": "customer_comments",
+   "fieldtype": "Small Text",
+   "label": "Customer Comments"
+  },
+  {
+   "fieldname": "section_break_84",
+   "fieldtype": "Section Break",
+   "hidden": 1
+  },
+  {
+   "fieldname": "barcode",
+   "fieldtype": "Attach Image",
+   "label": "Barcode",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_110",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "qrcode",
+   "fieldtype": "Attach Image",
+   "label": "QRcode",
+   "read_only": 1
+  },
+  {
+   "fieldname": "browser_details",
+   "fieldtype": "Section Break",
+   "hidden": 1,
+   "label": "Browser Details"
+  },
+  {
+   "fieldname": "browser",
+   "fieldtype": "Data",
+   "label": "Browser",
+   "read_only": 1
+  },
+  {
+   "default": "ORD-",
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Naming Series",
+   "options": "ORD-\nSUB-ORD-"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Order",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_54",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "customer_ip",
+   "fieldtype": "Data",
+   "label": "Customer Ip",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_56",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "order_from",
+   "fieldtype": "Select",
+   "label": "Order From",
+   "options": "Website\nAndroid Mobile App\nIOS Mobile App\nPOS\nMobile Web\nSE App",
+   "set_only_once": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "0",
+   "fieldname": "is_printed",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Is Printed"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "mail_status",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Mail Status"
+  },
+  {
+   "fieldname": "sec_break",
+   "fieldtype": "Section Break",
+   "hidden": 1,
+   "label": "Status History"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "status_history",
+   "fieldtype": "Table",
+   "label": "Status History",
+   "options": "Status History"
+  },
+  {
+   "fieldname": "section_break_104",
+   "fieldtype": "Section Break",
+   "hidden": 1
+  },
+  {
+   "fieldname": "shipments",
+   "fieldtype": "HTML",
+   "hidden": 1,
+   "label": "Shipments"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "shipping_method_name",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Shipping Method Name"
+  },
+  {
+   "allow_on_submit": 1,
+   "fetch_from": "payment_method.display_name",
+   "fieldname": "payment_method_name",
+   "fieldtype": "Data",
+   "label": "Payment Method Name"
+  },
+  {
+   "fieldname": "currency",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Currency",
+   "options": "Currency"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "cancel_reason",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Order Cancel Reason",
+   "options": "Order Cancel Reason"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "paid_using_wallet",
+   "fieldtype": "Currency",
+   "hidden": 1,
+   "label": "Paid Using Wallet"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "tax_json",
+   "fieldtype": "Code",
+   "hidden": 1,
+   "label": "Tax JSON"
+  },
+  {
+   "fieldname": "shipping_provider",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Shipping Provider"
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "0",
+   "fieldname": "is_viewed",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Is Viewed"
+  },
+  {
+   "fieldname": "web_url",
+   "fieldtype": "Data",
+   "label": "Web Url",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "checkout_attributes",
+   "fieldtype": "Table",
+   "label": "Checkout Attributes",
+   "options": "Order Checkout Attributes"
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "0",
+   "fieldname": "total_driver_charges",
+   "fieldtype": "Currency",
+   "label": "Total Driver Charges"
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "0",
+   "fieldname": "is_recurring_order",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Is Recurring Order"
+  },
+  {
+   "allow_on_submit": 1,
+   "depends_on": "eval:doc.shipping_method != 'Pickup'",
+   "fieldname": "actual_shipping_charges",
+   "fieldtype": "Currency",
+   "label": "Actual Shipping Charges"
+  },
+  {
+   "fieldname": "order_subtotal_after_discount",
+   "fieldtype": "Currency",
+   "hidden": 1,
+   "label": "Order Subtotal After Discount"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "advance_amount",
+   "fieldtype": "Currency",
+   "label": "Advance Amount"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "discount_coupon",
+   "fieldtype": "Data",
+   "label": "Discount Coupon"
+  },
+  {
+   "fieldname": "origin_type",
+   "fieldtype": "Select",
+   "label": "Origin",
+   "options": "Website\nMarketplace"
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "0",
+   "fieldname": "is_gift_card_order",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Is Gift Card Order"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "giftcard_coupon_code",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Giftcard Coupon Code"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "gift_card_amount",
+   "fieldtype": "Float",
+   "hidden": 1,
+   "label": "Gift Card Amount"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_shipment_bag_item",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Is Shipment Bag Item"
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "0",
+   "fieldname": "is_custom_discount",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Is Custom Discount"
+  },
+  {
+   "depends_on": "eval:((doc.is_shipment_bag_item==1))",
+   "fieldname": "shipment_charge",
+   "fieldtype": "Currency",
+   "label": "Shipment Charge"
+  },
+  {
+   "fieldname": "landmark",
+   "fieldtype": "Small Text",
+   "label": "Landmark"
+  },
+  {
+   "fieldname": "shipping_landmark",
+   "fieldtype": "Small Text",
+   "label": "Landmark"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "cash_collected_mode",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Cash Collected Mode"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "collected_payment_notes",
+   "fieldtype": "Small Text",
+   "hidden": 1,
+   "label": "Collected Payment Notes"
+  },
+  {
+   "default": "0",
+   "fieldname": "preorder_email",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Send Pre Order Email?"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "order_additional_charges",
+   "fieldtype": "Table",
+   "hidden": 1,
+   "label": "Order Additional Charges",
+   "options": "Order Additional Charge"
+  },
+  {
+   "fieldname": "delivery_date",
+   "fieldtype": "Select",
+   "label": "Delivery Date"
+  },
+  {
+   "fieldname": "delivery_slot",
+   "fieldtype": "Select",
+   "label": "Delivery Slot"
+  },
+  {
+   "fieldname": "uuid",
+   "fieldtype": "Small Text",
+   "hidden": 1,
+   "label": "uuid"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "customer_info_html",
+   "fieldtype": "Long Text",
+   "hidden": 1,
+   "is_virtual": 1,
+   "label": "Customer Info Html"
+  },
+  {
+   "fetch_from": "currency.symbol",
+   "fieldname": "currency_symbol",
+   "fieldtype": "Data",
+   "label": "Currency Symbol"
+  },
+  {
+   "default": "0",
+   "fieldname": "included_tax",
+   "fieldtype": "Check",
+   "label": "Is Price Included Tax?"
+  },
+  {
+   "fieldname": "components_section",
+   "fieldtype": "Section Break",
+   "hidden": 1,
+   "label": "Components"
+  },
+  {
+   "fieldname": "section_break_gzuc",
+   "fieldtype": "Section Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "order_info_html",
+   "fieldtype": "Long Text",
+   "is_virtual": 1,
+   "label": "Order Info Html"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "address_info_html",
+   "fieldtype": "Long Text",
+   "is_virtual": 1,
+   "label": "Address Info Html"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "items_html",
+   "fieldtype": "Long Text",
+   "is_virtual": 1,
+   "label": "Items Html"
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "0",
+   "fieldname": "is_admin_order",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Is Admin Order"
+  }
+ ],
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2024-03-26 19:33:13.271877",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Order",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "select": 1,
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Admin",
+   "select": 1,
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

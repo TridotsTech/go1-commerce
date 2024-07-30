@@ -1,0 +1,181 @@
+{
+ "actions": [],
+ "creation": "2019-06-26 12:49:53.832887",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "attribute_html",
+  "stock",
+  "weight",
+  "image",
+  "column_break_5",
+  "attribute_id",
+  "product_title",
+  "width",
+  "height",
+  "length",
+  "price",
+  "old_price",
+  "sku",
+  "option_color",
+  "attributes_json",
+  "pricing_rule_section",
+  "edit_pricing",
+  "role_based_pricing",
+  "pricing_html",
+  "image_list",
+  "varient_json",
+  "disabled",
+  "show_in_market_place",
+  "childname"
+ ],
+ "fields": [
+  {
+   "fieldname": "attribute_html",
+   "fieldtype": "Text Editor",
+   "ignore_xss_filter": 1,
+   "in_list_view": 1,
+   "label": "Attribute Html",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "attribute_id",
+   "fieldtype": "Text",
+   "hidden": 1,
+   "label": "Attribute Id"
+  },
+  {
+   "default": "1",
+   "fieldname": "stock",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Stock Qty"
+  },
+  {
+   "fieldname": "price",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Price"
+  },
+  {
+   "fieldname": "weight",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Weight (In gram)"
+  },
+  {
+   "fieldname": "image",
+   "fieldtype": "Small Text",
+   "label": "Image",
+   "read_only": 1
+  },
+  {
+   "fieldname": "option_color",
+   "fieldtype": "Small Text",
+   "label": "Color"
+  },
+  {
+   "fieldname": "attributes_json",
+   "fieldtype": "Code",
+   "hidden": 1,
+   "label": "Attributes JSON"
+  },
+  {
+   "fieldname": "edit_pricing",
+   "fieldtype": "Button",
+   "in_list_view": 1,
+   "label": "Add/Edit Pricing"
+  },
+  {
+   "fieldname": "sku",
+   "fieldtype": "Data",
+   "label": "SKU"
+  },
+  {
+   "default": "[]",
+   "fieldname": "role_based_pricing",
+   "fieldtype": "Code",
+   "hidden": 1,
+   "label": "Role Based Pricing"
+  },
+  {
+   "fieldname": "pricing_html",
+   "fieldtype": "HTML",
+   "label": "Pricing html"
+  },
+  {
+   "fieldname": "column_break_5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "pricing_rule_section",
+   "fieldtype": "Section Break",
+   "label": "Pricing Rule"
+  },
+  {
+   "fieldname": "image_list",
+   "fieldtype": "Code",
+   "label": "Image List"
+  },
+  {
+   "fieldname": "product_title",
+   "fieldtype": "Data",
+   "label": "Product Title"
+  },
+  {
+   "fieldname": "varient_json",
+   "fieldtype": "Code",
+   "label": "Varient JSON"
+  },
+  {
+   "fieldname": "width",
+   "fieldtype": "Float",
+   "label": "Width(cm)"
+  },
+  {
+   "fieldname": "height",
+   "fieldtype": "Float",
+   "label": "Height(cm)"
+  },
+  {
+   "fieldname": "length",
+   "fieldtype": "Float",
+   "label": "Length(cm)"
+  },
+  {
+   "default": "0",
+   "fieldname": "disabled",
+   "fieldtype": "Check",
+   "label": "Disabled"
+  },
+  {
+   "default": "1",
+   "fieldname": "show_in_market_place",
+   "fieldtype": "Check",
+   "label": "Show In Market Place?"
+  },
+  {
+   "fieldname": "childname",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Childname"
+  },
+  {
+   "fieldname": "old_price",
+   "fieldtype": "Currency",
+   "label": "Old Price"
+  }
+ ],
+ "istable": 1,
+ "links": [],
+ "modified": "2024-02-13 20:15:39.616890",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Product Variant Combination",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

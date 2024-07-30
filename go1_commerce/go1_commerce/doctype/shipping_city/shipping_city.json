@@ -1,0 +1,94 @@
+{
+ "autoname": "field:city",
+ "creation": "2020-12-05 08:45:16.695680",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "city",
+  "core_city",
+  "column_break_3",
+  "zipcode_section",
+  "zipcode_range",
+  "areas_section",
+  "add_area",
+  "add_newarea",
+  "area_table_html"
+ ],
+ "fields": [
+  {
+   "fieldname": "city",
+   "fieldtype": "Data",
+   "label": "Location",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "core_city",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "City",
+   "options": "City",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "zipcode_section",
+   "fieldtype": "Section Break",
+   "label": "Zipcode"
+  },
+  {
+   "fieldname": "zipcode_range",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "label": "Zipcode Range",
+   "reqd": 1
+  },
+  {
+   "fieldname": "areas_section",
+   "fieldtype": "Section Break",
+   "label": "Areas"
+  },
+  {
+   "fieldname": "add_area",
+   "fieldtype": "Button",
+   "label": "Add Area"
+  },
+  {
+   "fieldname": "add_newarea",
+   "fieldtype": "Button",
+   "hidden": 1,
+   "label": "Add New Area"
+  },
+  {
+   "fieldname": "area_table_html",
+   "fieldtype": "HTML",
+   "label": "Area Table"
+  }
+ ],
+ "modified": "2020-12-07 00:49:08.534250",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Shipping City",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

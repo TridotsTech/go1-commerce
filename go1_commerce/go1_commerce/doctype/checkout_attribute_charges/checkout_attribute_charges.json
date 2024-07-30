@@ -1,0 +1,64 @@
+{
+ "creation": "2021-03-02 07:32:55.379008",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "option",
+  "from_weight",
+  "to_weight",
+  "charge_amount"
+ ],
+ "fields": [
+  {
+   "fieldname": "option",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Option"
+  },
+  {
+   "fieldname": "from_weight",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "From Weight",
+   "reqd": 1
+  },
+  {
+   "fieldname": "to_weight",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "To Weight",
+   "reqd": 1
+  },
+  {
+   "fieldname": "charge_amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Charge Amount",
+   "reqd": 1
+  }
+ ],
+ "modified": "2021-03-02 07:34:19.909102",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Checkout Attribute Charges",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

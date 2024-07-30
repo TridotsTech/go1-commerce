@@ -1,0 +1,68 @@
+{
+ "creation": "2019-12-18 17:01:01.071440",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "item_type",
+  "item",
+  "item_name",
+  "quantity",
+  "price",
+  "total",
+  "attribute_description"
+ ],
+ "fields": [
+  {
+   "fieldname": "item_type",
+   "fieldtype": "Link",
+   "label": "Item Type",
+   "options": "DocType"
+  },
+  {
+   "fieldname": "item",
+   "fieldtype": "Dynamic Link",
+   "in_list_view": 1,
+   "label": "Item",
+   "options": "item_type"
+  },
+  {
+   "fieldname": "item_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Item Name"
+  },
+  {
+   "fieldname": "quantity",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Quantity"
+  },
+  {
+   "fieldname": "price",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Price"
+  },
+  {
+   "fieldname": "total",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Total "
+  },
+  {
+   "fieldname": "attribute_description",
+   "fieldtype": "Text",
+   "label": "Attribute Description"
+  }
+ ],
+ "istable": 1,
+ "modified": "2020-10-12 22:55:39.059243",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Shipment Item",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

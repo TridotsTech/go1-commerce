@@ -1,0 +1,1027 @@
+{
+ "actions": [],
+ "autoname": "naming_series:",
+ "creation": "2023-03-30 15:05:27.831043",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "product_info",
+  "has_variants",
+  "column_break_tn1jh",
+  "image",
+  "info_section",
+  "item",
+  "sku",
+  "brand",
+  "is_gift_card",
+  "column_break_2",
+  "price",
+  "tax_category",
+  "brand_name",
+  "brand_unique_name",
+  "column_break_4",
+  "old_price",
+  "is_active",
+  "status",
+  "display_home_page",
+  "homepage_order",
+  "desc_section",
+  "short_description",
+  "full_description",
+  "sec_20",
+  "tag_html",
+  "product_tag",
+  "highlight",
+  "highlights",
+  "category_mapping",
+  "category_section",
+  "add_categories",
+  "product_categories",
+  "section_break_49",
+  "column_break_51",
+  "commission_rate",
+  "column_break_53",
+  "product_images_tab",
+  "image_section",
+  "product_images",
+  "add_product_image",
+  "gallery_html",
+  "img_html",
+  "product_video",
+  "upload_product_video",
+  "demo_video",
+  "product_inventory",
+  "inventory_section",
+  "inventory_method",
+  "minimum_order_qty",
+  "column_break_24",
+  "is_stock_item",
+  "stock",
+  "maximum_order_qty",
+  "prev_qty",
+  "column_break_65",
+  "update_stock",
+  "disable_add_to_cart_button",
+  "show_inventory",
+  "shipping_info",
+  "section_break_26",
+  "enable_shipping",
+  "weight",
+  "gross_weight",
+  "width",
+  "column_break_83",
+  "free_shipping",
+  "uom",
+  "height",
+  "column_break_47",
+  "additional_shipping_cost",
+  "length",
+  "delivery_time",
+  "sec123",
+  "pick_return_policy",
+  "return_title",
+  "return_description",
+  "return_policy",
+  "replacement_policy_section",
+  "choose_replacement_policy",
+  "replacement_name",
+  "replacement_title",
+  "replacement_description",
+  "warranty_section",
+  "choose_warranty",
+  "warranty_name",
+  "title",
+  "description",
+  "brand_tab",
+  "brand_section",
+  "add_brands",
+  "product_brands",
+  "attributes",
+  "attributes_section",
+  "product_attribute_html",
+  "add_product_attribute",
+  "product_attributes",
+  "product_variant_html",
+  "attribute_options",
+  "product_attribute_combination",
+  "editable_combination_html",
+  "product_variant_combination_html",
+  "add_combination",
+  "variant_combination",
+  "combination_pricing_html",
+  "spec_tab",
+  "specification_attributes",
+  "pick_specification_attribute",
+  "product_specification_attributes",
+  "promotions_tab",
+  "cross_selling_products_section",
+  "choose_cross_selling",
+  "cross_selling_products",
+  "related_section",
+  "choose_related_products",
+  "related_products",
+  "related_category_section",
+  "choose_related_categories",
+  "related_product_categories",
+  "product_search_keyword",
+  "search_keyword",
+  "search_words",
+  "seo_section",
+  "meta_title",
+  "route",
+  "template_saved",
+  "column_break_40",
+  "meta_keywords",
+  "column_break_42",
+  "meta_description",
+  "section_break_95",
+  "search_engine_html",
+  "section_break_9",
+  "naming_series",
+  "approved_total_reviews",
+  "section_break_101",
+  "barcode",
+  "is_combinations_are_generated",
+  "amended_from",
+  "product_variant_option_mapping",
+  "list_images"
+ ],
+ "fields": [
+  {
+   "fieldname": "product_info",
+   "fieldtype": "Tab Break",
+   "label": "Product Info",
+   "options": "fa fa-pencil"
+  },
+  {
+   "fieldname": "image",
+   "fieldtype": "Attach Image",
+   "label": "Product Image"
+  },
+  {
+   "fieldname": "info_section",
+   "fieldtype": "Section Break",
+   "label": "Product Info"
+  },
+  {
+   "description": "Name of the product",
+   "fieldname": "item",
+   "fieldtype": "Data",
+   "in_global_search": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Product Name",
+   "reqd": 1,
+   "translatable": 1
+  },
+  {
+   "depends_on": "eval: doc.has_variants==0",
+   "description": "Product stock-keeping unit (SKU). It is the internal unique identifier used to track the product.",
+   "fieldname": "sku",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "SKU"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_gift_card",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Is gift card"
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "description": "The selling price of the product.",
+   "fieldname": "price",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Price"
+  },
+  {
+   "description": "Product's tax template",
+   "fieldname": "tax_category",
+   "fieldtype": "Link",
+   "label": "Tax Template",
+   "options": "Product Tax Template"
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "The old price of the product. This will be similar to applying a discount to the product. Based on the old price & new price, product discount % will be shown.",
+   "fieldname": "old_price",
+   "fieldtype": "Float",
+   "label": "Old Price (MRP)"
+  },
+  {
+   "default": "1",
+   "description": "If enabled, the product can be viewed/purchased by the end-customer",
+   "fieldname": "is_active",
+   "fieldtype": "Check",
+   "label": "Is Active?"
+  },
+  {
+   "default": "0",
+   "description": "If enabled, the product will be grouped as featured products.",
+   "fieldname": "display_home_page",
+   "fieldtype": "Check",
+   "label": "Is Featured Product?"
+  },
+  {
+   "depends_on": "eval: doc.display_home_page == 1 ",
+   "fieldname": "homepage_order",
+   "fieldtype": "Int",
+   "label": "HomePage Order"
+  },
+  {
+   "fieldname": "desc_section",
+   "fieldtype": "Section Break",
+   "label": "Description"
+  },
+  {
+   "description": "Short description of the product",
+   "fieldname": "short_description",
+   "fieldtype": "Small Text",
+   "label": "Short Description"
+  },
+  {
+   "description": "This is the full description of the product",
+   "fieldname": "full_description",
+   "fieldtype": "Text Editor",
+   "label": "Full Description"
+  },
+  {
+   "fieldname": "sec_20",
+   "fieldtype": "Section Break",
+   "hidden": 1,
+   "label": "Product Tags"
+  },
+  {
+   "fieldname": "tag_html",
+   "fieldtype": "HTML"
+  },
+  {
+   "default": "[]",
+   "fieldname": "product_tag",
+   "fieldtype": "Text",
+   "hidden": 1,
+   "label": "Product Tag"
+  },
+  {
+   "fieldname": "highlight",
+   "fieldtype": "Section Break",
+   "label": "Highlights",
+   "permlevel": 1
+  },
+  {
+   "fieldname": "highlights",
+   "fieldtype": "Table",
+   "options": "Highlights"
+  },
+  {
+   "fieldname": "product_images_tab",
+   "fieldtype": "Tab Break",
+   "label": "Images",
+   "options": "fa fa-picture-o"
+  },
+  {
+   "description": "<b>Note:Please save the document and then try uploading images</b><br>\nAdd multiple images to showcase your product quality.",
+   "fieldname": "image_section",
+   "fieldtype": "Section Break",
+   "label": "Product Images"
+  },
+  {
+   "fieldname": "product_images",
+   "fieldtype": "Table",
+   "hidden": 1,
+   "label": "Product Images",
+   "options": "Product Image"
+  },
+  {
+   "fieldname": "add_product_image",
+   "fieldtype": "Button",
+   "label": "Add / Edit Image"
+  },
+  {
+   "fieldname": "gallery_html",
+   "fieldtype": "HTML",
+   "hidden": 1,
+   "label": "Gallery Html"
+  },
+  {
+   "fieldname": "img_html",
+   "fieldtype": "HTML"
+  },
+  {
+   "fieldname": "product_video",
+   "fieldtype": "Section Break",
+   "label": "Product Videos"
+  },
+  {
+   "fieldname": "upload_product_video",
+   "fieldtype": "Button",
+   "label": "Upload Video"
+  },
+  {
+   "fieldname": "demo_video",
+   "fieldtype": "Table",
+   "options": "Product Video"
+  },
+  {
+   "fieldname": "product_inventory",
+   "fieldtype": "Tab Break",
+   "label": "Inventory"
+  },
+  {
+   "fieldname": "inventory_section",
+   "fieldtype": "Section Break",
+   "label": "Inventory"
+  },
+  {
+   "default": "Track Inventory",
+   "description": "This determines the stock management method of the product. If enabled, then based on the current stock, the end-customer can make a purchase of this product.",
+   "fieldname": "inventory_method",
+   "fieldtype": "Select",
+   "label": "Inventory Method",
+   "options": "Dont Track Inventory\nTrack Inventory\nTrack Inventory By Product Attributes"
+  },
+  {
+   "default": "1",
+   "description": "This denotes the minimum quantity of this product that should be added to the customer cart. For e.g., if this value is set a 2, then the customer cannot buy less than 2 quantities of this product.",
+   "fieldname": "minimum_order_qty",
+   "fieldtype": "Int",
+   "label": "Minimum Order Qty"
+  },
+  {
+   "fieldname": "column_break_24",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_stock_item",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Maintain Stock"
+  },
+  {
+   "depends_on": "eval:doc.inventory_method==\"Track Inventory\"",
+   "description": "The available stock quantity of the product",
+   "fieldname": "stock",
+   "fieldtype": "Int",
+   "label": "Stock Qty"
+  },
+  {
+   "default": "1000",
+   "description": "This denotes the maximum quantity of this product that should be added to the customer cart. For e.g., if this value is set a 5, then the customer cannot buy more than 5 quantities of this product. Generally, this is done when there is limited stock/production.",
+   "fieldname": "maximum_order_qty",
+   "fieldtype": "Int",
+   "label": "Maximum Order Qty"
+  },
+  {
+   "fieldname": "prev_qty",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "label": "Previous Qty"
+  },
+  {
+   "fieldname": "column_break_65",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "update_stock",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Update Stock"
+  },
+  {
+   "default": "0",
+   "description": "If enabled, the customer cannot add this product to their cart.",
+   "fieldname": "disable_add_to_cart_button",
+   "fieldtype": "Check",
+   "label": "Disable Add To Cart Button"
+  },
+  {
+   "default": "1",
+   "description": "If enabled, the current available stock will be shown to the customer.",
+   "fieldname": "show_inventory",
+   "fieldtype": "Check",
+   "label": "Show Product Availability"
+  },
+  {
+   "fieldname": "category_mapping",
+   "fieldtype": "Tab Break",
+   "label": "Categories",
+   "options": "fa fa-sitemap"
+  },
+  {
+   "fieldname": "category_section",
+   "fieldtype": "Section Break",
+   "label": "Category Mapping"
+  },
+  {
+   "fieldname": "add_categories",
+   "fieldtype": "Button",
+   "label": "Assign Category"
+  },
+  {
+   "description": "Select the categories in which this product should be listed",
+   "fieldname": "product_categories",
+   "fieldtype": "Table",
+   "label": "Product Categories",
+   "options": "Product Category Mapping"
+  },
+  {
+   "fieldname": "section_break_49",
+   "fieldtype": "Section Break",
+   "hidden": 1,
+   "label": "Commission"
+  },
+  {
+   "fieldname": "column_break_51",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "commission_rate",
+   "fieldtype": "Float",
+   "label": "Commission Rate",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_53",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "shipping_info",
+   "fieldtype": "Tab Break",
+   "label": "Shipping",
+   "options": "fa fa-truck"
+  },
+  {
+   "fieldname": "section_break_26",
+   "fieldtype": "Section Break",
+   "label": "Shipping Info"
+  },
+  {
+   "default": "1",
+   "description": "Determines whether the product can be shipped",
+   "fieldname": "enable_shipping",
+   "fieldtype": "Check",
+   "label": "Enable Shipping"
+  },
+  {
+   "fieldname": "length",
+   "fieldtype": "Float",
+   "label": "Length (In cm)"
+  },
+  {
+   "default": "0",
+   "description": "Weight of the product in grams",
+   "fieldname": "weight",
+   "fieldtype": "Float",
+   "label": "Weight (In KG)",
+   "mandatory_depends_on": "eval:doc.has_variants==0 "
+  },
+  {
+   "fieldname": "column_break_83",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:doc.enable_shipping==1",
+   "description": "If enabled, the shipping charges will not be calculated for this particular product at the time of purchase.",
+   "fieldname": "free_shipping",
+   "fieldtype": "Check",
+   "label": "Enable Free Shipping"
+  },
+  {
+   "fieldname": "column_break_47",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:doc.free_shipping!=1 && doc.enable_shipping==1",
+   "description": "This is the additional cost that will be added to the shipping charges if this product is purchased. Note: This charge will only apply if free shipping is not enabled.",
+   "fieldname": "additional_shipping_cost",
+   "fieldtype": "Currency",
+   "label": "Additional Shipping Cost"
+  },
+  {
+   "fieldname": "width",
+   "fieldtype": "Float",
+   "label": "Width (In cm)"
+  },
+  {
+   "fieldname": "delivery_time",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Delivery Time",
+   "options": "Delivery Time"
+  },
+  {
+   "fieldname": "height",
+   "fieldtype": "Float",
+   "label": "Height (In cm)"
+  },
+  {
+   "fieldname": "sec123",
+   "fieldtype": "Section Break",
+   "label": "Return Policy"
+  },
+  {
+   "description": "Return policy of this particular product. This information will be shown to the customer.",
+   "fieldname": "return_policy",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Return Policy",
+   "options": "Return Policy"
+  },
+  {
+   "fetch_from": "return_policy.description",
+   "fieldname": "return_description",
+   "fieldtype": "Small Text",
+   "label": "Description",
+   "read_only": 1
+  },
+  {
+   "fieldname": "brand",
+   "fieldtype": "Link",
+   "label": "Brand",
+   "options": "Product Brand"
+  },
+  {
+   "fieldname": "brand_section",
+   "fieldtype": "Section Break",
+   "label": "Brands"
+  },
+  {
+   "fieldname": "add_brands",
+   "fieldtype": "Button",
+   "label": "Assign Brands"
+  },
+  {
+   "fieldname": "product_brands",
+   "fieldtype": "Table",
+   "label": "Product Brands",
+   "options": "Product Brand Mapping"
+  },
+  {
+   "depends_on": "eval:doc.has_variants==1",
+   "fieldname": "attributes",
+   "fieldtype": "Tab Break",
+   "label": "Variants",
+   "options": "fa fa-list"
+  },
+  {
+   "fieldname": "attributes_section",
+   "fieldtype": "Section Break",
+   "label": "Variants"
+  },
+  {
+   "fieldname": "add_product_attribute",
+   "fieldtype": "Button",
+   "label": "Choose Variant"
+  },
+  {
+   "fieldname": "product_attribute_html",
+   "fieldtype": "HTML",
+   "label": "Product Variant Html"
+  },
+  {
+   "description": "You can add various attributes of products like size, color etc.",
+   "fieldname": "product_attributes",
+   "fieldtype": "Table",
+   "hidden": 1,
+   "label": "Product Variants",
+   "options": "Product Attribute Mapping"
+  },
+  {
+   "fieldname": "product_variant_html",
+   "fieldtype": "HTML",
+   "label": "Product Variant Html"
+  },
+  {
+   "fieldname": "attribute_options",
+   "fieldtype": "Table",
+   "hidden": 1,
+   "label": "Product Attribute Option",
+   "options": "Product Attribute Option"
+  },
+  {
+   "fieldname": "product_attribute_combination",
+   "fieldtype": "Section Break",
+   "label": "Variant Combination"
+  },
+  {
+   "fieldname": "add_combination",
+   "fieldtype": "HTML"
+  },
+  {
+   "fieldname": "editable_combination_html",
+   "fieldtype": "HTML",
+   "hidden": 1,
+   "label": "Combination"
+  },
+  {
+   "fieldname": "product_variant_combination_html",
+   "fieldtype": "HTML",
+   "label": "Product Combination Html"
+  },
+  {
+   "fieldname": "variant_combination",
+   "fieldtype": "Table",
+   "hidden": 1,
+   "options": "Product Variant Combination"
+  },
+  {
+   "fieldname": "combination_pricing_html",
+   "fieldtype": "HTML"
+  },
+  {
+   "fieldname": "spec_tab",
+   "fieldtype": "Tab Break",
+   "label": "Specifications",
+   "options": "fa fa-bars"
+  },
+  {
+   "fieldname": "specification_attributes",
+   "fieldtype": "Section Break",
+   "label": "Specification Attributes"
+  },
+  {
+   "fieldname": "product_specification_attributes",
+   "fieldtype": "Table",
+   "label": "Product Specification Attributes",
+   "options": "Product Specification Attribute Mapping"
+  },
+  {
+   "fieldname": "product_search_keyword",
+   "fieldtype": "Section Break",
+   "label": "Product Search Keyword"
+  },
+  {
+   "fieldname": "search_keyword",
+   "fieldtype": "Table",
+   "label": "Search Keyword",
+   "options": "Product Search Keyword"
+  },
+  {
+   "fieldname": "search_words",
+   "fieldtype": "Long Text",
+   "hidden": 1,
+   "label": "search words"
+  },
+  {
+   "fieldname": "seo_section",
+   "fieldtype": "Section Break",
+   "label": "Search Engine Optimisation (SEO)"
+  },
+  {
+   "fieldname": "meta_title",
+   "fieldtype": "Data",
+   "label": "Meta Title"
+  },
+  {
+   "fieldname": "route",
+   "fieldtype": "Data",
+   "label": "Friendly Url",
+   "no_copy": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "template_saved",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Template Saved"
+  },
+  {
+   "fieldname": "column_break_40",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "meta_keywords",
+   "fieldtype": "Small Text",
+   "label": "Meta Keywords"
+  },
+  {
+   "fieldname": "column_break_42",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "meta_description",
+   "fieldtype": "Small Text",
+   "label": "Meta Description"
+  },
+  {
+   "fieldname": "section_break_95",
+   "fieldtype": "Section Break",
+   "hidden": 1,
+   "label": "Search Engine Details"
+  },
+  {
+   "fieldname": "search_engine_html",
+   "fieldtype": "HTML",
+   "label": "Search Engine Html"
+  },
+  {
+   "fieldname": "section_break_9",
+   "fieldtype": "Section Break",
+   "hidden": 1
+  },
+  {
+   "default": "ITEM-",
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Naming Series",
+   "options": "MI-\nITEM-",
+   "reqd": 1
+  },
+  {
+   "fieldname": "approved_total_reviews",
+   "fieldtype": "Float",
+   "label": "Average Review",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_101",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "barcode",
+   "fieldtype": "Attach Image",
+   "label": "Barcode",
+   "read_only": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Product",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "warranty_section",
+   "fieldtype": "Section Break",
+   "hidden": 1,
+   "label": "Warranty"
+  },
+  {
+   "fieldname": "choose_warranty",
+   "fieldtype": "Button",
+   "label": "Choose Warranty"
+  },
+  {
+   "fieldname": "warranty_name",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Warranty Name",
+   "options": "Product Warranty"
+  },
+  {
+   "fetch_from": "warranty_name.title",
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "label": "Title"
+  },
+  {
+   "fetch_from": "warranty_name.description",
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "label": "Description"
+  },
+  {
+   "fieldname": "pick_return_policy",
+   "fieldtype": "Button",
+   "label": "Choose Return Policy"
+  },
+  {
+   "fetch_from": "return_policy.heading",
+   "fieldname": "return_title",
+   "fieldtype": "Data",
+   "label": "Return Title",
+   "read_only": 1
+  },
+  {
+   "fieldname": "promotions_tab",
+   "fieldtype": "Tab Break",
+   "label": "Promotions"
+  },
+  {
+   "fieldname": "cross_selling_products_section",
+   "fieldtype": "Section Break",
+   "label": "Cross Selling Products"
+  },
+  {
+   "fieldname": "choose_cross_selling",
+   "fieldtype": "Button",
+   "label": "Choose Cross Selling Products"
+  },
+  {
+   "fieldname": "cross_selling_products",
+   "fieldtype": "Table",
+   "label": "Cross Selling Products",
+   "options": "Cross Selling Products"
+  },
+  {
+   "fieldname": "related_section",
+   "fieldtype": "Section Break",
+   "label": "Related Products"
+  },
+  {
+   "fieldname": "choose_related_products",
+   "fieldtype": "Button",
+   "label": "Choose Related Products"
+  },
+  {
+   "fieldname": "related_products",
+   "fieldtype": "Table",
+   "label": "Related Products",
+   "options": "Related Product"
+  },
+  {
+   "fieldname": "related_category_section",
+   "fieldtype": "Section Break",
+   "label": "Related Product Categories"
+  },
+  {
+   "fieldname": "choose_related_categories",
+   "fieldtype": "Button",
+   "label": "Choose Related Product Categories"
+  },
+  {
+   "fieldname": "related_product_categories",
+   "fieldtype": "Table",
+   "label": "Related Product Categories",
+   "options": "Related Product Category"
+  },
+  {
+   "fieldname": "pick_specification_attribute",
+   "fieldtype": "Button",
+   "label": "Choose Specification Attribute"
+  },
+  {
+   "default": "0",
+   "fieldname": "has_variants",
+   "fieldtype": "Check",
+   "label": "Has Variants",
+   "set_only_once": 1
+  },
+  {
+   "fieldname": "column_break_tn1jh",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "gross_weight",
+   "fieldtype": "Float",
+   "hidden": 1,
+   "label": "Gross Weight"
+  },
+  {
+   "fieldname": "uom",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "UOM",
+   "options": "UOM"
+  },
+  {
+   "fieldname": "replacement_policy_section",
+   "fieldtype": "Section Break",
+   "label": "Replacement Policy"
+  },
+  {
+   "fieldname": "choose_replacement_policy",
+   "fieldtype": "Button",
+   "label": "Choose Replacement Policy"
+  },
+  {
+   "fetch_from": "replacement_name.heading",
+   "fieldname": "replacement_title",
+   "fieldtype": "Data",
+   "label": "Replacement Title",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "replacement_name.description",
+   "fieldname": "replacement_description",
+   "fieldtype": "Long Text",
+   "label": "Replacement Description",
+   "read_only": 1
+  },
+  {
+   "fieldname": "replacement_name",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Replacement",
+   "options": "Replacement Policy",
+   "read_only": 1
+  },
+  {
+   "fieldname": "brand_tab",
+   "fieldtype": "Tab Break",
+   "hidden": 1,
+   "label": "Brands",
+   "options": "fa fa-building"
+  },
+  {
+   "fetch_from": "brand.brand_name",
+   "fieldname": "brand_name",
+   "fieldtype": "Data",
+   "label": "Brand Name",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "brand.unique_name",
+   "fieldname": "brand_unique_name",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Brand Unique Name"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_combinations_are_generated",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Is Combinations are generated?"
+  },
+  {
+   "fieldname": "product_variant_option_mapping",
+   "fieldtype": "Table",
+   "hidden": 1,
+   "label": "Product Variant Options",
+   "options": "Product Variant Option Mapping"
+  },
+  {
+   "default": "Approved",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "\nWaiting for Product Approval\nApproved\nRejected"
+  },
+  {
+   "fieldname": "list_images",
+   "fieldtype": "Attach Image",
+   "hidden": 1,
+   "label": "List Images",
+   "options": "/files/asus-phone-24-01-2024,15:40:04.jpeg"
+  }
+ ],
+ "has_web_view": 1,
+ "image_field": "image",
+ "is_published_field": "is_active",
+ "links": [],
+ "modified": "2024-04-10 15:45:22.285703",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Product",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "permlevel": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "export": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Vendor",
+   "write": 1
+  }
+ ],
+ "search_fields": "item,sku",
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

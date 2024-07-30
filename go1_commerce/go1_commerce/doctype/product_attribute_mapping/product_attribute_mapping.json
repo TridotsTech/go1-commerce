@@ -1,0 +1,149 @@
+{
+ "actions": [],
+ "creation": "2019-03-13 21:11:06.656913",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "product_attribute",
+  "attribute",
+  "is_required",
+  "control_type",
+  "column_break_6",
+  "min_allowed_options",
+  "max_allowed_options",
+  "parent_attribute",
+  "parent_attribute_name",
+  "display_order",
+  "size_chart",
+  "attribute_group",
+  "group_name",
+  "edit_options",
+  "attribute_unique_name",
+  "childname"
+ ],
+ "fields": [
+  {
+   "fieldname": "product_attribute",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Product Attribute Id",
+   "options": "Product Attribute",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "product_attribute.attribute_name",
+   "fieldname": "attribute",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Product Attribute"
+  },
+  {
+   "columns": 1,
+   "default": "Yes",
+   "fieldname": "is_required",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Is Required",
+   "options": "Yes\nNo"
+  },
+  {
+   "default": "Radio Button List",
+   "fieldname": "control_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Control Type",
+   "options": "Dropdown List\nRadio Button List\nCheckbox List\nColor Boxes\nText Box\nTable\nMulti Line Text"
+  },
+  {
+   "columns": 1,
+   "default": "0",
+   "fieldname": "display_order",
+   "fieldtype": "Int",
+   "label": "Display Order"
+  },
+  {
+   "fieldname": "edit_options",
+   "fieldtype": "Button",
+   "in_list_view": 1,
+   "label": "Edit Options"
+  },
+  {
+   "fieldname": "attribute_unique_name",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Unique Name",
+   "options": "product_attribute.unique_name"
+  },
+  {
+   "depends_on": "",
+   "fieldname": "size_chart",
+   "fieldtype": "Link",
+   "label": "Size Chart",
+   "options": "Size Chart"
+  },
+  {
+   "depends_on": "",
+   "fieldname": "parent_attribute",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Parent Attribute",
+   "options": "Product Attribute"
+  },
+  {
+   "fieldname": "column_break_6",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "attribute_group",
+   "fieldtype": "Link",
+   "label": "Attribute Group",
+   "options": "Product Attribute Group"
+  },
+  {
+   "fieldname": "group_name",
+   "fieldtype": "Data",
+   "label": "Group Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "parent_attribute_name",
+   "fieldtype": "Data",
+   "label": "Parent Attribute Name",
+   "read_only": 1
+  },
+  {
+   "default": "1",
+   "depends_on": "eval: doc.control_type == \"Checkbox List\" ",
+   "fieldname": "max_allowed_options",
+   "fieldtype": "Int",
+   "label": "Maximum Allowed Options"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval: doc.control_type == \"Checkbox List\" ",
+   "fieldname": "min_allowed_options",
+   "fieldtype": "Int",
+   "label": "Minimum Allowed Option"
+  },
+  {
+   "fieldname": "childname",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "childname"
+  }
+ ],
+ "istable": 1,
+ "links": [],
+ "modified": "2023-06-15 13:32:14.136844",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Product Attribute Mapping",
+ "owner": "Administrator",
+ "permissions": [],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

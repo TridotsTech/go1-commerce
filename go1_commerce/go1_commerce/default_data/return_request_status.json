@@ -1,0 +1,11 @@
+[
+	{"doctype": "Return Request Status", "status":"Request Pending", "status_level":0},
+	{"doctype": "Return Request Status", "status":"Request Approved", "status_level":1},
+	{"doctype": "Return Request Status", "status":"Request Rejected", "status_level":2},
+	{"doctype": "Return Request Status", "status":"Request Delivered", "status_level":3},
+	{"doctype": "Return Request Status", "status":"Pending", "status_level":4},
+	{"doctype": "Return Request Status", "status":"Rejected", "status_level":5},
+	{"doctype": "Return Request Status", "status":"Approved", "status_level":5},
+	{"doctype": "Return Request Status", "status":"Delivered", "status_level":6},
+	{"doctype": "Return Request Status", "status":"Shipped", "status_level":7}
+]

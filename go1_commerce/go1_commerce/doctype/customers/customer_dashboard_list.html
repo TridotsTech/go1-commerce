@@ -1,0 +1,170 @@
+<div class="row">
+    {% if 1==2 %}
+    <div  class="count  col-md-{%if loyalty_dashboard%}2{%else%}2{%endif%}">
+         <a href="/app/order?customer={{customer_id}}">
+        <div class="box bg-color-1" >
+            <!-- <div class="dasboard-icon"><i class="fa fa-bar-chart"></i></div> -->
+            
+            <div class="dashboard-content">
+            <div>
+                
+            <h5 style="color:#000000">
+                <i class="fa fa-bar-chart" style="color: #c1c1c1;margin-right: 5px;font-size: 22px;"></i>{% if today_orders_count %}{{today_orders_count}}{%else%}0{%endif%}</h5>
+            </div>
+            <div>
+                <p style="color:#000000; font-weight: 400;font-size: 15px;margin: 0;">Today Orders</p>
+            </div>
+            </div>
+        </div>
+    </a>
+    </div>
+    {% endif %}
+     <div class="count col-md-{%if loyalty_dashboard%}3{%else%}3{%endif%}">
+         <a href="/app/order?customer={{customer_id}}">
+        <div class="box bg-color-2" >
+            <!-- <div class="dasboard-icon"><i class="fa fa-bar-chart"></i></div> -->
+            
+            <div class="dashboard-content">
+            <div>
+                
+                <h5 style="color:#000000">
+                    <i class="fa fa-bar-chart" style="color: #c1c1c1;margin-right: 5px;font-size: 22px;"></i>{% if all_count %}{{all_count}} {%else%}0{%endif%}</h5>
+            </div>
+            <div>
+                <p style="color:#000000; font-weight: 500;font-size: 15px;margin: 0; ">Total Orders</p>
+            </div>
+            </div>
+
+        </div>
+    </a>
+    </div>
+    <!-- by gopi on 25/9/23 -->
+    <!-- <div class="count col-md-{%if loyalty_dashboard%}3{%else%}3{%endif%}">
+        <a href="/app/order?customer={{customer_id}}">
+       <div class="box bg-color-2" >
+           <div class="dashboard-content">
+           <div>
+            
+            <h5 style="color:#000000">
+                <i class="fa fa-briefcase" style="color: #c1c1c1;margin-right: 5px;font-size: 22px;"></i>{% if all_sales %}{{all_sales}} {%else%}0{%endif%}</h5>
+
+           </div>
+           <div>
+            <p style="color:#000000; font-weight: 500;font-size: 15px;margin: 0;">Total Sales</p>
+           </div>
+           </div>
+
+       </div>
+   </a>
+   </div>
+    <div class="count col-md-{%if loyalty_dashboard%}3{%else%}3{%endif%}">
+        <a href="/app/wallet-transaction?party={{customer_id}}">
+        <div class="box bg-color-3" >
+            
+            <div class="dashboard-content">
+            <div>
+               
+                <h5 style="color:#000000"> 
+                    <i class="fa fa-briefcase" style="color: #c1c1c1;margin-right: 5px;font-size: 22px;"></i>{% if source %}{{currency}}{{source[0].current_wallet_amount}} {%else%}{{currency}} 0{%endif%}</h5>
+            </div>
+            <div>
+                <p style=" color:#000000; font-weight: 500;font-size: 15px;margin: 0; white-space: nowrap;">Current Wallet Amount</p>
+            </div>
+            </div>
+
+        </div>
+    </a>
+    </div> -->
+    <!-- end -->
+    <div class="count col-md-{%if loyalty_dashboard%}3{%else%}3{%endif%}">
+        <a href="/app/order?customer={{customer_id}}">
+       <div class="box bg-color-2" >
+           <!-- <div class="dasboard-icon"><i class="fa fa-bar-chart"></i></div> -->
+           
+           <div class="dashboard-content">
+           <div>
+               
+               <h5 style="color:#000000">
+                   <i class="fa fa-briefcase" style="color: #c1c1c1;margin-right: 5px;font-size: 22px;"></i>{% if avg_order_value %}{{avg_order_value}} {%else%}0{%endif%}</h5>
+           </div>
+           <div>
+               <p style="color:#000000; font-weight: 500;font-size: 15px;margin: 0; ">Avg Order Value</p>
+           </div>
+           </div>
+
+       </div>
+   </a>
+   </div>
+    {%if loyalty_dashboard%}
+    <div class="count col-md-{%if loyalty_dashboard%}3{%else%}3{%endif%}">
+        <a href="/desk#List/Loyalty%20Point%20Entry/List?customer={{customer_id}}">
+        <div class="box bg-color-4" >
+            <!-- <div class="dasboard-icon"><i class="fa fa-trophy"></i></div> -->
+            
+            <div class="dashboard-content">
+            <div>
+                <h5 style="color:#000000">
+                    <i class="fa fa-trophy" style="color: #c1c1c1; margin-right: 5px;font-size: 22px;"></i>{{total_available_points}}</h5>
+            </div>
+            <div>
+                <p style="color:#000000; font-weight: 500;font-size: 15px;margin: 0;">Available Points</p>
+            </div>
+            </div>
+            
+        </div>
+    </a>
+    </div>
+    {%endif%}
+</div>
+
+<style type="text/css">
+    .box {
+        border: 1px solid #eaeaea;
+        border-radius: 10px;
+        padding: 15px 15px;
+        float: left;
+        width: 100%;
+        min-height: 80px;
+        color: #fff;
+    }
+    .box h5{
+        padding: 10px 0px;
+        font-size: 25px;    margin-bottom: 0;
+        text-align: center;
+    }
+    .box p{
+        text-align: center;
+    }
+    .dasboard-icon {
+    float: left;
+    width: 18%;
+    font-size: 32px;
+    color:#000000;
+    padding-top: 10px;margin-right: 10px
+    
+}
+.dashboard-content {
+    float: left;
+    width: 100%;
+}
+.bg-color-2{
+    background: linear-gradient(to left,rgba(255,255,255,0) 25%,rgba(255,255,255,0.1));
+    background-color: #ffffff;
+}
+
+.bg-color-1 {
+    background: linear-gradient(to left,rgba(255,255,255,0) 25%,rgba(255,255,255,0.2));
+    background-color: #ffffff;
+}
+.bg-color-4 {
+    background: linear-gradient(to left,rgba(255,255,255,0) 25%,rgba(255,255,255,0.3));
+    background-color: #ffffff;
+}
+.bg-color-3 {
+    background: linear-gradient(to left,rgba(255,255,255,0) 25%,rgba(255,255,255,0.3));
+    background-color: #ffffff;
+}
+[data-fieldname="customer_dashboard"] {
+    margin-bottom: 0;
+}
+</style>

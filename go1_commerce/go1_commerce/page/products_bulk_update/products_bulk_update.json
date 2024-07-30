@@ -1,0 +1,26 @@
+{
+ "content": null,
+ "creation": "2020-09-04 04:04:58.020275",
+ "docstatus": 0,
+ "doctype": "Page",
+ "idx": 0,
+ "modified": "2024-07-27 18:39:47.418550",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "products-bulk-update",
+ "owner": "Administrator",
+ "page_name": "products-bulk-update",
+ "roles": [
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Vendor"
+  }
+ ],
+ "script": null,
+ "standard": "Yes",
+ "style": null,
+ "system_page": 0,
+ "title": "Products Bulk Update"
+}
