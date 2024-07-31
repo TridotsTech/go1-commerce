@@ -98,7 +98,7 @@ class Order(Document):
 	def on_update(self):
 		self.update_delivery_slot()
 		if self.order_item:
-			from go1_commerce.go1_commerce.doctype.discounts.discounts \ 
+			from go1_commerce.go1_commerce.doctype.discounts.discounts \
 			import check_product_discounts
 
 			total_weight = 0
@@ -1179,7 +1179,7 @@ class Order(Document):
 						else:
 							frappe.throw("Product stock quantity should be greater than item quantity.")
 					elif product_info.inventory_method=='Track Inventory By Product Attributes':
-						from go1_commerce.go1_commerce.v2.orders \ 
+						from go1_commerce.go1_commerce.v2.orders \
 						import get_attributes_json
 						attribute_id = get_attributes_json(item.attribute_ids)
 						check = next((x for x in product_info.variant_combination if x.attributes_json == attribute_id),None)
