@@ -27,7 +27,7 @@ frappe.ui.form.on('Wallet Transaction', {
     },
     get_wallet_settings(frm){
         frappe.call({
-            method: 'go1_commerce.go1_commerce.doctype.wallet.wallet.get_wallet_settings',
+            method: 'go1_commerce.accounts.doctype.wallet.wallet.get_wallet_settings',
             args: {},
             async: false,
             callback: function(data) {
