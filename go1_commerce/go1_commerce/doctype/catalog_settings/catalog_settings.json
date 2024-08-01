@@ -65,8 +65,6 @@
   "filter_view",
   "sort_view",
   "enable_model_finder",
-  "product_box",
-  "column_break_51",
   "product_detail",
   "product_reviews_to_be_approved",
   "wishlist_icon",
@@ -126,7 +124,6 @@
   "column_break_76",
   "send_sms_on_delivered",
   "additional_menus",
-  "additional_menu",
   "enable_donation",
   "captcha_settings_section",
   "enable_captcha",
@@ -487,16 +484,6 @@
    "label": "Enable Model Finder"
   },
   {
-   "fieldname": "product_box",
-   "fieldtype": "Section Break",
-   "hidden": 1,
-   "label": "Product Box"
-  },
-  {
-   "fieldname": "column_break_51",
-   "fieldtype": "Column Break"
-  },
-  {
    "description": "Common settings for product detail page.",
    "fieldname": "product_detail",
    "fieldtype": "Section Break",
@@ -839,12 +826,6 @@
    "label": "Additional Menus"
   },
   {
-   "fieldname": "additional_menu",
-   "fieldtype": "Table",
-   "label": "Additional Menu",
-   "options": "Additional Menu"
-  },
-  {
    "default": "0",
    "fieldname": "enable_donation",
    "fieldtype": "Check",
@@ -962,7 +943,7 @@
  ],
  "issingle": 1,
  "links": [],
- "modified": "2024-02-13 19:38:06.669289",
+ "modified": "2024-08-01 19:37:35.789456",
  "modified_by": "Administrator",
  "module": "Go1 Commerce",
  "name": "Catalog Settings",
