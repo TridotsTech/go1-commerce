@@ -1,0 +1,50 @@
+<div class="maindiv">
+  <div class="row">
+    <div class="col-md-12" style="
+    padding-left: 30px;
+    padding-right: 20px;
+">
+     <div class="row">
+  {% if content %}
+  {% for item in content %}
+  <div class="{%if column%}col-md-{{column}} col-xs-12{%else%}col-md-4 col-xs-12{%endif%}" style="margin-bottom: 10px;margin-top: 10px;">
+    <div class="row box" {% if item.css %}style="{{item.css}}  {%if innerstyle%}{{innerstyle}}{%endif%}"{% endif %}>
+      <div class="col-md-{{counter_column}} col-xs-12 {%if innerbox%}{{innerbox}}{%endif%}">
+        <h5><span><span class="{%if item.icon%}{{item.icon}}{%endif%}" {% if item.icon_style %}style="{{item.icon_style}}"{% endif %}></span><span style="padding-left: 5px;color:#fff">{{item.count}}</span></span></h5>
+          <p style="color:#fff">{{item.title}}</p>
+      </div>
+      <div class="col-md-{{graph_column}} chart_box {{chart_option}}" id="chart_option{{item.name}}"></div>
+    </div>
+     
+  </div>
+  {% endfor %}
+  {% endif %}
+</div>
+    </div>
+  </div>
+</div>
+<style type="text/css">
+ .box{
+    border: 1px solid #ccc;
+      padding: 10px 15px;
+  }
+  .box h5{
+    font-size: 25px;
+  }
+  .maindiv{
+    margin-right: 10px;
+  }
+  .layout-main-section-wrapper{
+    
+    margin-bottom: 25px;
+  }
+  #counters{
+    padding: 10px;
+  }
+  .layout-main-section{
+    
+        border-top: 0px !important;
+        border-bottom: 0px !important;
+    border: 0;  
+  }
+</style>

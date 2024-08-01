@@ -1,9 +1,9 @@
 // Copyright (c) 2018, info@valiantsystems.com and contributors
 // For license information, please see license.txt
 
-// frappe.require("assets/go1_commerce/css/select_list.css"); 
-// frappe.require("assets/go1_commerce/js/frappe-datatable.min.js");
-// frappe.require("assets/go1_commerce/js/frappe-datatable.min.css");
+frappe.require("assets/go1_commerce/css/select_list.css"); 
+frappe.require("assets/go1_commerce/js/frappe-datatable.min.js");
+frappe.require("assets/go1_commerce/js/frappe-datatable.min.css");
 
 
 frappe.ui.form.on('Order', {
@@ -346,6 +346,7 @@ frappe.ui.form.on('Order', {
             });
             dialog.set_primary_action(__('Save'), function() {
                 let values = dialog.get_values();
+                    console.log("values.driver: ",values.driver);
                     frappe.call({
                         method: 'go1_commerce.go1_commerce.doctype.order.order.update_order_items_status',
                         args: {
@@ -565,6 +566,7 @@ frappe.ui.form.on('Order', {
                                 data.price = parseFloat(check_data.price)
                                 data.amount = parseFloat(check_data.price)*parseInt(data.quantity)
                                 data.shipping_charge = parseFloat(check_data.shipping_charges)
+                                console.log("data",data);
                                 lists.push(data)
                             }
                             else {
@@ -582,6 +584,7 @@ frappe.ui.form.on('Order', {
             formData.return_reason = values.return_reason
             formData.return_action = values.return_action
             formData.remarks = values.comments
+            console.log(values);
             formData.images = values.images
             formData.order_shipping_charge = parseFloat(frm.doc.shipping_charges)
             formData.items = lists
@@ -974,7 +977,7 @@ frappe.ui.form.on("Order Item", {
                     var options = [];
                     var htm =''
                     if(data.message){
-                        
+                        console.log("MSGGG...",data.message);
                         if (data.message[0].length != 0){
                             htm +=` <select type="text" autocomplete="off" 
                                     class="input-with-feedback form-control ellipsis" 
@@ -984,7 +987,7 @@ frappe.ui.form.on("Order Item", {
                                     <option>
                                     </option>`
 
-                            
+                            console.log("HHHHH",htm);
                             data.message[0].forEach(function(row) {
                                 if(row){
                                     htm +=`<option data-id="${row.attribute_id}" value="${row.combination_txt}">
@@ -1033,9 +1036,9 @@ frappe.ui.form.on("Order Item", {
                         "customer":frm.doc.customer},
                 async: false,
                 callback: function(r) {
-                    
+                    console.log("dddd",r.message);
                     if( r.message){
-                        
+                        console.log("rrr",r.message.length);
                         frappe.model.set_value(cdt, cdn, "price", r.message.price);
                         frappe.model.set_value(cdt, cdn, "base_price", r.message.price);
                         frappe.model.set_value(cdt, cdn, "amount", r.message.price* d.quantity);
