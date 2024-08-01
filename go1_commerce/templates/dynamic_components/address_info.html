@@ -1,0 +1,64 @@
+<div class="row it-sec">
+    <div class="col-md-12 col-xs-12 col-sm-12">
+        <div class="addrBox" style="padding: 15px;">
+            <div class="row">
+                {% if show_address %}{% if order_details.address %}         
+                <div class="col-md-4 col-xs-12 col-sm-4">
+                    <h5>{{ _("Billing Address") }}</h5>
+                    <div class="od-info">
+                        {{order_details.first_name}} {% if order_details.last_name %}{{order_details.last_name}}{% endif %}<br>
+                        {{order_details.address}}<br>
+                        {{order_details.city}}
+                        {% if order_details.state %}<br>{{order_details.state}} {% endif %}
+                        <br>{{order_details.country}} - {{order_details.zipcode}}
+                       
+                    </div>
+                    <div>
+                        <p>{{ _("Phone") }}: {{order_details.phone}}</p>
+                    </div>
+                </div>
+                {% endif %}{% endif %}
+                {% if order_details.shipping_shipping_address %}
+                <div class="col-md-4 col-xs-12 col-sm-4">
+                    <h5>{{ _("Shipping Address") }}</h5>
+                    <div class="od-info">
+                        {{order_details.shipping_first_name}} {% if order_details.shipping_last_name %}{{order_details.shipping_last_name}}{% endif %}<br>
+                        {{order_details.shipping_shipping_address}}<br>
+                        {{order_details.shipping_city}}
+                        {% if order_details.shipping_state %}<br>{{order_details.shipping_state}}{% endif %}
+                        <br>{{order_details.shipping_country}} - {{order_details.shipping_zipcode}}
+                    </div>
+                    <div>
+                        <p>{{ _("Phone") }}: {{order_details.shipping_phone}}</p>
+                    </div>
+                </div>
+                {% endif %}                              
+                <div class="col-md-4 col-xs-12 col-sm-4">
+                    {% if order_details.shipping_method %}
+                    <h5>{{ _("Shipping Method") }}</h5>
+                    <div class="od-info">{{order_details.shipping_method_name}}</div>
+                    {% endif %}
+                    {% if order_details.payment_method %}
+                    <h5>{{ _("Payment Method") }}</h5>
+                    <div class="od-info">
+                        {{order_details.payment_method_name}}
+                        {% if order_details.cash_collected_mode %}({{order_details.cash_collected_mode}}){% endif %}
+                    </div>
+                    {% endif %}
+                    {% if order_details.transaction_id %}
+                    <h5>{{ _("Transaction Id") }}</h5>
+                    <div class="od-info">
+                        {{order_details.transaction_id}}
+                    </div>
+                    {% endif %}
+                    {% if order_details.payment_status %}
+                    <h5>{{ _("Payment Status") }}</h5>
+                    <div class="od-info">{{order_details.payment_status}}</div>
+                    {% endif %}
+                </div>    
+                             
+            </div>
+        </div>
+                
+    </div>
+</div>

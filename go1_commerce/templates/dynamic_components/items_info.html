@@ -1,0 +1,219 @@
+{% if order_details.order_item %}
+<div class="row it-sec">
+    <div class="col-md-12 col-xs-12">
+        <div class="it-box">
+            <div class="row item-table-head hidden-xs clearfix" style="margin-right: 0px;margin-left: 0px;">
+                <div class="col-md-2 col-sm-2">{{ _("ID") }}</div>
+                <div class="col-md-4 col-sm-4">{{ _("Item") }}</div>
+                <div class="col-md-6 col-sm-6">
+                     <div class="row">
+                    
+                    <div class="col-md-3 col-sm-3" style="text-align: center;">{{ _("SKU") }}</div>
+                   
+                    <div class="{% if not restaurant %}col-md-3 col-sm-3 ralign{% else %}col-md-4 col-sm-4 col-xs-4{% endif %} ralign">{{ _("Price") }}</div>
+                    <div class="{% if not restaurant %}col-md-3 col-sm-3 ralign{% else %}col-md-4 col-sm-4 col-xs-4{% endif %}" style="text-align: center;">{{ _("Quantity") }}</div>
+                    <div class="{% if not restaurant %}col-md-3 col-sm-3 ralign{% else %}col-md-4 col-sm-4 col-xs-4{% endif %} ralign">{{ _("Total") }}</div>
+                </div>
+                </div>
+            </div>
+            <div class="item-details sss">
+                {% for item in order_details.order_item %}
+                <div class="it-list">
+                    <div class="row" data-id="{{item.name}}" data-product="{{item.item_name}}" data-price="{{item.price}}" data-qty="{{item.quantity}}">
+            <div class="col-md-2 col-sm-2 col-xs-12">
+                            <div class="col-md-12 col-sm-12" style="text-align: left;">
+                                {{item.item}}<br/>
+
+                            </div>
+            </div>
+                        <div class="col-md-4 col-sm-4 col-xs-12">
+                            <div class="col-md-3 col-xs-12 col-sm-3" style="float:left;">     
+                            {% if item.is_free_item==1 %}
+                            <div class="free-item"><div class="wrap"><span>Free</span></div></div>
+                            {% endif %}                                
+                                <img src="{% if item.item_image %}{{item.item_image}}{% else %}/assets/ecommerce_business_store/images/no-img-120.jpg{%endif%}" class="img-responsive" style="margin: auto;width: 80px;height: auto;" />
+                            </div>
+                            <div class="col-md-9 col-sm-9 col-xs-12" style="float:left;">
+                                 <a href="/app/product/{{item.item}}" target="_blank">
+                                <h5>{{item.item_name}}</h5>
+                                {% if item.attribute_description %}
+                                <div class="attr-list" style="
+color: #5c5c5c;
+font-weight: 500;
+margin-bottom: 5px;margin-top: -5px;
+">{{item.attribute_description}}</div>
+                                {% endif %}
+                                {% if item.special_instruction %}<p>{{item.special_instruction}}</p>{% endif %}
+                               
+                            </a>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6 col-xs-12 hidden-xs">
+                            <div class="row">
+                            
+                            <div class="col-md-3 col-sm-3" style="text-align: center;">
+                                {{item.item_sku}}
+                            </div>
+                            
+                            <div class="{% if not restaurant %}col-md-3 col-sm-3 ralign{% else %}col-md-4 col-sm-4 col-xs-4{% endif %} ralign">
+                                {% if currency %}{{currency}}{% else %}${% endif %}{{"%0.2f" % item.price | float }}
+                            </div>
+                            <div class="{% if not restaurant %}col-md-3 col-sm-3 ralign{% else %}col-md-4 col-sm-4 col-xs-4{% endif %}" style="text-align: center;">
+                                {{item.quantity}}
+                            </div>
+                            <div class="{% if not restaurant %}col-md-3 col-sm-3 ralign{% else %}col-md-4 col-sm-4 col-xs-4{% endif %} ralign">
+                                {% if currency %}{{currency}}{% else %}${% endif %}{{"%0.2f" % item.amount | float }}
+                            </div>
+                        </div>
+                        </div>
+                        <div class="col-md-3 col-xs-12 hide-desk">
+                            <div class="col-md-4 col-xs-4">
+                                <p>{{ _("Price") }}</p>
+                                {% if currency %}{{currency}}{% else %}${% endif %}{{"%0.2f" % item.price | float }}
+                            </div>
+                            <div class="col-md-4 col-xs-4" style="text-align: center;">
+                                <p>{{ _("Quantity") }}</p>
+                                {{item.quantity}}
+                            </div>
+                            <div class="col-md-4 col-xs-4 ralign">
+                                <p>{{ _("Total") }}</p>
+                                {% if currency %}{{currency}}{% else %}${% endif %}{{"%0.2f" % item.amount | float }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="item-footer">
+                <div class="row">
+                    <div class="col-md-8 col-sm-6">
+                        {% if delivery_slot %}
+                        <table>
+                            <thead><tr><th style="padding: 5px 15px;"><b>{{_("Preferred Delivery Slot")}}:</b></th></tr></thead>
+                            <tbody>
+                                {% for item in delivery_slot %}
+                                <tr>
+                                    <!-- <td style="width: 25%;"><b>{{_("Preferred Delivery Slot")}}:</b></td> -->
+                                    
+                                    <td>{% if item.category %}{{item.category}} - {% endif %}{{item.delivery_date}} ({{item.from_time}} - {{item.to_time}})</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% endif %}
+                      
+                    </div>
+                    <div class="col-md-4 col-sm-6">
+                        <table >
+             <tr>
+                                <td>{{ _("Total Items") }}:</td>
+                                <td class="ralign">{{ order_details.order_item | sum(attribute='quantity') }}</td>
+                            </tr>
+                            <tr>
+                                <td>{{ _("Subtotal") }}:</td>
+                                <td class="ralign">{% if currency %}{{currency}}{% else %}${% endif %}{{"%0.2f" % order_details.order_subtotal | float }}</td>
+                            </tr>
+                            {% if order_details.discount %}
+                            <tr>
+                                <td>{{ _("Discount") }}:</td>
+                                <td class="ralign">{% if currency %}{{currency}}{% else %}${% endif %}{{"%0.2f" % order_details.discount | float }}</td>
+                            </tr>
+                            {% endif %}
+                            {% if order_details.gift_card_amount %}
+                            <tr>
+                                <td>{{ _("Gift Card Amount") }}:</td>
+                                <td class="ralign">{% if currency %}{{currency}}{% else %}${% endif %}{{"%0.2f" % order_details.gift_card_amount | float }}</td>
+                            </tr>
+                            {% endif %}
+                            {% if restaurant and order_details.tip_amount > 0 %}
+                            <tr>
+                                <td>{{ _("Tip Amount") }}:</td>
+                                <td class="ralign">{% if currency %}{{currency}}{% else %}${% endif %}{{"%0.2f" % order_details.tip_amount | float }}</td>
+                            </tr>
+                            {% endif %}
+                           
+                            <tr>
+                                <td>{{ _("Shipping Charge") }}:</td>
+                                <td class="ralign">{% if currency %}{{currency}}{% else %}${% endif %}{{"%0.2f" % order_details.shipping_charges | float }}</td>
+                            </tr>
+                            
+                            {% if order_details.total_tax_amount %}
+                            <tr>
+                                {% if catalog_settings.included_tax == 1 %}
+                                <td>{{ _("Tax (Incl. tax)") }}:</td>
+                                {% else %}
+                                <td>{{ _("Tax") }}:</td>
+                                {% endif %}
+                                <td class="ralign">{% if currency %}{{currency}}{% else %}${% endif %}{{"%0.2f" % order_details.total_tax_amount | float }}</td>
+                            </tr>
+                            {% endif %}
+                                {% if additional_charges %}
+                           
+                            {% for attrs in additional_charges %}
+                            <tr>
+                                <td>{{attrs.charge_name}}</td><td class="ralign">{% if currency %}{{currency}}{% else %}${% endif %}{{"%0.2f" % attrs.amount | float }}</td>
+                            </tr>
+                            {% endfor %}
+                            {% endif %}
+                            {% if order_details.checkout_attributes %}
+                            <tr>
+                                <td>{{_("Additional Charges")}}:</td><td class="ralign"></td>
+                            </tr>
+                            {% for attrs in order_details.checkout_attributes %}
+                            <tr>
+                                <td style="color:#a5a5a5;">{{attrs.attribute_description}}</td><td class="ralign">{% if currency %}{{currency}}{% else %}${% endif %}{{"%0.2f" % attrs.price_adjustment | float }}</td>
+                            </tr>
+                            {% endfor %}
+                            {% endif %}
+                            <tr>
+                                <td><b>{{ _("Order Total") }}:</b></td>
+                                <td class="ralign"><b>{% if currency %}{{currency}}{% else %}${% endif %}{{"%0.2f" % order_details.total_amount | float }}</b></td>
+                            </tr>
+            
+                            {% if loyalty and order_details.loyalty_points %}
+                            <tr>
+                                <td><b>{{ _("Loyalty Amount") }} </b> ({{order_details.loyalty_points}}pts)</td>
+                                <td class="ralign"><b>{% if currency %}{{currency}}{% else %}${% endif %}{{"%0.2f" % order_details.loyalty_amount | float}}</b></td>
+                            </tr>
+
+                            <tr>
+                                <td><b>{{ _("Total Amount") }} </b></td>
+                                <td class="ralign"><b>{% if currency %}{{currency}}{% else %}${% endif %}{{"%0.2f" % (order_details.total_amount - order_details.loyalty_amount) | float}}</b></td>
+                            </tr>
+                            {% endif %}
+                            {% if order_details.paid_using_wallet %}
+                            <tr>
+                                <td><b>{{ _("Paid Using Wallet") }}:</b></td>
+                                <td class="ralign"><b>{% if currency %}{{currency}}{% else %}${% endif %}{{"%0.2f" % order_details.paid_using_wallet | float }}</b></td>
+                            </tr>
+            {% endif %}
+            {%if order_details.doctype=="Order"%}
+            {%if order_details.paid_amount | float > 0%}
+                             <tr>
+                                <td><b>{{ _("Paid Amount") }}:</b></td>
+                                <td class="ralign"><b>{% if currency %}{{currency}}{% else %}${% endif %}{{"%0.2f" % order_details.paid_amount | float }}</b></td>
+                            </tr>
+                            {% endif %}
+             {%if order_details.outstanding_amount | float > 0%}
+                             <tr>
+                                <td><b>{{ _("Outstanding Amount") }}:</b></td>
+                                <td class="ralign"><b>{% if currency %}{{currency}}{% else %}${% endif %}{{"%0.2f" % order_details.outstanding_amount | float }}</b></td>
+                            </tr>
+                            {% endif %}
+                    {% if order_settings.enable_preorder==1 %}
+                    {% if order_details.advance_amount %}
+                     <tr>
+                        <td><b>{{ _("Advance Amount") }}:</b></td>
+                        <td class="ralign"><b>{% if currency %}{{currency}}{% else %}${% endif %}{{"%0.2f" % order_details.advance_amount | float }}</b></td>
+                    </tr>
+                    {% endif %}
+                    {% endif %}
+                    {% endif %}
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
