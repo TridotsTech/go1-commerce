@@ -814,40 +814,6 @@ class Order(Document):
 		workflow = frappe.db.get_all('Workflow', filters={'is_active': 1, 'document_type': 'Order'})
 		if workflow:
 			cur_state = self.workflow_state
-		if prev_state != cur_state and self.pre_status:
-			items = frappe.new_doc("Status History")
-			items.before_change= prev_state
-			items.new_status= cur_state
-			items.updated_on= now()
-			items.parenttype="Order"
-			items.parentfield="status_history"
-			items.notes = "Order status changed to "+str(cur_state)
-			items.parent=self.name
-			items.save(ignore_permissions=True)
-			frappe.db.commit()
-		else:
-			if self.pre_status:
-				items = frappe.new_doc("Status History")
-				items.before_change= prev_state
-				items.new_status= cur_state
-				items.updated_on= now()
-				items.parenttype="Order"
-				items.parentfield="status_history"
-				items.notes = "Order updated"
-				items.parent=self.name
-				items.save(ignore_permissions=True)
-				frappe.db.commit()
-			else:
-				items = frappe.new_doc("Status History")
-				items.before_change= prev_state
-				items.new_status= cur_state
-				items.updated_on= now()
-				items.parenttype="Order"
-				items.parentfield="status_history"
-				items.notes = "Order Placed"
-				items.parent=self.name
-				items.save(ignore_permissions=True)
-				frappe.db.commit()
 		frappe.db.set_value('Order', self.name, 'pre_status', cur_state)
 
 
@@ -1970,9 +1936,8 @@ def order_shipment_status(order_info,order_details,):
 	shipments = frappe.db.get_all("Shipment",
 										filters = {"document_name":order_info[0].name},
 										fields = ['*'])
-	status_history = frappe.db.get_all("Status History",
-										filters = {"parent":order_info[0].name},
-										fields = ['*'],order_by = 'creation desc')
+	status_history=[]
+	
 	tax_splitup = None
 	if order_details.tax_json:
 		tax_splitup = json.loads(order_details.tax_json)

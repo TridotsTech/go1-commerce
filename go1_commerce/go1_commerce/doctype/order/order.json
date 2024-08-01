@@ -102,7 +102,6 @@
   "paid_using_wallet",
   "outstanding_amount",
   "due_date",
-  "section_break_40",
   "section_break_44",
   "column_break_46",
   "card_type",
@@ -131,8 +130,6 @@
   "mail_status",
   "is_shipment_bag_item",
   "shipment_charge",
-  "sec_break",
-  "status_history",
   "section_break_104",
   "currency",
   "currency_symbol",
@@ -610,11 +607,6 @@
    "label": "Due Date"
   },
   {
-   "fieldname": "section_break_40",
-   "fieldtype": "Section Break",
-   "hidden": 1
-  },
-  {
    "fieldname": "section_break_44",
    "fieldtype": "Section Break",
    "hidden": 1,
@@ -748,19 +740,6 @@
    "fieldtype": "Data",
    "hidden": 1,
    "label": "Mail Status"
-  },
-  {
-   "fieldname": "sec_break",
-   "fieldtype": "Section Break",
-   "hidden": 1,
-   "label": "Status History"
-  },
-  {
-   "allow_on_submit": 1,
-   "fieldname": "status_history",
-   "fieldtype": "Table",
-   "label": "Status History",
-   "options": "Status History"
   },
   {
    "fieldname": "section_break_104",
@@ -1049,7 +1028,7 @@
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2024-03-26 19:33:13.271877",
+ "modified": "2024-08-01 21:06:41.721667",
  "modified_by": "Administrator",
  "module": "Go1 Commerce",
  "name": "Order",

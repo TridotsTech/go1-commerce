@@ -162,13 +162,7 @@ def get_orders_items(orders):
 						it.return_status = "Request Delivered"
 					if it.shipping_status == "Rejected":
 						it.return_status = "Request Rejected"
-			if get_time_log:
-				item.status_history = frappe.db.sql('''	SELECT 
-															before_change, new_status, updated_on 
-														FROM 
-															`tabStatus History` 
-														WHERE parent = %(parent)s
-														ORDER BY idx''',{'parent': item.name},as_dict=1)
+			item.status_history=[]
 			payment_entry = frappe.db.sql_list('''	SELECT DISTINCT p.mode_of_payment 
 													FROM `tabPayment Entry` p 
 													LEFT JOIN `tabPayment Reference` pr ON p.name=pr.parent
