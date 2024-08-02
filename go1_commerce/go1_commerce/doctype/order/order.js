@@ -1,9 +1,9 @@
 // Copyright (c) 2018, info@valiantsystems.com and contributors
 // For license information, please see license.txt
 
-frappe.require("assets/go1_commerce/css/select_list.css"); 
-frappe.require("assets/go1_commerce/js/frappe-datatable.min.js");
-frappe.require("assets/go1_commerce/js/frappe-datatable.min.css");
+// frappe.require("assets/go1_commerce/css/select_list.css"); 
+// frappe.require("assets/go1_commerce/js/frappe-datatable.min.js");
+// frappe.require("assets/go1_commerce/js/frappe-datatable.min.css");
 
 
 frappe.ui.form.on('Order', {
