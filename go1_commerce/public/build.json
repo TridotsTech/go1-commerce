@@ -1,0 +1,11 @@
+{
+    "js/custom-estore.min.js":[
+    	"public/js/templates/tab_view_template.html",
+        "public/js/custom_estore.js"
+    ],
+    "js/ecommerce-core.min.js": [
+		"public/js/utils.js",
+		"public/js/ui/filters/filter.js",
+		"public/js/ui/filters/custom_edit_filter.html"
+	]
+}

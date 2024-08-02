@@ -1,0 +1,47 @@
+.uploadFiles{
+    background: #fafafa;
+    border: 1px solid hsla(0,0%,58%,.2);
+    border-radius: 6px;
+    height: 450px;
+}
+.uploadFiles ul{
+    list-style: none;
+    padding-inline-start: 0;
+    height: 400px;
+    overflow-y: scroll;
+    background: #fff;  
+}
+.uploadFiles ul li img{
+    max-height: 70px;
+}
+.uploadFiles ul li .img-close{
+    color: #c13232;
+}
+.uploadFiles ul li{
+    padding: 5px 15px;
+    height: 80px;
+    border-bottom: 1px solid #ddd;
+}
+.uploadFiles .title{
+    font-weight: 500;
+    font-size: 15px;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+.uploadFiles ul li .img-name{
+    margin-top: 10px;
+    overflow-x: hidden;
+}
+/*.modal-dialog {
+    max-width: 1010px;
+   
+}
+@media (min-width: 576px){
+.modal-dialog {
+    max-width: 1010px;
+   
+}
+.modal-dialog.msgprint-dialog {
+    max-width: 575px !important;
+}
+}*/

@@ -1,0 +1,26 @@
+.card .nav-tabs li.tabcont a.tabcont {
+    background: #f5f5f5;
+    border-left: 2px solid #fff;
+    border-top: 1px solid #fff;
+}
+
+.card .nav-tabs > li.active > a {
+    border: none;
+    color: #222 !important;
+    / color: #18509f !important; /
+    background-color: #ffffff !important;
+    background: #fff !important;
+    width: calc(100% );
+    / border: 1px solid #d3d3d3; /
+    border-left: 2px solid #18509f !important;
+    border-right: none;
+    border-bottom: 1px solid #eee !important;
+    border-top: 1px solid #d3d3d3 !important;
+}
+[data-page-route="Form/Product"].row.form-section.visible-section {
+    width: calc(100% - 200px);
+   
+    position: absolute;
+    left: 200px;
+    top: 0;
+}

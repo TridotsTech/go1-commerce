@@ -1,0 +1,221 @@
+ {% if data %}
+
+  <div class="row tabbreak" style="min-height: 390px;">
+    <div class="col-md-12" style="margin-left: -0.3px;"> 
+     
+      <div class="card">
+        <ul class="nav nav-tabs" role="tablist">
+           {% for state in data %}
+         
+      {% if show !=1%} 
+          {% if state.indexval <=8%}
+
+          <li role="presentation" class="tabcont singletab {% if state.indexval==3 %} active {% endif%} "><a class="tabcont" href="{{state.tabid}}" aria-controls="tabs4" role="tab" data-toggle="tab"><i class="{% if state.icons %}{{state.icons}}{% else %}fa fa-clone{% endif%}"></i>  <span>{% if state.label %}{{state.label}}{% endif%}</span></a></li>
+           
+           {% else %}
+           
+           {% if state.indexval ==9%}
+           <li style="width:47px;height:39px;" role="presentation" class="tabcont"><a class="tabcont" href="show" aria-controls="show" role="tab" data-toggle="tab" style="width:47px;height:39px;"><i class="fa fa-forward"></i></a></li >
+          {% endif %}
+          
+          {% endif %}
+         
+          {% else %}
+
+          <li role="presentation" class="tabcont {% if state.indexval==3 %} active {% endif%}{% if state.hidden==1 %} hide {% endif%}"><a class="tabcont" href="{{state.tabid}}" onclick="show_tabcontent_section($(this))" data-tabid="{{state.tabid}}" data-basedon="{{based_on_tab}}" aria-controls="tabs{{state.indexval}}" role="tab" data-toggle="tab" style="{% if state.indexval==3 %} border-top:none; {% endif%}"><i class="{% if state.icons %}{{state.icons}}{% else %}fa fa-clone{% endif%}"></i>  <span>{% if state.label %}{{state.label}}{% endif%}</span></a></li>
+       
+          {% endif %}
+
+          {% endfor %}
+         
+        </ul>
+
+      </div>
+    </div>
+  </div>
+ 
+  {% endif %}
+{%if vertical_tab ==1%}
+<style type="text/css">
+  .card .nav-tabs {
+    border-bottom: 0px solid #fff;
+    float: left;
+    width: 200px;
+    margin-left: -1px;
+    border-right: 1px solid rgb(209, 216, 221);
+}
+.card .nav-tabs li.tabcont {
+    float: left;
+    width: 100%;
+    text-align: left;
+    height: 43px;
+}
+.card  .nav-tabs > li.active > a::after{    
+    background-color: #d3d3d3!important;;
+}
+  .card .nav-tabs li.tabcont a.tabcont {
+    border-left: 2px solid #fff;
+   
+    border-top: 1px solid #fff;
+}
+
+.card .nav-tabs > li.active > a {
+    border: none;
+    color: {{active_class_text}} !important;
+    background-color : {{active_class_background}} !important;
+    background: #fff !important;
+    width: calc(100% + 1px);
+    border-left: 2px solid {{active_class_line}} !important;
+    border-right: none !important;
+    border-bottom: 1px solid #eee !important;
+    border-top: 1px solid #d3d3d3;
+}
+[data-page-route="Form/{{cur_doctype}}"].row.form-section.visible-section {
+    width: calc(100% - 200px);
+   
+    position: absolute;
+    left: 200px;
+    top: 0;
+}
+[data-page-route="Form/{{cur_doctype}}"].card .nav-tabs li.tabcont {
+    float: left;
+    width: 100%;
+    text-align: left;
+    background: #fff;
+    height: auto;
+}
+[data-page-route="Form/{{cur_doctype}}"].layout-main-section {
+    border: 1px solid #d1d8dd;
+    border-top: 0px;
+    float: left;
+    width: 100%;
+    border-left: none;
+    border-bottom: none;
+}
+[data-page-route="Form/{{cur_doctype}}"].form-page-section> .form-section {
+    display: block;
+    width: calc(100% - 200px);
+    border-bottom: none;
+    margin-top: -258px;
+    float: right;
+
+}
+[data-page-route="Form/{{cur_doctype}}"].tabbreak-head.tab-head {
+  display: block;
+  width: calc(100% - 200px);
+  border-bottom: none;
+  margin-top: -258px;
+  float: right;
+}
+[data-page-route="Form/{{cur_doctype}}"].form-section:not(:last-child), .form-inner-toolbar {
+    border-bottom: 1px solid #d1d8dd;
+    border-left: 1px solid #d1d8dd;
+}
+div#tabs2,div#tabs3,div#tabs4,div#tabs5,div#tabs6,div#tabs7,div#tabs8,div#tabs9,
+div#tabs10,div#tabs11,div#tabs12,div#tabs13,div#tabs14,div#tabs15,div#tabs16,div#tabs17,div#tabs18
+div#tabs19,div#tabs20 {
+ border: 1px solid rgb(209, 216, 221);
+    display: block;
+    width: calc(100% - 198px);
+    margin-top: -380px;
+    float: right;
+    padding: 15px 15px 0px 0px !important;    min-height: 380px;
+
+}.card .nav-tabs li.tabcont:first-child a.tabcont {
+    border-top: none !important;
+}
+div#tabs1{
+ border: 1px solid rgb(209, 216, 221);
+    display: block;
+    width: 100%;
+    margin-top: -380px;
+    float: right;
+    padding: 15px 15px 0px 0px !important;
+
+}
+[data-page-route="Form/{{cur_doctype}}"] .row.form-section.visible-section {
+      border-bottom: none;
+    border: 1px solid #ebebeb;
+    width: calc(100% - 15px);
+    margin-left: 15px;
+    margin-bottom: 15px;
+}
+[data-page-route="Form/{{cur_doctype}}"] .form-section .form-section-heading {
+    margin: 10px 0px;
+    width: calc(100% + 60px);
+    background: #fafbfc;
+    float: left;
+    margin-left: -30px;
+    margin-top: -15px;
+    padding: 10px 20px;
+    border-bottom: 1px solid #ebebeb;
+}
+</style>
+{%endif%}
+<style type="text/css">
+.hide{
+  display:none;
+}
+
+.card {
+  margin-bottom: 0px !important;
+}
+.nav-tabs {
+    border-bottom: 0px solid #fff;
+}
+.nav-tabs > li.active > a, .nav-tabs > li.active > a:focus, .nav-tabs > li.active > a:hover {
+ border-width: 0; 
+}
+.card .nav-tabs > li > a { 
+  border: none; 
+  margin-bottom: -1px;
+    margin-right: 0px;
+    color: #222 !important; 
+    background : {{tab_background_color}} !important;
+    border-radius: 0px 0px 0 0; */
+}
+.card .nav-tabs > li > a i.fa{
+  margin-right:5px;
+}
+.nav-tabs > li.active > a, .nav-tabs > li > a:hover { 
+  border: none; 
+ color: {{active_class_text}} !important; 
+  background-color : {{active_class_background}} !important;
+}
+
+ .nav-tabs > li.active > a::after {
+    content: "";
+    height: 0px;
+    position: absolute;
+    width: 100%;
+    left: 0px;
+    bottom: 0px;
+    transition: all 250ms ease 0s;
+    transform: scale(0);
+   
+}
+.nav-tabs > li.active > a::after, .nav-tabs > li:hover > a::after { 
+  transform: scale(1); 
+}
+.tab-nav > li > a::after { 
+  background: #18509f none repeat scroll 0% 0%; 
+  color: #fff;
+ }
+.tab-pane { 
+  padding: 15px 0; 
+}
+.tab-content{
+  padding:20px;
+}
+.nav-tabs > li  {
+  text-align:center;
+}
+.card {
+  background: #FFF none repeat scroll 0% 0%; 
+  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3); 
+  margin-bottom: 30px; 
+}
+.singletab {
+    text-align: center;
+}
+</style>

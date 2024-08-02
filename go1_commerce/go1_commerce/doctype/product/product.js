@@ -3176,7 +3176,7 @@ var generate_variant_html = Class.extend({
             <div class="form-group option-group" style="margin-bottom: 0px;"> 
                 <div class="control-input-wrapper">
                     <div class="control-input form-control table-multiselect" 
-                        style="cursor:pointer;" id="table-multiselect" 
+                        style="cursor:pointer;background-color:unset !important;" id="table-multiselect" 
                         onclick="change_field(${docname},${size_chart_value})" 
                         id="change_field">
                         <div class="form-group option-group" style="margin-bottom: 0px;
@@ -3251,7 +3251,7 @@ var generate_variant_html = Class.extend({
         })
         var optionhtml = `<div class="form-group option-group" style="margin-bottom: 0px;">
                             <div class="control-input-wrapper">
-                                <div class="control-input form-control table-multiselect" 
+                                <div class="control-input form-control table-multiselect" style="background-color:unset !important;"
                                         id="table-multiselect">`
         if(varient_option){
             varient_option.map(f => {
@@ -3297,8 +3297,8 @@ var generate_variant_html = Class.extend({
         optionhtml += `
             <div class="link-field ui-front" style="position: relative; line-height: 1;">
                 <div class="awesomplete">
-                    <input placeholder="Type options..." style="padding: 6px 10px 8px;width: 178px;
-                        font-size: 11px;font-weight: 400; type="text" id="select_options${idx}"
+                    <input placeholder="Type options..." style="padding: 6px 10px 8px;
+                        font-size: 11px;font-weight: 400;width: 178px;" type="text" id="select_options${idx}"
                         keydown="add_option_totable($(this))" class="input-with-feedback bold" 
                         data-fieldtype="Table MultiSelect" data-fieldname="display_options" 
                         placeholder="" data-doctype="Product" data-target="Product" autocomplete="off" 
@@ -3804,7 +3804,7 @@ var append_variant_html = Class.extend({
         size_chart_html = `
             <div class="form-group option-group" style="margin-bottom: 0px;">
                 <div class="control-input-wrapper">
-                    <div class="control-input form-control table-multiselect" style="cursor:pointer;" 
+                    <div class="control-input form-control table-multiselect" style="cursor:pointer;background-color:unset !important;" 
                         id="table-multiselect"  onclick="change_field(${docname},${size_chart_value} )" id="change_field">
                         <div class="form-group option-group" style="margin-bottom: 0px;padding: 5px;border-radius:1px solid black;">
                             <span>
@@ -3877,7 +3877,7 @@ var append_variant_html = Class.extend({
         var optionhtml = `
             <div class="form-group option-group" style="margin-bottom: 0px;">
                 <div class="control-input-wrapper">
-                    <div class="control-input form-control table-multiselect" id="table-multiselect">`
+                    <div class="control-input form-control table-multiselect" style="background-color:unset !important;" id="table-multiselect">`
         if(varient_option){
             varient_option.map(f => {
                 var btn_cls = 'btn-default';
@@ -3921,8 +3921,8 @@ var append_variant_html = Class.extend({
         optionhtml  += `
                         <div class="link-field ui-front" style="position: relative; line-height: 1;">
                             <div class="awesomplete">   
-                            <input placeholder="Type options..." style="padding: 6px 10px 8px;width: 178px;font-size: 11px;
-                                font-weight: 400;" type="text" id="select_options${idx}" keydown="add_option_totable($(this))" 
+                            <input placeholder="Type options..." style="padding: 6px 10px 8px;font-size: 11px;
+                                font-weight: 400;width: 178px;" type="text" id="select_options${idx}" keydown="add_option_totable($(this))" 
                                 class="input-with-feedback bold" data-fieldtype="Table MultiSelect" data-fieldname="display_options" 
                                 placeholder="" data-doctype="Product" data-target="Product" autocomplete="off" aria-owns="awesomplete_list_45" 
                                 role="combobox" aria-activedescendant="awesomplete_list_45_item_0"> 
@@ -4115,7 +4115,7 @@ var append_variant_html = Class.extend({
         size_chart_html = `
             <div class="form-group option-group" style="margin-bottom: 0px;">
                 <div class="control-input-wrapper"> 
-                    <div class="control-input form-control table-multiselect" style="cursor:pointer;" 
+                    <div class="control-input form-control table-multiselect" style="cursor:pointer;background-color:unset !important;" 
                             id="table-multiselect" onclick="change_field(${docname},${size_chart_value})" 
                             id="change_field">
                         <div class="form-group option-group" style="margin-bottom: 0px;padding: 5px;border-radius:1px solid black;">
@@ -4192,7 +4192,7 @@ var append_variant_html = Class.extend({
         var optionhtml = `
             <div class="form-group option-group" style="margin-bottom: 0px;">
                 <div class="control-input-wrapper">
-                    <div class="control-input form-control table-multiselect" id="table-multiselect">
+                    <div class="control-input form-control table-multiselect" style="background-color:unset !important;" id="table-multiselect">
             `
         if(cur_frm.doc.product_attributes){
             varient_option.map(f => {
@@ -4234,8 +4234,8 @@ var append_variant_html = Class.extend({
         optionhtml += `
             <div class="link-field ui-front" style="position: relative; line-height: 1;">
                 <div class="awesomplete">
-                    <input placeholder="Type options..." style="padding: 6px 10px 8px;width: 178px;
-                        font-size: 11px;font-weight: 400;" type="text" id="select_options${this.product_attribute}
+                    <input placeholder="Type options..." style="padding: 6px 10px 8px;
+                        font-size: 11px;font-weight: 400;width: 178px;" type="text" id="select_options${this.product_attribute}
                         keydown="add_option_totable($(this))" class="input-with-feedback bold" data-fieldtype="Table MultiSelect" 
                         data-fieldname="display_options" placeholder="" data-doctype="Product" data-target="Product" 
                         autocomplete="off" aria-owns="awesomplete_list_45" role="combobox" aria-activedescendant="awesomplete_list_45_item_0">
