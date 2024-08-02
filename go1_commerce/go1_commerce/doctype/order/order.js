@@ -1437,7 +1437,7 @@ function validate_check_order_settings(frm){
         frm.set_value('status', "Placed");
         frm.set_value('shipping_status', "");
         frm.set_value('paid_using_wallet', 0);
-        frm.set_value('status_history', []);
+        
         frm.set_value('advance_amount', 0);
         frm.set_value('discount_coupon', '');
         frm.set_value('transaction_id', '');
