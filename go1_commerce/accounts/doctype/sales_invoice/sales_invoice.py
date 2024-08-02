@@ -6,7 +6,7 @@ from __future__ import unicode_literals
 import frappe
 from frappe.model.document import Document
 from frappe import _
-from go1_commerce.utils.setup import get_settings_value, get_settings
+from go1_commerce.utils.setup import get_settings
 
 class SalesInvoice(Document):
 	def autoname(self): 
