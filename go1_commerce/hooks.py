@@ -6,6 +6,213 @@ app_email = "info@tridotstech.com"
 app_license = "mit"
 # required_apps = []
 
+pp_logo_url = "/assets/go1_commerce/images/go1_commerce_logo.svg"
+
+website_context = {
+	"favicon": "/assets/go1_commerce/images/go1favicon.svg",
+	"splash_image": "/assets/go1_commerce/images/go1_commerce_logo.svg",
+}
+leaderboard = "go1_commerce.go1_commerce.leaders.get_leaderboards"
+
+boot_session = "go1_commerce.go1_commerce.v2.common.boot_session"
+
+custo="go1_commerce.go1_commerce.cust.get_leaderboards"
+
+leaderboardorder="go1_commerce.go1_commerce.leaderboardtest.get_leaderboardorder"
+
+custo = "go1_commerce.go1_commerce.cust.get_leaderboards"
+leaderboardorder = "go1_commerce.go1_commerce.leaderboardtest.get_leaderboardorder"
+# website permission
+has_website_permission = {
+	'Customers':'go1_commerce.go1_commerce.v2.common.customer_web_permission'
+}
+after_install = "go1_commerce.go1_commerce.after_install.after_install"
+# on login
+on_session_creation = "go1_commerce.go1_commerce.v2.common.login_customer"
+
+app_include_css = [
+	"/assets/go1_commerce/css/console.css",
+	"/assets/go1_commerce/css/ui/uploader.css",
+]
+app_include_js = [
+    "/assets/go1_commerce/js/ui/dialog_popup.js",
+     "/assets/go1_commerce/js/default_methods.js",
+     "/assets/go1_commerce/js/option.js",
+	"/assets/go1_commerce/js/console.js",
+	"/assets/go1_commerce/js/getting_started.js",
+	"assets/go1_commerce/js/ui/product_func_class.js",
+	"assets/go1_commerce/js/quick_entry/return_quick_entry.js",
+]
+doctype_js = {
+    "Web Form" : "public/js/ui/editor/web_form.js",
+     "Web Page Builder" : "public/js/web_page_builder.js"
+    }
+
+page_js = {
+	"products-bulk-update": [
+		"public/plugins/datatable/sortable.min.js",
+		"public/plugins/datatable/clusterize.min.js",
+		"public/plugins/datatable/frappe-datatable.min.js",
+		"public/js/uppy.min.js",
+		"public/js/lightgallery.js"
+	],
+	"seo-tool": [
+		"public/plugins/datatable/sortable.min.js",
+		"public/plugins/datatable/clusterize.min.js",
+		"public/plugins/datatable/frappe-datatable.min.js"
+	]
+}
+
+has_permission = {
+	# "Product Tax Template": "go1_commerce.go1_commerce.doctype.product_tax_template.product_tax_template.has_permission",
+	# "Return Policy": "go1_commerce.go1_commerce.doctype.return_policy.return_policy.has_permission",
+	# "Discounts": "go1_commerce.go1_commerce.doctype.discounts.discounts.has_permission"
+}
+has_website_permission = {
+	"Customers": "go1_commerce.go1_commerce.doctype.customers.customers.has_website_permission"
+}
+
+override_doctype_class = {
+	'File': 'go1_commerce.go1_commerce.override.CustomFile',
+	'PageSection': 'go1_commerce.go1_commerce.override.PageSection'
+}
+
+
+doc_events = {
+	"User": {
+		"after_insert": "go1_commerce.go1_commerce.doctype.customers.customers.generate_keys"
+	},
+	"Newsletter": {
+		"autoname": "go1_commerce.utils.setup.autoname_newsletter"
+	},
+	"Product": {
+		"on_update": "go1_commerce.utils.setup.website_generator_update",
+		"on_trash": "go1_commerce.utils.setup.website_generator_trash"
+	},
+	"Product Category": {
+		"on_update": "go1_commerce.utils.setup.website_generator_update",
+		"on_trash": "go1_commerce.utils.setup.website_generator_trash"
+	},
+	"Order": {
+		"on_submit": "go1_commerce.go1_commerce.v2.whoosh.update_order_item"
+	},
+	"Google Settings": {
+		"validate": "go1_commerce.utils.setup.validate_google_settings"
+	},
+	"Help Article": {
+		"validate": "go1_commerce.go1_commerce.v2.common.create_help_article_json"
+	},
+		"Order Settings": {
+		"on_update": "go1_commerce.go1_commerce.v2.common.generate_all_website_settings_json_doc"
+	},
+	"Catalog Settings": {
+		"on_update": "go1_commerce.go1_commerce.v2.common.generate_all_website_settings_json_doc"
+	},
+	"Market Place Settings": {
+		"on_update": "go1_commerce.go1_commerce.v2.common.generate_all_website_settings_json_doc"
+	},
+	"Shopping Cart Settings": {
+		"on_update": "go1_commerce.go1_commerce.v2.common.generate_all_website_settings_json_doc"
+	},
+	"Product Category": {
+		"on_update": "go1_commerce.go1_commerce.v2.common.generate_all_website_settings_json_doc"
+	},
+	"Media Settings": {
+		"on_update": "go1_commerce.go1_commerce.v2.common.generate_all_website_settings_json_doc"
+	},
+	"Header Component": {
+		"on_update": "go1_commerce.go1_commerce.v2.common.generate_all_website_settings_json_doc"
+	},
+	"Footer Component": {
+		"on_update": "go1_commerce.go1_commerce.v2.common.generate_all_website_settings_json_doc"
+	},
+	"Menu": {
+		"on_update": "go1_commerce.go1_commerce.v2.common.generate_all_website_settings_json_doc"
+	},
+	"Version":{
+		"after_insert":"go1_commerce.go1_commerce.v2.orders.update_stoke"
+	}
+}
+
+# Scheduled Tasks
+# ---------------
+scheduler_events = {
+	"all": [
+		"go1_commerce.accounts.api.release_lockedin_amount",
+		"go1_commerce.go1_commerce.doctype.product.product.check_menu_available_time",
+		"go1_commerce.go1_commerce.doctype.order.order.auto_complete_orders",
+	],
+	"daily": [
+		"go1_commerce.go1_commerce.doctype.donations.donations.remove_guestuser",
+	],
+	
+	"monthly": [
+		"go1_commerce.utils.setup.clear_logs"	
+	],
+	"cron": {
+		"* * * * *": [
+			"frappe.email.queue.flush",
+		],
+		"0 1 * * *": [
+			"go1_commerce.go1_commerce.doctype.customers.customers.delete_guest_customers",
+			"go1_commerce.go1_commerce.doctype.shopping_cart.shopping_cart.check_cart_discounts",
+			"go1_commerce.go1_commerce.doctype.pos_settings.pos_settings.clear_pos_orders",
+			"go1_commerce.membership.api.create_memberships"
+		],
+		"30 12 1 * *":[
+			"go1_commerce.utils.setup.clear_api_log"
+		]
+	}
+}
+
+fixtures = [
+	{
+		"doctype": "Custom Script",
+		"filters": [
+			["name", "in", (
+				"Newsletter-Client"
+			)]
+		]
+	},
+	{
+		"doctype": "Custom Field",
+		"filters": [
+			["name", "in", (
+				"Country-enabled",
+				"Country-phone_number_code",
+				"Country-validate_zipcode",
+				"Country-zipcode_validation_policy",
+				"Country-min_zipcode_length",
+				"Country-max_zipcode_length",
+				"Notification-allow_user_modify",
+				"Email Group Member-business",
+				"Google Settings-restrict_to_countries",
+				"Google Settings-countries",
+				"Google Settings-default_address",
+				"Google Settings-latitude",
+				"Google Settings-longitude",
+				"Google Settings-marker_icon",
+				"Help Article-doctype_name",
+				"Help Article-domain_name",
+				"Email Group-business",
+			)]
+		]
+	}
+]
+
+# Set default Role-updateby siva
+# -------
+default_roles = [
+	{'role': 'Customer', 'doctype':'Customers'},
+]
+override_whitelisted_methods = {
+    "frappe.client.validate_link": "go1_commerce.utils.utils.validate_link",
+    "frappe.desk.form.linked_with.cancel_all_linked_docs": "go1_commerce.utils.utils.cancel_all_linked_docs"
+    
+}
+
+auto_cancel_exempted_doctypes = ["Order"]
+
 # Includes in <head>
 # ------------------
 
