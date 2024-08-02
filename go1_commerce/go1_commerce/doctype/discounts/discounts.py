@@ -290,7 +290,7 @@ def get_order_subtotal_discount(subtotal, customer_id, cart_items, total_weight=
 									shipping_method, 
 									payment_method
 								)
-		if res['status'] == 'success':			
+		if res and res['status'] == 'success':			
 			assigned = True
 			discount = d
 			break
@@ -1902,11 +1902,9 @@ def validate_item_requirements(requirements,subtotal,total_weight,customer_id,ca
 
 def calculate_count_by_discount_requirement(customer_id,dis,subtotal,total_weight,shipping_method,
 											payment_method):
+	count=0
 	for r in dis.discount_requirements:
-		html += "discount_requirements: "+str(r.discount_requirement)+"\n"
 		if r.discount_requirement == 'Spend x amount':
-			html += "float(r.amount_to_be_spent): "+str(float(r.amount_to_be_spent))+"\n"
-			html += "float(subtotal or 0): "+str(float(subtotal or 0))+"\n"
 			if float(r.amount_to_be_spent) <= float(subtotal or 0):
 				count = count + 1
 			else:
