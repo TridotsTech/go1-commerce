@@ -23,8 +23,6 @@
   "sec_1212",
   "enable_customer_wallet",
   "customer_auto_debit",
-  "sec_12",
-  "role_commission",
   "sec_1",
   "document_type",
   "sec_13",
@@ -82,18 +80,6 @@
    "fieldname": "customer_auto_debit",
    "fieldtype": "Check",
    "label": "Enabled Auto Debit Option from Wallet (customer)"
-  },
-  {
-   "depends_on": "eval:((doc.enable_wallet==1))",
-   "fieldname": "sec_12",
-   "fieldtype": "Section Break",
-   "label": "Commission Split up"
-  },
-  {
-   "fieldname": "role_commission",
-   "fieldtype": "Table",
-   "label": "Role Based Commission",
-   "options": "Role Based Commission"
   },
   {
    "fieldname": "sec_1",
@@ -167,7 +153,7 @@
  ],
  "issingle": 1,
  "links": [],
- "modified": "2024-02-26 15:03:16.194283",
+ "modified": "2024-08-02 18:51:24.303099",
  "modified_by": "Administrator",
  "module": "Accounts",
  "name": "Wallet Settings",
