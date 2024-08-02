@@ -151,7 +151,6 @@ class Order(Document):
 
 
 	def validate(self):
-		self.maintain_history()
 		catalog_settings = frappe.get_single('Catalog Settings')
 		if not self.currency and catalog_settings.default_currency:
 			self.currency = catalog_settings.default_currency
@@ -791,22 +790,6 @@ class Order(Document):
 					new_order_item['weight'] = product.weight
 					order_item_ = order_items_list(new_order_item)
 					self.append("order_item", order_item_)
-
-
-	def maintain_history(self):
-		prev_state = self.pre_status
-		cur_state = self.status
-		if prev_state != cur_state:
-			row = self.append('status_history', {})
-			row.before_change = prev_state
-			row.new_status = self.status
-			row.updated_on = now()
-			row.parent = self.name
-			row.notes = "Order Placed"
-			row.parentfield = "status_history"
-			row.parenttype = "Order"
-			self.pre_status=cur_state
-
 
 	def update_status_history(self):
 		prev_state = self.pre_status
