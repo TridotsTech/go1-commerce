@@ -37,4 +37,3 @@ class SalesInvoice(Document):
 							  payment_status= %(payment_status)s WHERE name = %(doc_name)s''',
 							  {"payment_status":"Paid", "doc_name":self.reference, "outstanding_amount": outstanding_amount})
 				frappe.db.commit()
-				res = frappe.db.sql(f"""SELECT * FROM `tabOrder` WHERE name = ''{self.reference}""")
