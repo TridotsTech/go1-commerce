@@ -29,7 +29,13 @@ function add_class(){
         color: #222;position: absolute;height: 120px;width: 120px;border: 1px solid #ddd;top: 0;
         border-radius: 5px;`);
     $('div[data-fieldname="product_brands"] .grid-add-row').addClass('hide')
-    $('[class="btn btn-xs btn-secondary grid-add-row"]').hide()
+    // $('[class="btn btn-xs btn-secondary grid-add-row"]').hide()
+    $('div[data-fieldname="cross_selling_products"] .grid-add-row').addClass('hide')
+    $('div[data-fieldname="related_products"] .grid-add-row').addClass('hide')
+    $('div[data-fieldname="related_product_categories"] .grid-add-row').addClass('hide')
+    $('div[data-fieldname="search_keyword"] .grid-add-row').addClass('hide')
+    $('div[data-fieldname="product_specification_attributes"] .grid-add-row').addClass('hide')
+
     $('div[data-fieldname="product_brands"] .grid-add-multiple-rows').addClass('addProductBrands')
     $('div[data-fieldname="add_product_image"] .grid-add-multiple-rows').addClass('addProductImages')
     $('div[data-fieldname="product_categories"] .grid-footer .grid-add-row').addClass('hide')
