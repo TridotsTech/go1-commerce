@@ -1,18 +1,646 @@
 {
  "actions": [],
- "allow_rename": 1,
- "creation": "2024-08-01 17:04:34.640365",
+ "autoname": "naming_series:",
+ "creation": "2020-07-14 11:04:14.815351",
  "doctype": "DocType",
+ "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "section_break_qkyb",
+  "ec",
+  "customer_type",
+  "order_info",
+  "customer",
+  "col_br",
+  "customer_name",
+  "column_break_5",
+  "customer_email",
+  "sec_br",
+  "shipping_provider",
+  "order_date",
+  "column_break_3",
+  "status",
+  "column_break_2",
+  "shipping_method",
+  "shipping_method_name",
+  "billing_section",
+  "billing_address",
+  "first_name",
+  "city",
+  "cl1",
+  "last_name",
+  "state",
+  "phone",
+  "business_phone",
+  "column_break_22",
+  "address",
+  "country",
+  "zipcode",
+  "shipping_section",
+  "shipping_address",
+  "latitude",
+  "longitude",
+  "shipping_first_name",
+  "shipping_city",
+  "column_break_23",
+  "shipping_last_name",
+  "shipping_state",
+  "shipping_phone",
+  "column_break_25",
+  "shipping_shipping_address",
+  "shipping_country",
+  "shipping_zipcode",
+  "sec_2",
+  "order_item",
+  "section_break_13",
+  "payment_type",
+  "order_subtotal",
+  "discount",
+  "total_amount",
+  "column_break_20",
+  "total_tax_amount",
+  "delivery",
+  "total_driver_charges",
+  "column_break_21",
+  "shipping_charges",
+  "pickup_charge",
+  "service_provider_discount",
+  "dserf",
+  "tip_amount",
+  "payment_gateway_charges",
+  "section_break_42",
+  "tax_breakup",
+  "tax_splitup",
+  "commission_information_section",
+  "commission_info",
+  "sec_12",
+  "commission_amt",
+  "gft",
+  "commission_tax",
+  "column_break_jpmj",
+  "commission",
+  "payment_details",
+  "customer_payment",
+  "transaction_id",
+  "refund_id",
+  "refunded",
+  "paid_amount",
+  "paid_using_wallet",
+  "column_break_88",
+  "payment_method_name",
+  "payment_method",
+  "outstanding_amount",
+  "due_date",
+  "section_break_44",
+  "column_break_46",
+  "card_type",
+  "column_break_48",
+  "card_no",
+  "column_break_50",
+  "card_expiry",
+  "sec_note",
+  "notes",
+  "naming_series",
+  "section_break_104",
+  "shipments",
+  "currency",
+  "tax_json",
   "amended_from",
+  "sec_5",
   "reference"
  ],
  "fields": [
   {
-   "fieldname": "section_break_qkyb",
+   "allow_on_submit": 1,
+   "fieldname": "order_info",
+   "fieldtype": "Code",
+   "hidden": 1,
+   "label": "Invoice Info"
+  },
+  {
+   "fieldname": "ec",
    "fieldtype": "Section Break"
+  },
+  {
+   "default": "Customers",
+   "fieldname": "customer_type",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Customer Type",
+   "options": "DocType"
+  },
+  {
+   "fieldname": "customer",
+   "fieldtype": "Dynamic Link",
+   "label": "Customer",
+   "options": "customer_type"
+  },
+  {
+   "fieldname": "col_br",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "customer_name",
+   "fieldtype": "Data",
+   "label": "Customer Name",
+   "options": "customer"
+  },
+  {
+   "fieldname": "column_break_5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "customer_email",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Customer Email",
+   "options": "Email"
+  },
+  {
+   "fieldname": "sec_br",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "shipping_provider",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Shipping Provider"
+  },
+  {
+   "default": "Today",
+   "fieldname": "order_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Invoice Date",
+   "set_only_once": 1
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_13",
+   "fieldtype": "Section Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "payment_type",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Payment Type",
+   "options": "Cash\nOnline Payment",
+   "set_only_once": 1
+  },
+  {
+   "fieldname": "order_subtotal",
+   "fieldtype": "Currency",
+   "label": "Order Subtotal"
+  },
+  {
+   "fieldname": "column_break_20",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "discount",
+   "fieldtype": "Currency",
+   "label": "Discount"
+  },
+  {
+   "depends_on": "eval:doc.type=='Delivery'",
+   "fieldname": "delivery",
+   "fieldtype": "Data",
+   "label": "Delivery Charges ",
+   "options": "restaurant.delivery_fee",
+   "set_only_once": 1
+  },
+  {
+   "fieldname": "service_provider_discount",
+   "fieldtype": "Currency",
+   "label": "Service Provider Discount"
+  },
+  {
+   "fieldname": "column_break_21",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0.00",
+   "depends_on": "eval:doc.shipping_method != 'Pickup'",
+   "fieldname": "shipping_charges",
+   "fieldtype": "Currency",
+   "label": "Shipping Charges"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:doc.shipping_method=='Pickup'",
+   "fieldname": "pickup_charge",
+   "fieldtype": "Currency",
+   "label": "Pickup Charges"
+  },
+  {
+   "default": "0",
+   "fieldname": "total_driver_charges",
+   "fieldtype": "Currency",
+   "label": "Total Driver Charges"
+  },
+  {
+   "fieldname": "dserf",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_tax_amount",
+   "fieldtype": "Currency",
+   "label": "Total Tax Amount"
+  },
+  {
+   "fieldname": "tip_amount",
+   "fieldtype": "Currency",
+   "label": "Tip Amount"
+  },
+  {
+   "default": "0.00",
+   "fieldname": "payment_gateway_charges",
+   "fieldtype": "Currency",
+   "label": "Payment Gateway Charges"
+  },
+  {
+   "fieldname": "total_amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Total Amount"
+  },
+  {
+   "fieldname": "tax_breakup",
+   "fieldtype": "Small Text",
+   "hidden": 1,
+   "label": "Tax Breakup",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "depends_on": "eval: doc.total_tax_amount > 0",
+   "fieldname": "section_break_42",
+   "fieldtype": "Section Break",
+   "label": "Tax Breakup"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "tax_splitup",
+   "fieldtype": "HTML",
+   "label": "Tax Splitup"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "billing_section",
+   "fieldtype": "Section Break",
+   "label": "Billing Address"
+  },
+  {
+   "fieldname": "billing_address",
+   "fieldtype": "Link",
+   "label": "Billing Address",
+   "options": "Customer Address"
+  },
+  {
+   "fieldname": "first_name",
+   "fieldtype": "Data",
+   "label": "First Name",
+   "options": "billing_address.first_name"
+  },
+  {
+   "fieldname": "city",
+   "fieldtype": "Data",
+   "label": "City",
+   "options": "billing_address.city"
+  },
+  {
+   "fieldname": "zipcode",
+   "fieldtype": "Data",
+   "label": "Zipcode",
+   "options": "billing_address.zipcode"
+  },
+  {
+   "fieldname": "cl1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "last_name",
+   "fieldtype": "Data",
+   "label": "Last Name",
+   "options": "billing_address.last_name"
+  },
+  {
+   "fieldname": "state",
+   "fieldtype": "Data",
+   "label": "State",
+   "options": "billing_address.state"
+  },
+  {
+   "fieldname": "phone",
+   "fieldtype": "Data",
+   "label": "Phone",
+   "options": "Phone"
+  },
+  {
+   "fieldname": "business_phone",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Business Phone",
+   "options": "Phone"
+  },
+  {
+   "fieldname": "column_break_22",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "address",
+   "fieldtype": "Data",
+   "label": "Address",
+   "options": "billing_address.address"
+  },
+  {
+   "fieldname": "country",
+   "fieldtype": "Data",
+   "label": "Country",
+   "options": "billing_address.country"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "shipping_section",
+   "fieldtype": "Section Break",
+   "label": "Shipping Address"
+  },
+  {
+   "fieldname": "shipping_address",
+   "fieldtype": "Link",
+   "label": "Shipping Address Id",
+   "options": "Customer Address"
+  },
+  {
+   "fieldname": "latitude",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Latitude"
+  },
+  {
+   "fieldname": "longitude",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Longitude"
+  },
+  {
+   "fieldname": "shipping_first_name",
+   "fieldtype": "Data",
+   "in_standard_filter": 1,
+   "label": "First Name",
+   "options": "shipping_address.first_name"
+  },
+  {
+   "fieldname": "shipping_city",
+   "fieldtype": "Data",
+   "label": "City",
+   "options": "shipping_address.city"
+  },
+  {
+   "fieldname": "shipping_zipcode",
+   "fieldtype": "Data",
+   "label": "Zipcode",
+   "options": "shipping_address.zipcode"
+  },
+  {
+   "fieldname": "column_break_23",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "shipping_last_name",
+   "fieldtype": "Data",
+   "label": "Last Name",
+   "options": "shipping_address.last_name"
+  },
+  {
+   "fieldname": "shipping_state",
+   "fieldtype": "Data",
+   "label": "State",
+   "options": "shipping_address.state"
+  },
+  {
+   "fieldname": "shipping_phone",
+   "fieldtype": "Data",
+   "label": "Phone",
+   "options": "Phone"
+  },
+  {
+   "fieldname": "column_break_25",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "shipping_shipping_address",
+   "fieldtype": "Data",
+   "label": "Address",
+   "options": "shipping_address.address"
+  },
+  {
+   "fieldname": "shipping_country",
+   "fieldtype": "Data",
+   "label": "Country",
+   "options": "shipping_address.country"
+  },
+  {
+   "fieldname": "sec_2",
+   "fieldtype": "Section Break",
+   "label": "Invoice items"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "order_item",
+   "fieldtype": "Table",
+   "label": "Invoice Item",
+   "options": "Sales Invoice Item",
+   "read_only": 1
+  },
+  {
+   "fieldname": "commission_information_section",
+   "fieldtype": "Section Break",
+   "hidden": 1,
+   "label": "Commission Information"
+  },
+  {
+   "fieldname": "commission_info",
+   "fieldtype": "HTML",
+   "label": "Commission Info"
+  },
+  {
+   "fieldname": "sec_12",
+   "fieldtype": "Section Break",
+   "hidden": 1,
+   "label": "Commission"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "commission_amt",
+   "fieldtype": "Currency",
+   "label": "Total Commission Amount",
+   "read_only": 1
+  },
+  {
+   "fieldname": "commission",
+   "fieldtype": "Currency",
+   "label": "Commission",
+   "read_only": 1
+  },
+  {
+   "fieldname": "gft",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "commission_tax",
+   "fieldtype": "Currency",
+   "label": "Commission Tax",
+   "read_only": 1
+  },
+  {
+   "fieldname": "payment_details",
+   "fieldtype": "Section Break",
+   "label": "Payment Details"
+  },
+  {
+   "fieldname": "customer_payment",
+   "fieldtype": "HTML"
+  },
+  {
+   "fieldname": "transaction_id",
+   "fieldtype": "Data",
+   "label": "Transaction Id"
+  },
+  {
+   "fieldname": "refund_id",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Refund Id"
+  },
+  {
+   "default": "0",
+   "fieldname": "refunded",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Refunded"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "paid_amount",
+   "fieldtype": "Currency",
+   "hidden": 1,
+   "label": "Paid Amount"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "paid_using_wallet",
+   "fieldtype": "Currency",
+   "hidden": 1,
+   "label": "Paid Using Wallet"
+  },
+  {
+   "fieldname": "payment_method",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Payment Method"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "outstanding_amount",
+   "fieldtype": "Currency",
+   "hidden": 1,
+   "label": "Outstanding Amount"
+  },
+  {
+   "fieldname": "due_date",
+   "fieldtype": "Date",
+   "hidden": 1,
+   "label": "Due Date"
+  },
+  {
+   "fieldname": "section_break_44",
+   "fieldtype": "Section Break",
+   "hidden": 1,
+   "label": "Payment Info"
+  },
+  {
+   "fieldname": "column_break_46",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "card_type",
+   "fieldtype": "Data",
+   "label": "Card Type",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_48",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "card_no",
+   "fieldtype": "Data",
+   "label": "Card No",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_50",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "card_expiry",
+   "fieldtype": "Data",
+   "label": "Card Expiry",
+   "read_only": 1
+  },
+  {
+   "default": "S-INV-YYYY-",
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Naming Series",
+   "options": "S-INV-YYYY-"
+  },
+  {
+   "fieldname": "section_break_104",
+   "fieldtype": "Section Break",
+   "hidden": 1
+  },
+  {
+   "fieldname": "shipments",
+   "fieldtype": "HTML",
+   "hidden": 1,
+   "label": "Shipments"
+  },
+  {
+   "fieldname": "shipping_method_name",
+   "fieldtype": "Data",
+   "label": "Shipping Method Name",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "payment_method_name",
+   "fieldtype": "Data",
+   "label": "Payment Method Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "currency",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Currency",
+   "options": "Currency"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "tax_json",
+   "fieldtype": "Code",
+   "hidden": 1,
+   "label": "Tax JSON"
   },
   {
    "fieldname": "amended_from",
@@ -21,26 +649,67 @@
    "no_copy": 1,
    "options": "Sales Invoice",
    "print_hide": 1,
-   "read_only": 1,
-   "search_index": 1
+   "read_only": 1
   },
   {
    "fieldname": "reference",
-   "fieldtype": "Link",
+   "fieldtype": "Data",
    "label": "Reference",
-   "options": "Order"
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "Unpaid",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Paid\nUnpaid\nOverdue\nCancelled",
+   "read_only": 1
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "sec_5",
+   "fieldtype": "Section Break",
+   "label": "Reference"
+  },
+  {
+   "fieldname": "shipping_method",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Shipping Method"
+  },
+  {
+   "fieldname": "column_break_88",
+   "fieldtype": "Column Break"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "sec_note",
+   "fieldtype": "Section Break",
+   "label": "Notes"
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Small Text",
+   "label": "Notes"
+  },
+  {
+   "fieldname": "column_break_jpmj",
+   "fieldtype": "Column Break"
   }
  ],
- "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-08-01 17:21:34.966857",
+ "modified": "2024-08-02 10:55:37.903410",
  "modified_by": "Administrator",
  "module": "Accounts",
  "name": "Sales Invoice",
+ "naming_rule": "By \"Naming Series\" field",
  "owner": "Administrator",
  "permissions": [
   {
+   "amend": 1,
+   "cancel": 1,
    "create": 1,
    "delete": 1,
    "email": 1,
@@ -56,5 +725,6 @@
  ],
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "track_changes": 1
 }

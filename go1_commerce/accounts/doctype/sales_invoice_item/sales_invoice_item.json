@@ -1,0 +1,268 @@
+{
+ "actions": [],
+ "creation": "2020-07-14 10:24:00.306565",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "order_item_type",
+  "item",
+  "item_name",
+  "item_sku",
+  "ordered_weight",
+  "weight",
+  "attribute_description",
+  "checkout_attributes",
+  "attribute_ids",
+  "quantity",
+  "price",
+  "special_instruction",
+  "is_free_item",
+  "item_image",
+  "column_break_2",
+  "amount",
+  "discount",
+  "discount_name",
+  "d_amount",
+  "pre_total",
+  "tax",
+  "shipping_charges",
+  "t_amount",
+  "shipping_status",
+  "shipped_date",
+  "delivery_status",
+  "delivery_date",
+  "return_created"
+ ],
+ "fields": [
+  {
+   "allow_on_submit": 1,
+   "default": "Product",
+   "fieldname": "order_item_type",
+   "fieldtype": "Link",
+   "label": "Order Item Type",
+   "options": "DocType",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "columns": 2,
+   "fieldname": "item",
+   "fieldtype": "Dynamic Link",
+   "in_list_view": 1,
+   "label": "Item",
+   "options": "order_item_type",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "columns": 2,
+   "fieldname": "item_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Item Name",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "depends_on": "eval:doc.order_item_type==\"Product\"",
+   "fieldname": "item_sku",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Item Sku",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "depends_on": "eval:doc.order_item_type==\"Product\"",
+   "fieldname": "weight",
+   "fieldtype": "Data",
+   "label": "Weight",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "attribute_description",
+   "fieldtype": "Text Editor",
+   "label": "Attribute Description",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "checkout_attributes",
+   "fieldtype": "Text Editor",
+   "label": "Checkout Attributes",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "attribute_ids",
+   "fieldtype": "Small Text",
+   "hidden": 1,
+   "label": "Attribute Ids",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "columns": 1,
+   "fieldname": "quantity",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Quantity",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "columns": 2,
+   "fieldname": "price",
+   "fieldtype": "Currency",
+   "label": "Price",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "special_instruction",
+   "fieldtype": "Small Text",
+   "label": "Special Instruction",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "0",
+   "fieldname": "is_free_item",
+   "fieldtype": "Check",
+   "label": "Is Free Item",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "item_image",
+   "fieldtype": "Attach",
+   "label": "Item Image"
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "columns": 1,
+   "fieldname": "amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Amount",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "discount",
+   "fieldtype": "Link",
+   "label": "Discount",
+   "options": "Discounts",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "discount_name",
+   "fieldtype": "Data",
+   "label": "Discount Name",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "columns": 1,
+   "fieldname": "d_amount",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Discount Amount",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "pre_total",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Pre Total"
+  },
+  {
+   "allow_on_submit": 1,
+   "columns": 1,
+   "fieldname": "tax",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Tax Amount",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "shipping_charges",
+   "fieldtype": "Currency",
+   "label": "Shipping Charges",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "columns": 1,
+   "fieldname": "t_amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Total Amount",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "shipping_status",
+   "fieldtype": "Select",
+   "label": "Shipping Status",
+   "options": "Pending\nPacked\nShipped\nDelivered"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "shipped_date",
+   "fieldtype": "Data",
+   "label": "Shipped Date"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "delivery_status",
+   "fieldtype": "Data",
+   "label": "Delivery Status",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "delivery_date",
+   "fieldtype": "Date",
+   "label": "Delivery Date",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "0",
+   "fieldname": "return_created",
+   "fieldtype": "Check",
+   "label": "Return Created",
+   "read_only": 1
+  },
+  {
+   "fieldname": "ordered_weight",
+   "fieldtype": "Float",
+   "hidden": 1,
+   "label": "Ordered Weight",
+   "read_only": 1
+  }
+ ],
+ "istable": 1,
+ "links": [],
+ "modified": "2024-07-17 12:06:41.475971",
+ "modified_by": "Administrator",
+ "module": "Accounts",
+ "name": "Sales Invoice Item",
+ "owner": "Administrator",
+ "permissions": [],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}
