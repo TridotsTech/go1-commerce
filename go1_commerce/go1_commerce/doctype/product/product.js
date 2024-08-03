@@ -3330,6 +3330,9 @@ var generate_variant_html = Class.extend({
         input3.set_value(optionhtml)
         $('#select_options'+idx).on("focusin", function(event){
             $("#awesompletelist_"+idx).show()
+            if($(this).next().children().length === 0){
+                $(this).next().hide();
+            }
             var varient_options  = cur_frm.doc.attribute_options.filter( x =>  x.attribute == cur_frm.doc.product_attributes[index].product_attribute && x.attribute_id == cur_frm.doc.product_attributes[index].name);
             if (!varient_options){
                 varient_options = []
@@ -3952,6 +3955,9 @@ var append_variant_html = Class.extend({
         input3.set_value(optionhtml)
         $('#select_options'+idx).on("focusin", function(event){
             $("#awesompletelist_"+idx).show()
+             if($(this).next().children().length === 0){
+                $(this).next().hide();
+            }
             var varient_options  = cur_frm.doc.attribute_options.filter( x =>  x.attribute == cur_frm.doc.product_attributes[index].product_attribute && 
                                                                                 x.attribute_id == cur_frm.doc.product_attributes[index].name);
             if(!varient_options){
@@ -4265,11 +4271,18 @@ var append_variant_html = Class.extend({
         });
         input3.set_value(optionhtml)
         $('#select_options'+this.product_attribute).on("focusin", function(event){
+             if($(this).next().children().length === 0){
+                $(this).next().hide();
+            }else{
               $(this).next().show()
+            }
         })
          $('#select_options'+this.product_attribute).on("focusout", function(event){
-
-              $(this).next().hide()
+            if($(this).next().children().length === 0){
+                $(this).next().hide();
+            }else{
+              $(this).next().show()
+            }
         })
         $('#select_options'+this.product_attribute).on("keyup", function(event){
             var val = $(this).val();
