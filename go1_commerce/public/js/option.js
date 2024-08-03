@@ -191,14 +191,35 @@ if(cur_frm.catalog_settings.enable_product_video){
     
     
     $("#hdnSelectedDoc").val();
-
+     
     $("input[data-fieldname='option_value']").val($("#tr-" + optionId).find("td:eq(0)").text());
     $("input[data-fieldname='display_order_no']").val($("#tr-" + optionId).find("td:eq(1)").text());
-    $("input[data-fieldname='price_adjustment']").val($("#tr-" + optionId).find("td:eq(2)").text());
-    $("input[data-fieldname='weight_adjustment']").val($("#tr-" + optionId).find("td:eq(3)").text());
-    $("input[data-fieldname='parent_option']").val($("#tr-" + optionId).find("td:eq(4)").text());
+    
+     if(parseInt($("#tr-" + optionId).find("td:eq(5)").text())==1){
+       
+        $("input[data-fieldname='is_pre_selected']").prop("checked", true);
+        $("input[data-fieldname='is_pre_selected']").val(parseInt($("#tr-" + optionId).find("td:eq(5)").text()))
+        
+        $("input[data-fieldname='is_pre_selected']").attr("checked", true);
+     }else{
+         $("input[data-fieldname='is_pre_selected']").prop("checked", false);
+         $("input[data-fieldname='is_pre_selected']").val(parseInt($("#tr-" + optionId).find("td:eq(5)").text()))
+     
+     }
+     // $("input[data-fieldname='is_pre_selected']").val($("#tr-" + optionId).find("td:eq(2)").text());
+     if(parseInt($("#tr-" + optionId).find("td:eq(7)").text())==1){
+        $("input[data-fieldname='disable']").prop("checked", true);
+     }else{
+         $("input[data-fieldname='disable']").prop("checked", false);
+     }
+      // $("input[data-fieldname='disable']").val($("#tr-" + optionId).find("td:eq(3)").text());
+      
+    // $("input[data-fieldname='price_adjustment']").val($("#tr-" + optionId).find("td:eq(2)").text());
+    // $("input[data-fieldname='weight_adjustment']").val($("#tr-" + optionId).find("td:eq(3)").text());
+    // $("input[data-fieldname='parent_option']").val($("#tr-" + optionId).find("td:eq(4)").text());
 
-    /*$("input[data-fieldname='is_pre_selected']").val($("#tr-" + optionId).find("td:eq(4)").text());*/
+   
+    
     if($("#tr-" + optionId).find("td:eq(4)").text() == '-'){
         $("input[data-fieldname='attribute_color']").val('');
     }

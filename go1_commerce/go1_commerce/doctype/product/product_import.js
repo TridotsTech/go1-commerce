@@ -778,13 +778,22 @@ function saveattributeoption(product, attribute, option, display_order, price_ad
         if (varient_options) {
             $.each(varient_options, function (i, d) {
                 html += `
-                    <tr id="tr-${d.name} data-image="${d.image}">
-                        <td>${d.option_value}</td>
-                        <td>${d.display_order}</td>
-                        <td id = "pre_selected" data-preselection= "${d.is_pre_selected}">
-                            ${d.is_pre_selected}
-                        </td>
-                        <td id="disable">${d.disable}</td>
+                    <tr id="tr-${d.name}" data-image="${d.image}">
+                        
+                    <td>${d.option_value}</td>
+                                    <td>${d.display_order}</td> 
+                                    <td style="display:none">${d.price_adjustment}</td>
+                                    <td style="display:none">${d.weight_adjustment}</td>
+                                    <td style="text-align:center;display:none;">${d.attribute_color}</td>
+                                    <td id = "pre_selected" data-preselection="${d.is_pre_selected}">
+                                        ${d.is_pre_selected}
+                                    </td>
+                                    <td style="display:none" width="20%">
+                                        <div style="width: 165px;overflow: hidden;text-overflow: ellipsis;
+                                                white-space: nowrap;">${d.product_title}
+                                        </div>
+                                    </td>
+                                    <td id="disable">${d.disable}</td>
                         <td style="width:20%">
                             <button class="btn btn-xs btn-success editbtn"  data-fieldtype="Button" 
                                 onclick=EditAttributeOptions("${d.name}")>Edit
@@ -903,9 +912,13 @@ function saveattributeoption(product, attribute, option, display_order, price_ad
         var variant_option  = cur_frm.doc.attribute_options.filter( x =>  x.attribute == cur_frm.doc.product_attributes[objectIndex].product_attribute && x.attribute_id == cur_frm.doc.product_attributes[objectIndex].name);
         if (variant_option) {
             $.each(variant_option, function (i, d) {
-                html += '<tr id="tr-' + d.name + '" data-image="' + d.image + '"><td>' + d.option_value + '</td> ';
+               html += '<tr id="tr-' + d.name + '" data-image="' + d.image + '"><td>' + d.option_value + '</td> ';
                 html += ' <td>' + d.display_order + '</td> ';
+                html += ' <td>' + d.price_adjustment + '</td> ';
+                html += ' <td>' + d.weight_adjustment + '</td> ';
+                html += ' <td style="text-align:center;">' + d.attribute_color + '</td> ';
                 html += ' <td id = "pre_selected" data-preselection= "' + d.is_pre_selected + '">' + d.is_pre_selected + '</td> ';
+                html += ' <td width="20%"><div style="width: 165px;overflow: hidden;text-overflow: ellipsis;white-space: nowrap;">' + d.product_title + '</div></td> ';
                 html += ' <td id="disable">' + d.disable + '</td> ';
                 html += ' <td style="width:20%"><button class="btn btn-xs btn-success editbtn"  data-fieldtype="Button" onclick=EditAttributeOptions("' + d.name + '")>Edit</button><a class="btn btn-xs btn-danger" style="margin-left:10px;" onclick=DeleteAttributeOption("' + d.name + '")>Delete</a></td></tr>';
             });
