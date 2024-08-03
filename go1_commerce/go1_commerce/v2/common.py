@@ -1302,7 +1302,6 @@ def customer_registration_login(phone):
 		cus_reg.email = email
 		cus_reg.new_password  = pwd
 		cus_reg.customer_status = status
-		cus_reg.allow_multiple_address = 1 if order_settings.allow_multiple_address else 0
 		cus_reg.save(ignore_permissions=True)
 		frappe.db.commit()
 		token = get_auth_token(email)

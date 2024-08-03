@@ -13,20 +13,14 @@
   "show_gift_card_box",
   "enable_wallet",
   "allow_customer_to_add_wallet",
-  "enable_scoket",
-  "send_notification_admin",
   "column_break_2",
   "allow_cancel_order",
   "allow_customer_print_order",
   "auto_customer_approval",
-  "allow_multiple_address",
-  "customer_business_kyc",
   "customer_print_format",
   "cancel_order_days",
-  "enable_tracking_order",
   "column_break_6",
   "default_print_format",
-  "default_vendor_order_print_format",
   "invoice_section",
   "enable_invoice",
   "column_break_14",
@@ -43,12 +37,6 @@
   "disable_order_completed_page",
   "generate_barcode_for_order",
   "generate_qrcode_for_order",
-  "notification",
-  "enable_driver_notification",
-  "clbr",
-  "enable_notification_for_admin_website",
-  "onesignal_notification_section",
-  "enable_onesignal_notification",
   "return_request",
   "enable_returns_system",
   "all_eligible_products_return",
@@ -61,9 +49,7 @@
   "free_shipping_enabled",
   "amount_to_be_ordered",
   "column_break_28",
-  "shipment_by",
   "column_break_33",
-  "enable_driver_for_shipment",
   "section_break_17",
   "enable_map",
   "enable_zipcode",
@@ -77,19 +63,6 @@
   "max_delivery_distance",
   "distance_unit",
   "restrict_region_by",
-  "reward_points",
-  "enabled",
-  "exchange_reward_point",
-  "disable_points_inweb",
-  "column_break_60",
-  "loyalty_labeling",
-  "enable_referral",
-  "enable_eq_amount",
-  "disable_points",
-  "earning_reward_points",
-  "points_for_registration",
-  "points_for_product_review",
-  "point_for_purchases",
   "account_settings",
   "enable_gender",
   "is_gender_required",
@@ -118,29 +91,6 @@
   "column_break_83",
   "min_pincode_length",
   "max_pincode_length",
-  "sec_login",
-  "login_type",
-  "column_break_111",
-  "email_req",
-  "phone_req",
-  "phonem_emailo",
-  "emailm_phoneo",
-  "emailm_phonem",
-  "column_break_109",
-  "otp_required",
-  "login_with_password",
-  "max_retry",
-  "firebase_settings_section",
-  "apikey",
-  "authdomain",
-  "appid",
-  "column_break_120",
-  "databaseurl",
-  "projectid",
-  "storagebucket",
-  "column_break_124",
-  "messagingsenderid",
-  "measurementid",
   "validations",
   "enable_phone_validation",
   "min_phone_length",
@@ -154,23 +104,10 @@
   "customer_edit_order",
   "allow_admin_to_edit_order",
   "allow_admin_to_create_order",
-  "price_calculated_based_on_weight",
   "admin_order_edit_status",
   "admin_order_template",
   "show_flow_chart",
   "enable_refund_option",
-  "pre_order_setting_section",
-  "enable_preorder",
-  "column_break_125",
-  "pre_order_not_allow_cart",
-  "franchise_customer_settings_section",
-  "franchise_role",
-  "defaults_section",
-  "sales",
-  "selling_price_list",
-  "column_break_x0kt9",
-  "role_based_pricing",
-  "enable_price_list",
   "otp_tab",
   "otp_length",
   "column_break_aaz0",
@@ -214,18 +151,6 @@
    "label": "Allow Customer To Add Wallet"
   },
   {
-   "default": "0",
-   "fieldname": "enable_scoket",
-   "fieldtype": "Check",
-   "label": "Enable Socket For Order Updates"
-  },
-  {
-   "default": "0",
-   "fieldname": "send_notification_admin",
-   "fieldtype": "Check",
-   "label": "Send App Notification To Admin For Order"
-  },
-  {
    "fieldname": "column_break_2",
    "fieldtype": "Column Break"
   },
@@ -248,18 +173,6 @@
    "label": "Auto Customer Approved"
   },
   {
-   "default": "0",
-   "fieldname": "allow_multiple_address",
-   "fieldtype": "Check",
-   "label": "Allow Multiple Address"
-  },
-  {
-   "default": "0",
-   "fieldname": "customer_business_kyc",
-   "fieldtype": "Check",
-   "label": "Allow Get Business and KYC From Customer?"
-  },
-  {
    "depends_on": "eval:doc.allow_customer_print_order == 1",
    "fieldname": "customer_print_format",
    "fieldtype": "Link",
@@ -273,12 +186,6 @@
    "label": "No. of Days That Customer Can Cancel Order"
   },
   {
-   "default": "1",
-   "fieldname": "enable_tracking_order",
-   "fieldtype": "Check",
-   "label": "Enable Tracking Order"
-  },
-  {
    "fieldname": "column_break_6",
    "fieldtype": "Column Break"
   },
@@ -286,12 +193,6 @@
    "fieldname": "default_print_format",
    "fieldtype": "Link",
    "label": "Default Order Print Format",
-   "options": "Print Format"
-  },
-  {
-   "fieldname": "default_vendor_order_print_format",
-   "fieldtype": "Link",
-   "label": "Default Vendor Order Print Format",
    "options": "Print Format"
   },
   {
@@ -382,39 +283,6 @@
    "label": "Generate QRcode for Order"
   },
   {
-   "fieldname": "notification",
-   "fieldtype": "Section Break",
-   "label": "Notification"
-  },
-  {
-   "default": "0",
-   "description": "Trigger app notification for drivers when order placed.",
-   "fieldname": "enable_driver_notification",
-   "fieldtype": "Check",
-   "label": "Enable Notification For Driver"
-  },
-  {
-   "fieldname": "clbr",
-   "fieldtype": "Column Break"
-  },
-  {
-   "default": "0",
-   "fieldname": "enable_notification_for_admin_website",
-   "fieldtype": "Check",
-   "label": "Enable Notification For Admin Website"
-  },
-  {
-   "fieldname": "onesignal_notification_section",
-   "fieldtype": "Section Break",
-   "label": "OneSignal Notification"
-  },
-  {
-   "default": "0",
-   "fieldname": "enable_onesignal_notification",
-   "fieldtype": "Check",
-   "label": "Enable Onesignal Notification"
-  },
-  {
    "default": "1",
    "description": "Enabling return of the items sold",
    "fieldname": "return_request",
@@ -484,20 +352,8 @@
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "shipment_by",
-   "fieldtype": "Select",
-   "label": "Shipment By",
-   "options": "Service Provider\nVendor"
-  },
-  {
    "fieldname": "column_break_33",
    "fieldtype": "Column Break"
-  },
-  {
-   "default": "0",
-   "fieldname": "enable_driver_for_shipment",
-   "fieldtype": "Check",
-   "label": "Enable Driver Allocation For Delivery?"
   },
   {
    "fieldname": "section_break_17",
@@ -577,84 +433,6 @@
    "fieldtype": "Select",
    "label": "Restrict Region By",
    "options": "\nCountry\nState\nCity"
-  },
-  {
-   "description": "Enabling Reward points system for the customer based on their activity.",
-   "fieldname": "reward_points",
-   "fieldtype": "Section Break",
-   "label": "Reward Points"
-  },
-  {
-   "default": "0",
-   "fieldname": "enabled",
-   "fieldtype": "Check",
-   "label": "Enabled"
-  },
-  {
-   "depends_on": "eval:doc.enabled==1",
-   "fieldname": "exchange_reward_point",
-   "fieldtype": "Int",
-   "label": "Exchange Reward Point"
-  },
-  {
-   "default": "0",
-   "fieldname": "disable_points_inweb",
-   "fieldtype": "Check",
-   "label": "Disable Reward Points in Website"
-  },
-  {
-   "fieldname": "column_break_60",
-   "fieldtype": "Column Break"
-  },
-  {
-   "description": "Instead of \"Point\" we can give some other label. ex: \"Coin\"",
-   "fieldname": "loyalty_labeling",
-   "fieldtype": "Data",
-   "label": "Labeling"
-  },
-  {
-   "default": "0",
-   "fieldname": "enable_referral",
-   "fieldtype": "Check",
-   "label": "Enable Referral in website"
-  },
-  {
-   "default": "0",
-   "description": "Enable Equivalent Amount in website Dashboard",
-   "fieldname": "enable_eq_amount",
-   "fieldtype": "Check",
-   "label": "Enable Equivalent Amount"
-  },
-  {
-   "default": "0",
-   "fieldname": "disable_points",
-   "fieldtype": "Check",
-   "label": "Disable available Points in Website"
-  },
-  {
-   "depends_on": "eval:doc.enabled==1",
-   "description": "Reward points earning rules",
-   "fieldname": "earning_reward_points",
-   "fieldtype": "Section Break",
-   "label": "Earning Reward Points"
-  },
-  {
-   "depends_on": "eval:doc.enabled==1",
-   "fieldname": "points_for_registration",
-   "fieldtype": "Data",
-   "label": "Points for registration"
-  },
-  {
-   "depends_on": "eval:doc.enabled==1",
-   "fieldname": "points_for_product_review",
-   "fieldtype": "Data",
-   "label": "Points for Product Review"
-  },
-  {
-   "depends_on": "eval:doc.enabled==1",
-   "fieldname": "point_for_purchases",
-   "fieldtype": "Data",
-   "label": "Point for Purchases"
   },
   {
    "fieldname": "account_settings",
@@ -819,127 +597,6 @@
    "label": "Max Pincode Length"
   },
   {
-   "fieldname": "sec_login",
-   "fieldtype": "Section Break",
-   "label": "Login & Registration"
-  },
-  {
-   "fieldname": "login_type",
-   "fieldtype": "Select",
-   "label": "Login Type",
-   "options": "Email Only\nPhone Only\nPhone & Email(Optional)\nEmail & Phone(Optional)\nEmail & Phone & UserName"
-  },
-  {
-   "fieldname": "column_break_111",
-   "fieldtype": "Column Break"
-  },
-  {
-   "default": "0",
-   "fieldname": "email_req",
-   "fieldtype": "Check",
-   "label": "Email Only"
-  },
-  {
-   "default": "0",
-   "fieldname": "phone_req",
-   "fieldtype": "Check",
-   "label": "Phone Only"
-  },
-  {
-   "default": "0",
-   "fieldname": "phonem_emailo",
-   "fieldtype": "Check",
-   "label": "Phone & Email(Optional)"
-  },
-  {
-   "default": "0",
-   "fieldname": "emailm_phoneo",
-   "fieldtype": "Check",
-   "label": "Email & Phone(Optional)"
-  },
-  {
-   "default": "0",
-   "fieldname": "emailm_phonem",
-   "fieldtype": "Check",
-   "label": "Email & Phone & UserName"
-  },
-  {
-   "fieldname": "column_break_109",
-   "fieldtype": "Column Break"
-  },
-  {
-   "default": "0",
-   "fieldname": "otp_required",
-   "fieldtype": "Check",
-   "label": "OTP Verfication Required"
-  },
-  {
-   "default": "0",
-   "depends_on": "eval:((doc.otp_required==1))",
-   "fieldname": "login_with_password",
-   "fieldtype": "Check",
-   "label": "Enable Login using Password"
-  },
-  {
-   "depends_on": "eval:((doc.otp_required==1))",
-   "fieldname": "max_retry",
-   "fieldtype": "Int",
-   "label": "Max Retry(worng otp)"
-  },
-  {
-   "fieldname": "firebase_settings_section",
-   "fieldtype": "Section Break",
-   "label": "Firebase Settings"
-  },
-  {
-   "fieldname": "apikey",
-   "fieldtype": "Data",
-   "label": "Api Key"
-  },
-  {
-   "fieldname": "authdomain",
-   "fieldtype": "Data",
-   "label": "Auth Domain"
-  },
-  {
-   "fieldname": "appid",
-   "fieldtype": "Data",
-   "label": "AppId"
-  },
-  {
-   "fieldname": "column_break_120",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "databaseurl",
-   "fieldtype": "Data",
-   "label": "Database URL"
-  },
-  {
-   "fieldname": "projectid",
-   "fieldtype": "Data",
-   "label": "Project ID"
-  },
-  {
-   "fieldname": "storagebucket",
-   "fieldtype": "Data",
-   "label": "Storage Bucket"
-  },
-  {
-   "fieldname": "column_break_124",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "messagingsenderid",
-   "fieldtype": "Data",
-   "label": "Messaging Sender ID"
-  },
-  {
-   "fieldname": "measurementid",
-   "fieldtype": "Data",
-   "label": "Measurement ID"
-  },
-  {
    "description": "Phone number & password validations",
    "fieldname": "validations",
    "fieldtype": "Section Break",
@@ -1019,13 +676,6 @@
    "label": "Allow Admin To Create Order"
   },
   {
-   "default": "0",
-   "depends_on": "eval:doc.allow_admin_to_edit_order==1",
-   "fieldname": "price_calculated_based_on_weight",
-   "fieldtype": "Check",
-   "label": "Price Calculated Based on Weight?"
-  },
-  {
    "depends_on": "eval:doc.allow_admin_to_edit_order==1",
    "fieldname": "admin_order_edit_status",
    "fieldtype": "Table",
@@ -1053,71 +703,6 @@
    "label": "Enable Mark as Refund Option in Order"
   },
   {
-   "fieldname": "pre_order_setting_section",
-   "fieldtype": "Section Break",
-   "label": "Pre Order Setting"
-  },
-  {
-   "default": "0",
-   "fieldname": "enable_preorder",
-   "fieldtype": "Check",
-   "label": "Enable Preorder"
-  },
-  {
-   "fieldname": "column_break_125",
-   "fieldtype": "Column Break"
-  },
-  {
-   "default": "0",
-   "depends_on": "eval:doc.enable_preorder == 1",
-   "fieldname": "pre_order_not_allow_cart",
-   "fieldtype": "Check",
-   "label": " Pre Order Items To Be Seperate In Cart"
-  },
-  {
-   "fieldname": "franchise_customer_settings_section",
-   "fieldtype": "Section Break",
-   "label": "Franchise Customer Settings "
-  },
-  {
-   "fieldname": "franchise_role",
-   "fieldtype": "Link",
-   "label": "Franchise Role",
-   "options": "Role"
-  },
-  {
-   "fieldname": "defaults_section",
-   "fieldtype": "Section Break",
-   "label": "Defaults"
-  },
-  {
-   "fieldname": "sales",
-   "fieldtype": "Heading",
-   "label": "Sales"
-  },
-  {
-   "fieldname": "selling_price_list",
-   "fieldtype": "Link",
-   "label": "Selling Price List",
-   "options": "Price List"
-  },
-  {
-   "fieldname": "column_break_x0kt9",
-   "fieldtype": "Column Break"
-  },
-  {
-   "default": "0",
-   "fieldname": "role_based_pricing",
-   "fieldtype": "Check",
-   "label": "Enable Role Based Pricing(In Product)"
-  },
-  {
-   "default": "0",
-   "fieldname": "enable_price_list",
-   "fieldtype": "Check",
-   "label": "Enable Price List"
-  },
-  {
    "fieldname": "otp_tab",
    "fieldtype": "Tab Break",
    "label": "OTP"
@@ -1139,7 +724,7 @@
  ],
  "issingle": 1,
  "links": [],
- "modified": "2024-05-27 12:00:22.704500",
+ "modified": "2024-08-03 14:36:58.783627",
  "modified_by": "Administrator",
  "module": "Go1 Commerce",
  "name": "Order Settings",

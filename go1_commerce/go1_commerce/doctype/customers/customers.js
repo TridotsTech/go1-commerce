@@ -80,14 +80,7 @@ frappe.ui.form.on('Customers', {
                 if(d.message.allow_multiple_address==1){
                     frm.set_value("allow_multiple_address",1);
                 }
-                if(d.message.customer_business_kyc==0){
-                    $("#customers-business_details-tab").hide();
-                    $("#customers-kyc_tab_break-tab").hide();
-                }
-                if(d.message.customer_business_kyc==1){
-                    $("#customers-business_details-tab").show();
-                    $("#customers-kyc_tab_break-tab").show();
-                }
+              
                 if(d.message.auto_customer_approval==1){
                     frm.set_value("customer_status","Approved");
                 }

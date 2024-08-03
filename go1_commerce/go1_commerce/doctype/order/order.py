@@ -268,29 +268,7 @@ class Order(Document):
 	
 	def set_customer_address(self):
 		customer_info = frappe.get_doc("Customers",self.customer)
-		if frappe.get_single('Order Settings').allow_multiple_address == 0:
-			self.address = customer_info.address
-			self.city = customer_info.city
-			self.country = customer_info.country
-			self.first_name = customer_info.first_name
-			self.last_name = customer_info.last_name
-			self.shipping_city = customer_info.city
-			self.shipping_country = customer_info.country
-			self.shipping_first_name = customer_info.first_name
-			self.landmark = customer_info.landmark
-			self.shipping_landmark = customer_info.landmark
-			self.shipping_last_name = customer_info.last_name
-			self.shipping_phone = customer_info.phone
-			self.phone = customer_info.phone
-			self.shipping_shipping_address = customer_info.address
-			self.shipping_zipcode = customer_info.zipcode
-			self.zipcode = customer_info.zipcode
-			self.state = customer_info.state
-			self.shipping_state = customer_info.state
-			self.latitude = customer_info.latitude
-			self.longitude = customer_info.longitude
-		else:
-			self.set_default_address(customer_info)
+		self.set_default_address(customer_info)
 	
 	
 	def set_default_address(self,customer_info):
@@ -499,15 +477,6 @@ class Order(Document):
 					if not item.is_free_item:
 						total = 0
 						amount = 0
-						if order_settings.allow_admin_to_edit_order == 1 and order_settings.price_calculated_based_on_weight == 1:
-							actual_weight = item.weight
-							unitprice = flt(item.base_price)*flt(actual_weight)
-							item.price = unitprice
-							if item.weight == 1:
-								amount = flt(item.price) * int(item.quantity)
-							else:
-								amount = unitprice
-							item.amount = amount
 						if self.docstatus==1:
 							frappe.db.set_value(item.doctype,item.name,'amount',item.amount)
 						total += flt(item.amount) if item.amount else 0

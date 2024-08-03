@@ -131,17 +131,6 @@ class Order(Document):
 				if not item.is_free_item:
 					total = 0
 					amount = 0
-					if order_settings.allow_admin_to_edit_order == 1 and order_settings.price_calculated_based_on_weight == 1:
-						
-						actual_weight = item.weight
-						unitprice = flt(item.base_price)*flt(actual_weight)
-						item.price = unitprice
-						if item.weight == 1:
-							amount = flt(item.price) * int(item.quantity)
-						else:
-							amount = unitprice
-						item.amount = amount
-						
 					if self.docstatus==1:
 						frappe.db.set_value(item.doctype,item.name,'amount',item.amount)
 					total += flt(item.amount) if item.amount else 0

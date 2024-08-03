@@ -3566,7 +3566,7 @@ def get_invoices(token):
     return download_multi_pdf(
                                 order_id, doctype = "Orders", 
                                 name = docnames[0],
-                                format_ = order_settings.default_vendor_order_print_format,
+                                format_ = order_settings.default_print_format,
                                 no_letterhead = 1,
                                 letterhead = 'No Letterhead'
                             )
