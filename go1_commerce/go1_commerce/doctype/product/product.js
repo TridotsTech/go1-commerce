@@ -368,11 +368,9 @@ frappe.ui.form.on('Product', {
         let wrapper = $(frm.get_field('product_attribute_html').wrapper).empty();
         let hide_size_chart = '';
         if(frm.catalog_settings){
-            hide_size_chart = (frm.catalog_settings.enable_size_chart == 1) ? '' : 'hide';
+            hide_size_chart = 'hide';
         }
-        if(frm.catalog_settings && frm.catalog_settings.enable_vendor_based_pricing == 1 ){
-            hide_edit_option = 'hide';
-        }
+        
         let table_html = $(`<table class="table table-bordered" style="cursor:pointer; margin:0px;">
             <thead>
                 <tr>
@@ -1717,12 +1715,7 @@ frappe.ui.form.on('Product', {
                 "fieldname": "group_name", "reqd": 0
             });
         } 
-        else if(frm.catalog_settings.enable_size_chart) {
-            dialog_fields.push({
-                "fieldtype": "Link", "label": __("Size Chart"), "fieldname": "size_chart",
-                "reqd": 0, "options": "Size Chart"
-            });
-        }
+        
         let dialog2 = new frappe.ui.Dialog({
             title: __("Product Attribute"),
             fields: dialog_fields
@@ -2901,7 +2894,7 @@ var generate_variant_html = Class.extend({
         this.frm.fields_dict["product_attribute_html"].$wrapper.empty();
         let wrapper = this.frm.fields_dict["product_attribute_html"].$wrapper;
         let table;
-        if(this.frm.catalog_settings.enable_size_chart == 0){
+        
             table = $(`<table class="table table-bordered" id="attributeWithOptions">
                     <thead>
                         <tr>
@@ -2944,60 +2937,10 @@ var generate_variant_html = Class.extend({
                         div[data-fieldname="product_attribute_html"] .table-bordered >
                                 thead > tr > th{border-bottom-width: 0px;}
                 </style>`).appendTo(wrapper);
-        }
-        if(this.frm.catalog_settings.enable_size_chart == 1){
-            table = $(`<table class="table table-bordered" id="attributeWithOptions">
-                <thead>
-                    <tr>
-                        <th></th>
-                        <th style="display:none;">${__("Variant ID")}</th>
-                        <th style="">${__("Variant")}</th>
-                        <th >${__("Display Type")}</th>
-                        <th style="">${__("Options")}<p style="font-size: 10px;margin: 0px;
-                            font-weight: 400;">Choose options from list (OR) Type your custom  options  
-                            separated by Comma ( , )</p>
-                        </th>
-                        <th style="">${__("Size Chart")}</th>
-                        <th class="btnclm" style="width:5%"></th>
-                    </tr>
-                </thead>
-                <tbody id="productAttributeBody"></tbody>
-                <tfoot style="display:none;"> 
-                    <tr>
-                        <td colspan="6">
-                            <a onclick="save_attribute_and_options()" class="btn btn-xs btn-secondary btn-xs"
-                                 style="display:none;float:right;margin-left:10px;">Generate Combination</a>
-                            <a class="btn btn-default btn-primary btn-xs" id="add_new_attribute" 
-                                style="display:none;float:right;margin-left:10px;">Add Attribute</a>
-                        </td>
-                    </tr>
-                </tfoot>
-            </table>
-                <style>
-                    .option-group>.btn:hover{
-                        background-color: #ecf7fe !important;}
-                    .option-group>.btn:focus, .option-group>
-                        .btn:active:focus{
-                            outline:none;background-color: #ecf7fe !important;}
-                    .custom-sortable-width{
-                        width:100px;}
-                    div[data-fieldname="product_attribute_html"] td div 
-                        .frappe-control{
-                            margin-bottom: 0px !important;min-height: 32px !important;}
-                    div[data-fieldname="product_attribute_html"] 
-                        td div input{
-                            border-radius: 4px !important;}
-                    div[data-fieldname="product_attribute_html"] .table > tbody > tr > 
-                        td{
-                            padding: 5px;vertical-align: middle;}
-                    div[data-fieldname="product_attribute_html"] .table-bordered > 
-                        thead > tr > th{
-                            border-bottom-width: 0px;}
-                </style>`).appendTo(wrapper);
-        }
+        
         if(cur_frm.doc.product_attributes && cur_frm.doc.product_attributes.length>0){
             var bthide=""
-            if(this.frm.catalog_settings.enable_size_chart==0){
+           
                 cur_frm.doc.product_attributes.map(f => {
                    
                     let row = $(`<tr data-id="${f.idx}" data-name="${f.name}">
@@ -3024,38 +2967,6 @@ var generate_variant_html = Class.extend({
                 table.find('tbody').append(row);
                 me.update_row(wrapper, table, f.idx);
                 })
-            }
-            else{
-                cur_frm.doc.product_attributes.map(f => {
-                if(!f.size_chart){
-                    f.size_chart=""
-                }
-                let row = $(`<tr data-id="${f.idx}" data-name="${f.name}">
-                        <td style="text-align: center;">
-                            <img src="/assets/go1_commerce/images/section-icon.svg" 
-                                style="height:18px;cursor: all-scroll;position: relative;">
-                            ${f.idx}
-                        </td>
-                        <td style="display:none;">${__(f.product_attribute)}</td>
-                        <td style="">${__(f.attribute)}</td>
-                        <td >${__(f.control_type)}</td>
-                        <td id="optiontag" style="">${__(f.options)}</td>
-                        <td style="">${__(f.size_chart)}</td>
-                        <td class="${bthide}" style="width: 5%;">
-                            <button class="btn btn-primary btn-xs" style="margin-right: 8px;
-                                color: var(--text-on-green);background: var(--bg-green);">
-                                <span class="fa fa-pencil-square-o" style="display:none;"></span>
-                                Edit Options
-                            </button>
-                            <button class="btn btn-danger btn-xs">
-                                <span class="fa fa-trash"></span>
-                            </button>
-                        </td>
-                    </tr>`);
-                table.find('tbody').append(row);
-                me.update_row(wrapper, table, f.idx);
-                })
-            }
         }
         else{
             table.find('tbody').append(`<tr data-type="noitems">
@@ -3134,27 +3045,7 @@ var generate_variant_html = Class.extend({
                     <a class="btn btn-danger btn-xs"><span class="fa fa-trash"></span></a>
                 </td>
             `);
-        if(cur_frm.catalog_settings.enable_size_chart == 1){
-            new_row = $(`
-                <td style="width:5%;text-align: center;">
-                    <img src="/assets/go1_commerce/images/section-icon.svg" 
-                    style="height:18px;cursor: all-scroll;position: relative;">
-                ${idx}</td>
-                <td style="width:15%;display:none;">
-                    <div class="product_attribute"></div>
-                </td>
-                <td style="width:15%;"><div class="attribute"></div></td>
-                <td style="width:15%;"><div class="control_type_html"></div></td>
-                <td style="width:35%" id="optiontag"><div class="option_html"></div></td>
-                <td style="width:15%;" ><div class="size_chart"></div></td>
-               <td class="${btnhide}" style="width: 14%;">
-                    <a class="btn btn-success btn-xs" style="margin-right: 8px;
-                        background: var(--bg-green);color: var(--text-on-green);">
-                        <span class="fa fa-floppy-o" style="display:none;"></span>
-                    Edit Options</a>
-                    <a class="btn btn-danger btn-xs"><span class="fa fa-trash"></span></a></td>
-            `);
-        }
+       
         table.find('tbody').find('tr[data-id="'+idx+'"]').html(new_row);
         let index = cur_frm.doc.product_attributes.findIndex(x => x.idx == idx);
         var attr_html = '<div class="form-group option-group" style="margin-bottom: 0px;padding: 5px;"><span >'+cur_frm.doc.product_attributes[index]["attribute"]+'</span></div>'
@@ -3186,19 +3077,7 @@ var generate_variant_html = Class.extend({
             size_chart_html += cur_frm.doc.product_attributes[index]["size_chart_name"]
         }
         size_chart_html += '</span><div class="control-input-wrapper"></div>'
-      if(cur_frm.catalog_settings.enable_size_chart == 1){
-        let input11 = frappe.ui.form.make_control({
-            df: {
-                "fieldtype": "HTML",
-                "label": __("Size Chart"),
-                "fieldname": "size_chart"
-            },
-            parent: new_row.find('.size_chart'),
-            only_input: true,
-            default:size_chart_html
-        })
-        input11.set_value(size_chart_html)
-       }
+      
         var controlhtml = `
             <div class="form-group option-group" style="margin-bottom: 0px;">
                 <a class="btn btn-sm" style="background: transparent;border-radius: 5px;
@@ -3534,7 +3413,7 @@ var append_variant_html = Class.extend({
         this.frm.fields_dict["product_attribute_html"].$wrapper.empty();
         let wrapper = this.frm.fields_dict["product_attribute_html"].$wrapper;
         let table;
-        if(this.frm.catalog_settings.enable_size_chart==0){
+        
          table = $(`<table class="table table-bordered" id="attributeWithOptions">
                 <thead>
                     <tr>
@@ -3583,59 +3462,11 @@ var append_variant_html = Class.extend({
                 div[data-fieldname="product_attribute_html"] .table-bordered > thead > tr > th{
                     border-bottom-width: 0px;}
             </style>`).appendTo(wrapper);
-        }
-        if(this.frm.catalog_settings.enable_size_chart == 1){
-            table = $(`
-                <table class="table table-bordered" id="attributeWithOptions">
-                    <thead>
-                        <tr>
-                            <th></th>
-                            <th style="display:none;">${__("Variant ID")}</th>
-                            <th style="">${__("Variant")}</th>
-                            <th >${__("Display Type")}</th>
-                            <th style="">${__("Options")}
-                                <p style="font-size: 10px;margin: 0px;font-weight: 400;">
-                                    Choose options from list (OR) Type your custom  options  separated by Comma ( , )
-                                </p>
-                            </th>
-                            <th style="">${__("Size Chart")}</th>
-                            <th class="btnclm" style="width:5%"></th>
-                        </tr>
-                    </thead>
-                    <tbody id="productAttributeBody"></tbody>
-                    <tfoot style="display:none;">
-                        <tr>
-                            <td colspan="6">
-                                <a onclick="save_attribute_and_options()" class="btn btn-xs btn-secondary btn-xs" 
-                                    style="display:none;float:right;margin-left:10px;">Generate Combination
-                                </a>
-                                <a class="btn btn-default btn-primary btn-xs" id="add_new_attribute" style="display:none;
-                                    float:right;margin-left:10px;">Add Attribute
-                                </a>
-                            </td>
-                        </tr>
-                    </tfoot>
-                </table>
-                <style>
-                    .option-group>.btn:hover{
-                        background-color: #ecf7fe !important;}
-                    .option-group>.btn:focus, .option-group>.btn:active:focus{
-                        outline:none;background-color: #ecf7fe !important;}
-                    .custom-sortable-width{
-                        width:100px;}
-                    div[data-fieldname="product_attribute_html"] td div .frappe-control {
-                        margin-bottom: 0px !important;min-height: 32px !important;} 
-                    div[data-fieldname="product_attribute_html"] td div input{
-                        border-radius: 4px !important;} 
-                    div[data-fieldname="product_attribute_html"] .table > tbody > tr > td{
-                        padding: 5px;vertical-align: middle;}
-                    div[data-fieldname="product_attribute_html"] .table-bordered > thead > tr > th{
-                        border-bottom-width: 0px;}
-                </style>`).appendTo(wrapper);
-        }
+        
+     
         if(cur_frm.doc.product_attributes.length > 0){
             var bthide = ""
-            if(this.frm.catalog_settings.enable_size_chart == 0){
+           
                 cur_frm.doc.product_attributes.map(f => {
                     let row = $(`
                         <tr data-id="${f.idx}" data-name="${f.name}">
@@ -3659,36 +3490,7 @@ var append_variant_html = Class.extend({
                     table.find('tbody').append(row);
                     me.update_row(wrapper, table, f.idx);
                 })
-            }
-            else{
-                cur_frm.doc.product_attributes.map(f => {
-                    if(!f.size_chart){
-                        f.size_chart = ""
-                    }
-                    let row = $(`
-                        <tr data-id="${f.idx}" data-name="${f.name}">
-                            <td style="text-align: center;">
-                                <img src="/assets/go1_commerce/images/section-icon.svg" 
-                                    style="height:18px;cursor: all-scroll;position: relative;">
-                                ${f.idx}
-                            </td>
-                            <td style="display:none;">${__(f.product_attribute)}</td>
-                            <td style="">${__(f.attribute)}</td>
-                            <td >${__(f.control_type)}</td>
-                            <td id="optiontag" style="">${__(f.options)}</td> 
-                            <td style="">${__(f.size_chart)}</td>
-                            <td class="${bthide}" style="width: 5%;">
-                                <button class="btn btn-primary btn-xs" style="margin-right: 8px;background: var(--bg-green);
-                                    color: var(--text-on-green);">
-                                    <span class="fa fa-pencil-square-o" style="display:none;"></span>Edit Options
-                                </button>
-                                <button class="btn btn-danger btn-xs"><span class="fa fa-trash"></span></button>
-                            </td>
-                        </tr>`);
-                    table.find('tbody').append(row);
-                    me.update_row(wrapper, table, f.idx);
-                })
-            }
+            
         }
         else{
             table.find('tbody').append(`<tr data-type="noitems"><td colspan="9">Records Not Found!</td></tr>`);
@@ -3758,35 +3560,7 @@ var append_variant_html = Class.extend({
                     </a>
                 </td>
             `);
-        if(cur_frm.catalog_settings.enable_size_chart == 1){
-            new_row = $(`
-                <td style="width:5%;text-align: center;">
-                    <img src="/assets/go1_commerce/images/section-icon.svg" 
-                        style="height:18px;cursor: all-scroll;position: relative;">
-                                ${idx}
-                </td>
-                <td style="width:15%;display:none;">
-                    <div class="product_attribute"></div>
-                </td> 
-                <td style="width:15%;">
-                    <div class="attribute"></div>
-                </td> 
-                <td style="width:15%;">
-                    <div class="control_type_html"></div>
-                </td> 
-                <td style="width:35%" id="optiontag">
-                    <div class="option_html"></div>
-                </td>
-                <td style="width:15%;"><div class="size_chart"></div></td>                   
-                <td class="${btnhide}" style="width: 14%;">
-                    <a class="btn btn-success btn-xs" style="margin-right: 8px;background: var(--bg-green);
-                            color: var(--text-on-green);">
-                        <span class="fa fa-floppy-o" style="display:none;"></span>Edit Options
-                    </a>
-                    <a class="btn btn-danger btn-xs"><span class="fa fa-trash"></span></a>
-                </td>
-            `);
-        }
+       
         table.find('tbody').find('tr[data-id="'+idx+'"]').html(new_row);
         let index = cur_frm.doc.product_attributes.findIndex(x => x.idx == idx);
         var attr_html = '<div class="form-group option-group" style="margin-bottom: 0px;padding: 5px;"><span >'+cur_frm.doc.product_attributes[index]["attribute"]+'</span></div>'
@@ -3816,19 +3590,8 @@ var append_variant_html = Class.extend({
             size_chart_html += cur_frm.doc.product_attributes[index]["size_chart_name"]
         }
         size_chart_html += '</span><div class="control-input-wrapper"></div>'
-      if(cur_frm.catalog_settings.enable_size_chart == 1){
-        let input11 = frappe.ui.form.make_control({
-            df: {
-                "fieldtype": "HTML",
-                "label": __("Size Chart"),
-                "fieldname": "size_chart"
-            },
-            parent: new_row.find('.size_chart'),
-            only_input: true,
-            default:size_chart_html
-        })
-        input11.set_value(size_chart_html)
-       }
+      
+
         var controlhtml = `
             <div class="form-group option-group" style="margin-bottom: 0px;">
                 <a class="btn btn-sm" style="background: transparent;border-radius: 5px;border: .1rem solid #1b8fdb;
@@ -4072,28 +3835,8 @@ var append_variant_html = Class.extend({
                     <a class="btn btn-danger btn-xs"><span class="fa fa-trash"></span></a>
                 </td>
             </tr>`);
-        if(cur_frm.catalog_settings.enable_size_chart == 1){
-            new_row = $(`
-                <tr data-id="${cur_frm.doc.product_attributes[index].idx}" data-attr="${cur_frm.doc.product_attributes[index].attribute}" 
-                    data-name="${cur_frm.doc.product_attributes[index].name}">
-                    <td style="width:5%;text-align: center;">
-                        <img src="/assets/go1_commerce/images/section-icon.svg" 
-                            style="height:18px;cursor: all-scroll;position: relative;">${idx}
-                    </td>
-                    <td style="width:15%;display:none;"><div class="product_attribute"></div></td> 
-                    <td style="width:15%;"><div class="attribute"></div></td> 
-                    <td style="width:15%;"><div class="control_type_html"></div></td> 
-                    <td style="width:35%" id="optiontag"><div class="option_html"></div></td>
-                    <td style="width:15%;" ><div class="size_chart"></div></td>                   
-                    <td class="${btnhide}" style="width: 14%;">
-                        <a class="btn btn-success btn-xs" style="margin-right: 8px;background: var(--bg-green);
-                                color: var(--text-on-green);">
-                            <span class="fa fa-floppy-o" style="display:none;"></span>Edit Options
-                        </a>
-                        <a class="btn btn-danger btn-xs"><span class="fa fa-trash"></span></a>
-                    </td>
-                </tr> `);
-        }
+        
+
         table.find('tbody').append(new_row);
         var attr_html = `
             <div class="form-group option-group" style="margin-bottom: 0px;padding: 5px;">
@@ -4132,19 +3875,7 @@ var append_variant_html = Class.extend({
         }
         size_chart_html += '</span><div class="control-input-wrapper">'
         size_chart_html +='</div>'
-      if(cur_frm.catalog_settings.enable_size_chart == 1){
-        let input11 = frappe.ui.form.make_control({
-            df: {
-                "fieldtype": "HTML",
-                "label": __("Size Chart"),
-                "fieldname": "size_chart"
-            },
-            parent: new_row.find('.size_chart'),
-            only_input: true,
-            default:size_chart_html
-        })
-        input11.set_value(size_chart_html)
-       }
+     
         var controlhtml = `
             <div class="form-group option-group" style="margin-bottom: 0px;">
                 <a class="btn btn-sm" style="background: transparent;border-radius: 5px;
