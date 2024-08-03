@@ -340,7 +340,7 @@ function update_attroption(e){
           var comb_index = f.display_order
          
          var btn_cls = 'btn-info';
-         optionhtml += '<div class="btn-group tb-selected-value" id="multi_input_updatevalue" style="display: inline-block;margin-right: 5px;margin-bottom: 5px;" data-value="'+f.option_value+'" data-name="'+f.name+'" data-index="'+index+'">'
+         optionhtml += '<div class="btn-group tb-selected-value" id="multi_input_updatevalue" style="display: inline-block;margin-bottom: 5px;" data-value="'+f.option_value+'" data-name="'+f.name+'" data-index="'+index+'">'
         optionhtml += '<a class="btn '+btn_cls+' btn-xs btn-link-to-form" data-parentidx="'+parentindex+'" data-id="'+f.option_value+'" data-attribute="'+cur_frm.doc.product_attributes[index]["product_attribute"]+'" data-index="'+index+'" data-display_order="'+comb_index+'" data-option_name="'+f.name+'" data-is_pre_selected="'+cur_frm.doc.attribute_options[objIndex].is_pre_selected+'" data-product_title="'+f.product_title+'"  data-disable="'+f.disable+'" data-parent-control-type="'+cur_frm.doc.product_attributes[index]["control_type"]+'" ondblclick="update_attroption($(this))"><img src="/assets/go1_commerce/images/section-icon.svg" style="height:10px;cursor: all-scroll;position: relative;">'+f.option_value+'</a>'
         optionhtml += '<a class="btn '+btn_cls+' btn-xs btn-remove" data-id="'+f.option_value+'" onclick="remove_attroption($(this))"><i class="fa fa-remove text-muted"></i> </a></div>'     
        }
@@ -353,12 +353,12 @@ function update_attroption(e){
           var comb_index = f.display_order
           
         var btn_cls = 'btn-default';
-         optionhtml += '<div class="btn-group tb-selected-value" id="multi_input_updatevalue" style="display: inline-block;margin-right: 5px;margin-bottom: 5px;" data-value="'+f.option_value+'" data-name="'+f.name+'" data-index="'+index+'">'
+         optionhtml += '<div class="btn-group tb-selected-value" id="multi_input_updatevalue" style="display: inline-block;margin-bottom: 5px;" data-value="'+f.option_value+'" data-name="'+f.name+'" data-index="'+index+'">'
         optionhtml += '<a class="btn '+btn_cls+' btn-xs btn-link-to-form" data-parentidx="'+parentindex+'" data-id="'+f.option_value+'" data-attribute="'+cur_frm.doc.product_attributes[index]["product_attribute"]+'" data-index="'+index+'" data-display_order="'+comb_index+'" data-option_name="'+f.name+'" data-is_pre_selected="'+cur_frm.doc.attribute_options[objIndex].is_pre_selected+'" data-product_title="'+f.product_title+'"  data-disable="'+f.disable+'" data-parent-control-type="'+cur_frm.doc.product_attributes[index]["control_type"]+'" ondblclick="update_attroption($(this))"><img src="/assets/go1_commerce/images/section-icon.svg" style="height:10px;cursor: all-scroll;position: relative;">'+f.option_value+'</a>'
         optionhtml += '<a class="btn '+btn_cls+' btn-xs btn-remove" data-id="'+f.option_value+'" onclick="remove_attroption($(this))"><i class="fa fa-remove text-muted"></i> </a></div>'     
       }
       })
-    optionhtml  += '<div class="link-field ui-front" style="position: relative; line-height: 1;"><div class="awesomplete"><input placeholder="Separate options with a comma" style="padding: 6px 10px 8px;font-size: 11px;width: 178px;font-weight: 400;" type="text" id="select_options'+parentindex+'" keydown="add_option_totable($(this))" class="input-with-feedback bold" data-fieldtype="Table MultiSelect" data-fieldname="display_options" placeholder="" data-doctype="Product" data-target="Product" autocomplete="off" aria-owns="awesomplete_list_45" role="combobox" aria-activedescendant="awesomplete_list_45_item_0"></div> </div>'
+    optionhtml  += '<div class="link-field ui-front" style="position: relative; line-height: 1;"><div class="awesomplete"><input placeholder="Separate options with a comma" style="padding: 6px 10px 8px;font-size: 12px;width: 178px;font-weight: 400;" type="text" id="select_options'+parentindex+'" keydown="add_option_totable($(this))" class="input-with-feedback bold" data-fieldtype="Table MultiSelect" data-fieldname="display_options" placeholder="" data-doctype="Product" data-target="Product" autocomplete="off" aria-owns="awesomplete_list_45" role="combobox" aria-activedescendant="awesomplete_list_45_item_0"></div> </div>'
     optionhtml += '</div></div>'
 
     $(e).parent().parent().parent().parent().html(optionhtml);

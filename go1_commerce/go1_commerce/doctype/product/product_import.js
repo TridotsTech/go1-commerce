@@ -815,7 +815,7 @@ function saveattributeoption(product, attribute, option, display_order, price_ad
             var idx = 1
             optionhtml += `
                 <div class="btn-group tb-selected-value" id="multi_input_updatevalue" style="display: inline-block;
-                        margin-right: 5px;margin-bottom: 5px;" data-value="${option}" data-name="${name}" data-index="${index}">
+                        margin-bottom: 5px;" data-value="${option}" data-name="${name}" data-index="${index}">
                     <a class="btn ${btn_cls} btn-xs btn-link-to-form" data-parentidx="${idx}" data-id="${option}"
                         data-attribute='${cur_frm.doc.product_attributes[index]["product_attribute"]}' data-index="${index}" 
                         data-display_order="${comb_index}" data-option_name="${name}" data-is_pre_selected="${pre_selected}" 

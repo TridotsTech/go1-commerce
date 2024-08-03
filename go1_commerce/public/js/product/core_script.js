@@ -307,7 +307,7 @@ function option_selection(e){
         child.attribute =cur_frm.doc.product_attributes[index]["product_attribute"];
         cur_frm.refresh_field("attribute_options");
 
-        var optionhtmls = '<div class="btn-group tb-selected-value" id="multi_input_updatevalue" style="display: inline-block;margin-right: 5px;margin-bottom: 5px;" data-value="'+val+'" data-name="" data-index="'+index+'">'
+        var optionhtmls = '<div class="btn-group tb-selected-value" id="multi_input_updatevalue" style="display: inline-block;margin-bottom: 5px;" data-value="'+val+'" data-name="" data-index="'+index+'">'
         optionhtmls += '<a class="btn '+btn_cls+' btn-xs btn-link-to-form" data-id="'+val+'" data-attribute="'+cur_frm.doc.product_attributes[index]["product_attribute"]+'" data-index="'+index+'" data-option_name="" data-display_order="'+cur_frm.doc.product_attributes[index]["display_order"]+'" data-is_pre_selected="'+cur_frm.doc.product_attributes[index]["is_pre_selected"]+'" data-product_title="'+cur_frm.doc.product_attributes[index]["product_title"]+'"  data-disable="'+cur_frm.doc.product_attributes[index]["disable"]+'" data-parent-control-type="'+cur_frm.doc.product_attributes[index]["control_type"]+'" data-attribute_color="'
         if($(e).attr("data-attribute_color")){
             optionhtmls += $(e).attr("data-attribute_color")

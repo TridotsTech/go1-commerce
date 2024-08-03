@@ -3263,12 +3263,12 @@ var generate_variant_html = Class.extend({
                     selected_color = "1px solid var(--text-on-green)";
                     option_style =` style='background: var(--bg-green);
                                             color: var(--text-on-green);
-                                            font-weight: 600;'`
+                                            '`
                 }
                 var comb_index = f.display_order
                 optionhtml += `
                     <div class="btn-group tb-selected-value" id="multi_input_updatevalue"
-                        style="display: inline-block;margin-right: 5px;margin-bottom: 5px;
+                        style="display: inline-block;margin-bottom: 5px;
                         border-radius: 6px;" data-value="${f.option_value}" data-name="${f.name}" 
                         data-index="${index}">
                         <a ${option_style} class="btn ${btn_cls} btn-xs btn-link-to-form" 
@@ -3298,7 +3298,7 @@ var generate_variant_html = Class.extend({
             <div class="link-field ui-front" style="position: relative; line-height: 1;">
                 <div class="awesomplete">
                     <input placeholder="Type options..." style="padding: 6px 10px 8px;
-                        font-size: 11px;font-weight: 400;width: 178px;" type="text" id="select_options${idx}"
+                        font-size: 12px;font-weight: 400;width: 178px;" type="text" id="select_options${idx}"
                         keydown="add_option_totable($(this))" class="input-with-feedback bold" 
                         data-fieldtype="Table MultiSelect" data-fieldname="display_options" 
                         placeholder="" data-doctype="Product" data-target="Product" autocomplete="off" 
@@ -3462,7 +3462,7 @@ var generate_variant_html = Class.extend({
                 child.attribute =cur_frm.doc.product_attributes[index]["product_attribute"];
                 cur_frm.refresh_field("attribute_options");
                 var optionhtmls = `<div class="btn-group tb-selected-value" id="multi_input_updatevalue" 
-                                        style="display: inline-block;margin-right: 5px;margin-bottom: 5px;" 
+                                        style="display: inline-block;margin-bottom: 5px;" 
                                         data-value="${val}" data-name="${child.name}" data-index="${index}">
                                         <a class="btn ${btn_cls} btn-xs btn-link-to-form" data-id="${val}" 
                                             data-attribute="${cur_frm.doc.product_attributes[index]["product_attribute"]}" 
@@ -3486,7 +3486,7 @@ var generate_variant_html = Class.extend({
                 child.attribute =cur_frm.doc.product_attributes[index]["product_attribute"];
                 cur_frm.refresh_field("attribute_options");
                 var optionhtmls = `<div class="btn-group tb-selected-value" id="multi_input_updatevalue" 
-                                        style="display: inline-block;margin-right: 5px;margin-bottom: 5px;" 
+                                        style="display: inline-block;margin-bottom: 5px;" 
                                         data-value="${val}" data-name="${child.name}" data-index="${index}">
                                         <a class="btn ${btn_cls} btn-xs btn-link-to-form" data-id="${val}" 
                                             data-attribute="${cur_frm.doc.product_attributes[index]["product_attribute"]}" 
@@ -3891,7 +3891,7 @@ var append_variant_html = Class.extend({
                 cur_frm.doc.attribute_options[optindex]["display_order"] = comb_index
                 optionhtml += `
                     <div class="btn-group tb-selected-value" id="multi_input_updatevalue" 
-                            style="display: inline-block;margin-right: 5px;margin-bottom: 5px;" 
+                            style="display: inline-block;margin-bottom: 5px;" 
                             data-value="${f.option_value}" data-name="${f.name}" data-index="${index}">
                         <a class="btn ${btn_cls} btn-xs btn-link-to-form" data-parentidx="${idx}"
                             data-id="${f.option_value}" data-attribute="${cur_frm.doc.product_attributes[index]["product_attribute"]}' 
@@ -3921,7 +3921,7 @@ var append_variant_html = Class.extend({
         optionhtml  += `
                         <div class="link-field ui-front" style="position: relative; line-height: 1;">
                             <div class="awesomplete">   
-                            <input placeholder="Type options..." style="padding: 6px 10px 8px;font-size: 11px;
+                            <input placeholder="Type options..." style="padding: 6px 10px 8px;font-size: 12px;
                                 font-weight: 400;width: 178px;" type="text" id="select_options${idx}" keydown="add_option_totable($(this))" 
                                 class="input-with-feedback bold" data-fieldtype="Table MultiSelect" data-fieldname="display_options" 
                                 placeholder="" data-doctype="Product" data-target="Product" autocomplete="off" aria-owns="awesomplete_list_45" 
@@ -4206,7 +4206,7 @@ var append_variant_html = Class.extend({
                 cur_frm.doc.attribute_options[objIndex].display_order = comb_index
                 optionhtml += `
                     <div class="btn-group tb-selected-value" id="multi_input_updatevalue" style="display: inline-block;
-                            margin-right: 5px;margin-bottom: 5px;" data-value="${f.option_value}" data-name="${f.name}" 
+                            margin-bottom: 5px;" data-value="${f.option_value}" data-name="${f.name}" 
                             data-index="${index}">
                         <a class="btn ${btn_cls} btn-xs btn-link-to-form" data-parentidx="${idx}" data-id="${f.option_value}" 
                             data-attribute="${cur_frm.doc.product_attributes[index].product_attribute}" data-index="${index}" 
@@ -4235,7 +4235,7 @@ var append_variant_html = Class.extend({
             <div class="link-field ui-front" style="position: relative; line-height: 1;">
                 <div class="awesomplete">
                     <input placeholder="Type options..." style="padding: 6px 10px 8px;
-                        font-size: 11px;font-weight: 400;width: 178px;" type="text" id="select_options${this.product_attribute}
+                        font-size: 12px;font-weight: 400;width: 178px;" type="text" id="select_options${this.product_attribute}
                         keydown="add_option_totable($(this))" class="input-with-feedback bold" data-fieldtype="Table MultiSelect" 
                         data-fieldname="display_options" placeholder="" data-doctype="Product" data-target="Product" 
                         autocomplete="off" aria-owns="awesomplete_list_45" role="combobox" aria-activedescendant="awesomplete_list_45_item_0">
@@ -4383,7 +4383,7 @@ var append_variant_html = Class.extend({
             cur_frm.refresh_field("attribute_options");
             var optionhtmls = `
                 <div class="btn-group tb-selected-value" id="multi_input_updatevalue" style="display: inline-block;
-                    margin-right: 5px;margin-bottom: 5px;" data-value="${val}" data-name="" data-index="${index}">
+                    margin-bottom: 5px;" data-value="${val}" data-name="" data-index="${index}">
                     <a class="btn ${btn_cls} btn-xs btn-link-to-form" data-id="${val}" 
                         data-attribute="${cur_frm.doc.product_attributes[index]["product_attribute"]}" data-index="${index}" 
                         data-option_name="" data-display_order="${cur_frm.doc.product_attributes[index]["display_order"]}"
