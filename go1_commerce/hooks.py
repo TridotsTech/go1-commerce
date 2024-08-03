@@ -12,20 +12,14 @@ website_context = {
 	"favicon": "/assets/go1_commerce/images/go1favicon.svg",
 	"splash_image": "/assets/go1_commerce/images/go1_commerce_logo.svg",
 }
-leaderboard = "go1_commerce.go1_commerce.leaders.get_leaderboards"
 
 boot_session = "go1_commerce.go1_commerce.v2.common.boot_session"
 
-custo="go1_commerce.go1_commerce.cust.get_leaderboards"
-
-leaderboardorder="go1_commerce.go1_commerce.leaderboardtest.get_leaderboardorder"
-
-custo = "go1_commerce.go1_commerce.cust.get_leaderboards"
-leaderboardorder = "go1_commerce.go1_commerce.leaderboardtest.get_leaderboardorder"
 # website permission
 has_website_permission = {
 	'Customers':'go1_commerce.go1_commerce.v2.common.customer_web_permission'
 }
+
 after_install = "go1_commerce.go1_commerce.after_install.after_install"
 # on login
 on_session_creation = "go1_commerce.go1_commerce.v2.common.login_customer"
@@ -44,8 +38,7 @@ app_include_js = [
 	"assets/go1_commerce/js/quick_entry/return_quick_entry.js",
 ]
 doctype_js = {
-    "Web Form" : "public/js/ui/editor/web_form.js",
-     "Web Page Builder" : "public/js/web_page_builder.js"
+    "Web Form" : "public/js/ui/editor/web_form.js"
     }
 
 page_js = {
@@ -55,26 +48,16 @@ page_js = {
 		"public/plugins/datatable/frappe-datatable.min.js",
 		"public/js/uppy.min.js",
 		"public/js/lightgallery.js"
-	],
-	"seo-tool": [
-		"public/plugins/datatable/sortable.min.js",
-		"public/plugins/datatable/clusterize.min.js",
-		"public/plugins/datatable/frappe-datatable.min.js"
 	]
 }
 
-has_permission = {
-	# "Product Tax Template": "go1_commerce.go1_commerce.doctype.product_tax_template.product_tax_template.has_permission",
-	# "Return Policy": "go1_commerce.go1_commerce.doctype.return_policy.return_policy.has_permission",
-	# "Discounts": "go1_commerce.go1_commerce.doctype.discounts.discounts.has_permission"
-}
+
 has_website_permission = {
 	"Customers": "go1_commerce.go1_commerce.doctype.customers.customers.has_website_permission"
 }
 
 override_doctype_class = {
-	'File': 'go1_commerce.go1_commerce.override.CustomFile',
-	'PageSection': 'go1_commerce.go1_commerce.override.PageSection'
+	'File': 'go1_commerce.go1_commerce.override.CustomFile'
 }
 
 
