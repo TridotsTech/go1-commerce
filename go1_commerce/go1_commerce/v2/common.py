@@ -115,11 +115,6 @@ def get_all_website_settings_data():
 												  from `tabArea` order by area''',as_dict=1)
 					
 		enable_left_panel = 1
-		if catalog_settings.disable_category_filter and \
-		   catalog_settings.disable_price_filter and \
-		   catalog_settings.disable_brand_filter and \
-		   catalog_settings.disable_ratings_filter:
-			enable_left_panel = 0
 		default_header = default_footer = website_logo = login_image = None
 		if app_settings:
 			if app_settings.default_header:
@@ -141,25 +136,25 @@ def get_all_website_settings_data():
 			"default_header":default_header,
 			"default_footer":default_footer,
 			# "enable_multi_vendor":enable_multi_vendor,
-			"no_of_records_per_page":catalog_settings.no_of_records_per_page,
-			"products_per_row":catalog_settings.products_per_row,
-			"show_short_description":catalog_settings.show_short_description,
-			"show_brand":catalog_settings.show_brand,
+			"no_of_records_per_page":10,
+			"products_per_row":5,
+			"show_short_description":'',
+			"show_brand":1,
 			# "enable_loyalty":enable_loyalty,
-			"disable_category_filter":catalog_settings.disable_category_filter,
-			'additional_menus':catalog_settings.additional_menu,
-			"disable_price_filter":catalog_settings.disable_price_filter,
-			"disable_brand_filter":catalog_settings.disable_brand_filter,
-			"disable_ratings_filter":catalog_settings.disable_ratings_filter,
+			"disable_category_filter":0,
+			'additional_menus':'',
+			"disable_price_filter":0,
+			"disable_brand_filter":0,
+			"disable_ratings_filter":0,
 			# "enable_left_panel":enable_left_panel,
 			"website_logo":website_logo,
 			"login_image":login_image,
-			"upload_review_images":catalog_settings.upload_review_images,
+			"upload_review_images":'',
 			"included_tax":catalog_settings.included_tax,
-			"enable_related_products":catalog_settings.enable_related_products,
-			"enable_best_sellers":catalog_settings.enable_best_sellers,
-			"customers_who_bought":catalog_settings.customers_who_bought,
-			"default_product_sort_order":catalog_settings.default_product_sort_order,
+			"enable_related_products":1,
+			"enable_best_sellers":1,
+			"customers_who_bought":1,
+			"default_product_sort_order":'',
 			# "enable_subscription":enable_subscription,
 			"enable_wallet":order_settings.enable_wallet,
 			"enable_guest_checkout":order_settings.enable_checkout_as_guest,
@@ -174,19 +169,19 @@ def get_all_website_settings_data():
 			"enable_reorder":order_settings.is_re_order_allowed,
 			"enable_returns_system":order_settings.enable_returns_system,
 			"collecting_the_bank_details":order_settings.collecting_the_bank_details,
-			"default_products_per_row":catalog_settings.products_per_row,
+			"default_products_per_row":5,
 			"enable_referral":order_settings.enable_referral,
 			"enable_terms_of_service":order_settings.terms_of_service,
 			"return_based_on":order_settings.return_based_on,
 			"return_request_period":order_settings.return_request_period,
-			"enable_question_and_answers":catalog_settings.enable_question_and_answers,
-			"enable_recently_viewed_products":catalog_settings.enable_recetly_viewed_products,
-			"enable_best_sellers":catalog_settings.enable_best_sellers,
+			"enable_question_and_answers":1,
+			"enable_recently_viewed_products":1,
+			"enable_best_sellers":1,
 			"default_country":frappe.db.get_value("System Settings","System Settings","country"),
 			"currency":catalog_settings.default_currency,
 			"currency_symbol":frappe.db.get_value("Currency",catalog_settings.default_currency,"symbol"),
-			"enable_customers_who_bought":catalog_settings.customers_who_bought,
-			"allow_guest_to_review":catalog_settings.allow_anonymous_users_to_write_product_reviews,
+			"enable_customers_who_bought":1,
+			"allow_guest_to_review":1,
 			"account_settings":{
 				"enable_gender":order_settings.enable_gender,
 				# "enable_lastname":order_settings.enable_lastname,
