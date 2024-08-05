@@ -320,13 +320,15 @@
    "depends_on": "eval:doc.enable_captcha==1",
    "fieldname": "public_key",
    "fieldtype": "Data",
-   "label": "Public Key"
+   "label": "Public Key",
+   "mandatory_depends_on": "eval:doc.enable_captcha==1"
   },
   {
    "depends_on": "eval:doc.enable_captcha==1",
    "fieldname": "private_key",
    "fieldtype": "Data",
-   "label": "Private Key"
+   "label": "Private Key",
+   "mandatory_depends_on": "eval:doc.enable_captcha==1"
   },
   {
    "fieldname": "default_meta_information",
@@ -470,7 +472,7 @@
  ],
  "issingle": 1,
  "links": [],
- "modified": "2024-08-05 13:47:03.158240",
+ "modified": "2024-08-05 14:01:07.279885",
  "modified_by": "Administrator",
  "module": "Go1 Commerce",
  "name": "Catalog Settings",

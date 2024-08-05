@@ -85,14 +85,7 @@ def get_all_website_settings_data():
 	app_settings = frappe.get_single('Mobile App Setting')
 	wallet_settings = frappe.get_single('Wallet Settings')
 	res_data = {}
-	enable_loyalty = 0
-	enable_subscription = 0
 	if catalog_settings and media_settings and cart_settings and order_settings and app_settings:
-		if frappe.db.sql(''' select * from `tabModule Def` where app_name='loyalty' ''', as_dict=True):
-			if order_settings.enabled:
-				enable_loyalty = 1
-		if frappe.db.sql(''' select * from `tabModule Def` where app_name='subscription' ''', as_dict=True):
-			enable_subscription = 1
 		locations = []
 		location_areas = []
 		default_location = None
@@ -135,18 +128,15 @@ def get_all_website_settings_data():
 		res_data={
 			"default_header":default_header,
 			"default_footer":default_footer,
-			# "enable_multi_vendor":enable_multi_vendor,
 			"no_of_records_per_page":10,
 			"products_per_row":5,
 			"show_short_description":'',
 			"show_brand":1,
-			# "enable_loyalty":enable_loyalty,
 			"disable_category_filter":0,
 			'additional_menus':'',
 			"disable_price_filter":0,
 			"disable_brand_filter":0,
 			"disable_ratings_filter":0,
-			# "enable_left_panel":enable_left_panel,
 			"website_logo":website_logo,
 			"login_image":login_image,
 			"upload_review_images":'',
@@ -155,13 +145,11 @@ def get_all_website_settings_data():
 			"enable_best_sellers":1,
 			"customers_who_bought":1,
 			"default_product_sort_order":'',
-			# "enable_subscription":enable_subscription,
 			"enable_wallet":order_settings.enable_wallet,
 			"enable_guest_checkout":order_settings.enable_checkout_as_guest,
 			"allow_customer_to_addwallet":order_settings.allow_customer_to_add_wallet,
 			"enable_map":order_settings.enable_map,
 			"allow_cancel_order":order_settings.allow_cancel_order,
-			"enable_driver_for_shipment":order_settings.enable_driver_for_shipment,
 			"enable_auto_debit_wallet":wallet_settings.customer_auto_debit,
 			"show_bestsellers_in_shopping_cart":cart_settings.show_bestsellers_in_shopping_cart,
 			"enable_shipping_address":cart_settings.enable_ship_addr,
@@ -170,8 +158,6 @@ def get_all_website_settings_data():
 			"enable_returns_system":order_settings.enable_returns_system,
 			"collecting_the_bank_details":order_settings.collecting_the_bank_details,
 			"default_products_per_row":5,
-			"enable_referral":order_settings.enable_referral,
-			"enable_terms_of_service":order_settings.terms_of_service,
 			"return_based_on":order_settings.return_based_on,
 			"return_request_period":order_settings.return_request_period,
 			"enable_question_and_answers":1,
@@ -184,8 +170,7 @@ def get_all_website_settings_data():
 			"allow_guest_to_review":1,
 			"account_settings":{
 				"enable_gender":order_settings.enable_gender,
-				# "enable_lastname":order_settings.enable_lastname,
-				# "is_gender_required":order_settings.is_gender_required,
+				"is_gender_required":order_settings.is_gender_required,
 				"is_lastname_required":order_settings.is_lastname_required,
 				"enable_dob":order_settings.enable_dob,
 				"dob_required":order_settings.dob_required,
@@ -198,10 +183,7 @@ def get_all_website_settings_data():
 				"is_landmark_required":order_settings.is_landmark_required,
 				"enable_door_no":order_settings.enable_door_no,
 				"is_door_no_required":order_settings.is_door_no_required,
-				# "enable_message_forum":order_settings.enable_message_forum,
-				# "enable_vendor_contact_form":order_settings.enable_vendor_contact_form,
 			},
-			# "catalog_settings":catalog_settings,
 			"picode_vaidation":{
 				"pincode_type":order_settings.pincode,
 				"min_pincode_length":order_settings.min_pincode_length,
@@ -216,79 +198,17 @@ def get_all_website_settings_data():
 				"max_phone_length":order_settings.max_phone_length,
 			},
 			"enable_zipcode":order_settings.enable_zipcode,
-			# "radius_based_validation":order_settings.radius_based_validation,
 			"location_areas":location_areas,
-			# "locations":locations,
 			"default_location":default_location,
-			# "enable_multi_store":enable_multi_store,
 			"app_settings":app_settings,
 			"social_tracking_codes":tracking_codes[0] if tracking_codes else None,
 			"default_meta_title":catalog_settings.meta_title,
 			"default_meta_description":catalog_settings.meta_description,
 			"default_meta_keywords":catalog_settings.meta_keywords,
-			# "market_place_fees":frappe.db.get_all("Market Place Fee",fields=["fee_name","fee_amount","fee_type","fee_percentage"]),
 			"all_categories":get_parent_categories()
 		}
-	#to store the response data 
 	return res_data
 
-# @frappe.whitelist(allow_guest=True)
-# def get_all_website_settings_data():
-# 	catalog_settings = frappe.get_single('Catalog Settings')
-# 	media_settings = frappe.get_single('Media Settings')
-# 	cart_settings = frappe.get_single('Shopping Cart Settings')
-# 	order_settings = frappe.get_single('Order Settings')
-# 	frappe.log_error("order_settings",order_settings)
-# 	app_settings = frappe.get_single('Mobile App Setting')
-# 	wallet_settings = frappe.get_single('Wallet Settings')
-# 	res_data = {}
-# 	if catalog_settings and media_settings and cart_settings and order_settings and app_settings:
-# 		location_areas = []
-# 		tracking_codes = frappe.db.get_all("Social Tracking Code",
-# 							fields=['google_site_verification','google_analytics_code','tag_manager_snippet',
-# 									'pixel_code','live_chat_snippet','whatsapp_snippet','facebook_messenger',
-# 									'facebook_page_id','header_script'])
-# 		if order_settings:
-# 			if order_settings.enable_zipcode:
-# 				location_areas = frappe.db.sql('''select name, area, zipcode,city 
-# 												  from `tabArea` order by area''',as_dict=1)
-# 		default_header = default_footer = website_logo = login_image = None
-# 		if app_settings:
-# 			data = check_app_setting_exist(app_settings)
-# 			login_image,website_logo,default_footer,default_header = data[0],data[1],data[2],data[3]
-# 		country = frappe.db.get_value("System Settings","System Settings","country")
-# 		symbol = frappe.db.get_value("Currency",catalog_settings.default_currency,"symbol")
-# 		from go1_commerce.go1_commerce.v2.category import get_parent_categories
-# 		parent_categories = get_parent_categories()
-# 		filtered_categories = []
-# 		filtered_category = iterate_parent_cat_in_web_settings(parent_categories)
-
-# 		filtered_categories.append(filtered_category)
-# 		tracking_codes = tracking_codes[0] if tracking_codes else None
-# 		json_data = {
-# 					"catalog_settings":catalog_settings,
-# 					"media_settings":media_settings,
-# 					"cart_settings":cart_settings,
-# 					"order_settings":order_settings,
-# 					"app_settings":app_settings,
-# 					"wallet_settings":wallet_settings,
-# 					"location_areas":location_areas,
-# 					"location_areas":location_areas,
-# 					"tracking_codes":tracking_codes,
-# 					"default_header":default_header,
-# 					"default_footer":default_footer,
-# 					"website_logo":website_logo,
-# 					"login_image":login_image,
-# 					"country":country,
-# 					"symbol":symbol,
-# 					"parent_categories":filtered_categories
-# 			   }
-# 		res_data = (frappe.render_template('/templates/website_settings_data.html', json_data))
-# 		result = minify_string(res_data)
-# 		frappe.log_error("TYPEEE",type(result))
-# 		return result
-# 	else:
-# 		return res_data
 
 def minify_string(html):
 	import re
