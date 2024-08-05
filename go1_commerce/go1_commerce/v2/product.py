@@ -9,7 +9,7 @@ import pytz
 from six import string_types
 from go1_commerce.utils.setup import get_settings_value,get_settings
 from go1_commerce.go1_commerce.v2.category \
-    import get_parent_categories,get_parent_categorie
+    import get_parent_categories,get_parent_categorie,get_child_categories
 from go1_commerce.utils.utils import get_customer_from_token, other_exception
 
 try:
@@ -71,14 +71,10 @@ class Product:
 		return result
  
 @frappe.whitelist(allow_guest=True)
-def get_parent_categories(domain=None,business=None):
+def get_parent_categories():
 	try:
-		if domain:
-			if not business:
-				business = get_business_from_web_domain(domain)
 		filters = {'parent_product_category': '', 'is_active': 1}
-		if business:
-			filters = {'parent_product_category': '', 'is_active': 1, 'business': business}
+		
 		item_group = frappe.db.get_all('Product Category',
 				fields=['category_image', 'name', 'category_name', 'mobile_image', 'show_attributes_inlist', 'products_per_row_for_mobile_app','full_description','default_view','type_of_category'], filters=filters,
 				order_by='mega_menu_column,display_order', limit_page_length=50)
@@ -209,10 +205,8 @@ def get_products_bought_together(item, business=None, isMobile=0):
 		items = get_product_details(items, isMobile=isMobile)
 	return items
 
-def get_category_based_best_sellers(category, item, business=None, isMobile=0):
+def get_category_based_best_sellers(category, item, isMobile=0):
 	cond = ''
-	if business:
-		cond = ' and p.restaurant = "{0}"'.format(business)
 	best_sellers = frappe.db.sql('''SELECT p.item, p.tax_category, p.price, p.old_price, p.restaurant,
 		p.short_description, p.full_description, p.sku, p.name, p.route, p.inventory_method,
 		p.minimum_order_qty, p.maximum_order_qty, p.stock, p.disable_add_to_cart_button,p.approved_total_reviews,  
@@ -638,7 +632,7 @@ def product_mapped_category(x):
 			x.item_categories = product_category[0]
 	if mapped_category and len(mapped_category) > 0:
 		for category in mapped_category:
-			child_categories = get_parent_categories(category.category)
+			child_categories = get_child_categories(category.category)
 			if child_categories and len(child_categories) > 0:
 				for cat in child_categories:
 					item_category = frappe.get_doc('Product Category', cat.name)

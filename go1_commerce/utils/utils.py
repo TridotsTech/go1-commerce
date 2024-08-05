@@ -188,16 +188,17 @@ def get_auth_token(user):
 		return {"status":"failed","error_message":"Api key not generated."}
 
 def get_customer_from_token():
-	authorization_header = frappe.get_request_header("Authorization", "").split(" ")
-	if authorization_header and len(authorization_header)>1:
-		token = authorization_header[1].split(":")
-		users = frappe.db.get_all("User",filters={"api_key":token[0]})
-		if users:
-			customer_email = frappe.db.get_all("Customers",filters={"email":users[0].name,"customer_status":"Approved"})
-			if customer_email:
-				customer_id = customer_email[0].name
-				frappe.log_error("customer_id",customer_id)
-				return customer_id
+	if frappe.get_request_header("Authorization", ""):
+		authorization_header = frappe.get_request_header("Authorization", "").split(" ")
+		if authorization_header and len(authorization_header)>1:
+			token = authorization_header[1].split(":")
+			users = frappe.db.get_all("User",filters={"api_key":token[0]})
+			if users:
+				customer_email = frappe.db.get_all("Customers",filters={"email":users[0].name,"customer_status":"Approved"})
+				if customer_email:
+					customer_id = customer_email[0].name
+					frappe.log_error("customer_id",customer_id)
+					return customer_id
 	return None
 
 def get_customer_reg_from_token():
