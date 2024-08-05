@@ -285,6 +285,8 @@ def get_list_product_details(products,customer = None):
 											THEN
 												end_date >= "{today}"
 											ELSE 1 = 1 END)""".format(today=today_date),as_dict=1)
+		currency = catalog_settings.default_currency
+		currency_symbol = frappe.db.get_value("Currency",catalog_settings.default_currency,"symbol")
 		for x in products:
 			x["actual_price"] = x.get("price")
 			x["actual_old_price"] = x.get("old_price")
@@ -329,6 +331,8 @@ def get_list_product_details(products,customer = None):
 			if float(x.get("old_price")) > 0 and float(x.get("price")) < float(x.get("old_price")):
 				x["discount_percentage"]= int(round((flt(str(x.get("old_price"))) - flt(str(x.get("price")))) / 
 										flt(str(x.get("old_price"))) * 100, 0))
+			x["formatted_price"] = frappe.utils.fmt_money(x["price"],currency=currency_symbol)
+			x["formatted_old_price"] = frappe.utils.fmt_money(x["old_price"],currency=currency_symbol)
 	return products
 
 def get_customer_recently_viewed_products(customer=None):
@@ -1285,18 +1289,6 @@ def get_product_details_(product, isMobile=0, customer=None, current_category=No
 			if x.product_tag:
 				tags = json.loads(x.product_tag)
 				x.product_tags = frappe.db.get_all('Product Tag', filters={'name': ('in', tags)}, fields=['title', 'icon'])
-			if x.restaurant:
-				business = frappe.get_doc('Business', x.restaurant)
-				x.business_route = business.route
-			installed_apps=frappe.db.sql(''' select * from `tabModule Def` where app_name='book_shop' ''',as_dict=True)
-			if len(installed_apps)>0:
-				x.book_type=x.book_type
-				x.published_year=x.published_year
-				x.number_of_pages=x.number_of_pages
-				x.author_name=x.author_name
-				x.author_route=x.author_route
-				x.publisher_name=x.publisher_name
-				x.publisher_route=x.publisher_route
 			custom_values = None
 			if catalog_settings.display_custom_fields == 1:
 				if frappe.db.get_all("Custom Field",filters={"dt":"Product"}):
