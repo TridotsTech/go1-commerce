@@ -650,7 +650,6 @@ def product_price_details(x, discount_list, media_settings, customer):
 	x.item_title = x.item
 	x.role_based_price = 0
 	price_details = None
-	x.vendor_price_list = []
 	if discount_list:
 		price_details = get_product_price(x, customer=customer)
 	product_price = x.price
@@ -662,7 +661,7 @@ def product_price_details(x, discount_list, media_settings, customer):
 		discount_info = frappe.db.get_all("Discounts",
 							filters={"name":price_details.get('discount_rule')},
 							fields=['percent_or_amount','discount_percentage','discount_amount','discount_type'])
-		discount_requirements = product_discount_requirements(x,price_details,customer,discount_info)
+		# discount_requirements = product_discount_requirements(x,price_details,customer,discount_info)
 	if x.price != product_price:
 		x.old_price = x.price
 		x.price = product_price
