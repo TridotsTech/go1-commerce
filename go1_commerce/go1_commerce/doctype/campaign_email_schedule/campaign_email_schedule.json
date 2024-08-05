@@ -1,0 +1,49 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-08-05 17:43:46.933437",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "email_template",
+  "send_after_days",
+  "no_of_times"
+ ],
+ "fields": [
+  {
+   "fieldname": "email_template",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Email Template",
+   "options": "Email Template",
+   "reqd": 1
+  },
+  {
+   "fieldname": "send_after_days",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Send After (days)",
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "description": "* The email will be trigger to the customer by depends on this value",
+   "fieldname": "no_of_times",
+   "fieldtype": "Int",
+   "label": "No Of Times (days)"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2024-08-05 17:43:46.933437",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Campaign Email Schedule",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

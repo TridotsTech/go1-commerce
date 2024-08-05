@@ -1,0 +1,74 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-08-05 17:28:17.407896",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "enable_campaign",
+  "campaign_settings",
+  "email_group",
+  "shopping_cart",
+  "column_break_4",
+  "default_sender"
+ ],
+ "fields": [
+  {
+   "default": "0",
+   "fieldname": "enable_campaign",
+   "fieldtype": "Check",
+   "label": "Enable Campaign"
+  },
+  {
+   "depends_on": "eval: {{doc.enable_campaign == 1}}",
+   "fieldname": "campaign_settings",
+   "fieldtype": "Section Break",
+   "label": "Campaign Settings"
+  },
+  {
+   "fieldname": "email_group",
+   "fieldtype": "Link",
+   "label": "Email Group",
+   "options": "Campaign"
+  },
+  {
+   "fieldname": "shopping_cart",
+   "fieldtype": "Link",
+   "label": "Shopping Cart",
+   "options": "Campaign"
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "default_sender",
+   "fieldtype": "Link",
+   "label": "Default Sender",
+   "options": "User"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2024-08-05 17:51:20.933288",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Email Campaign Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
