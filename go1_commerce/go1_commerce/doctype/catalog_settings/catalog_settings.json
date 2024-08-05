@@ -7,21 +7,15 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "business",
   "general",
   "website_logo",
   "login_image",
+  "wishlist_empty_image",
+  "column_break_3",
   "email_logo",
   "cart_empty_image",
-  "wishlist_empty_image",
   "default_sharing_logo",
-  "column_break_3",
-  "show_sku",
-  "generate_barcode_for_product",
-  "site_name",
   "column_break_5",
-  "compare_products_enabled",
-  "column_break_7",
   "default_currency",
   "default_currency_symbol",
   "tax_settings",
@@ -34,6 +28,26 @@
   "hide_zero_tax",
   "show_tax_information_in_product_list",
   "show_tax_information_in_product_detail_page",
+  "product_list_section",
+  "include_products_from_subcategories",
+  "list_empty_image",
+  "column_break_toa9",
+  "default_product_sort_order",
+  "no_of_records_per_page",
+  "product_detail_section",
+  "product_reviews_to_be_approved",
+  "product_thumbnail_image_position",
+  "enable_related_products",
+  "upload_review_images",
+  "column_break_u3p1",
+  "allow_anonymous_users_to_write_product_reviews",
+  "enable_question_and_answers",
+  "enable_cross_selling_products",
+  "column_break_rrt8",
+  "email_a_friend_enabled",
+  "enable_recently_viewed_products",
+  "enable_best_sellers",
+  "enable_customers_who_bought",
   "search_settings",
   "enable_full_text_search",
   "column_break_101",
@@ -65,13 +79,6 @@
   "meta_keywords"
  ],
  "fields": [
-  {
-   "fieldname": "business",
-   "fieldtype": "Link",
-   "hidden": 1,
-   "label": "Business",
-   "options": "Business"
-  },
   {
    "fieldname": "general",
    "fieldtype": "Section Break",
@@ -112,38 +119,7 @@
    "fieldtype": "Column Break"
   },
   {
-   "default": "0",
-   "description": "If enabled, SKU of the product will be displayed to the customer in product detail page",
-   "fieldname": "show_sku",
-   "fieldtype": "Check",
-   "label": "Show SKU"
-  },
-  {
-   "default": "0",
-   "description": "Enable to generate barcode for all products",
-   "fieldname": "generate_barcode_for_product",
-   "fieldtype": "Check",
-   "label": "Generate Barcode for Product"
-  },
-  {
-   "description": "The site name to be displayed in the website",
-   "fieldname": "site_name",
-   "fieldtype": "Data",
-   "label": "Site Name"
-  },
-  {
    "fieldname": "column_break_5",
-   "fieldtype": "Column Break"
-  },
-  {
-   "default": "0",
-   "description": "To allow customer to compare one or more products in website.",
-   "fieldname": "compare_products_enabled",
-   "fieldtype": "Check",
-   "label": "Compare Products Enabled"
-  },
-  {
-   "fieldname": "column_break_7",
    "fieldtype": "Column Break"
   },
   {
@@ -379,11 +355,122 @@
    "fieldname": "meta_keywords",
    "fieldtype": "Small Text",
    "label": "Meta Keywords"
+  },
+  {
+   "fieldname": "product_list_section",
+   "fieldtype": "Section Break",
+   "label": "Product List"
+  },
+  {
+   "default": "0",
+   "fieldname": "include_products_from_subcategories",
+   "fieldtype": "Check",
+   "label": " Include Products From Subcategories"
+  },
+  {
+   "fieldname": "list_empty_image",
+   "fieldtype": "Attach Image",
+   "label": "List Empty Image"
+  },
+  {
+   "fieldname": "column_break_toa9",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Relevance",
+   "fieldname": "default_product_sort_order",
+   "fieldtype": "Select",
+   "label": "Default Product Sort Order",
+   "options": "Relevance\nName: A to Z\nName: Z to A\nPrice: Low to High\nPrice: High to Low\nNewest Arrivals\nDate: Oldest first"
+  },
+  {
+   "fieldname": "no_of_records_per_page",
+   "fieldtype": "Int",
+   "label": "No of Records Per Page"
+  },
+  {
+   "fieldname": "product_detail_section",
+   "fieldtype": "Section Break",
+   "label": "Product Detail"
+  },
+  {
+   "default": "0",
+   "fieldname": "product_reviews_to_be_approved",
+   "fieldtype": "Check",
+   "label": "Product Reviews To Be Approved"
+  },
+  {
+   "fieldname": "column_break_u3p1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_anonymous_users_to_write_product_reviews",
+   "fieldtype": "Check",
+   "label": "Allow Anonymous Users To Write Product Reviews"
+  },
+  {
+   "fieldname": "column_break_rrt8",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "email_a_friend_enabled",
+   "fieldtype": "Check",
+   "label": " Email A Friend Enabled"
+  },
+  {
+   "fieldname": "product_thumbnail_image_position",
+   "fieldtype": "Select",
+   "label": "Product Thumbnail Image Position",
+   "options": "Vertical\nHorizontal"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_question_and_answers",
+   "fieldtype": "Check",
+   "label": " Enable Question And Answers"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_related_products",
+   "fieldtype": "Check",
+   "label": "Enable Related Products"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_cross_selling_products",
+   "fieldtype": "Check",
+   "label": "Enable Cross Selling Products"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_recently_viewed_products",
+   "fieldtype": "Check",
+   "label": " Enable Recently Viewed Products"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_best_sellers",
+   "fieldtype": "Check",
+   "label": "Enable Best Sellers"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_customers_who_bought",
+   "fieldtype": "Check",
+   "label": "Enable Customers Who Bought"
+  },
+  {
+   "default": "0",
+   "fieldname": "upload_review_images",
+   "fieldtype": "Check",
+   "label": " Upload Review Images"
   }
  ],
  "issingle": 1,
  "links": [],
- "modified": "2024-08-03 15:18:35.125696",
+ "modified": "2024-08-05 13:47:03.158240",
  "modified_by": "Administrator",
  "module": "Go1 Commerce",
  "name": "Catalog Settings",

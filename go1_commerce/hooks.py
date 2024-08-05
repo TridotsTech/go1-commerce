@@ -4,9 +4,9 @@ app_publisher = "Tridotstech PVT LTD"
 app_description = "Go1 Commerce is an Open Source eCommerce portal built on frappe framework."
 app_email = "info@tridotstech.com"
 app_license = "mit"
-# required_apps = []
+required_apps = ['builder']
 
-pp_logo_url = "/assets/go1_commerce/images/go1_commerce_logo.svg"
+app_logo_url = "/assets/go1_commerce/images/go1_commerce_logo.svg"
 
 website_context = {
 	"favicon": "/assets/go1_commerce/images/go1favicon.svg",
@@ -57,7 +57,9 @@ has_website_permission = {
 }
 
 override_doctype_class = {
-	'File': 'go1_commerce.go1_commerce.override.CustomFile'
+	'File': 'go1_commerce.go1_commerce.override.CustomFile',
+	'PageSection': 'go1_commerce.go1_commerce.override.PageSection',
+	'Builder Page':'go1_commerce.go1_commerce.doctype.override_doctype.builder_page.BuilderPage'
 }
 
 
@@ -114,6 +116,9 @@ doc_events = {
 	},
 	"Version":{
 		"after_insert":"go1_commerce.go1_commerce.v2.orders.update_stoke"
+	},
+	"Builder Page":{
+		"on_update":"go1_commerce.go1_commerce.v2.builder_page.update_global_script"
 	}
 }
 
@@ -178,6 +183,8 @@ fixtures = [
 				"Help Article-doctype_name",
 				"Help Article-domain_name",
 				"Email Group-business",
+				"Builder Settings-custom_server_script",
+
 			)]
 		]
 	}
