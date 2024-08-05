@@ -13,10 +13,6 @@ frappe.query_reports["Daily Sales Report"] = {
 		}
 	],
 	"onload": function(){
-		var business_filter = frappe.query_report.get_filter('business');
-		if(frappe.session.user != 'Administrator' && has_common(['Vendor'], frappe.user_roles)){
-			business_filter.df.hidden = 1;
-			business_filter.refresh();
-		}
+		
 	}
 };

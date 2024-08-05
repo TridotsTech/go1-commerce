@@ -23,11 +23,6 @@
 		},
 	],
 	"onload": function() {
-		var business_filter = frappe.query_report.get_filter('business');
-		if(frappe.session.user != 'Administrator' && has_common(['Vendor'], frappe.user_roles)){
-			business_filter.df.hidden = 1;
-			business_filter.refresh();
-		}
 		return frappe.call({
 			method: "go1_commerce.go1_commerce.report.total_orders.total_orders.get_years",
 			callback: function(r) {

@@ -42,7 +42,7 @@ def customer_report(filters):
 	if filters.get('order_from'):
 		condition+=' and order_from="%s"' % filters.get('order_from') 
 	customer_order = frappe.db.sql('''select name, order_date,status, payment_status, concat(first_name,' ' ,last_name), 
-		 customer_email,phone,total_amount,order_from, commission_amt, total_amount_for_vendor from 
+		 customer_email,phone,total_amount,order_from from 
 		`tabOrder` where naming_series !="SUB-ORD-" and docstatus=1 {condition} '''.format(condition=condition),as_list=1)
 	return customer_order
 
@@ -75,7 +75,7 @@ def get_chart_data_source(filters):
 		condition+=' and payment_status="%s"' % filters.get('payment_status') 
 	if filters.get('order_from'):
 		condition+=' and order_from="%s"' % filters.get('order_from') 
-	customer_order = frappe.db.sql('''select order_date,total_amount, total_amount_for_vendor from 
+	customer_order = frappe.db.sql('''select order_date,total_amount from 
 		`tabOrder` where naming_series !="SUB-ORD-" and docstatus=1 {condition} '''.format(condition=condition),as_list=1)
 	
 	return customer_order

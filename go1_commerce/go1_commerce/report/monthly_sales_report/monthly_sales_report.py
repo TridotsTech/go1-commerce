@@ -28,7 +28,7 @@ def get_data(filters):
 	if filters.get('to_date'):
 		conditions+=' and o.order_date<="%s"' % filters.get('to_date')
 	data = frappe.db.sql('''select o.order_date, count(o.name), sum(o.total_amount), o.payment_method_name from 
-	`tabOrder` o where o.docstatus = 1 and o.payment_status = 'Paid' {condition} group by o.order_date, o.business'''.format(condition=conditions), as_list=1)
+	`tabOrder` o where o.docstatus = 1 and o.payment_status = 'Paid' {condition} group by o.order_date'''.format(condition=conditions), as_list=1)
 	return data
 
 def days_cur_month(filters):
@@ -63,6 +63,6 @@ def get_chart_data(filters):
 
 def get_chart_data_source(filters):
 	conditions = ' and year(o.order_date) = "{0}" and monthname(o.order_date) = "{1}"'.format(filters.get('year'), filters.get('month'))
-	data = frappe.db.sql('''select o.order_date, sum(o.total_amount), sum(o.commission_amt) from 
+	data = frappe.db.sql('''select o.order_date, sum(o.total_amount) from 
 		`tabOrder` o where o.docstatus = 1 {condition} group by o.order_date'''.format(condition=conditions), as_list=1)
 	return data

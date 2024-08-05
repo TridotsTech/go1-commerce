@@ -28,12 +28,7 @@ def get_columns(filters):
 def get_data(filters):
 	conditions = ' and o.order_date = "{0}"'.format(filters.get('date'))
 	
-	if "Vendor" in frappe.get_roles(frappe.session.user) and frappe.session.user != "Administrator":
-		permission=frappe.db.sql('''select group_concat(concat('"',for_value,'"')) as business from `tabUser Permission` where user=%s and allow="Business"''',(frappe.session.user),as_dict=1)
-		if permission and permission[0].business:
-			conditions +=' and o.business in ({business})'.format(business=permission[0].business)
-		else:
-			frappe.throw(_('No {0} is mapped for your login.').format(_("Business")))
+	
 	query = 'select o.name, o.order_date,o.status,o.payment_status, o.payment_method_name,o.customer_name,o.customer_email,o.phone,'
 	query += 'o.total_amount from `tabOrder` o where o.docstatus = 1 {condition}'
 	data = frappe.db.sql(query.format(condition=conditions), as_list=1)
@@ -41,12 +36,6 @@ def get_data(filters):
 
 def get_orders(filters):
 	conditions = ' and o.order_date = "{0}"'.format(filters.get('date'))
-	
-	if "Vendor" in frappe.get_roles(frappe.session.user) and frappe.session.user != "Administrator":
-		permission=frappe.db.sql('''select group_concat(concat('"',for_value,'"')) as business from `tabUser Permission` where user=%s and allow="Business"''',(frappe.session.user),as_dict=1)
-		if permission and permission[0].business:
-			conditions +=' and o.business in ({business})'.format(business=permission[0].business)
-		
 	query = 'select o.name from `tabOrder` o where o.docstatus = 1 {condition}'
 	data = frappe.db.sql(query.format(condition=conditions), as_list=1)
 	return data
@@ -58,11 +47,7 @@ def get_chart_data(orders,data, filters):
 	for item in orders:
 		if item:
 			conditions = ' and o.order_date = "{0}"'.format(filters.get('date'))
-			if "Vendor" in frappe.get_roles(frappe.session.user) and frappe.session.user != "Administrator":
-				permission=frappe.db.sql('''select group_concat(concat('"',for_value,'"')) as business from `tabUser Permission` where user=%s and allow="Business"''',(frappe.session.user),as_dict=1)
-				if permission and permission[0].business:
-					conditions +=' and o.business in ({business})'.format(business=permission[0].business)
-				
+			
 			query = 'select o.total_amount from `tabOrder` o where o.docstatus = 1 and o.name=%s {condition}'
 			data = frappe.db.sql(query.format(condition=conditions), (item[0]), as_list=1)
 			datasets.append(data[0][0])
