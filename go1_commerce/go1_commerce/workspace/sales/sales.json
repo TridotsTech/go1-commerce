@@ -5,7 +5,7 @@
    "label": "Sales"
   }
  ],
- "content": "[{\"id\":\"Sk3SdKKsin\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Sales</span>\",\"col\":12}},{\"id\":\"cPzGH6cnz5\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Sales\",\"col\":12}},{\"id\":\"o3Mi9D7Hc4\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Orders\",\"col\":12}},{\"id\":\"rtvhaR6zir\",\"type\":\"card\",\"data\":{\"card_name\":\"Sales\",\"col\":4}}]",
+ "content": "[{\"id\":\"Sk3SdKKsin\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Sales</span>\",\"col\":12}},{\"id\":\"cPzGH6cnz5\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Sales\",\"col\":12}},{\"id\":\"rtvhaR6zir\",\"type\":\"card\",\"data\":{\"card_name\":\"Sales\",\"col\":4}},{\"id\":\"XsTIP-DkGg\",\"type\":\"card\",\"data\":{\"card_name\":\"Settings\",\"col\":4}}]",
  "creation": "2024-08-05 11:28:08.457018",
  "custom_blocks": [],
  "docstatus": 0,
@@ -76,9 +76,38 @@
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Settings",
+   "link_count": 2,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Catalog Settings",
+   "link_count": 0,
+   "link_to": "Catalog Settings",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Order Settings",
+   "link_count": 0,
+   "link_to": "Order Settings",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
   }
  ],
- "modified": "2024-08-05 12:53:13.231487",
+ "modified": "2024-08-05 13:07:08.971605",
  "modified_by": "Administrator",
  "module": "Go1 Commerce",
  "name": "Sales",
