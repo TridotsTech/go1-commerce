@@ -24,7 +24,7 @@
   },
   {
    "hidden": 0,
-   "is_query_report": 0,
+   "is_query_report": 1,
    "label": "Sales Report ",
    "link_count": 0,
    "link_to": "Customer Order",
@@ -34,7 +34,7 @@
   },
   {
    "hidden": 0,
-   "is_query_report": 0,
+   "is_query_report": 1,
    "label": "Daily Sales Repo",
    "link_count": 0,
    "link_to": "Daily Sales Report",
@@ -44,7 +44,7 @@
   },
   {
    "hidden": 0,
-   "is_query_report": 0,
+   "is_query_report": 1,
    "label": "Monthly Sales Report ",
    "link_count": 0,
    "link_to": "Monthly Sales Report",
@@ -54,7 +54,7 @@
   },
   {
    "hidden": 0,
-   "is_query_report": 0,
+   "is_query_report": 1,
    "label": "Yearly Sales Report",
    "link_count": 0,
    "link_to": "Yearly Sales Report",
@@ -64,7 +64,7 @@
   },
   {
    "hidden": 0,
-   "is_query_report": 0,
+   "is_query_report": 1,
    "label": "Item Wise Sales Report",
    "link_count": 0,
    "link_to": "Item Wise Sales Report",
@@ -74,7 +74,7 @@
   },
   {
    "hidden": 0,
-   "is_query_report": 0,
+   "is_query_report": 1,
    "label": "Best Selling Items By Amount",
    "link_count": 0,
    "link_to": "Best Selling Items By Amount",
@@ -83,7 +83,7 @@
    "type": "Link"
   }
  ],
- "modified": "2024-08-05 11:53:07.653315",
+ "modified": "2024-08-05 12:01:25.452537",
  "modified_by": "Administrator",
  "module": "Go1 Commerce",
  "name": "Reports",
