@@ -198,9 +198,9 @@ if(cur_frm.catalog_settings.enable_product_video){
      if(parseInt($("#tr-" + optionId).find("td:eq(5)").text())==1){
        
         $("input[data-fieldname='is_pre_selected']").prop("checked", true);
-        $("input[data-fieldname='is_pre_selected']").val(parseInt($("#tr-" + optionId).find("td:eq(5)").text()))
-        
         $("input[data-fieldname='is_pre_selected']").attr("checked", true);
+         $("input[data-fieldname='is_pre_selected']").val($("#tr-" + optionId).find("td:eq(5)").text());
+  
      }else{
          $("input[data-fieldname='is_pre_selected']").prop("checked", false);
          $("input[data-fieldname='is_pre_selected']").val(parseInt($("#tr-" + optionId).find("td:eq(5)").text()))

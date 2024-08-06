@@ -13,11 +13,11 @@
   "section_break_5",
   "language",
   "column_break_7",
+  "enabled_doctypes",
   "default_settings",
   "default_business",
   "column_break_11",
   "auto_product_approval",
-  "section_break_13",
   "tab_view_settings",
   "tab_background_color",
   "active_class_line",
@@ -25,7 +25,6 @@
   "column_break_19",
   "tab_text_color",
   "active_class_background",
-  "tab_view_enabled_doctypes",
   "custom_page_buttons",
   "enable_go_back",
   "enable_clear_button"
@@ -92,12 +91,6 @@
   },
   {
    "collapsible": 1,
-   "fieldname": "section_break_13",
-   "fieldtype": "Section Break",
-   "label": "Notification Settings"
-  },
-  {
-   "collapsible": 1,
    "fieldname": "tab_view_settings",
    "fieldtype": "Section Break",
    "label": "Tab View Settings"
@@ -138,12 +131,6 @@
   },
   {
    "collapsible": 1,
-   "fieldname": "tab_view_enabled_doctypes",
-   "fieldtype": "Section Break",
-   "label": "Tab View Enabled DocTypes"
-  },
-  {
-   "collapsible": 1,
    "fieldname": "custom_page_buttons",
    "fieldtype": "Section Break",
    "label": "Custom Page Buttons"
@@ -165,11 +152,17 @@
    "fieldname": "is_cms_site",
    "fieldtype": "Check",
    "label": "Is CMS Site?"
+  },
+  {
+   "fieldname": "enabled_doctypes",
+   "fieldtype": "Table",
+   "label": "Enabled Doctypes",
+   "options": "Enabled Doctypes"
   }
  ],
  "issingle": 1,
  "links": [],
- "modified": "2024-03-27 20:09:50.545481",
+ "modified": "2024-08-06 18:26:17.491698",
  "modified_by": "Administrator",
  "module": "Go1 Commerce",
  "name": "Core Settings",
