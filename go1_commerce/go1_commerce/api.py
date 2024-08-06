@@ -5,12 +5,11 @@ from frappe.utils import getdate, nowdate,add_days
 def create_data_import(document_type):
 	doc = frappe.new_doc('Data Import')
 	doc.reference_doctype = document_type
+	doc.import_type = "Insert New Records"
 	doc.skip_errors = 1
 	doc.no_email = 1
 	doc.save(ignore_permissions=True)
 	return doc
-
-# by gopi on 13/6/24
 
 def on_update_shopping_cart(doc, method):
 	try:
@@ -52,7 +51,6 @@ def insert_email_campaign(campaign, email_campaign_for, recipient):
 		doc.email_template = entry.get("email_template")
 		doc.campign_id = entry.name
 		doc.save(ignore_permissions=True)
-
 
 def after_insert_email_group(doc, method):
 	enable_campaign = frappe.db.get_value('Email Campaign Settings', None, 'enable_campaign')
