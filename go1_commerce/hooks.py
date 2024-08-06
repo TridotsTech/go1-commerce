@@ -136,14 +136,8 @@ doc_events = {
 # ---------------
 scheduler_events = {
 	"all": [
-		"go1_commerce.accounts.api.release_lockedin_amount",
-		"go1_commerce.go1_commerce.doctype.product.product.check_menu_available_time",
-		"go1_commerce.go1_commerce.doctype.order.order.auto_complete_orders",
+		"go1_commerce.accounts.api.release_lockedin_amount"
 	],
-	"daily": [
-		"go1_commerce.go1_commerce.doctype.donations.donations.remove_guestuser",
-	],
-	
 	"monthly": [
 		"go1_commerce.utils.setup.clear_logs"	
 	],
