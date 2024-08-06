@@ -20,7 +20,7 @@
    "label": "Enable Campaign"
   },
   {
-   "depends_on": "eval: {{doc.enable_campaign == 1}}",
+   "depends_on": "eval: ((doc.enable_campaign == 1))",
    "fieldname": "campaign_settings",
    "fieldtype": "Section Break",
    "label": "Campaign Settings"
