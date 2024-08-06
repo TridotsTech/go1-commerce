@@ -2598,7 +2598,7 @@ frappe.ui.form.on('Product', {
                                     data-reference_method='${c.reference_method}' data-child_link='${c.child_tab_link}'
                                     data-hasimage='${c.hasimage}' data-imagefield='${c.imagefield}'>
                                 <button class="btn btn-default btn-sm" style="float:right;background-color: #ccc;margin: 0px 0px 0px 0px;
-                                    padding: 11px 17px 10px 17px;font-size: 15px;" data-fieldtype="Button" data-fieldname="more_btn" 
+                                    padding: 12px 12px 10px 12px;font-size: 15px;" data-fieldtype="Button" data-fieldname="more_btn" 
                                         onclick="search_onbutton($(this))">
                                     Search
                                 </button>
