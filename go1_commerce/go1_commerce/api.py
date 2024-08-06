@@ -53,33 +53,11 @@ def insert_email_campaign(campaign, email_campaign_for, recipient):
 		doc.campign_id = entry.name
 		doc.save(ignore_permissions=True)
 
-# def on_update_shopping_cart(doc, method):
-# 	try:
-# 		enable_campaign = frappe.db.get_value('Email Campaign Settings', None, 'enable_campaign')
-# 		if enable_campaign:
-# 			if doc.items and doc.naming_series != 'GC- ':
-# 				date = min([x.creation for x in doc.items])
-# 				check_campaign = frappe.db.sql('''select name from `tabEmail Campaign` where email_campaign_for = "Shopping Cart" and recipient = %(recipient)s and end_date >= %(date)s''',{'date': getdate(date), 'recipient': doc.name}, as_dict=1)
-# 				if not check_campaign:
-# 					campaign = frappe.db.get_value('Email Campaign Settings', None, 'shopping_cart')
-# 					if campaign:
-# 						create_email_campaign(campaign, 'Shopping Cart', doc.name)
-# 	except Exception:
-# 		frappe.log_error(message = frappe.get_traceback(), title = "Error in on_update_shopping_cart")
-
-# end
 
 def after_insert_email_group(doc, method):
 	enable_campaign = frappe.db.get_value('Email Campaign Settings', None, 'enable_campaign')
 	if enable_campaign:
-		campaign = None
-		if frappe.db.get_value("Email Group",doc.name,"business"):
-			business = frappe.db.get_value("Email Group",doc.name,"business")
-			campaigns = frappe.db.get_all("Business Campaign",filters={"parent":'Email Campaign Settings',"business":business},fields=['campaign'])
-			if campaigns:
-				campaign = campaigns[0].campaign
-		else:
-			campaign = frappe.db.get_value('Email Campaign Settings', None, 'email_group')
+		campaign = frappe.db.get_value('Email Campaign Settings', None, 'email_group')
 		if campaign:
 			create_email_campaign(campaign, 'Email Group', doc.name)
 
