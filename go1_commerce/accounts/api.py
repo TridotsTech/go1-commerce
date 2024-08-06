@@ -78,7 +78,7 @@ def release_lockedin_amount():
         frappe.log_error(title = "Error in release_lockedin_amount",mesaage = frappe.get_traceback() )
 
 
-@frappe.whitelist(allow_guest = True)
+@frappe.whitelist()
 def update_wallet(doc):
     try:
         current_date = now_datetime().strftime(" %Y-%m-%d %H:%M:%S")
@@ -179,7 +179,7 @@ def handle_pending_without_startdate(doc, wal):
         wal.total_wallet_amount = flt(doc.amount)
         wal.current_wallet_amount=0
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def validate_wallet_status(doc,wal):
     if doc.status == "Credited":
         handling_created_status(doc, wal)
@@ -356,7 +356,7 @@ def make_payment(source_name = None, order = None, mode_of_payment = None, amoun
         frappe.log_error(message = frappe.get_traceback(), title = "Error in accounts.api.make_payment")
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def customer_payment_for_order(customer):
     orders = frappe.get_all('Order',fields=['*'],filters={"customer":customer})
     if orders:
@@ -446,7 +446,7 @@ def not_app_pay_wallet_details(customer,limit_start,page_len):
                                                         limit_page_length=page_len),
                                             customer,as_dict=1)
     return source
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def get_wallet_details(list_type,customer,page_no,page_len):
     limit_start = str(((int(page_no)-1)*int(page_len)))
     if list_type=="app_pay":
@@ -455,7 +455,7 @@ def get_wallet_details(list_type,customer,page_no,page_len):
         return not_app_pay_wallet_details(customer,limit_start,page_len)
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def create_withdraw_request(party_type, user, amount, note=None):
     source = None
     if party_type and user:
@@ -474,7 +474,7 @@ def create_withdraw_request(party_type, user, amount, note=None):
         return {"status": "Success",
                 "message":pe}
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def get_wallet_detail_counters(user):
     try:
         from go1_commerce.go1_commerce.doctype.wallet.\
@@ -520,7 +520,7 @@ def app_transaction_total_count(user):
                                         ORDER BY WT.creation DESC
                                         ''',user,as_dict=1)
     return total_count
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def get_app_transactions(user, page_no, page_len):
     try:
         start=(int(page_no)-1)*int(page_len)
@@ -576,7 +576,7 @@ def counter_transaction_total_count(user):
                                         ORDER BY WT.creation DESC
                                         ''',user,as_dict=1)
     return total_count
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def get_counter_transactions(user, page_no, page_len):
     try:
         start=(int(page_no)-1)*int(page_len)
@@ -605,7 +605,7 @@ def get_counter_transactions(user, page_no, page_len):
         frappe.log_error(frappe.get_traceback(), "wallet.get_commission_list")
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def insert_wallet_transaction(data):
     wallet_trans_entry = frappe.get_doc({
                                         "doctype":"Wallet Transaction",
@@ -674,7 +674,7 @@ def _make_party_details(source_name, ignore_permissions=False):
     return frappe.get_doc(source_name.customer_type, source_name.customer)
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def make_invoice_payment(source_name=None, source=None, target_doc=None):
     try:
         source_doctype = "Sales Invoice"
@@ -723,7 +723,7 @@ def make_invoice_payment(source_name=None, source=None, target_doc=None):
         frappe.log_error(frappe.get_traceback(), "accounts.api.make_invoice_payment")
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def update_docstatus(doctype, docname, statusfield , status,paid_amount = 0):
     try:
         frappe.log_error("status",status)
