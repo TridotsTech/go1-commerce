@@ -74,7 +74,7 @@ def make_wallet_transaction(source_name):
 		frappe.log_error(frappe.get_traceback(), "wallet.make_wallet_transaction") 
 	
 
-def get_payment_entry(default_currency,account_settings,source,total):
+def get_payment_entry(default_currency,source,total):
 	pe = frappe.new_doc("Payment Entry")
 	pe.payment_type = "Pay"
 	pe.posting_date = nowdate()
@@ -84,8 +84,8 @@ def get_payment_entry(default_currency,account_settings,source,total):
 	pe.party_name = source.party_name
 	pe.contact_person = ""
 	pe.contact_email = ""
-	pe.paid_from = account_settings.paid_from_account
-	pe.paid_to = account_settings.paid_to_account
+	# pe.paid_from = account_settings.paid_from_account
+	# pe.paid_to = account_settings.paid_to_account
 	pe.paid_from_account_currency = default_currency
 	pe.paid_to_account_currency = default_currency
 	pe.paid_amount = total
@@ -108,13 +108,12 @@ def get_payment_entry(default_currency,account_settings,source,total):
 def make_autowallet_payment(source_name):
 	try:
 		default_currency = get_settings_value("Catalog Settings","default_currency")
-		account_settings=frappe.get_single('Core Settings')
 		source=frappe.get_all("Wallet Transaction",fields=["*"],filters={"name":source_name})[0]
 		if flt(source.outstanding_amount)>0:
 			total=source.outstanding_amount
 		else:	
 			total=source.withdraw_amount
-		get_payment_entry(default_currency,account_settings,total, source)
+		get_payment_entry(default_currency,total, source)
 	except Exception:
 		frappe.log_error(frappe.get_traceback(), "wallet.make_autowallet_payment") 
 
@@ -157,7 +156,6 @@ def transacrtion_reference(source):
 def make_wallet_payment(source_name, target_doc=None):
 	try:
 		default_currency=get_settings_value("Catalog Settings","default_currency")
-		account_settings=frappe.get_single('Core Settings')
 		source=frappe.db.get_list("Wallet Transaction",fields=["*"],filters={"name":source_name})[0]
 		if flt(source.outstanding_amount)>0:
 			total=source.outstanding_amount
@@ -172,8 +170,8 @@ def make_wallet_payment(source_name, target_doc=None):
 		pe.party_name = source.party_name
 		pe.contact_person = ""
 		pe.contact_email = ""
-		pe.paid_from = account_settings.paid_from_account
-		pe.paid_to = account_settings.paid_to_account
+		# pe.paid_from = paid_from_account
+		# pe.paid_to = paid_to_account
 		pe.paid_from_account_currency = default_currency
 		pe.paid_to_account_currency = default_currency
 		pe.paid_amount = total

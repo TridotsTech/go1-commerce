@@ -12,13 +12,7 @@ from go1_commerce.utils.setup import get_settings
 def check_wallet_setting():
     return frappe.get_single("Wallet Settings")
 
-
-@frappe.whitelist(allow_guest = True)
-def get_core_settings():
-    return frappe.get_single("Core Settings")
-
-
-@frappe.whitelist(allow_guest = True)
+@frappe.whitelist()
 def release_lockedin_amount():
     try:
         wallet_settings = frappe.get_single("Wallet Settings")
@@ -225,7 +219,7 @@ def update_wallet_by_name(doc,wallet_name,current_date):
                 "message": wallet_detail}
 
 
-@frappe.whitelist(allow_guest = True)
+@frappe.whitelist()
 def make_withdraw_request(source_name = None):
     try:
         trans_ref = ""
@@ -257,7 +251,7 @@ def make_withdraw_request(source_name = None):
         return {'status':'Failed'}
     
     
-@frappe.whitelist(allow_guest = True)
+@frappe.whitelist()
 def orders_for_update(source):
     try:
         order_list = frappe.db.sql('''  SELECT IFNULL(order_id, name) AS name, name AS trans_id 

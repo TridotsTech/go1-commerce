@@ -19,7 +19,6 @@ def get_all_website_settings(allow_guest = True):
 		all_categories = None
 		if os.path.exists(file_path):
 				f = open(file_path)
-				# frappe.log_error("FFFFFFF",type(f))
 				all_categories = json.load(f)
 		frappe.log_error("all_categories",all_categories)
 		return all_categories
@@ -1719,24 +1718,13 @@ def boot_session(bootinfo):
 										""", as_dict = 1, 
 										update = {'doctype': ':Currency'})
 		filters = {}
-		if check_domain('single_vendor'):
-			filters = {'name': frappe.db.get_single_value('Core Settings', 'default_business')}
+		
 		if "System Manager" not in frappe.get_roles(frappe.session.user):
 			settings = frappe.db.get_all('Business', fields=['name'], filters=filters)
 			if settings:
 				bootinfo.sysdefaults.business = settings[0].name
 		# domain_configuration = frappe.get_single('Server Configuration')
 		# bootinfo.sysdefaults.domain_configuration = domain_configuration
-		translation_settings = frappe.get_single('Core Settings')
-		bootinfo.sysdefaults.translation_settings = translation_settings
-		doc_list = frappe.db.sql('''SELECT enbled_doctype 
-									FROM `tabEnabled Doctypes` 
-									WHERE parent = "Core Settings"
-								''', as_dict=1)
-		tan_enabled_docs = []
-		for n in doc_list:
-			tan_enabled_docs.append(n.enbled_doctype)
-		bootinfo.sysdefaults.translation_enabled_docs = tan_enabled_docs
 		domains = []
 		domains = get_domains_data()
 		bootinfo.sysdefaults.domain_constants = domains
