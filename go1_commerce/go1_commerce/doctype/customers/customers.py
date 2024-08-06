@@ -211,9 +211,9 @@ class Customers(NestedSet):
 	def validate_pwd(self):
 		order_settings = get_settings('Order Settings')
 		'''updated str() in self.set_new_password-by sivaranjani(Jan, 13, 20)'''
-		if order_settings and order_settings.phone_req==0 and order_settings.login_with_password==0:
-			if len(str(self.set_new_password)) < int(order_settings.min_password_length):
-				frappe.throw(frappe._('Password must contain {0} digits').format(order_settings.min_password_length))
+		# if order_settings and order_settings.phone_req==0 and order_settings.login_with_password==0:
+		if len(str(self.set_new_password)) < int(order_settings.min_password_length):
+			frappe.throw(frappe._('Password must contain {0} digits').format(order_settings.min_password_length))
 
 
 	def on_trash(self):
