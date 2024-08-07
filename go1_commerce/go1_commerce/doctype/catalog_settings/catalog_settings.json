@@ -18,6 +18,7 @@
   "column_break_5",
   "default_currency",
   "default_currency_symbol",
+  "generate_barcode_for_product",
   "tax_settings",
   "included_tax",
   "display_tax_suffix",
@@ -130,6 +131,7 @@
    "options": "Currency"
   },
   {
+   "fetch_from": "default_currency.symbol",
    "fieldname": "default_currency_symbol",
    "fieldtype": "Data",
    "hidden": 1,
@@ -468,11 +470,18 @@
    "fieldname": "upload_review_images",
    "fieldtype": "Check",
    "label": " Upload Review Images"
+  },
+  {
+   "default": "0",
+   "description": "Enable to generate barcode for all products",
+   "fieldname": "generate_barcode_for_product",
+   "fieldtype": "Check",
+   "label": "Generate Barcode for Product"
   }
  ],
  "issingle": 1,
  "links": [],
- "modified": "2024-08-05 14:01:07.279885",
+ "modified": "2024-08-07 11:43:27.421534",
  "modified_by": "Administrator",
  "module": "Go1 Commerce",
  "name": "Catalog Settings",
