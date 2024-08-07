@@ -5,7 +5,7 @@
    "label": "Sales"
   }
  ],
- "content": "[{\"id\":\"Sk3SdKKsin\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Sales</span>\",\"col\":12}},{\"id\":\"cPzGH6cnz5\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Sales\",\"col\":12}},{\"id\":\"rtvhaR6zir\",\"type\":\"card\",\"data\":{\"card_name\":\"Sales\",\"col\":4}},{\"id\":\"XsTIP-DkGg\",\"type\":\"card\",\"data\":{\"card_name\":\"Settings\",\"col\":4}}]",
+ "content": "[{\"id\":\"Sk3SdKKsin\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Sales</span>\",\"col\":12}},{\"id\":\"cPzGH6cnz5\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Sales\",\"col\":12}},{\"id\":\"b9R6E_pkHe\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Orders\",\"col\":3}},{\"id\":\"BlmoBGuIgq\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Order Cancel Reasons\",\"col\":3}},{\"id\":\"oPmrKAIi5T\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Return Request\",\"col\":3}},{\"id\":\"JSXB4vQUf5\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Return Request Reason\",\"col\":3}},{\"id\":\"BIpvCIZIeI\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Shipping Rate Method\",\"col\":3}},{\"id\":\"B3p-oJ2idE\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Settings</b></span>\",\"col\":12}},{\"id\":\"ThUsHQatls\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Catalog Settings\",\"col\":3}},{\"id\":\"qACJXE1xZL\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Order Settings\",\"col\":3}}]",
  "creation": "2024-08-05 11:28:08.457018",
  "custom_blocks": [],
  "docstatus": 0,
@@ -18,65 +18,6 @@
  "is_hidden": 0,
  "label": "Sales",
  "links": [
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Sales",
-   "link_count": 5,
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Card Break"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Orders",
-   "link_count": 0,
-   "link_to": "Order",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Order Cancel Reasons",
-   "link_count": 0,
-   "link_to": "Order Cancel Reason",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Return Requests",
-   "link_count": 0,
-   "link_to": "Return Request",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Return Request Reasons",
-   "link_count": 0,
-   "link_to": "Return Request Reasons",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Shipping Rate Method ",
-   "link_count": 0,
-   "link_to": "Shipping Rate Method",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
   {
    "hidden": 0,
    "is_query_report": 0,
@@ -107,7 +48,7 @@
    "type": "Link"
   }
  ],
- "modified": "2024-08-05 13:07:08.971605",
+ "modified": "2024-08-07 11:44:36.479318",
  "modified_by": "Administrator",
  "module": "Go1 Commerce",
  "name": "Sales",
@@ -118,6 +59,61 @@
  "quick_lists": [],
  "roles": [],
  "sequence_id": 29.0,
- "shortcuts": [],
+ "shortcuts": [
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Orders",
+   "link_to": "Order",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Catalog Settings",
+   "link_to": "Catalog Settings",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Order Cancel Reasons",
+   "link_to": "Order Cancel Reason",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Order Settings",
+   "link_to": "Order Settings",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Return Request",
+   "link_to": "Return Request",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Return Request Reason",
+   "link_to": "Return Request Reasons",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Shipping Rate Method",
+   "link_to": "Shipping Rate Method",
+   "stats_filter": "[]",
+   "type": "DocType"
+  }
+ ],
  "title": "Sales"
 }

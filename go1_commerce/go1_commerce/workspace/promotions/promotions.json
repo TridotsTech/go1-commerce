@@ -1,6 +1,6 @@
 {
  "charts": [],
- "content": "[{\"id\":\"4bDI6h7WMI\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Promotions</span>\",\"col\":12}},{\"id\":\"qNbs5htGc5\",\"type\":\"card\",\"data\":{\"card_name\":\"Promotions\",\"col\":4}}]",
+ "content": "[{\"id\":\"4bDI6h7WMI\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Promotions</span>\",\"col\":12}},{\"id\":\"yBBWcRhOtV\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Discounts\",\"col\":3}},{\"id\":\"G0uPdYAVzq\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Wallet\",\"col\":3}},{\"id\":\"df_XMsLwoP\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Wallet Transactions\",\"col\":3}},{\"id\":\"uoeaTV5q9q\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Email Groups\",\"col\":3}},{\"id\":\"Th8w-YJnYT\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Email Group Members\",\"col\":3}},{\"id\":\"KP1n2h3Poa\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Newsletters\",\"col\":3}}]",
  "creation": "2024-08-05 11:31:43.844929",
  "custom_blocks": [],
  "docstatus": 0,
@@ -12,78 +12,8 @@
  "indicator_color": "green",
  "is_hidden": 0,
  "label": "Promotions",
- "links": [
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Promotions",
-   "link_count": 6,
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Card Break"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Discounts",
-   "link_count": 0,
-   "link_to": "Discounts",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Wallet",
-   "link_count": 0,
-   "link_to": "Wallet",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Wallet Transactions",
-   "link_count": 0,
-   "link_to": "Wallet Transaction",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Email Groups",
-   "link_count": 0,
-   "link_to": "Email Group",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Email Group Members",
-   "link_count": 0,
-   "link_to": "Email Group Member",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Newsletters",
-   "link_count": 0,
-   "link_to": "Newsletter",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  }
- ],
- "modified": "2024-08-05 11:53:26.396756",
+ "links": [],
+ "modified": "2024-08-07 11:49:27.338168",
  "modified_by": "Administrator",
  "module": "Go1 Commerce",
  "name": "Promotions",
@@ -94,6 +24,55 @@
  "quick_lists": [],
  "roles": [],
  "sequence_id": 30.0,
- "shortcuts": [],
+ "shortcuts": [
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Discounts",
+   "link_to": "Discounts",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Wallet",
+   "link_to": "Wallet",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Wallet Transactions",
+   "link_to": "Wallet Transaction",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Email Groups",
+   "link_to": "Email Group",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Email Group Members",
+   "link_to": "Email Group Member",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Newsletters",
+   "link_to": "Newsletter",
+   "stats_filter": "[]",
+   "type": "DocType"
+  }
+ ],
  "title": "Promotions"
 }

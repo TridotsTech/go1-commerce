@@ -1,6 +1,6 @@
 {
  "charts": [],
- "content": "[{\"id\":\"a27iwFc2gP\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Reports</span>\",\"col\":12}},{\"id\":\"aQP4v9FbQp\",\"type\":\"card\",\"data\":{\"card_name\":\"Reports\",\"col\":4}}]",
+ "content": "[{\"id\":\"a27iwFc2gP\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Reports</span>\",\"col\":12}},{\"id\":\"XrRH3jLGti\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Best Selling Items By Amount\",\"col\":3}},{\"id\":\"0F0q2Irsga\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Item Wise Sales Report\",\"col\":3}},{\"id\":\"GeR9FGH4Hv\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Yearly Sales Report\",\"col\":3}},{\"id\":\"xnrH3sRNTt\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Monthly Sales Report\",\"col\":3}},{\"id\":\"WZMgh1kmoG\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Daily Sales Report\",\"col\":3}},{\"id\":\"_HlHUzWBFH\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Sales Report\",\"col\":3}}]",
  "creation": "2024-08-05 11:34:53.344727",
  "custom_blocks": [],
  "docstatus": 0,
@@ -12,78 +12,8 @@
  "indicator_color": "green",
  "is_hidden": 0,
  "label": "Reports",
- "links": [
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Reports",
-   "link_count": 6,
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Card Break"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 1,
-   "label": "Sales Report ",
-   "link_count": 0,
-   "link_to": "Customer Order",
-   "link_type": "Report",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 1,
-   "label": "Daily Sales Repo",
-   "link_count": 0,
-   "link_to": "Daily Sales Report",
-   "link_type": "Report",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 1,
-   "label": "Monthly Sales Report ",
-   "link_count": 0,
-   "link_to": "Monthly Sales Report",
-   "link_type": "Report",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 1,
-   "label": "Yearly Sales Report",
-   "link_count": 0,
-   "link_to": "Yearly Sales Report",
-   "link_type": "Report",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 1,
-   "label": "Item Wise Sales Report",
-   "link_count": 0,
-   "link_to": "Item Wise Sales Report",
-   "link_type": "Report",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 1,
-   "label": "Best Selling Items By Amount",
-   "link_count": 0,
-   "link_to": "Best Selling Items By Amount",
-   "link_type": "Report",
-   "onboard": 0,
-   "type": "Link"
-  }
- ],
- "modified": "2024-08-05 12:01:25.452537",
+ "links": [],
+ "modified": "2024-08-07 11:53:11.200828",
  "modified_by": "Administrator",
  "module": "Go1 Commerce",
  "name": "Reports",
@@ -94,6 +24,49 @@
  "quick_lists": [],
  "roles": [],
  "sequence_id": 31.0,
- "shortcuts": [],
+ "shortcuts": [
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Best Selling Items By Amount",
+   "link_to": "Best Selling Items By Amount",
+   "type": "Report"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Item Wise Sales Report",
+   "link_to": "Item Wise Sales Report",
+   "type": "Report"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Yearly Sales Report",
+   "link_to": "Yearly Sales Report",
+   "type": "Report"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Monthly Sales Report",
+   "link_to": "Monthly Sales Report",
+   "type": "Report"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Daily Sales Report",
+   "link_to": "Daily Sales Report",
+   "type": "Report"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Sales Report",
+   "link_to": "Customer Order",
+   "type": "Report"
+  }
+ ],
  "title": "Reports"
 }

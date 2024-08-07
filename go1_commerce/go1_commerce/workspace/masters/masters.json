@@ -1,6 +1,6 @@
 {
  "charts": [],
- "content": "[{\"id\":\"xbqoKFCs3x\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Masters</span>\",\"col\":12}},{\"id\":\"_Z7lSs7bdK\",\"type\":\"card\",\"data\":{\"card_name\":\"Masters\",\"col\":4}}]",
+ "content": "[{\"id\":\"xbqoKFCs3x\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Masters</span>\",\"col\":12}},{\"id\":\"Mmr90jLf5f\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Products\",\"col\":3}},{\"id\":\"S-Q2h02bTx\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Product Categories\",\"col\":3}},{\"id\":\"kp0b7WPFd_\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Product Brands\",\"col\":3}},{\"id\":\"hkep2Lj8YF\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Country\",\"col\":3}},{\"id\":\"D2G-zAfh9K\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"State\",\"col\":3}},{\"id\":\"I1jS770j-9\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"City\",\"col\":3}},{\"id\":\"cU8m5mk0On\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Zone\",\"col\":3}},{\"id\":\"jMJuepK86n\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Area\",\"col\":3}}]",
  "creation": "2024-08-05 11:16:17.324923",
  "custom_blocks": [],
  "docstatus": 0,
@@ -12,98 +12,8 @@
  "indicator_color": "green",
  "is_hidden": 0,
  "label": "Masters",
- "links": [
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Masters",
-   "link_count": 8,
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Card Break"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Products",
-   "link_count": 0,
-   "link_to": "Product",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Product Categories",
-   "link_count": 0,
-   "link_to": "Product Category",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Product Brands",
-   "link_count": 0,
-   "link_to": "Product Brand",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Country",
-   "link_count": 0,
-   "link_to": "Country",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "State",
-   "link_count": 0,
-   "link_to": "State",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "City",
-   "link_count": 0,
-   "link_to": "City",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Zone",
-   "link_count": 0,
-   "link_to": "Zone",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Area",
-   "link_count": 0,
-   "link_to": "Area",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  }
- ],
- "modified": "2024-08-05 11:52:24.034535",
+ "links": [],
+ "modified": "2024-08-07 11:38:48.765855",
  "modified_by": "Administrator",
  "module": "Go1 Commerce",
  "name": "Masters",
@@ -114,6 +24,71 @@
  "quick_lists": [],
  "roles": [],
  "sequence_id": 28.0,
- "shortcuts": [],
+ "shortcuts": [
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Products",
+   "link_to": "Product",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Product Categories",
+   "link_to": "Product Category",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Product Brands",
+   "link_to": "Product Brand",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Country",
+   "link_to": "Country",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "State",
+   "link_to": "State",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "City",
+   "link_to": "City",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Zone",
+   "link_to": "Zone",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Area",
+   "link_to": "Area",
+   "stats_filter": "[]",
+   "type": "DocType"
+  }
+ ],
  "title": "Masters"
 }
