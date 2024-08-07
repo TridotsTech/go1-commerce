@@ -117,6 +117,7 @@ doc_events = {
 
 # Scheduled Tasks
 # ---------------
+
 scheduler_events = {
 	"all": [
 		"go1_commerce.accounts.api.release_lockedin_amount"
@@ -128,7 +129,11 @@ scheduler_events = {
 		"* * * * *": [
 			"frappe.email.queue.flush",
 		],
+		"0 9 * * *": [
+			"go1_commerce.go1_commerce.doctype.email_campaign.email_campaign.send_email_to_campaigns"			
+		],
 		"0 1 * * *": [
+			"go1_commerce.go1_commerce.doctype.email_campaign.email_campaign.set_email_campaign_status",
 			"go1_commerce.go1_commerce.doctype.customers.customers.delete_guest_customers",
 		],
 		"30 12 1 * *":[
