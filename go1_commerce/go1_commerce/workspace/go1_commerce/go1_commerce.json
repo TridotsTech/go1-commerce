@@ -1,6 +1,6 @@
 {
  "charts": [],
- "content": "[{\"id\":\"0NCwrUxTnN\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Go1 Commerce</span><br>\",\"col\":12}},{\"id\":\"_9dgF7vXd-\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Product\",\"col\":3}},{\"id\":\"IKHvsKjjZx\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Orders\",\"col\":3}},{\"id\":\"KQ0qV-6-k5\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Discounts\",\"col\":3}},{\"id\":\"OWvO01Xb9J\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Buyers\",\"col\":3}},{\"id\":\"YkS0XxzRfr\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"User OTPs\",\"col\":3}},{\"id\":\"1u5mpjjLqt\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Data Imports\",\"col\":3}},{\"id\":\"SEk_P3FxPG\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Wallet\",\"col\":3}},{\"id\":\"8jsq7i17Mm\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Wallet Transactions\",\"col\":3}},{\"id\":\"NHcyTdmwzi\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"kr07f7Yo7R\",\"type\":\"card\",\"data\":{\"card_name\":\"Masters\",\"col\":3}},{\"id\":\"8I-I-vZlgp\",\"type\":\"card\",\"data\":{\"card_name\":\"Sales\",\"col\":3}},{\"id\":\"WiI-JkB-Ja\",\"type\":\"card\",\"data\":{\"card_name\":\"Promotions\",\"col\":3}},{\"id\":\"SfifbG9wXV\",\"type\":\"card\",\"data\":{\"card_name\":\"Reports\",\"col\":3}}]",
+ "content": "[{\"id\":\"0NCwrUxTnN\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Go1 Commerce</span><br>\",\"col\":12}},{\"id\":\"_9dgF7vXd-\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Product\",\"col\":3}},{\"id\":\"IKHvsKjjZx\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Orders\",\"col\":3}},{\"id\":\"KQ0qV-6-k5\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Discounts\",\"col\":3}},{\"id\":\"OWvO01Xb9J\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Buyers\",\"col\":3}},{\"id\":\"YkS0XxzRfr\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"User OTPs\",\"col\":3}},{\"id\":\"1u5mpjjLqt\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Data Imports\",\"col\":3}},{\"id\":\"SEk_P3FxPG\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Wallet\",\"col\":3}},{\"id\":\"8jsq7i17Mm\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Wallet Transactions\",\"col\":3}},{\"id\":\"NHcyTdmwzi\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"vGaLlDeMhZ\",\"type\":\"card\",\"data\":{\"card_name\":\"Catalog\",\"col\":4}},{\"id\":\"kr07f7Yo7R\",\"type\":\"card\",\"data\":{\"card_name\":\"Masters\",\"col\":3}},{\"id\":\"8I-I-vZlgp\",\"type\":\"card\",\"data\":{\"card_name\":\"Sales\",\"col\":3}},{\"id\":\"WiI-JkB-Ja\",\"type\":\"card\",\"data\":{\"card_name\":\"Promotions\",\"col\":3}},{\"id\":\"SfifbG9wXV\",\"type\":\"card\",\"data\":{\"card_name\":\"Reports\",\"col\":3}}]",
  "creation": "2024-01-23 14:39:16.350701",
  "custom_blocks": [],
  "docstatus": 0,
@@ -336,65 +336,6 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Masters",
-   "link_count": 5,
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Card Break"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Country",
-   "link_count": 0,
-   "link_to": "Country",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "State",
-   "link_count": 0,
-   "link_to": "State",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "City",
-   "link_count": 0,
-   "link_to": "City",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Zone",
-   "link_count": 0,
-   "link_to": "Zone",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Area",
-   "link_count": 0,
-   "link_to": "Area",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
    "label": "Products",
    "link_count": 0,
    "link_to": "Product",
@@ -628,9 +569,177 @@
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Catalog",
+   "link_count": 10,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Products",
+   "link_count": 0,
+   "link_to": "Product",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Attributes",
+   "link_count": 0,
+   "link_to": "Product Attribute",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Categories",
+   "link_count": 0,
+   "link_to": "Product Category",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Brands",
+   "link_count": 0,
+   "link_to": "Product Brand",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Specification Attributes",
+   "link_count": 0,
+   "link_to": "Specification Attribute",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Product Enquiry",
+   "link_count": 0,
+   "link_to": "Product Enquiry",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Product Review",
+   "link_count": 0,
+   "link_to": "Product Review",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Product Availability Notification",
+   "link_count": 0,
+   "link_to": "Product Availability Notification",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Return Policy",
+   "link_count": 0,
+   "link_to": "Return Policy",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Replacement Policy",
+   "link_count": 0,
+   "link_to": "Replacement Policy",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Masters",
+   "link_count": 5,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Country",
+   "link_count": 0,
+   "link_to": "Country",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "State",
+   "link_count": 0,
+   "link_to": "State",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "City",
+   "link_count": 0,
+   "link_to": "City",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Zone",
+   "link_count": 0,
+   "link_to": "Zone",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Area",
+   "link_count": 0,
+   "link_to": "Area",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
   }
  ],
- "modified": "2024-07-27 19:37:52.276022",
+ "modified": "2024-08-07 12:30:55.863495",
  "modified_by": "Administrator",
  "module": "Go1 Commerce",
  "name": "Go1 Commerce",
