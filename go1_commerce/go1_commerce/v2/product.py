@@ -41,7 +41,7 @@ class Product:
 		return """ P.item, P.price, P.old_price, P.short_description,P.has_variants,
 				P.sku, P.name, P.route, P.inventory_method, P.is_gift_card, P.image AS product_image,
 				P.minimum_order_qty, P.maximum_order_qty, P.disable_add_to_cart_button, 
-				P.weight, P.approved_total_reviews,
+				P.weight, P.approved_total_reviews,(CONCAT("/pr/",P.route)) AS b_route,P.brand_name AS brand,
 				P.brand_unique_name AS brand_route,P.route,P.brand_name AS product_brand """
 	
 	def get_sorted_category_products(self,category, sort_by, page_no, page_size, brands,

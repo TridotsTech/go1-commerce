@@ -50,20 +50,13 @@ def get_parent_categories(show_count=0):
 			fields=[
 				"category_image",
 				"name",
-				"mega_menu_column",
 				"category_name",
 				"mobile_image",
-				"show_attributes_inlist",
-				"products_per_row_for_mobile_app",
 				"full_description",
-				"default_view",
-				"type_of_category",
 				"route",
-				"products_per_row_in_list",
-				"enable_left_side_panel",
 			],
 			filters={"parent_product_category": "", "is_active": 1},
-			order_by="mega_menu_column, display_order",
+			order_by="display_order",
 			limit=50)
 		if show_count:
 			for category in top_level_categories:
@@ -90,19 +83,12 @@ def get_child_categories(parent_category_name, show_count=0, limit=500):
 	child_categories = frappe.get_all(
 		"Product Category",
 		fields=[
-			"mega_menu_column",
 			"category_image",
 			"name",
 			"category_name",
 			"mobile_image",
-			"show_attributes_inlist",
-			"products_per_row_for_mobile_app",
 			"full_description",
-			"default_view",
-			"type_of_category",
 			"route",
-			"products_per_row_in_list",
-			"enable_left_side_panel",
 		],
 		filters={"parent_product_category": parent_category_name, "is_active": 1},
 		order_by="mega_menu_column, display_order",
@@ -115,69 +101,70 @@ def get_child_categories(parent_category_name, show_count=0, limit=500):
 	return child_categories
 
 def get_categories_sidemenu(category):
-    try:
-        if category:
-            category = category.replace('&amp;', '&')
-        current_category = get_current_category(category)
-        result = {}
-        parent_category = None
-        parent_categories = None
-        if current_category.parent_product_category and \
-                current_category.parent_product_category != 'All Product Category':
-            parent_category = get_parent_category(current_category)
-            result['parent_category'] = parent_category
-            if parent_category.parent_product_category:
-                parent_categories = get_parent_category_list(parent_category)
-                result['parent_categories'] = parent_categories
-        parent_category_child = get_parent_category_child(current_category)
-        child_categories = get_child_categories(category)
-        result['parent_category_child'] = parent_category_child
-        result['child_categories'] = child_categories
-        result['current_category'] = current_category
-        all_categories = get_all_categories()
-        result['all_categories'] = all_categories
-        return result
-    except Exception as e:
-        frappe.log_error(title = 'Error in get_categories_sidemenu',message = _("Error in get_categories_sidemenu: {0}").format(str(e)))
-        
+	try:
+		frappe.log_error("get_categories_sidemenu",category)
+		if category:
+			category = category.replace('&amp;', '&')
+		current_category = get_current_category(category)
+		result = {}
+		parent_category = None
+		parent_categories = None
+		if current_category.parent_product_category and \
+				current_category.parent_product_category != 'All Product Category':
+			parent_category = get_parent_category(current_category)
+			result['parent_category'] = parent_category
+			if parent_category.parent_product_category:
+				parent_categories = get_parent_category_list(parent_category)
+				result['parent_categories'] = parent_categories
+		parent_category_child = get_parent_category_child(current_category)
+		child_categories = get_child_categories(category)
+		result['parent_category_child'] = parent_category_child
+		result['child_categories'] = child_categories
+		result['current_category'] = current_category
+		all_categories = get_all_categories()
+		result['all_categories'] = all_categories
+		return result
+	except Exception as e:
+		frappe.log_error(title = 'Error in get_categories_sidemenu',message = _("Error in get_categories_sidemenu: {0}").format(str(e)))
+		
 def get_parent_category_child(current_category):
-    filters = {
-        'parent_product_category': current_category.parent_product_category,
-        'is_active': 1, 'disable_in_website': 0
-    }
-    return frappe.get_all('Product Category',
-                          fields=['name', 'category_name', 'route'],
-                          filters=filters, order_by='display_order', limit_page_length=50)
+	filters = {
+		'parent_product_category': current_category.parent_product_category,
+		'is_active': 1, 'disable_in_website': 0
+	}
+	return frappe.get_all('Product Category',
+						  fields=['name', 'category_name', 'route'],
+						  filters=filters, order_by='display_order', limit_page_length=50)
 
 def get_all_categories():
-    filters = {'parent_product_category': '', 'is_active': 1, 'disable_in_website': 0}
-    return frappe.get_all('Product Category',
-                          fields=['name', 'category_name', 'route'],
-                          filters=filters, order_by='display_order', limit_page_length=50)
+	filters = {'parent_product_category': '', 'is_active': 1, 'disable_in_website': 0}
+	return frappe.get_all('Product Category',
+						  fields=['name', 'category_name', 'route'],
+						  filters=filters, order_by='display_order', limit_page_length=50)
 
 def get_current_category(category):
-    current_category_list = frappe.get_all('Product Category',
-                                           fields=['name', 'category_name', 'route'],
-                                           filters={"name": category})
-    return current_category_list[0] if current_category_list else None
+	current_category_list = frappe.get_all('Product Category',
+										   fields=['name', 'category_name', 'route'],
+										   filters={"name": category})
+	return current_category_list[0] if current_category_list else None
 
 def get_parent_category(current_category):
-    parent_category = frappe.get_doc('Product Category', current_category.parent_product_category)
-    parent_category.parent_category_route = parent_category.route
-    parent_category.parent_parent_category_route = frappe.db.get_value(
-        'Product Category', parent_category.parent_product_category, "route")
-    parent_category.parent_parent_category_name = frappe.db.get_value(
-        'Product Category', parent_category.parent_product_category, "category_name")
-    return parent_category
+	parent_category = frappe.get_doc('Product Category', current_category.parent_product_category)
+	parent_category.parent_category_route = parent_category.route
+	parent_category.parent_parent_category_route = frappe.db.get_value(
+		'Product Category', parent_category.parent_product_category, "route")
+	parent_category.parent_parent_category_name = frappe.db.get_value(
+		'Product Category', parent_category.parent_product_category, "category_name")
+	return parent_category
 
 def get_parent_category_list(parent_category):
-    filters = {
-        'parent_product_category': parent_category.parent_product_category,
-        'is_active': 1, 'disable_in_website': 0
-    }
-    return frappe.get_all('Product Category',
-                          fields=['name', 'category_name', 'route'],
-                          filters=filters, order_by='display_order', limit_page_length=50)
+	filters = {
+		'parent_product_category': parent_category.parent_product_category,
+		'is_active': 1, 'disable_in_website': 0
+	}
+	return frappe.get_all('Product Category',
+						  fields=['name', 'category_name', 'route'],
+						  filters=filters, order_by='display_order', limit_page_length=50)
 
 @frappe.whitelist(allow_guest=True)
 def get_category_filters_json(category=None, brands='', ratings='', min_price='', max_price='',route=None):
@@ -186,19 +173,30 @@ def get_category_filters_json(category=None, brands='', ratings='', min_price=''
 			categories = frappe.db.get_all("Product Category",filters={"route":route})
 			if categories:
 				category = categories[0].name
-		p_ids = get_category_product_ids(category)
-		brand_filters = get_category_brands_filter(p_ids)
-		attribute_filters = get_category_item_attribute_filter(p_ids)
-		category_list = get_categories_sidemenu(category)
-		category_info = frappe.get_doc("Product Category",category)
-		meta_info = {"meta_title":category_info.meta_title,
-					"meta_keywords":category_info.meta_keywords,
-					"meta_description":category_info.meta_description}
-		return {'meta_info':meta_info,'attribute_list': attribute_filters, 
-				'brand_list': brand_filters, 'category_list': category_list}
+		if category:
+			catalog_settings = frappe.get_single('Catalog Settings')
+			category_filter = "'" + category + "'"
+			if catalog_settings.include_products_from_subcategories == 1:
+				from go1_commerce.go1_commerce.v2.category \
+				import get_child_categories
+				child_categories = get_child_categories(category)
+				if child_categories:
+					category_filter = ','.join(['"' + x.name + '"' for x in child_categories])
+			p_ids = get_category_product_ids(category_filter)
+			brand_filters = get_category_brands_filter(p_ids)
+			attribute_filters = get_category_item_attribute_filter(p_ids)
+			category_list = get_categories_sidemenu(category)
+			category_info = frappe.get_doc("Product Category",category)
+			meta_info = {"meta_title":category_info.meta_title,
+						"meta_keywords":category_info.meta_keywords,
+						"meta_description":category_info.meta_description}
+			return {'meta_info':meta_info,'attribute_list': attribute_filters, 
+					'brand_list': brand_filters, 'category_list': category_list}
+		return {'meta_info':{},'attribute_list': [], 'brand_list': [], 'category_list': []}
+
 	except Exception as e:
 		other_exception("Error in v2.category.get_category_filters")
-		return {'meta_info':[],'attribute_list': [], 'brand_list': [], 'category_list': []}
+		return {'meta_info':{},'attribute_list': [], 'brand_list': [], 'category_list': []}
 
 @frappe.whitelist(allow_guest=True)
 def get_category_filters(category=None, brands='', ratings='', min_price='', max_price='',route=None):
@@ -216,9 +214,9 @@ def get_category_filters(category=None, brands='', ratings='', min_price='', max
 		filter_data = get_filter_data_from_json_files(category, route)
 		return {
 			'meta_info': meta_info,
-			'attribute_list': filter_data.get('attribute_filters', []),
-			'brand_list': filter_data.get('brand_filters', []),
-			'category_list': filter_data.get('category_list', [])
+			'attribute_list': filter_data.get('attributes', []),
+			'brand_list': filter_data.get('brands', []),
+			'category_list': filter_data.get('categories', [])
 		}
 	except Exception as e:
 		frappe.log_error(title=_("Error in v2.category.get_category_filters"),message=frappe.get_traceback(), exc_info=True)
@@ -259,19 +257,25 @@ def get_filter_data_from_json_files(category=None, route=None):
 			category = categories[0].name
 	if not route and category:
 		route = frappe.db.get_value("Product Category",category,['route'])
-	filter_data = {}	
+	filter_data = {}
+	# frappe.log_error("category_path_route",route)
+	# frappe.log_error("category_path_category",category)	
 	if route and category:
-		import os,json	
+		from frappe.utils import get_files_path
+		import os,json
+		path = get_files_path()
 		category_path = (route.replace("/","-")+"-"+category)
 		for file_name in ["attributes.json", "brands.json", "categories.json"]:
-			file_path = os.path.join(category_path, file_name)
+			file_path = os.path.join(path,category_path, file_name)
 			if os.path.exists(file_path):
+				# frappe.log_error("file_path",file_path)
 				try:
 					with open(file_path, 'r') as f:
 						filter_data[file_name.replace(".json", "")] = json.load(f)
 				except (IOError, json.JSONDecodeError) as e:
 					frappe.log_error(title=_("Error reading JSON file"), 
 									message=f"Error reading {file_name}: {str(e)}")
+	# frappe.log_error("filter_data",filter_data)
 	return filter_data		
 
 def brands_not_equals_empty(brands):
@@ -330,7 +334,7 @@ def get_category_option_query(products_filter, attributes):
 				GROUP BY PAO.unique_name
 				""".format(products_filter=products_filter,attribute_id=x.product_attribute)
 		x.options = frappe.db.sql(optionquery,as_dict=1)
-	return optionquery
+	return attributes
 
 
 def get_category_item_attribute_filter(product_ids):
@@ -350,7 +354,7 @@ def get_category_item_attribute_filter(product_ids):
 					GROUP BY product_attribute""".format(products_filter=products_filter)
 		
 		attributes = frappe.db.sql(query,as_dict=1)
-		get_category_option_query(products_filter, attributes)
+		attribute = get_category_option_query(products_filter, attributes)
 		return attributes
 	return []
 
@@ -359,7 +363,7 @@ def get_category_product_ids(category_filter):
 					P.name AS product 
 				FROM `tabProduct` P 
 				INNER JOIN 
-					`tabProduct Category Mapping` CM ON CM.parent=p.name
+					`tabProduct Category Mapping` CM ON CM.parent=P.name
 				INNER JOIN 
 					`tabProduct Category` pc ON CM.category=pc.name 
 				WHERE 

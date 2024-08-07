@@ -51,8 +51,7 @@ class ProductCategory(WebsiteGenerator, NestedSet):
 			file_name=self.category_image.split('.')
 			self.category_thumbnail=file_name[0]+"_"+str(45)+"x"+str(45)+"."+file_name[len(file_name)-1]			
 		if self.is_active==1:
-			frappe.enqueue('go1_commerce.go1_commerce.doctype.\
-			product_category.product_category.update_category_data_json',queue = 'short',at_front = True,doc = self)
+			frappe.enqueue('go1_commerce.go1_commerce.doctype.product_category.product_category.update_category_data_json',queue = 'short',at_front = True,doc = self)
 
 
 	def on_trash(self):	
@@ -61,27 +60,26 @@ class ProductCategory(WebsiteGenerator, NestedSet):
 	
 
 	def make_route(self):
-		if not self.route:
-			self.route = ''
-			if self.parent_product_category:
-				parent_product_category = frappe.get_doc('Product Category', 
-											 		self.parent_product_category)
-				if parent_product_category:
-					self.route = self.scrub(parent_product_category.category_name) + '/'
-					if parent_product_category.parent_product_category:
-						parent_category = frappe.get_doc('Product Category', 
-									   parent_product_category.parent_product_category)
-						if parent_category :
-							self.route = self.scrub(parent_category.category_name) + \
-									'/' +self.scrub(parent_product_category.category_name) + '/'
-							if parent_category.parent_product_category:
-								parent_parent_category = frappe.get_doc('Product Category', 
-												parent_category.parent_product_category)
-								if parent_parent_category:
-									self.route = self.scrub(parent_product_category.category_name) + \
-										'/' +self.scrub(parent_category.category_name) + \
-										'/'+self.scrub(parent_parent_category.category_name) + '/'
-			self.route += self.scrub(self.category_name)
+		self.route = ''
+		if self.parent_product_category:
+			parent_product_category = frappe.get_doc('Product Category', 
+										 		self.parent_product_category)
+			if parent_product_category:
+				self.route = self.scrub(parent_product_category.category_name) + '-'
+				if parent_product_category.parent_product_category:
+					parent_category = frappe.get_doc('Product Category', 
+								   parent_product_category.parent_product_category)
+					if parent_category :
+						self.route = self.scrub(parent_category.category_name) + \
+								'-' +self.scrub(parent_product_category.category_name) + '-'
+						if parent_category.parent_product_category:
+							parent_parent_category = frappe.get_doc('Product Category', 
+											parent_category.parent_product_category)
+							if parent_parent_category:
+								self.route = self.scrub(parent_product_category.category_name) + \
+									'-' +self.scrub(parent_category.category_name) + \
+									'-'+self.scrub(parent_parent_category.category_name) + '-'
+		self.route += self.scrub(self.category_name)
 	
 	
 @frappe.whitelist()
@@ -253,8 +251,7 @@ def update_category_data_json(doc):
 	cat_route = cat_route.replace("/","-")
 	if not os.path.exists(os.path.join(path,cat_route+"-"+doc.name)):
 		frappe.create_folder(os.path.join(path,cat_route+"-"+doc.name))
-	from go1_commerce.go1_commerce.v2.category \
-																import get_category_filters_json
+	from go1_commerce.go1_commerce.v2.category import get_category_filters_json
 	filters_resp = get_category_filters_json(category=doc.name)
 	if filters_resp.get("attribute_list"):
 		with open(os.path.join(path,(cat_route+"-"+doc.name), 'attributes.json'), "w") as f:
@@ -272,8 +269,7 @@ def update_category_data_json(doc):
 			
 def update_whoose_search(self):
 	try:
-		from go1_commerce.go1_commerce.v2.whoosh \
-																import insert_update_search_data
+		from go1_commerce.go1_commerce.v2.whoosh import insert_update_search_data
 		send__data = []
 		dict__ = {}
 		dict__['name'] = self.name
@@ -288,8 +284,7 @@ def update_whoose_search(self):
 
 def delete_whoose_data(self):
 	try:
-		from go1_commerce.go1_commerce.v2.whoosh \
-																import remove_deleted_data
+		from go1_commerce.go1_commerce.v2.whoosh import remove_deleted_data
 		remove_deleted_data([self.name])
 	except Exception:
 		frappe.log_error(title="Error in delete product search data",message = frappe.get_traceback())

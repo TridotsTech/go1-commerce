@@ -43,44 +43,6 @@ def get_settings_value(dt, field):
 	if settings:
 		return settings
 	
-@frappe.whitelist()
-def get_integration_settings():
-	active_theme = get_theme_settings()
-	if active_theme:
-		theme_settings = frappe.get_doc('Web Theme', active_theme)
-		return theme_settings.get('enable_view_tracking')
-	return frappe.db.get_single_value('Website Settings', 'enable_view_tracking')
-
-
-def website_generator_update(doc,method):
-    	send_indexing_request(doc)
-
-
-def website_generator_trash(doc,method):
-	send_indexing_request(doc, 'URL_DELETED')
-
-
-def send_indexing_request(doc, operation_type='URL_UPDATED'):
-	try:
-		"""Send indexing request on update/trash operation."""
-		settings = get_theme_settings()
-		if frappe.db.get_value("Web Theme", settings, "enable_google_indexing"):
-			url = frappe.utils.get_url(doc.route)
-			from go1_commerce.utils.google_indexing import publish_site
-			publish_site(url=url, operation_type=operation_type)
-	except Exception:
-		frappe.log_error(frappe.get_traceback(), 'go1_commerce.go1_commerce.setup.send_indexing_request')
-
-
-def get_website_properties(doc, key=None, default=None):
-	out = getattr(doc, '_website', None) or getattr(doc, 'website', None) or {}
-	if not isinstance(out, dict):
-		out = {}
-	if key:
-		return out.get(key, default)
-	else:
-		return out
-
 
 def is_website_published(doc):
 	"""Return true if published in website"""

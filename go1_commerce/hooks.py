@@ -38,8 +38,7 @@ app_include_js = [
 	"assets/go1_commerce/js/quick_entry/return_quick_entry.js",
 ]
 doctype_js = {
-    "Web Form" : "public/js/ui/editor/web_form.js",
-    "Email Group" : "www/email_group.js"
+    "Web Form" : "public/js/ui/editor/web_form.js"
     }
 
 page_js = {
@@ -71,14 +70,7 @@ doc_events = {
 	"Newsletter": {
 		"autoname": "go1_commerce.utils.setup.autoname_newsletter"
 	},
-	"Product": {
-		"on_update": "go1_commerce.utils.setup.website_generator_update",
-		"on_trash": "go1_commerce.utils.setup.website_generator_trash"
-	},
-	"Product Category": {
-		"on_update": "go1_commerce.utils.setup.website_generator_update",
-		"on_trash": "go1_commerce.utils.setup.website_generator_trash"
-	},
+	
 	"Order": {
 		"on_submit": "go1_commerce.go1_commerce.v2.whoosh.update_order_item"
 	},
@@ -120,15 +112,6 @@ doc_events = {
 	},
 	"Builder Page":{
 		"on_update":"go1_commerce.go1_commerce.v2.builder_page.update_global_script"
-	},
-	"Shopping Cart": {
-		"on_update": "go1_commerce.go1_commerce.api.on_update_shopping_cart"
-	},
-	"Email Group": {
-		"after_insert": "go1_commerce.go1_commerce.api.after_insert_email_group"
-	},
-	"Email Unsubscribe": {
-		"after_insert": "go1_commerce.go1_commerce.doctype.email_campaign.email_campaign.unsubscribe_recipient"
 	}
 }
 
@@ -147,18 +130,9 @@ scheduler_events = {
 		],
 		"0 1 * * *": [
 			"go1_commerce.go1_commerce.doctype.customers.customers.delete_guest_customers",
-			"go1_commerce.go1_commerce.doctype.shopping_cart.shopping_cart.check_cart_discounts",
-			"go1_commerce.go1_commerce.doctype.pos_settings.pos_settings.clear_pos_orders",
-			"go1_commerce.membership.api.create_memberships"
 		],
 		"30 12 1 * *":[
 			"go1_commerce.utils.setup.clear_api_log"
-		],
-		"0 9 * * *": [
-			"go1_commerce.go1_commerce.doctype.email_campaign.email_campaign.send_email_to_campaigns"			
-		],
-		"0 1 * * *": [
-			"go1_commerce.go1_commerce.doctype.email_campaign.email_campaign.set_email_campaign_status"
 		]
 	}
 }
