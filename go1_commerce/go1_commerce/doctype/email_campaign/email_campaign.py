@@ -66,8 +66,13 @@ def send_email_to_campaigns():
 		email_campaigns = frappe.get_all("Email Campaign", filters = { 'status': ('not in', ['Unsubscribed', 'Completed', 'Scheduled']) })
 		for camp in email_campaigns:
 			email_campaign = frappe.get_doc("Email Campaign", camp.name)
-			if not frappe.db.get_value("Email Template",{"name": email_campaign.get("email_template")},'name'):
-				email_campaign.email_template = frappe.db.get_value("Campaign Email Schedule",camp.campign_id,"email_template")
+			if email_campaign.campaign:
+				campaign = frappe.db.get_value("Campaign Email Schedule", {"parent":email_campaign.campaign},"email_template")
+				campaign_email = frappe.get_doc({
+		            'doctype': 'Campaign Email Schedule', 
+		            'parent': email_campaign.campaign
+		            })
+				email_campaign.email_template=campaign
 			send_mail(email_campaign)
 	except Exception:
 		frappe.log_error(title="Error in send_email_to_campaigns", message = frappe.get_traceback())
