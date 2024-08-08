@@ -20,6 +20,8 @@ class CrudCart:
 	
 	def validate_stock_min_max_qty(self,item_info,qty,attribute_ids = None):
 		result = None
+		if isinstance(qty, str):
+			qty = int(qty)
 		if item_info.disable_add_to_cart_button == 1:
 			result = { 'status': False, 'message': _(f'Sorry! no stock available for the item {item_info.item}.') }
 		elif item_info.inventory_method == 'Dont Track Inventory':
@@ -627,3 +629,4 @@ def get_customer_cart(cart_type,customer):
 		return customer_cart
 	else:
 		return {}
+

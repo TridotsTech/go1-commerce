@@ -90,14 +90,9 @@ def search_product(search_txt,page_no = 1,page_length = 10):
 		frappe.log_error('Error in search product api ',frappe.get_traceback())
 
 def search_product_query(p_ids):
-	p_query = f'''	SELECT DISTINCT PP.product, P.item, PP.business, PP.price_list, 
-						PP.name AS product_price,P.image AS product_image,P.sku, P.name, P.route, 
-						(SELECT price FROM `tabProduct Price` PR 
-							INNER JOIN 
-								`tabPrice List Zone` ZPR ON 
-								PR.price_list = ZPR.parent
-							WHERE product = P.name AND price > 0
-							ORDER BY price LIMIT 1) AS price, PP.old_price,
+	p_query = f'''	SELECT DISTINCT P.item as product, P.item, 
+						P.image AS product_image,P.sku, P.name, P.route, 
+						P.price, P.old_price,
 						P.has_variants, P.short_description, P.tax_category, P.full_description,
 						P.inventory_method, P.disable_add_to_cart_button, P.weight,
 						P.gross_weight, P.approved_total_reviews, P.route AS brand_route,
@@ -105,15 +100,8 @@ def search_product_query(p_ids):
 							WHERE parent = P.name LIMIT 1) AS product_brand
 					FROM 
 						`tabProduct` P
-					INNER JOIN 
-						`tabProduct Price` PP ON PP.product = P.name
-					INNER JOIN 
-						`tabPrice List Zone` Z ON PP.price_list = Z.parent
-					INNER JOIN 
-						`tabBusiness` B ON B.name = PP.business
 					WHERE P.is_active = 1 AND 
 						P.show_in_market_place = 1 AND 
-						PP.price > 0 AND 
 						P.status = 'Approved'
 					AND (CASE
 							WHEN (P.has_variants = 1 AND
@@ -124,8 +112,7 @@ def search_product_query(p_ids):
 							THEN 1 = 1
 							ELSE 1 = 0
 						END)
-					AND PP.product IN ({p_ids})
-					GROUP BY PP.product'''
+					'''
 	return p_query
 
 def get_paginated_data(data_list, page_number, page_size):

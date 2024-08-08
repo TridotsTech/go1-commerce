@@ -136,20 +136,15 @@ def get_orders_list(page_no=1,page_length=10,no_subscription_order=0,order_from=
 		other_exception("Error in v2.customer.get_orders_list")
 
 def get_orders_items(orders):
-	language = frappe.get_system_settings('language')
 	get_time_log = 1
 	if orders:
 		for item in orders:
 			item.items = frappe.db.sql("""	SELECT 
-												return_created, shipping_status,
-											IFNULL((SELECT target_name FROM `tabDocType Translation` 
-												WHERE 
-													parent = ITEM AND language = %(language)s AND 
-													source_name = item_name), item_name) AS item_name
+												return_created, shipping_status, item_name
 											FROM 
 												`tabOrder Item` 
 											WHERE parent = %(parent)s""",
-										{'parent': item.name, 'language': language},as_dict=1)
+										{'parent': item.name},as_dict=1)
 			for it in item['items']:
 				if it.return_created==1:
 					if it.shipping_status == "Pending":

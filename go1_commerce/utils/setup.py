@@ -141,11 +141,11 @@ def get_query_condition_newsletter(user):
 
 
 def update_api_log(cmd):
-	common_settings = frappe.get_single('Common Settings')
-	if common_settings.enable_api_logs:
-		if not common_settings.api_log_method or len(common_settings.api_log_method) == 0:
+	order_settings = frappe.get_single('Order Settings')
+	if order_settings.enable_api_logs:
+		if not order_settings.api_log_method or len(order_settings.api_log_method) == 0:
 			return
-		check_method = next((x for x in common_settings.api_log_method if x.method == cmd), None)
+		check_method = next((x for x in order_settings.api_log_method if x.method == cmd), None)
 		if check_method:
 			cur_user = frappe.session.user
 			get_user = frappe.db.get_all('API Log',filters={'user':cur_user},fields=['name'])
@@ -181,7 +181,7 @@ def clear_executed_command_log():
 @frappe.whitelist()
 def delete_api_logs():
 	try:
-		enable_api_log = frappe.db.get_single_value('Common Settings', 'enable_api_logs')
+		enable_api_log = frappe.db.get_single_value('Order Settings', 'enable_api_logs')
 		if enable_api_log:
 			logs = frappe.db.sql('''select group_concat(concat('"', name, '"')) from `tabAPI Log` where creation < date_sub(curdate(), interval 7 day) order by creation limit 100''')
 			if logs and logs[0] and logs[0][0]:

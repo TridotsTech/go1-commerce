@@ -1018,13 +1018,6 @@ def get_location_details(zipcode):
 				city = item.get('long_name')
 	return zipcode, city, state, country
 
-@frappe.whitelist()
-def get_related_option(addon,parent):
-	try:
-		Group = frappe.db.sql("""select option_name from `tabItem Option` where add_on = %s and parent=%s""", (addon,parent))
-		return Group
-	except Exception:
-		frappe.log_error(frappe.get_traceback(), "go1_commerce.go1_commerce.doctype.product.get_related_option") 
 
 def convert_product_image(image_name,size,productid,updated_column=None,updated_name=None):
 	try:
@@ -1058,13 +1051,6 @@ def get_related_option_from_addon(add_on):
 	except Exception:
 		frappe.log_error(frappe.get_traceback(), "go1_commerce.go1_commerce.doctype.product.get_related_option_from_addon") 
 
-@frappe.whitelist()
-def get_relatedoption(addon):
-	try:
-		Group = frappe.db.sql("""select option_name from `tabItem Option` where add_on = %s""", (addon))    
-		return Group
-	except Exception:
-		frappe.log_error(frappe.get_traceback(), "go1_commerce.go1_commerce.doctype.product.get_relatedoption") 
 
 @frappe.whitelist()
 def get_product_attribute_options(attribute,product,attribute_id):

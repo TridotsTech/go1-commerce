@@ -1,6 +1,6 @@
 {
  "charts": [],
- "content": "[{\"id\":\"xbqoKFCs3x\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Masters</span>\",\"col\":12}},{\"id\":\"hkep2Lj8YF\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Country\",\"col\":3}},{\"id\":\"D2G-zAfh9K\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"State\",\"col\":3}},{\"id\":\"I1jS770j-9\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"City\",\"col\":3}},{\"id\":\"cU8m5mk0On\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Zone\",\"col\":3}},{\"id\":\"jMJuepK86n\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Area\",\"col\":3}}]",
+ "content": "[{\"id\":\"xbqoKFCs3x\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Masters</span>\",\"col\":12}},{\"id\":\"hkep2Lj8YF\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Country\",\"col\":3}},{\"id\":\"D2G-zAfh9K\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"State\",\"col\":3}},{\"id\":\"I1jS770j-9\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"City\",\"col\":3}},{\"id\":\"jMJuepK86n\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Area\",\"col\":3}}]",
  "creation": "2024-08-05 11:16:17.324923",
  "custom_blocks": [],
  "docstatus": 0,
@@ -13,7 +13,7 @@
  "is_hidden": 0,
  "label": "Masters",
  "links": [],
- "modified": "2024-08-07 12:31:17.387444",
+ "modified": "2024-08-08 20:39:37.238859",
  "modified_by": "Administrator",
  "module": "Go1 Commerce",
  "name": "Masters",
@@ -46,14 +46,6 @@
    "doc_view": "List",
    "label": "City",
    "link_to": "City",
-   "stats_filter": "[]",
-   "type": "DocType"
-  },
-  {
-   "color": "Grey",
-   "doc_view": "List",
-   "label": "Zone",
-   "link_to": "Zone",
    "stats_filter": "[]",
    "type": "DocType"
   },

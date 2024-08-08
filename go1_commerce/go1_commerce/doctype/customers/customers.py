@@ -215,18 +215,6 @@ class Customers(NestedSet):
 		if len(str(self.set_new_password)) < int(order_settings.min_password_length):
 			frappe.throw(frappe._('Password must contain {0} digits').format(order_settings.min_password_length))
 
-
-	def on_trash(self):
-		check_records = frappe.db.sql_list("""	SELECT name 
-												FROM `tabWebsite User` 
-												WHERE party_type = "Customers" 
-            										AND party = %(party)s
-											""", {'party': self.name})
-		if check_records:
-			frappe.db.sql("""DELETE FROM `tabWebsite User` 
-							WHERE name IN ({0})
-						""".format(','.join([('"' + x + '"') for x in check_records])))
-
 	
 def update_user(self):	
 	frappe.db.set_value("User", self.user_id , "first_name", self.first_name)

@@ -831,19 +831,6 @@ def get_location_details(zipcode):
 				city = item.get('long_name')
 	return zipcode, city, state, country
 
-
-@frappe.whitelist()
-def get_related_option(addon,parent):
-	try:
-		Group = frappe.db.sql("""SELECT option_name 
-								FROM `tabItem Option` 
-								WHERE add_on = %s AND parent = %s
-							""", (addon, parent))
-		return Group
-	except Exception:
-		frappe.log_error(frappe.get_traceback(), "Error in doctype.product.get_related_option") 
-
-
 @frappe.whitelist()
 def get_all_tags():
 	""" get the tags set in the  """
@@ -852,19 +839,6 @@ def get_all_tags():
 
 	active_tags = [row.get("title") for row in tags]
 	return active_tags
-
-
-@frappe.whitelist()
-def get_relatedoption(addon):
-	try:
-		Group = frappe.db.sql("""SELECT option_name 
-								FROM `tabItem Option` 
-								WHERE add_on = %s """, (addon))
-    
-		return Group
-	except Exception:
-		frappe.log_error(frappe.get_traceback(), "Error in doctype.product.get_relatedoption") 
-
 
 @frappe.whitelist()
 def get_product_attribute_options(attribute,product,attribute_id):
@@ -2501,8 +2475,6 @@ def insert_product_attribute_and_options(doc):
 				attr.idx= item.get('idx')
 				attr.attribute= frappe.db.get_value("Product Attribute",
 										item.get('product_attribute'), "attribute_name")
-				attr.attribute_unique_name= frappe.db.get_value("Product Attribute",
-										item.get('product_attribute'), "unique_name")
 				attr.control_type= item.get('control_type')
 				attr.display_order= item.get('display_order')
 				attr.is_required= item.get('is_required')
@@ -2683,36 +2655,27 @@ def update_whoose_search(self):
 			send__data = []
 			dict__ = {}
 			if self.is_active==1 and self.status=="Approved":
-				p_prices = frappe.db.sql("""SELECT product
-											FROM 
-												`tabProduct Price` PP 
-											INNER JOIN 
-												`tabPrice List` PL ON PP.price_list = PL.name
-											WHERE PP.product = %(product)s 
-											GROUP BY product """, {"product": self.name}, as_dict=1)
-				if p_prices:
-					for x in p_prices:   
-						dict__['name'] = self.name
-						dict__['product_id'] = self.name
+				dict__['name'] = self.name
+				dict__['product_id'] = self.name
+				dict__['title'] = self.item
+				dict__['route'] = cat_route + "/" +self.route if cat_route else self.route
+				dict__['type'] = "Product"
+				dict__['search_keyword'] = self.item
+				dict__['product_image'] = self.image
+				send__data.append(dict__)
+				dict__ = {}
+				if self.search_keyword:
+					for s__ in self.search_keyword:
+						dict__['name'] = s__.name
 						dict__['title'] = self.item
+						dict__['product_id'] = self.name
 						dict__['route'] = cat_route + "/" +self.route if cat_route else self.route
 						dict__['type'] = "Product"
-						dict__['search_keyword'] = self.item
 						dict__['product_image'] = self.image
+						dict__['search_keyword'] = s__.search_keywords
 						send__data.append(dict__)
 						dict__ = {}
-						if self.search_keyword:
-							for s__ in self.search_keyword:
-								dict__['name'] = s__.name
-								dict__['title'] = self.item
-								dict__['product_id'] = self.name
-								dict__['route'] = cat_route + "/" +self.route if cat_route else self.route
-								dict__['type'] = "Product"
-								dict__['product_image'] = self.image
-								dict__['search_keyword'] = s__.search_keywords
-								send__data.append(dict__)
-								dict__ = {}
-					insert_update_search_data(send__data)
+			insert_update_search_data(send__data)
 	except Exception:
 		frappe.log_error(title="Error in update product search data",message = frappe.get_traceback())
 

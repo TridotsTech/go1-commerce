@@ -15,31 +15,7 @@ class ShoppingCart(Document):
 	def validate(self):
 		from go1_commerce.go1_commerce.api import check_domain		
 		if self.cart_type == 'Shopping Cart':			
-			if not check_domain('restaurant'):
-				self.validate_cart_qty()
-		if self.items and check_domain('b2b'):
-			for cartitem in self.items:
-				user_id = frappe.db.get_value("Customers", self.customer, "user_id")
-				if not user_id:
-					user_id = frappe.session.user
-				role = frappe.get_roles(user_id)
-				roles = ','.join('"{0}"'.format(r) for r in role)
-				query = '''SELECT price FROM `tabProduct Pricing Rule` WHERE parent="{product}" AND parentfield="pricing_rule" AND role IN ({roles}) ORDER BY creation DESC'''.format(roles=roles,product=cartitem.product)
-				product_pricing_rule = frappe.db.sql('''{query}'''.format(query=query),as_dict=1)
-				if product_pricing_rule:
-					cartitem.price = product_pricing_rule[0].price
-				else:
-					product_info = frappe.get_doc("Product",cartitem.product)
-					product_price = product_info.price
-					price_details = get_product_price(product_info, customer=self.customer)
-					if price_details and price_details.get('discount_amount'):
-						product_price = price_details.get('rate')
-					cartitem.price = product_price
-
-		if check_domain('restaurant'):
-			if not self.business:
-				if self.items:
-					self.business = frappe.db.get_value('Product', self.items[0].product, 'restaurant')
+			self.validate_cart_qty()
 		self.validate_item_price()	
 		self.validate_subtotal_discount_forfree_item()	
 	
@@ -67,16 +43,7 @@ class ShoppingCart(Document):
 						product_info = None
 						if frappe.db.exists("Product",item.product):		
 							product_info = frappe.get_doc('Product', item.product)
-							if check_domain('b2b'):
-								user_id = frappe.db.get_value("Customers", self.customer, "user_id")
-								if not user_id:
-									user_id = frappe.session.user
-								role = frappe.get_roles(user_id)
-								roles = ','.join('"{0}"'.format(r) for r in role)
-								query = '''SELECT price FROM `tabProduct Pricing Rule` WHERE parent="{product}" AND parentfield="pricing_rule" AND role IN ({roles}) ORDER BY creation DESC'''.format(roles=roles,product=product_info.name)
-								product_pricing_rule = frappe.db.sql('''{query}'''.format(query=query),as_dict=1)
-								if product_pricing_rule:
-									product_info.price = product_pricing_rule[0].price
+							
 							product_rate = item.price
 							if product_info and product_info.get('custom_entered_price') and product_info.get('custom_entered_price') == 1:
 								product_rate = item.price

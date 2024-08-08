@@ -822,23 +822,19 @@ def get_page_content(route, user=None, customer=None,application_type="mobile",s
 
 def conditional_products_query(items_filter,conditions):
 	query = f"""SELECT DISTINCT 
-			PP.product, P.item AS ITEM, PP.price_list, PP.name AS product_price,
-			(SELECT price FROM `tabProduct Price` pr 
-				INNER JOIN `tabPrice List Zone` zpr ON pr.price_list = zpr.parent
-				WHERE product = P.name AND price > 0 ORDER BY price LIMIT 1) AS price, 
+			P.item AS product, P.item AS ITEM,
+			 P.price, 
 			P.has_variants, P.short_description, P.tax_category, P.full_description,
 			P.sku, P.name, P.route, P.inventory_method, P.minimum_order_qty,
-			P.disable_add_to_cart_button, P.weight,PP.old_price,
+			P.disable_add_to_cart_button, P.weight,P.old_price,
 			P.gross_weight, P.approved_total_reviews, CM.category
 		FROM `tabProduct` P
-		INNER JOIN `tabProduct Price` PP ON PP.product = P.name
-		INNER JOIN `tabPrice List Zone` Z ON PP.price_list = Z.parent
 		INNER JOIN `tabProduct Category Mapping` CM ON CM.parent = P.name
 		INNER JOIN `tabProduct Category` PC ON CM.category = PC.name
 		WHERE P.is_active = 1 AND P.show_in_market_place = 1 
-			AND PP.price > 0 AND P.status = 'Approved'
+			AND P.status = 'Approved'
 			AND P.name IN ({items_filter}) {conditions}
-		GROUP BY PP.product"""
+		"""
 	
 	return query
 	
@@ -856,34 +852,26 @@ def get_conditional_products(seller_classify,items_filter):
 
 def no_stock_products_yuery(items_filter,conditions,seller_classify_cond):
 	query = f"""SELECT DISTINCT 
-				PP.product, P.item, PP.price_list,P.full_description,P.route AS brand_route 
-				PP.name AS product_price,P.has_variants, P.short_description,P.tax_category,
-				P.brand_name AS product_brand (
-					SELECT price 
-					FROM `tabProduct Price` PR 
-					INNER JOIN `tabPrice List Zone` ZPR 
-					ON PR.price_list = ZPR.parent 
-					WHERE product = P.name AND price > 0 
-					ORDER BY price 
-					LIMIT 1) AS price, PP.old_price,
+				P.item as product, P.item, P.full_description,P.route AS brand_route 
+				P.name AS product_price,P.has_variants, P.short_description,P.tax_category,
+				P.brand_name AS product_brand ,P.price, P.old_price,
 				P.sku, P.name, P.route, P.inventory_method, P.minimum_order_qty,P.image AS product_image,
 				P.disable_add_to_cart_button, P.weight,P.approved_total_reviews,CM.category,P.gross_weight
 			FROM `tabProduct` P 
-			INNER JOIN `tabProduct Price` PP 
-				ON PP.product = P.name 
+			
 			INNER JOIN `tabProduct Category Mapping` CM 
 				ON CM.parent = P.name 
 			INNER JOIN `tabProduct Category` PC 
 				ON CM.category = PC.name 
 			WHERE P.is_active = 1 AND P.show_in_market_place = 1 AND
-				PP.price > 0 AND P.status = 'Approved' 
+				 P.status = 'Approved' 
 			AND (CASE WHEN (P.has_variants = 1 AND 
 				EXISTS (SELECT VC.name 
 						FROM `tabProduct Variant Combination` VC 
 						WHERE VC.show_in_market_place = 1 '{seller_classify_cond}' AND 
 							VC.disabled = 0 THEN 1 = 1 
 					WHEN (P.has_variants = 0 THEN 1 = 1 ELSE 1 = 0 END) 
-			AND P.name IN (%s) %s GROUP BY PP.product """ % (items_filter, conditions)
+			AND P.name IN (%s) %s  """ % (items_filter, conditions)
 	return query
 
 @frappe.whitelist(allow_guest=True)

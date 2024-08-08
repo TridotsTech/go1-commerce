@@ -108,6 +108,13 @@
   "admin_order_template",
   "show_flow_chart",
   "enable_refund_option",
+  "domain_and_ip_settings_section",
+  "domain_restriction",
+  "allowed_domains",
+  "blocked_ips",
+  "api_log_settings_section",
+  "enable_api_logs",
+  "api_log_method",
   "otp_tab",
   "otp_length",
   "column_break_aaz0",
@@ -720,11 +727,53 @@
    "fieldname": "otp_expiry",
    "fieldtype": "Int",
    "label": "OTP Expiry ( In Seconds)"
+  },
+  {
+   "fieldname": "api_log_settings_section",
+   "fieldtype": "Section Break",
+   "label": "API Log Settings"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_api_logs",
+   "fieldtype": "Check",
+   "label": "Enable API Logs"
+  },
+  {
+   "depends_on": "eval: doc.enable_api_logs == 1",
+   "fieldname": "api_log_method",
+   "fieldtype": "Table",
+   "label": "API Log Method",
+   "options": "API Log Method"
+  },
+  {
+   "fieldname": "domain_and_ip_settings_section",
+   "fieldtype": "Section Break",
+   "label": "Domain and IP Settings"
+  },
+  {
+   "default": "0",
+   "fieldname": "domain_restriction",
+   "fieldtype": "Check",
+   "label": "Restrict the domain for order"
+  },
+  {
+   "depends_on": "eval:doc.domain_restriction == 1",
+   "fieldname": "allowed_domains",
+   "fieldtype": "Table",
+   "label": "Allowed Domains",
+   "options": "Allowed Domain"
+  },
+  {
+   "fieldname": "blocked_ips",
+   "fieldtype": "Table",
+   "label": "IP Address to be blocked",
+   "options": "Block IP Address"
   }
  ],
  "issingle": 1,
  "links": [],
- "modified": "2024-08-03 14:36:58.783627",
+ "modified": "2024-08-08 17:26:33.344374",
  "modified_by": "Administrator",
  "module": "Go1 Commerce",
  "name": "Order Settings",

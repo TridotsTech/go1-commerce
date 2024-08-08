@@ -25,10 +25,6 @@ class BlogTag(WebsiteGenerator):
 		temp = frappe.db.get_value("Web Page Builder",
 					filters,["file_path","header_template","footer_template","name", "document"],as_dict=1)
 		if temp:
-			if temp.header_template:
-				context.header_file = frappe.db.get_value('Header Template', temp.header_template, 'route')
-			if temp.footer_template:
-				context.footer_file = frappe.db.get_value('Footer Template', temp.footer_template, 'route')
 			enable_generate_html=frappe.db.get_single_value("CMS Settings", "generate_html")
 			if enable_generate_html or temp.document:
 				context.template = temp.file_path

@@ -63,16 +63,17 @@ class Discounts(Document):
 			discount_requirements_has_values(self)
 		elif self.discount_type == 'Assigned to Products' and self.percent_or_amount == 'Discount Amount':
 			for item in self.discount_products:
+
 				products = frappe.db.sql('''
-							SELECT P.product, P.product_name, P.price, P.vendor_name 
-							FROM `tabProduct Price` AS P 
-							WHERE P.product = "{0}"
+							SELECT P.name,P.item,P.price 
+							FROM `tabProduct` AS P 
+							WHERE P.name = "{0}"
 						'''.format(item.items), as_dict=1)
 
 				for pdt in products:
 					if flt(self.discount_amount) > flt(pdt.price):
 						frappe.throw(frappe._('Price of {0} is lesser than \
-									the current discount amount.').format(pdt.product_name))
+									the current discount amount.').format(pdt.item))
 		if self.discount_type == 'Assigned to Sub Total':
 			for item in self.discount_requirements:
 				if item.discount_requirement != 'Spend x amount' and item.discount_requirement != \

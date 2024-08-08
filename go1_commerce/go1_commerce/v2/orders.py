@@ -240,12 +240,12 @@ def validate_coupon_data(coupon_data, order_total, cart_items):
 
 
 def validate_domain_and_ips():
-    common_settings = frappe.get_single("Common Settings")
-    if common_settings:
+    order_settings = frappe.get_single("Order Settings")
+    if order_settings:
         hostname = socket.gethostname()
         IPAddr = socket.gethostbyname(hostname)
-        blocked_ips = frappe.db.get_all("Block IP Address",
-                                        filters={"parent":common_settings.name,"ip_address":IPAddr})
+        blocked_ips = frappe.db.get_list("Block IP Address",
+                                        filters={"parent":order_settings.name,"ip_address":IPAddr})
         if blocked_ips:
             return False
     return True
