@@ -143,7 +143,7 @@ class WalletTransaction(Document):
 		doc.status = "Cancelled"
 		doc.save()
 
-@frappe.whitelist(allow_guest=True)
+
 def update_wallet(self):
 	try:
 		wallet_setting = frappe.get_single("Wallet Settings")
@@ -188,7 +188,7 @@ def update_wallet(self):
 				"Error in accounts.doctype.wallet_entry.wallet_entry.update_wallet") 
 
 
-@frappe.whitelist(allow_guest=True)
+
 def create_new_wallet_entry(self):
 	wal = frappe.new_doc("Wallet")
 	wal.last_updated = current_date
@@ -250,7 +250,7 @@ def create_new_wallet_entry(self):
 			wal.name1=name
 		wal.insert(ignore_permissions=True)
 
-@frappe.whitelist(allow_guest=True)
+
 def create_new_wallet_cod(self):
 	wal = frappe.new_doc("Wallet")
 	wal.last_updated = current_date
@@ -289,7 +289,7 @@ def create_new_wallet_cod(self):
 	wal.insert(ignore_permissions=True)
 
 
-@frappe.whitelist(allow_guest=True)
+
 def update_walletcancel(self):
 	try:
 		wallet_setting = frappe.get_single("Wallet Settings")
@@ -335,7 +335,7 @@ def update_walletcancel(self):
 		frappe.log_error(frappe.get_traceback(), " Error in wallet.update_walletcancel") 
 
 
-@frappe.whitelist(allow_guest=True)
+
 def cancel_payment_entry(self):
 	try:
 		slt = frappe.db.sql(""" SELECT DISTINCT R.parent 
@@ -356,7 +356,7 @@ def cancel_payment_entry(self):
 		frappe.log_error(frappe.get_traceback(), "Error in wallet.cancel_payment_entry") 
 
 
-@frappe.whitelist(allow_guest=True)
+
 def update_walletcancels(self):
 	try:
 		if self.type!="Service Provider":
@@ -442,7 +442,7 @@ def update_walletcancels(self):
 		frappe.log_error(frappe.get_traceback(), 
 								"Error in accounts.doctype.wallet_entry.wallet_entry.update_walletcancel") 
 
-@frappe.whitelist(allow_guest=True)
+
 def update_transaction_status(id,doctype,status):
 	trans=frappe.get_doc('Wallet Transaction',id)
 	providers = frappe.db.sql('''SELECT name 
@@ -473,7 +473,7 @@ def update_transaction_status(id,doctype,status):
 	return "Success"
 
 
-@frappe.whitelist(allow_guest=True)
+
 def update_docstatus(docid, doctype, status, field=None):
 
 	doc = frappe.get_doc(doctype,docid)
@@ -487,7 +487,7 @@ def update_docstatus(docid, doctype, status, field=None):
 	return "Success"
 
 
-@frappe.whitelist(allow_guest=True)
+
 def make_recived_payment(source_name,payment_type,reference=None):
 	try:
 		frappe.log_error("SO NA",source_name.name)

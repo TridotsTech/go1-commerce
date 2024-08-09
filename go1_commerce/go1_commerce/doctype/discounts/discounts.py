@@ -183,7 +183,7 @@ def discount_requirements_has_values(self):
 		else:
 			frappe.throw(frappe._('Please select the requirement type "Spend x Amount"'))
 			
-@frappe.whitelist()
+
 def get_free_item(txt):
 	condition = ''
 	if txt:
@@ -195,7 +195,7 @@ def get_free_item(txt):
 						'''.format(condition=condition))
 
 
-@frappe.whitelist(allow_guest=True)
+
 def get_product_discount(product, qty = 1, rate = None, customer_id = None, attribute_id = None, product_array = None):
 	try:
 		product = frappe._dict(product)
@@ -274,7 +274,7 @@ def get_product_categories(product_id):
 	return '""'
 
 
-@frappe.whitelist(allow_guest=True)
+
 def get_order_subtotal_discount(subtotal, customer_id, cart_items, total_weight=0,
 								shipping_method=None, payment_method=None, shipping_charges=0):
 	out = {}
@@ -322,7 +322,7 @@ def get_order_subtotal_discount(subtotal, customer_id, cart_items, total_weight=
 	return out
 
 
-@frappe.whitelist(allow_guest=True)
+
 def get_ordersubtotal_discount_forfree_item(subtotal,cart_items):
 	out = {}
 	products_list = []
@@ -440,7 +440,7 @@ def get_usage_history(discount):
 												'start_date': discount.start_date}, as_dict=1)
 
 
-@frappe.whitelist(allow_guest=True)
+
 def get_coupon_code(coupon_code, subtotal, customer_id, cart_items,discount_type=None, 
 					shipping_method=None, payment_method=None,total_weight=0,shipping_charges=0):
 	out = {}
@@ -520,7 +520,7 @@ def validate_birthday_club(customer_id):
 	return allow
 
 
-@frappe.whitelist()
+
 def delete_item(name):
 	doc = frappe.get_doc("Discount Products", name)
 	doc.delete()
@@ -649,7 +649,7 @@ def check_delivery_charge_discount(
 	return out
 
 
-@frappe.whitelist()
+
 def save_as_template(discount, title):
 	from frappe.model.mapper import get_mapped_doc
 	doc = get_mapped_doc("Discounts", discount, {
@@ -664,7 +664,7 @@ def save_as_template(discount, title):
 	doc.save(ignore_permissions=True)
 	return doc
 
-@frappe.whitelist()
+
 def update_cart():
 	carts = frappe.db.sql_list('''
 				SELECT C.name
@@ -680,7 +680,7 @@ def update_cart():
 			doc.save(ignore_permissions=True)
 
 
-@frappe.whitelist()
+
 def get_products(doctype, txt, searchfield, start, page_len, filters):
 	if txt:
 		condition += ' and (name like "%{txt}%" or item like "%{txt}%")'.format(txt = txt)
@@ -851,13 +851,13 @@ def update_wallet_transaction(order_info, discount, notes, cashback):
 	return res
 
 
-@frappe.whitelist()
+
 def get_shopping_cart_settings():
 	from go1_commerce.utils.setup import get_settings
 	return get_settings('Shopping Cart Settings')
 
 
-@frappe.whitelist()
+
 def get_product_attribute(product):
 	from go1_commerce.go1_commerce.doctype.\
 		product.product import get_product_attribute_options

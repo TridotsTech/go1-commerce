@@ -9,7 +9,6 @@ from frappe.model.document import Document
 class DeliverySetting(Document):
 	pass
 
-@frappe.whitelist()
 def check_category_exist_or_not():
 	category = []
 	is_exist = frappe.db.sql('''SELECT category 

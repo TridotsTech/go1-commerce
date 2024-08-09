@@ -100,7 +100,7 @@ class ProductReview(Document):
 						"message": "Reward Point for Product Review "+self.name
 						}).insert(ignore_permissions=True)
 
-@frappe.whitelist()
+
 def convert_product_image(image_name,size,productid):
 	try:
 		image_file=image_name.split('.')

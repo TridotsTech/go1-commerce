@@ -9,7 +9,7 @@ from frappe.model.document import Document
 class PartyType(Document):
 	pass
 
-@frappe.whitelist()
+
 def get_party_name(party_type,party):
 	party_name = "item"
 	if party_type == "Business":

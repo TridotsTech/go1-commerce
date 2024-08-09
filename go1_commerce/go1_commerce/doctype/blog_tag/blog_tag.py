@@ -41,7 +41,6 @@ class BlogTag(WebsiteGenerator):
 		context.BlogCateogories=BlogCateogories 
 
 
-@frappe.whitelist(allow_guest=True)
 def get_tag_based_blog_list(tag = None, page_no = 1, page_size = 12):
 	start = (int(page_no) - 1) * int(page_size)
 	data = frappe.db.sql(f"""SELECT B.* 

@@ -10,12 +10,10 @@ from frappe.model.document import Document
 class DiscountTemplate(Document):
 	pass
 
-@frappe.whitelist()
 def get_all_templates():
 	return frappe.db.sql('''SELECT name, name1, image 
 							FROM `tabDiscount Template`''', as_dict=1)
 
-@frappe.whitelist()
 def create_discount(template):
 	from frappe.model.mapper import get_mapped_doc
 	doc = get_mapped_doc("Discount Template", template, {
@@ -30,6 +28,5 @@ def create_discount(template):
 	doc.save(ignore_permissions=True)
 	return doc
 
-@frappe.whitelist()
 def get_template_info(name):
 	return frappe.get_doc('Discount Template', name)

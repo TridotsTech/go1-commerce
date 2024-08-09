@@ -9,7 +9,7 @@ from frappe.model.document import Document
 
 class CheckoutAttributes(Document):
 	pass
-@frappe.whitelist()
+
 def get_options(attribute):
 	return frappe.db.sql('''SELECT option_value 
 							FROM 

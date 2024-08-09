@@ -82,7 +82,7 @@ class ProductCategory(WebsiteGenerator, NestedSet):
 		self.route += self.scrub(self.category_name)
 	
 	
-@frappe.whitelist()
+
 def get_children(doctype, parent=None, is_root=False):
 	try:
 		if parent == None or parent == "All Categories":
@@ -104,7 +104,7 @@ def get_children(doctype, parent=None, is_root=False):
 		frappe.log_error(frappe.get_traceback(), "Error in doctype.product_category.get_children") 
 	
  
-@frappe.whitelist()
+
 def add_customer_withparent(data, parent):
 	data = json.loads(data)
 	new_doc = frappe.new_doc('Product Category')
@@ -116,7 +116,7 @@ def add_customer_withparent(data, parent):
 	return new_doc
 
 
-@frappe.whitelist()
+
 def add_node():	
 	try:
 		args = make_cat_tree_args(**frappe.form_dict)	
@@ -146,7 +146,7 @@ def make_cat_tree_args(**kwarg):
 		frappe.log_error(frappe.get_traceback(), "Error in doctype.product_category.make_cat_tree_args") 
 	
  
-@frappe.whitelist()
+
 def update_image_thumbnail(doc):
 	try:
 		all_products=frappe.db.sql("""
@@ -219,7 +219,7 @@ def get_child_groups(product_category_name):
 						""", {'lft': product_category.lft, 'rgt': product_category.rgt})
 
 
-@frappe.whitelist()
+
 def get_parent_category(txt):
 	condition=''
 	if txt:
@@ -243,7 +243,7 @@ def save_cdn_to_local(org_image,title,size,column_name,id):
 	res.save(ignore_permissions=True)
 
 
-@frappe.whitelist()
+
 def update_category_data_json(doc):
 	from frappe.utils import get_files_path	
 	path = get_files_path()

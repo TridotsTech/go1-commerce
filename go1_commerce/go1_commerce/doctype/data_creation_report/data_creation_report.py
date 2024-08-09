@@ -14,7 +14,6 @@ class DataCreationReport(Document):
 			res_json = json.loads(self.result_json)
 		return res_json
 
-@frappe.whitelist()
 def create_data_report(business, data_type='Default Data'):
 	doc = frappe.new_doc('Data Creation Report')
 	doc.business = business
@@ -25,7 +24,7 @@ def create_data_report(business, data_type='Default Data'):
 	return doc
 
 
-@frappe.whitelist()
+
 def update_data_report(name, results):
 	doc = frappe.get_doc('Data Creation Report', name)
 	doc.result_json = results

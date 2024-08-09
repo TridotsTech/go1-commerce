@@ -81,13 +81,10 @@ class Business(WebsiteGenerator):
 		return ''.join(random.choice(chars) for _ in range(size))
 
 	
-@frappe.whitelist()
 def get_all_weekdays():
 	Group = frappe.db.get_all('Week Day',fields=['name','day'],order_by='displayorder asc')
 	return Group 
 
-	
-@frappe.whitelist()
 def validate_geo_location(self,address):
 	try:
 		if not self.latitude or not self.longitude:				

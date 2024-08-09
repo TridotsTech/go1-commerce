@@ -102,7 +102,6 @@ class BuilderPage(WebsiteGenerator):
 		if not self.name:
 			self.name = f"page-{frappe.generate_hash(length=5)}"
 
-	@frappe.whitelist()
 	def publish(self, **kwargs):
 		frappe.form_dict.update(kwargs)
 		self.published = 1
@@ -203,7 +202,7 @@ class BuilderPage(WebsiteGenerator):
 		if builder_settings.style:
 			context.setdefault("styles", []).append(builder_settings.style_public_url)
 
-	@frappe.whitelist()
+	
 	def get_page_data(self, args=None):
 		if args:
 			args = frappe.parse_json(args)
@@ -548,7 +547,6 @@ def escape_single_quotes(text):
 # 	subprocess.run(["npx", "tailwindcss", "-o", tailwind_css_file_path, "--config", temp_config_file_path, "--minify"])
 
 
-@frappe.whitelist()
 def get_page_preview_html(page: str, **kwarg) -> str:
 	# to load preview without publishing
 	frappe.form_dict.update(kwarg)
@@ -616,7 +614,7 @@ def is_component_used(blocks, component_id):
 	return False
 
 
-@frappe.whitelist()
+
 def upload_builder_asset():
 	from frappe.handler import upload_file
 
@@ -628,7 +626,6 @@ def upload_builder_asset():
 	return image_file
 
 
-@frappe.whitelist()
 def convert_to_webp(image_url: str | None = None, file_doc: Document | None = None) -> str:
 	"""BETA: Convert image to webp format"""
 

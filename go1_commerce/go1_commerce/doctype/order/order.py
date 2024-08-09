@@ -1376,7 +1376,7 @@ def calculate_shipping_charges_method(items,catalog_settings,shipping_rate_metho
 			}
 
 
-@frappe.whitelist()
+
 def make_invoice(source_name, target_doc = None):
 	make_sales_invoice(
 						source_name, 
@@ -1385,7 +1385,7 @@ def make_invoice(source_name, target_doc = None):
 					)
 
 
-@frappe.whitelist(allow_guest = True)
+
 def calculate_shipping_charges_by_total(shipping_method, shipping_rate_method, items):
 	total_shipping_charges = 0
 	total_order_amount = 0
@@ -1416,7 +1416,7 @@ def calculate_shipping_charges_by_total(shipping_method, shipping_rate_method, i
 	return total_shipping_charges
 
 
-@frappe.whitelist(allow_guest=True)
+
 def calculate_shipping_charges_by_weight(shipping_method, shipping_rate_method, items):
 	weight_shipping_charges = 0
 	weight_order_amount = 0
@@ -1446,7 +1446,7 @@ def calculate_shipping_charges_by_weight(shipping_method, shipping_rate_method, 
 		weight_shipping_charges = last_charge.charge_amount
 		return weight_shipping_charges
 
-@frappe.whitelist(allow_guest=True)
+
 def calculate_shipping_charges_by_distance(shipping_method, shipping_addr, shipping_rate_method, items):
 	hts = ""
 	shipping_charges = 0
@@ -1511,7 +1511,7 @@ def calculate_shipping_charges_by_distance(shipping_method, shipping_addr, shipp
 	return shipping_charges
 
 
-@frappe.whitelist(allow_guest=True)
+
 def calculate_shipping_charges_by_distance_and_total(shipping_method, shipping_addr, shipping_rate_method, 
 														subtotal, items):
 	shipping_charges = 0
@@ -1772,7 +1772,7 @@ def update_discount_foradminorder(doc):
 	return returndata
 
 
-@frappe.whitelist()
+
 def calculate_tax_after_discount(customer_id, discount_amount, discount, subtotal,
 									cart_items, prev_discount=None, discount_type=None, response=None):
 
@@ -1945,7 +1945,7 @@ def order_shipment_status(order_info,order_details,):
 			customer_notes,farm_share_notes,is_driver]
 
 
-@frappe.whitelist()
+
 def get_drivers(doctype, txt, searchfield, start, page_len, filters):
 	try:
 		user = frappe.db.sql('''select name from `tabDrivers`''')
@@ -1954,7 +1954,7 @@ def get_drivers(doctype, txt, searchfield, start, page_len, filters):
 		frappe.log_error("Error in doctype.order.get_drivers", frappe.get_traceback())
 
 
-@frappe.whitelist()
+
 def get_customers(doctype,txt,searchfield,start,page_len,filters):
 	try:
 		condition = ""
@@ -1970,7 +1970,7 @@ def get_customers(doctype,txt,searchfield,start,page_len,filters):
 		frappe.log_error("Error in doctype.order.get_customers", frappe.get_traceback())
 
 
-@frappe.whitelist()
+
 def get_order_status(doctype,txt,searchfield,start,page_len,filters):
 	try:
 		condition = ''
@@ -1994,7 +1994,7 @@ def get_order_status(doctype,txt,searchfield,start,page_len,filters):
 		frappe.log_error("Error in doctype.order.order.get_order_status",frappe.get_traceback())
 
 
-@frappe.whitelist()
+
 def check_payment(self):
 	try:
 		if self.payment_status == "Paid":
@@ -2015,7 +2015,7 @@ def check_payment(self):
 		frappe.log_error("Error in doctype.order.check_payment", frappe.get_traceback())
 
 
-@frappe.whitelist(allow_guest = True)
+
 def send_notification(self,doctype = "Order",message = "You have an order!"):
 	try:
 		frappe.publish_realtime(event = 'msgprint',message = 'hello',user = 'administrator')
@@ -2023,7 +2023,7 @@ def send_notification(self,doctype = "Order",message = "You have an order!"):
 		frappe.log_error("Error in .doctype.order.send_notification", frappe.get_traceback())
 
 
-@frappe.whitelist(allow_guest=True)
+
 def check_orderDelivery(self):
 	try:
 		orderDelivery = frappe.db.get_all('Order Delivery',filters={'order_id':self.name})
@@ -2043,7 +2043,7 @@ def check_orderDelivery(self):
 		frappe.log_error("Error in doctype.order.check_orderDelivery", frappe.get_traceback())
 
 
-@frappe.whitelist(allow_guest=True)
+
 def update_orderDelivery(self):
 	try:
 		orderDelivery=frappe.db.get_all('Delivery',filters={'order_id':self.name})
@@ -2072,7 +2072,7 @@ def randomStringDigits(stringLength=6):
 	return ''.join(random.choice(lettersAndDigits) for i in range(stringLength))
 
 
-@frappe.whitelist()
+
 def get_order_settings(order_id,doctype):
 	if not frappe.db.get_value(doctype, order_id):
 		return
@@ -2098,7 +2098,7 @@ def get_order_settings(order_id,doctype):
 			"allow_shipment":allow_shipment}
 
 
-@frappe.whitelist()
+
 def check_order_settings():
 	is_restaurant_driver = 0
 	return {
@@ -2107,7 +2107,7 @@ def check_order_settings():
 			"is_restaurant_driver":is_restaurant_driver}
 
 
-@frappe.whitelist()
+
 def make_refund(refund_amount, order):
 	payment = get_customer_payments(order)
 	if len(payment)>0:
@@ -2119,14 +2119,14 @@ def make_refund(refund_amount, order):
 	return "failed"
 
 
-@frappe.whitelist()
+
 def mark_as_ready(order):
 	order_info = frappe.get_doc("Order",order)
 	order_info.status = "Ready"
 	order_info.save(ignore_permissions=True)
 
 
-@frappe.whitelist()
+
 def get_customer_payments(order):
 	payments = frappe.db.sql('''SELECT P.name, P.posting_date, P.paid_amount, R.outstanding_amount
 								FROM `tabPayment Entry` P, `tabPayment Reference` R
@@ -2137,7 +2137,7 @@ def get_customer_payments(order):
 	return payments
 
 
-@frappe.whitelist(allow_guest = True)
+
 def cancel_order(order):
 	if not frappe.db.get_value('Order', order):
 		return
@@ -2155,12 +2155,12 @@ def cancel_order(order):
 	return {'status': 'Success'}
 
 
-@frappe.whitelist(allow_guest=True)
+
 def get_linked_invoice(order):
 	return frappe.db.get_value("Sales Invoice",{"reference":order})
 
 
-@frappe.whitelist(allow_guest = True)
+
 def shipping_zip_matches_order(zip, ziprange):
 	zipcoderanges = []
 	returnValue = False
@@ -2186,14 +2186,14 @@ def shipping_zip_matches_order(zip, ziprange):
 	return returnValue
 
 
-@frappe.whitelist(allow_guest=True)
+
 def check_installed_app(app_name):
 	if app_name in frappe.get_installed_apps():
 		return True
 	return False
 
 
-@frappe.whitelist()
+
 def clear_guest_user_details(order_id):
 	if not frappe.db.get_value('Order', order_id):
 		return
@@ -2214,7 +2214,7 @@ def clear_guest_user_details(order_id):
 				frappe.db.set_value('Order', order_id, 'customer_name', customer_info.full_name)
 
 
-@frappe.whitelist()
+
 def update_order_shipment_payment(order):
 	shipments = frappe.db.get_all("Shipment",filters = {"document_name":order},fields = ['*'])
 	if shipments:
@@ -2224,13 +2224,13 @@ def update_order_shipment_payment(order):
 					''', {'shipment_id': shipments[0].name})
 
 
-@frappe.whitelist()
+
 def get_order_shipments(name):
 	shipments = frappe.db.get_all("Shipment",filters={"document_name":name},fields=['*'])
 	return shipments
 
 
-@frappe.whitelist()
+
 def update_order_totals(order, shipping_charges, discount_amount, Wallet_amount):
 	order_info = frappe.get_doc("Order",order)
 	frappe.db.set_value('Order', order, 'shipping_charges', shipping_charges)
@@ -2243,7 +2243,7 @@ def update_order_totals(order, shipping_charges, discount_amount, Wallet_amount)
 	order_info.save(ignore_permissions=True)
 
 
-@frappe.whitelist()
+
 def create_custom_wallet_entry(order,amount):
 	wallet_trans_entry = frappe.get_doc({
 											"doctype":"Wallet Transaction",
@@ -2266,7 +2266,7 @@ def create_custom_wallet_entry(order,amount):
 	wallet_trans_entry.submit()
 
 
-@frappe.whitelist()
+
 def update_order_checkout_attributes(order,attributes):
 	for x in json.loads(attributes):
 		if x.get('name') and x.get('name') != '':
@@ -2290,7 +2290,7 @@ def update_order_checkout_attributes(order,attributes):
 	order_info.save(ignore_permissions=True)
 
 
-@frappe.whitelist()
+
 def update_giftcard_payments(order_id,transaction_id):
 	giftcard_orders = frappe.get_all("Gift Card Order",filters={"order_reference":order_id})
 	for x in giftcard_orders:
@@ -2300,7 +2300,7 @@ def update_giftcard_payments(order_id,transaction_id):
 		giftcard_order.save(ignore_permissions = True)
 
 
-@frappe.whitelist()
+
 def update_giftcard_status(order):
 	giftcard_orders = frappe.get_all("Gift Card Order",
 									filters={
@@ -2322,7 +2322,7 @@ def update_giftcard_status(order):
 		frappe.db.commit()
 
 
-@frappe.whitelist()
+
 def clear_selected_orders(names):
 	docs = json.loads(names)
 	if len(docs) == 0:
@@ -2467,7 +2467,7 @@ def get_order_item(order_id, coupon_code,coupon_data,msg,status):
 				}
 
 
-@frappe.whitelist()
+
 def update_order_items_status(Products, status, OrderId, doctype, Tracking_Number = None,
 								Tracking_Link = None,create_shipment = None, driver = None):
 	try:
@@ -2489,7 +2489,7 @@ def update_order_items_status(Products, status, OrderId, doctype, Tracking_Numbe
 		frappe.log_error("Error in doctype.order.order.update_order_items_status", frappe.get_traceback())
 
 
-@frappe.whitelist()
+
 def create_order_shipment(dt, dn, products, tracking_number = None, tracking_link = None, driver = None):
 	try:
 		doc = frappe.get_doc(dt, dn)
@@ -2544,7 +2544,7 @@ def create_order_shipment(dt, dn, products, tracking_number = None, tracking_lin
 			frappe.log_error("Error in doctype.order.create_order_shipment", frappe.get_traceback())
 
 
-@frappe.whitelist(allow_guest=True)
+
 def get_order_items(OrderId,fntype):
 	try:
 		if fntype == 'packed' or fntype == 'Packed':
@@ -2607,7 +2607,7 @@ def get_order_items(OrderId,fntype):
 		frappe.log_error("Error in doctype.order.get_order_items", frappe.get_traceback())
 
 
-@frappe.whitelist()
+
 def _get_order_items_(OrderId, fntype):
 	try:
 		lists = []
@@ -2626,7 +2626,7 @@ def _get_order_items_(OrderId, fntype):
 		frappe.log_error("Error in doctype.order._get_order_items_", frappe.get_traceback())
 
 
-@frappe.whitelist()
+
 def get_shipment_bag_id(order_id):
 	items=frappe.db.sql(''' SELECT parent
 							FROM `tabShipment Bag Item`
@@ -2645,7 +2645,7 @@ def get_shipment_bag_id(order_id):
 			}
 
 
-@frappe.whitelist()
+
 def get_attributes_combination(product):
 	combination = frappe.db.get_all('Product Variant Combination',
 									filters = {'parent':product, 'disabled':0},
@@ -2699,7 +2699,7 @@ def get_attributes_combination_text(attribute):
 		frappe.log_error('Error in v2.product.get_attributes_combination', frappe.get_traceback())
 
 
-@frappe.whitelist()
+
 def update_variant_id(product, v_text):
 	combination = frappe.db.get_all('Product Variant Combination',
 									filters = {'parent':product, 'disabled':0},
@@ -2740,7 +2740,7 @@ def variant_stock_update(item):
 						)
 
 
-@frappe.whitelist()
+
 def get_doc_single_value(doctype, fieldname, filters=None, as_dict=True, debug=False, parent=None):
 	"""Returns a value form a document
 	:param doctype: DocType to be queried
@@ -2769,13 +2769,13 @@ def get_doc_single_value(doctype, fieldname, filters=None, as_dict=True, debug=F
 	return value[0] if len(fields) > 1 else value[0][0]
 
 
-@frappe.whitelist()
+
 def get_customer_details(doctype,fields,filters):
 	details = frappe.db.get_all(doctype,fields = fields,filters = filters,page_length = 1)
 	return details[0] if details else {}
 
 
-@frappe.whitelist()
+
 def get_list( doctype, fields = None, filters = None, order_by = None, limit_start = None,
 				limit_page_length = 20, parent = None, debug = False, as_dict = True, or_filters = None):
 	"""Returns a list of records by filters, fields, ordering and limit
@@ -2807,7 +2807,7 @@ def get_list( doctype, fields = None, filters = None, order_by = None, limit_sta
 	return frappe.get_list(**args)
 
 
-@frappe.whitelist(allow_guest=True)
+
 def calculate_vendor_order_shipping_charges(order_item, order_doc):
 	shipping_charges = 0
 	shipping_rate_methods = []
@@ -2864,7 +2864,7 @@ def calculate_vendor_order_shipping_charges(order_item, order_doc):
 	return shipping_charges
 
 
-@frappe.whitelist()
+
 def shipping_by_total(catalog_settings, order_item, order_doc, shipping_rate_method):
 	if shipping_rate_method.shipping_rate_method == "Shipping By Total":
 		order_total = 0
@@ -2913,7 +2913,7 @@ def shipping_by_weight(order_item, order_doc, shipping_rate_method):
 				vo_shipping_charges += float(shipping_charges_list[0].charge_amount)
 
 
-@frappe.whitelist()
+
 def get_product_price(product, customer, attribute = None):
 	try:
 		price = 0

@@ -17,7 +17,7 @@ class Shipment(Document):
 			for item in self.items:
 				products.append({'product': item.item, 'orderid': self.document_name})
 
-@frappe.whitelist()
+
 def make_payment(name):
 	doc = frappe.get_doc('Shipment', name)
 	order = frappe.get_doc(doc.document_type, doc.document_name)

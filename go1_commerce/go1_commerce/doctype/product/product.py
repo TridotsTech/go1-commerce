@@ -810,8 +810,6 @@ def remove_html_tags(text):
 		frappe.log_error(frappe.get_traceback(), 
 				   ' Error in product.events.remove_html_tags')
 
-
-@frappe.whitelist(allow_guest=True)
 def get_location_details(zipcode):
 	city = state = country = None
 	from go1_commerce.go1_commerce.utils.google_maps \
@@ -831,7 +829,6 @@ def get_location_details(zipcode):
 				city = item.get('long_name')
 	return zipcode, city, state, country
 
-@frappe.whitelist()
 def get_all_tags():
 	""" get the tags set in the  """
 	tags = frappe.get_all("Product Tag",
@@ -840,7 +837,6 @@ def get_all_tags():
 	active_tags = [row.get("title") for row in tags]
 	return active_tags
 
-@frappe.whitelist()
 def get_product_attribute_options(attribute,product,attribute_id):
 	try:
 		attributeoptions = frappe.db.sql("""SELECT * 
@@ -855,8 +851,6 @@ def get_product_attribute_options(attribute,product,attribute_id):
 		frappe.log_error(frappe.get_traceback(),
 				   "Error in doctype.product.get_product_attribute_options") 
 
-
-@frappe.whitelist()
 def get_parent_product_attribute_options(attribute,product):
 	try:
 		query = f"""SELECT *
@@ -871,7 +865,6 @@ def get_parent_product_attribute_options(attribute,product):
 				   "Error in doctype.product.get_product_attribute_options") 
 
 
-@frappe.whitelist()
 def get_product_specification_attribute_options(attribute):
 	try:
 		attributeoptions = frappe.db.sql(""" SELECT option_value 
@@ -885,7 +878,6 @@ def get_product_specification_attribute_options(attribute):
 				"Error in doctype.product.get_product_specification_attribute_options") 
 
 
-@frappe.whitelist()
 def insert_product_attribute_options(attribute,product,option,display_order,price_adjustment,
 									weight_adjustment,image,pre_selected,attribute_color,
 									product_title,parent_option=None,attribute_id = None,
@@ -947,7 +939,6 @@ def insert_product_attribute_option(attribute,product,option,display_order,price
 	doc.insert()
 		
 
-@frappe.whitelist()
 def update_product_attribute_options(attribute,product,option,display_order,price_adjustment,
 									weight_adjustment,optionid,image,pre_selected,attribute_color,
 									product_title,parent_option=None,attribute_id = None, 
@@ -1006,7 +997,6 @@ def update_product_attribute_option(attributeoptions,attribute,product,option,di
 	doc.save()
 
 
-@frappe.whitelist()
 def get_all_brands():
 	try:
 		return frappe.db.sql('''SELECT brand_logo, name, brand_name, published 
@@ -1017,7 +1007,7 @@ def get_all_brands():
 		frappe.log_error(frappe.get_traceback(), "Error in doctype.product.get_all_brands") 
 
 
-@frappe.whitelist(allow_guest=True)
+
 def get_all_category_list():    
 	try:
 		lists=[]
@@ -1044,7 +1034,6 @@ def get_all_category_list():
 		frappe.log_error(frappe.get_traceback(), "Error in doctype.product.get_all_category_list") 
 
 
-@frappe.whitelist()
 def get_sub_category_list(category):    
 	try:
 		s = frappe.db.sql('''SELECT 
@@ -1057,7 +1046,6 @@ def get_sub_category_list(category):
 		frappe.log_error(frappe.get_traceback(), "Error in doctype.product.get_sub_category_list") 
 
 
-@frappe.whitelist()
 def approve_products(names,status):
 	try:
 		import json
@@ -1070,8 +1058,7 @@ def approve_products(names,status):
 	except Exception:
 		frappe.log_error(frappe.get_traceback(), "Error in doctype.product.approve_products") 
 
-
-@frappe.whitelist() 
+ 
 def save_as_template(names, selected_business):
 	try:
 		import json
@@ -1108,7 +1095,6 @@ def save_as_template(names, selected_business):
 		frappe.log_error(frappe.get_traceback(), "Error in doctype.product.save_as_template") 
 
 
-@frappe.whitelist()
 def get_product_attributes_with_options(product):
 	attributes=frappe.db.get_all('Product Attribute Mapping',filters={'parent':product},
 							  fields=['name','product_attribute','is_required','control_type',
@@ -1119,7 +1105,6 @@ def get_product_attributes_with_options(product):
 	return attributes
 
 
-@frappe.whitelist()
 def create_variant_combinations(attributes):
 	try:
 		import json
@@ -1183,7 +1168,6 @@ def get_combination_list(sku_seq,combination,all_options,p_combinations,attribut
 			frappe.throw(_("Please add and save the attribute options to create the combinations"))
 	return lists
 
-@frappe.whitelist()
 def get_attributes_text(attributes_json):
 	combination_txt=""
 	if attributes_json:
@@ -1198,7 +1182,6 @@ def get_attributes_text(attributes_json):
 			attribute_html += attribute_name+":"+option_value
 		combination_txt = attribute_html
 	return combination_txt
-@frappe.whitelist()
 def get_category_based_attributes(txt,filters):
 	condition=''
 	if filters.get('productId'):
@@ -1224,21 +1207,18 @@ def get_category_based_attributes(txt,filters):
 								`tab{doctype}` '''.format(doctype=filters.get('type')))
 
 
-@frappe.whitelist()
 def get_vendor_based_tax_templates():
 	return frappe.db.sql('''SELECT name 
 							FROM 
 								`tabProduct Tax Template` ''')
 
 
-@frappe.whitelist()
 def get_vendor_based_return_policy():
 	return frappe.db.sql('''SELECT name 
 							FROM 
 								`tabReturn Policy` ''')
 
 
-@frappe.whitelist()
 def update_image(imageId,image_name,is_primary):
 	doc=frappe.get_doc('Product Image',imageId)
 	doc.image_name=image_name
@@ -1246,7 +1226,6 @@ def update_image(imageId,image_name,is_primary):
 	doc.save(ignore_permissions=True)
 
 
-@frappe.whitelist()
 def delete_product_attribute_option(option):
 	try:
 		attribute_video = frappe.db.sql('''SELECT name, option_id 
@@ -1272,7 +1251,6 @@ def delete_product_attribute_option(option):
 		frappe.log_error(frappe.get_traceback(), 
 				   "Error in doctype.product.product.delete_product_attribute_option")
 
-@frappe.whitelist()
 def delete_product_attribute_option_image(ref_doctype, file_url):
 	try:
 		frappe.db.sql('''DELETE FROM `tabFile` 
@@ -1293,7 +1271,7 @@ def randomStringDigits(stringLength=6):
 	return ''.join(random.choice(lettersAndDigits) for i in range(stringLength))
 
 
-@frappe.whitelist(allow_guest=True)
+
 def update_product_categories(category1,name):
 	frappe.db.sql('''DELETE 
 					FROM `tabProduct Category Mapping` 
@@ -1309,7 +1287,7 @@ def update_product_categories(category1,name):
 		paper_question.save()
 
 
-@frappe.whitelist(allow_guest=True)
+
 def update_product_categories1(category1,name):
 	frappe.db.sql('''DELETE FROM 
 						`tabProduct Category Mapping` 
@@ -1325,7 +1303,6 @@ def update_product_categories1(category1,name):
 		paper_question.save()
 
 
-@frappe.whitelist()
 def update_image(count,image_name,primary,childname):
 	if image_name:
 		frappe.db.set_value('Product Image', childname, 'idx', count)
@@ -1343,7 +1320,7 @@ def format_convertion(price=None):
 	return rounded_amt
 
 
-@frappe.whitelist(allow_guest = True)
+
 def get_product_scroll(item, page_no, page_len):
 	try:
 		start = (int(page_no) - 1) * int(page_len)
@@ -1369,7 +1346,7 @@ def get_product_scroll(item, page_no, page_len):
 		frappe.log_error(frappe.get_traceback(), "Error in doctype.product.product.get_product_scroll")
 
 
-@frappe.whitelist(allow_guest=True)
+
 def get_review_scroll(item, page_no, page_len):
 	start=(int(page_no)-1)*int(page_len)
 	dateformat='%b %d, %Y'
@@ -1392,7 +1369,7 @@ def get_review_scroll(item, page_no, page_len):
 	return Reviews
 
 
-@frappe.whitelist(allow_guest=True) 
+ 
 def get_review_images(name,product):
 	dateformat='%b %d, %Y'
 	approved_reviews1 = frappe.db.sql('''SELECT RI.review_thumbnail,RI.image,RI.list_image,RI.name,
@@ -1410,7 +1387,7 @@ def get_review_images(name,product):
 	return approved_reviews1
 
 
-@frappe.whitelist(allow_guest=True)
+
 def get_curreview_images(name):
 	dateformat='%b %d, %Y'
 	approved_review = frappe.db.sql('''SELECT RI.review_thumbnail,RI.image,RI.list_image,RI.parent,PR.*,
@@ -1427,7 +1404,7 @@ def get_curreview_images(name):
 	return approved_review
 
 
-@frappe.whitelist(allow_guest=True)
+
 def check_product_attribute_options(product_attributes = None):
 	if product_attributes:
 		attribute_len = frappe.get_list("Product Attribute Option",fields = ['name'],
@@ -1440,7 +1417,7 @@ def check_product_attribute_options(product_attributes = None):
 		pass
 
 
-@frappe.whitelist(allow_guest=True)
+
 def get_product_reviews_list(product, page_no=0, page_len=10):
 	start = int(page_no) * int(page_len)
 	dateformat='%b %d, %Y'
@@ -1465,7 +1442,7 @@ def get_product_reviews_list(product, page_no=0, page_len=10):
 	return reviews
 
 
-@frappe.whitelist(allow_guest=True)
+
 def update_customer_recently_viewed(product, customer=None):
 	enable_recently_viewed = get_settings_value('Catalog Settings', 'enable_recetly_viewed_products')
 	if enable_recently_viewed:
@@ -1496,7 +1473,6 @@ def update_customer_recently_viewed(product, customer=None):
 				frappe.db.commit()
 
 
-@frappe.whitelist()
 def show_attribute_err(attribute_id):
 	attribute_option = frappe.get_list("Product Attribute Option", 
 									fields = ["attribute_id"], 
@@ -1507,7 +1483,6 @@ def show_attribute_err(attribute_id):
 		return "Failed"
 
 
-@frappe.whitelist()
 def check_attr_combination(self):
 	if len(self.variant_combination) > 0:
 		for i in self.variant_combination:
@@ -1525,7 +1500,6 @@ def check_attr_combination(self):
 			frappe.throw("Please delete Attribute combinations and then try to delete attribute")
 
 
-@frappe.whitelist()
 def delete_attribute_option_alert(option):
 	combination = frappe.db.sql('''SELECT name, attribute_id 
 									FROM 
@@ -1543,7 +1517,6 @@ def delete_attribute_option_alert(option):
 		return "Success"
 
 
-@frappe.whitelist()
 def show_attribute_deletion_err(item, row_id):
 	combination = frappe.db.sql('''SELECT name, attribute_id 
 									FROM 
@@ -1566,14 +1539,12 @@ def show_attribute_deletion_err(item, row_id):
 		return 'Failed'
 
 
-@frappe.whitelist()
 def check_attr_combination_price(self):
 	if len(self.variant_combination) > 0:
 		for i in self.variant_combination:
 			if flt(i.price)<flt(self.price):
 				frappe.throw("Attribute combination price should be greater than or equal to base price")
 
-@frappe.whitelist()
 def delete_attribute_options(dt, dn):
 	try:
 		doc = frappe.get_doc(dt, dn)
@@ -1610,7 +1581,7 @@ def delete_attribute_options(dt, dn):
 		return {'status': 'Failed'}
 
 
-@frappe.whitelist(allow_guest=True)
+
 def insert_attribute_option_video(option_id,video_id,video_type):
 	attribute_option_video = frappe.new_doc("Product Attribute Option Video")
 	attribute_option_video.option_id = option_id
@@ -1626,8 +1597,7 @@ def insert_attribute_option_video(option_id,video_id,video_type):
 
 	if attributeoptions_video:
 		return attributeoptions_video
-
-@frappe.whitelist()     
+     
 def get_attribute_option_videos(option_id):
 	attributeoptions_video = frappe.db.sql("""SELECT * 
 											FROM 
@@ -1639,13 +1609,11 @@ def get_attribute_option_videos(option_id):
 		return attributeoptions_video
 
 
-@frappe.whitelist()
 def delete_product_attribute_option_video(name):
 	doc = frappe.get_doc('Product Attribute Option Video', name)
 	doc.delete()
 	return {'status': "Success"}
 
-@frappe.whitelist()
 def update_attribute_option_video(name,video_id,option_id,video_type):
 	frappe.db.set_value('Product Attribute Option Video',name,'youtube_video_id',video_id)
 	frappe.db.set_value('Product Attribute Option Video',name,'video_type',video_type)
@@ -1659,7 +1627,7 @@ def update_attribute_option_video(name,video_id,option_id,video_type):
 		return attributeoptions_video
 
 
-@frappe.whitelist(allow_guest=True)   
+   
 def get_all_category_lists(product_group=None):
 	item_group = frappe.db.get_all("Product Category", fields=["*"], filters={"is_active":1})
 	for n in item_group:
@@ -1667,7 +1635,6 @@ def get_all_category_lists(product_group=None):
 		parent_category = get_parent_item_groups(n.name)
 		
 
-@frappe.whitelist()
 def get_parent_item_groups(item_group_name):
 	item_group = frappe.get_doc("Product Category", item_group_name)
 	return frappe.db.sql("""SELECT name, category_name 
@@ -1710,7 +1677,6 @@ def get_child_categories1(category):
 		frappe.log_error(frappe.get_traceback(), 'Error in api.get_child_categories')
 
 
-@frappe.whitelist()
 def get_category_list(reference_doc, reference_fields, filters=None, page_no=1, page_len=20, 
 					  								search_txt=None, search_field="name"):
 	reference_field = json.loads(reference_fields)
@@ -1756,7 +1722,7 @@ def get_category_list(reference_doc, reference_fields, filters=None, page_no=1, 
 	return {"list_name":list_name, "list_len":len(list_len)}
 
 
-@frappe.whitelist(allow_guest=True)
+
 def get_category_attributes(reference_doc, reference_fields, filters=None,page_no=1, page_len=20, 
 															search_txt=None, search_field="name"):
 	condition = ''
@@ -1796,7 +1762,6 @@ def get_category_attributes(reference_doc, reference_fields, filters=None,page_n
 	return {"list_name":list_name, "list_len":len(list_len)}
 
 
-@frappe.whitelist()
 def get_returnpolicy_list(reference_doc, reference_fields, filters=None,page_no=1, 
 						  		page_len=20, search_txt=None, search_field="name"):
 	start = (int(page_no) - 1) * int(page_len)
@@ -1829,7 +1794,6 @@ def get_returnpolicy_list(reference_doc, reference_fields, filters=None,page_no=
 	return {"list_name":list_name, "list_len":len(list_len)}
 
 
-@frappe.whitelist()
 def get_specification_list(reference_doc, reference_fields, filters=None,page_no=1, page_len=20, 
 						   									search_txt=None, search_field="name"):
 	start = (int(page_no) - 1) * int(page_len)
@@ -1862,7 +1826,6 @@ def get_specification_list(reference_doc, reference_fields, filters=None,page_no
 	return {"list_name":list_name, "list_len":len(list_len)}
 
 
-@frappe.whitelist()
 def get_brand_list(reference_doc, reference_fields, filters=None, page_no=1, page_len=20, 
 				   									search_txt=None, search_field="name"):
 	start = (int(page_no) - 1) * int(page_len)
@@ -1892,7 +1855,6 @@ def get_brand_list(reference_doc, reference_fields, filters=None, page_no=1, pag
 	return {"list_name":list_name, "list_len":len(list_len)}
 
 
-@frappe.whitelist()
 def get_recent_products():
 	try:
 		role = frappe.get_roles(frappe.session.user)
@@ -1911,7 +1873,6 @@ def get_recent_products():
 		frappe.log_error(frappe.get_traceback(), 'Error in doctype.product.product.get_recent_products')
 
 
-@frappe.whitelist()
 def insert_attribute_template(attribute,product_attr,message):
 	try:
 		template = frappe.db.sql('''SELECT name 
@@ -1948,7 +1909,6 @@ def insert_attribute_template(attribute,product_attr,message):
 		frappe.log_error(frappe.get_traceback(), 'Error in doctype.product.product.insert_attribute_template')
 
 
-@frappe.whitelist()
 def select_attribute_template(template_name,attribute,product,attribute_id):
 	try:
 		option_template = frappe.db.sql('''SELECT name,attribute_id,attribute_name 
@@ -1994,7 +1954,6 @@ def select_attribute_template(template_name,attribute,product,attribute_id):
 		frappe.log_error(frappe.get_traceback(), 'Error in doctype.product.product.select_attribute_template')
 
 
-@frappe.whitelist()
 def delete_option(name):
 	frappe.db.sql('''DELETE FROM 
 						`tabProduct Attribute Mapping` 
@@ -2003,7 +1962,6 @@ def delete_option(name):
 	return "success"
 
 
-@frappe.whitelist()
 def insert_json(selected_business,name):
 	doc = frappe.get_doc('Product', name).as_dict()
 	vertical_name = re.sub('[^a-zA-Z0-9 ]', '', selected_business).lower().replace(' ','_')
@@ -2030,7 +1988,6 @@ def insert_json(selected_business,name):
 	frappe.db.set_value('Product',doc.name,'template_saved',1)
 
 
-@frappe.whitelist()
 def get_order_settings():
 	check_file_uploader = 0
 	apps = frappe.get_installed_apps()
@@ -2042,7 +1999,6 @@ def get_order_settings():
 			"s3_enable":check_file_uploader}
 
 
-@frappe.whitelist()
 def get_role_list(doctype, txt, searchfield, start, page_len, filters):
 	condition=''
 	if filters.get('productId'):
@@ -2085,7 +2041,6 @@ def get_role_list(doctype, txt, searchfield, start, page_len, filters):
 							'_txt': txt.replace("%", ""),'start': start,'page_len': page_len})
 
 
-@frappe.whitelist()
 def get_models(reference_doc, reference_fields):
 	reference_field = json.loads(reference_fields)
 	list_name = frappe.db.get_all(reference_doc,fields=reference_field,filters={"is_active":1},
@@ -2093,7 +2048,6 @@ def get_models(reference_doc, reference_fields):
 	return {"list_name":list_name}
 
 
-@frappe.whitelist()
 def get_all_products_with_attributes(category=None, brand=None, item_name=None, active=None, featured=None,):
 	try:
 		lists=[]
@@ -2115,7 +2069,6 @@ def get_all_products_with_attributes(category=None, brand=None, item_name=None, 
 		frappe.log_error(frappe.get_traceback(), "Error in doctype.product.get_all_products_with_attributes") 
 	
 
-@frappe.whitelist()
 def get_product_attributes(name):   
 	try:
 		query = '''SELECT AO.name AS docname,
@@ -2137,7 +2090,6 @@ def get_product_attributes(name):
 		frappe.log_error(frappe.get_traceback(), "Error in doctype.product.get_product_attributes") 
 
 
-@frappe.whitelist()
 def get_products(category=None,brand=None,cat_doctype=None,brand_doctype=None,item_name=None,
 				 												active=None,featured=None):
 	if category or brand:
@@ -2245,7 +2197,6 @@ def get_products(category=None,brand=None,cat_doctype=None,brand_doctype=None,it
 	return p
 
 
-@frappe.whitelist()
 def update_bulk_data(doctype,docname,fieldname,value):
 	try:
 		if doctype=="Product Attribute Option":
@@ -2266,7 +2217,6 @@ def update_bulk_data(doctype,docname,fieldname,value):
 		frappe.log_error(frappe.get_traceback(), "Error in doctype.product.update_bulk_data") 
 
 
-@frappe.whitelist()
 def get_gallery_list(parent, name=None):
 	condition = ""
 	if parent:
@@ -2284,7 +2234,6 @@ def get_gallery_list(parent, name=None):
 						''', {"parent": parent, "name" : name}, as_dict=1)
 
 
-@frappe.whitelist()
 def get_product_template(name=None):
 	user = frappe.session.user
 	if name:
@@ -2292,14 +2241,12 @@ def get_product_template(name=None):
 	return frappe.db.get_all("Product", fields=["*"], filters={"is_template":1})
 
 
-@frappe.whitelist()
 def get_product_templates(name=None):
 	if name:
 		return frappe.get_doc("Product", name)
 	return frappe.db.get_all("Product", fields=["*"], filters={"is_template":1})
 
 
-@frappe.whitelist()
 def save_gallery_changes(data):
 	doc = data
 	if isinstance(doc, string_types):
@@ -2311,7 +2258,6 @@ def save_gallery_changes(data):
 	return ret
 
 
-@frappe.whitelist()
 def upload_img():
 	try:
 		files = frappe.request.files
@@ -2342,7 +2288,6 @@ def get_query_condition(user):
 		user = frappe.session.user
 	
 			
-@frappe.whitelist()
 def get_record_count(dt):
 	condition = ''
 	d = frappe.db.sql('''SELECT (CASE 
@@ -2360,7 +2305,6 @@ def get_record_count(dt):
 	return out
 
 
-@frappe.whitelist()
 def clear_test_records(dt):
 	test_records = frappe.db.get_all(dt, filters={'is_test_record': 1}, limit_page_length=500, 
 								  						order_by='creation desc')
@@ -2372,7 +2316,7 @@ def clear_test_records(dt):
 	return {'status': 'Success'}
 
 
-@frappe.whitelist(allow_guest=True)
+
 def product_detail_onscroll(productid, layout, domain=None):
 	from go1_commerce.go1_commerce.V2.product \
 		import get_product_other_info, get_customer_recently_viewed_products
@@ -2458,7 +2402,6 @@ def product_detail_onscroll(productid, layout, domain=None):
 	return template
 
 
-@frappe.whitelist()
 def insert_product_attribute_and_options(doc):
 	try:
 		if isinstance(doc, string_types):
@@ -2522,7 +2465,6 @@ def insert_product_attribute_and_options(doc):
 		frappe.log_error(frappe.get_traceback(), "Error in doctype.product.insert_product_attribute_and_options") 
 
 
-@frappe.whitelist()
 def get_doc_images(dt, dn):
 	if dt == "Product Category":        
 		products = frappe.db.sql_list('''SELECT M.parent 
@@ -2552,14 +2494,14 @@ def get_doc_images(dt, dn):
 	return []
 
 
-@frappe.whitelist(allow_guest=True)
+
 def get_attributes_combination(product):
 	combination=frappe.db.get_all('Product Variant Combination',filters={'parent':product},fields=['*'])
 	productdoc=frappe.db.get_all('Product',fields=['*'],filters={'name':product})
 	return combination,productdoc
 
 
-@frappe.whitelist(allow_guest=True)
+
 def get_attributes_name(attribute_id,product):
 	combination=frappe.db.get_all('Product Variant Combination',
 							   filters={
@@ -2569,7 +2511,6 @@ def get_attributes_name(attribute_id,product):
 	return combination
 
 
-@frappe.whitelist()
 def create_product(source_name, target_doc=None):
 	doc = get_mapped_doc('Product', source_name, {
 		'Product': {
@@ -2603,7 +2544,6 @@ def create_product(source_name, target_doc=None):
 	return doc
 
 
-@frappe.whitelist()
 def delete_current_img(childname, doctype):
 	try:
 		image_doc = 'Product Image'
@@ -2635,7 +2575,6 @@ def delete_current_img(childname, doctype):
 		frappe.log_error(frappe.get_traceback(), 'delete_current_img')
 
 
-@frappe.whitelist()
 def check_exist_sku(doc):
 	doc = json.loads(doc)
 	if doc.get("sku"):
@@ -2679,12 +2618,10 @@ def update_whoose_search(self):
 	except Exception:
 		frappe.log_error(title="Error in update product search data",message = frappe.get_traceback())
 
-@frappe.whitelist()
 def delete_combination(dt, dn):
 	frappe.delete_doc(dt, dn)
 	frappe.db.commit()
 
-@frappe.whitelist()
 def update_attr_options():
 	p_list = frappe.db.sql("""SELECT P.name 
 							FROM 
@@ -2710,7 +2647,6 @@ def update_attr_options():
 			p_doc.save(ignore_permissions=True)
 
 
-@frappe.whitelist()
 def update_product_variant_combinations():
 	p_list = frappe.db.get_all("Product",filters={"has_variants":1})
 	for p in p_list:
@@ -2804,7 +2740,6 @@ def generate_combinations(product_id,attributes):
 	return lists
 
 
-@frappe.whitelist()
 def update_category_data_json(doc):
 	from frappe.utils import get_files_path	
 	path = get_files_path()
@@ -2831,7 +2766,6 @@ def update_category_data_json(doc):
 					f.write(content)
 
 
-@frappe.whitelist()
 def update_attr_options_unique_names():
 	p_list = frappe.db.get_all("Product",filters={"has_variants":1})
 	for p in p_list:

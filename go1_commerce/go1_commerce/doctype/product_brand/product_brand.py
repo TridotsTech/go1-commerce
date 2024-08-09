@@ -54,7 +54,7 @@ def permissions(user):
 		return None
 
 
-@frappe.whitelist()
+
 def get_sorted_columns(sort_by):
 	try:
 		switcher = {

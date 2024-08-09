@@ -106,7 +106,7 @@ class Drivers(Document):
 def update_user(self):	
 	add_arole(self,'Driver')
 		
-@frappe.whitelist()
+
 def add_arole(self,role):	
 	user_role = frappe.db.get_all('Has Role', filters = {'parent':self.driver_email,'role':role})
 	if not user_role:
@@ -119,7 +119,6 @@ def add_arole(self,role):
 									"role": role
 								}).insert()
 		
-@frappe.whitelist(allow_guest=True)
 def insert_user(self):	
 	result = frappe.get_doc({
 								"doctype": "User",
@@ -134,7 +133,7 @@ def insert_user(self):
 	add_arole(self,'Driver')
 	return result		
 
-@frappe.whitelist()
+
 def get_shipping_manager():
 	shipping_info = ''
 	installed_apps = frappe.db.sql(''' SELECT * 

@@ -102,7 +102,6 @@ def remove_birthday_club_discount(self):
 	discount.save()
 
 
-@frappe.whitelist(allow_guest=True)
 def update_birthday_club_wallet():
 	from datetime import date
 	todays_date = date.today()

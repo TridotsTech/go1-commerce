@@ -31,7 +31,7 @@ class WalletWithdrawalRequest(Document):
 			make_wallet_transaction(self.name)
 		
 
-@frappe.whitelist(allow_guest=True)
+
 def update_requested_status(id,doctype,status):
 	trans = frappe.get_doc('Wallet Withdrawal Request',id)
 	trans.status = status
@@ -39,7 +39,7 @@ def update_requested_status(id,doctype,status):
 	return "Success"	
 		
 
-@frappe.whitelist(allow_guest=True)
+
 def make_wallet_transaction(source_name):
 	try:
 		if source_name:
@@ -104,7 +104,7 @@ def get_payment_entry(default_currency,source,total):
 	pe.flags.ignore_permissions=True
 	pe.submit()
 
-@frappe.whitelist(allow_guest=True)
+
 def make_autowallet_payment(source_name):
 	try:
 		default_currency = get_settings_value("Catalog Settings","default_currency")
@@ -117,7 +117,7 @@ def make_autowallet_payment(source_name):
 	except Exception:
 		frappe.log_error(frappe.get_traceback(), "wallet.make_autowallet_payment") 
 
-@frappe.whitelist()	
+	
 def transacrtion_reference(source):
 	try:
 		tran = ""
@@ -152,7 +152,7 @@ def transacrtion_reference(source):
 	except Exception:
 		frappe.log_error(frappe.get_traceback(), "wallet.transacrtion_reference") 
 
-@frappe.whitelist(allow_guest=True)
+
 def make_wallet_payment(source_name, target_doc=None):
 	try:
 		default_currency=get_settings_value("Catalog Settings","default_currency")

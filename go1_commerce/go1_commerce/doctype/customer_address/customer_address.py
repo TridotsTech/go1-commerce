@@ -21,7 +21,6 @@ class CustomerAddress(Document):
 				address += str(self.zipcode)		
 			validate_geo_location(self, address)
 
-@frappe.whitelist()
 def validate_geo_location(self,address):
 	try:
 		if not self.latitude or not self.longitude:				

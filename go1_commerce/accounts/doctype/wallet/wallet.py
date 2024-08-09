@@ -56,7 +56,7 @@ def get_all_orders_list(start,**kwargs):
 							'''.format(start,int(kwargs.get('page_len'))),kwargs.get('user'),as_dict=1)
 	return order_list
 
-@frappe.whitelist()
+
 def get_all_orders(**kwargs):
 	try:
 		condition = 'total_amount <> 0'
@@ -101,7 +101,7 @@ def total_and_order_list(start, **kwargs):
 							'''.format(start,int(kwargs.get('page_len'))),kwargs.get('user'),as_dict=1)
 	return [total_count, order_list]
 
-@frappe.whitelist()
+
 def get_commission_list(**kwargs):
 	try:
 		condition = 'total_amount <> 0'
@@ -225,7 +225,7 @@ def get_transactions_not_proiv(start_count, start, **kwargs):
 
 	return [total_count,order_list,counterpay_total_count,counterpay_order_list]
 
-@frappe.whitelist()
+
 def get_transaction_history(**kwargs):
 	try:
 		condition = 'total_amount <> 0'
@@ -279,7 +279,7 @@ def get_transaction_history(**kwargs):
 	except Exception:
 		frappe.log_error(frappe.get_traceback(), " Error in wallet.get_commission_list")
 
-@frappe.whitelist(allow_guest = True)
+
 def make_withdraw_request(source_name,order_list=None):
 	try:
 		if source_name:
@@ -308,7 +308,7 @@ def make_withdraw_request(source_name,order_list=None):
 	except Exception:
 		frappe.log_error(frappe.get_traceback(), "wallet.make_withdraw_request") 
 
-@frappe.whitelist(allow_guest = True)
+
 def add_fund_to_wallet(source_name):
 	default_currency = get_settings("Catalog Settings")
 	if source_name:
@@ -371,7 +371,7 @@ def get_if_provider(source, vendor):
 									''',vendor,as_dict = 1)[0].amount
 	return source
 
-@frappe.whitelist(allow_guest = True)
+
 def get_counter_apy_counters(vendor):
 	if vendor!="Service Provider":
 		source = frappe.db.sql(""" SELECT user_type, user, name1 AS user_name 
@@ -386,11 +386,11 @@ def get_counter_apy_counters(vendor):
 						 		""", vendor, as_dict = 1)
 		return get_if_provider(source, vendor)
 
-@frappe.whitelist()
+
 def get_wallet_settings():
 	return frappe.get_single("Wallet Settings")
 
-@frappe.whitelist()
+
 def total_counter_graph_options(common_filters = [], ignore_permissions = True, count = 100):
 	dash = get_dash_value()
 	chart_options={}

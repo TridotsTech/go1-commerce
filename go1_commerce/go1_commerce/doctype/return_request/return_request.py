@@ -99,7 +99,6 @@ class ReturnRequest(Document):
 		# 	doc = make_payment(self.order_id)
 		# 	doc.insert(ignore_permissions = True)
 			
-@frappe.whitelist(allow_guest=True)
 def make_payment(source_name = None, order = None, mode_of_payment = None, amount = None):
 	try:
 		frappe.log_error("source_name",source_name)
@@ -149,7 +148,7 @@ def make_payment(source_name = None, order = None, mode_of_payment = None, amoun
 		frappe.log_error(message = frappe.get_traceback(), title = "Error in accounts.api.make_payment")
 		
 
-@frappe.whitelist(allow_guest = True)
+
 def update_order_status(self):
 	order_status = frappe.db.sql("""SELECT OI.name, OI.item
 									FROM `tabOrder` O
@@ -167,7 +166,7 @@ def update_order_status(self):
 		doc.update_order_detail_html()
 
 
-@frappe.whitelist()
+
 def make_customer_payment(doc):
 	try:
 		if doc.order_id:
@@ -186,7 +185,7 @@ def make_customer_payment(doc):
 		raise exc
 
 
-@frappe.whitelist(allow_guest=True)
+
 def get_product_info(product,qty,order):
 	from go1_commerce.go1_commerce.v2.orders \
 		import get_Products_Tax_Template
@@ -246,13 +245,13 @@ def get_query_condition(user):
 			return '(`tabReturn Request`.order_id in ({data_list}))'.format(data_list = data_list)
 
 
-@frappe.whitelist()
+
 def get_returnorder_shipments(name):
 	shipments = frappe.db.get_all("Return Shipment",filters = {"document_name":name},fields = ['*'])
 	return shipments
 
 
-@frappe.whitelist()
+
 def get_returnshipments(document_type, document_name):
 	return frappe.db.get_value("Return Shipment", 
 								{
@@ -266,7 +265,7 @@ def get_returnshipments(document_type, document_name):
 								as_dict = True)
 	
 
-@frappe.whitelist()
+
 def get_return_order_items(returnId, fntype, doctype = "Order"):
 	try:
 		order = frappe.db.get_value("Return Request", returnId, 
@@ -288,7 +287,7 @@ def get_return_order_items(returnId, fntype, doctype = "Order"):
 		frappe.log_error(frappe.get_traceback(), "Error in doctype.vendor_orders.get_vendor_order_items") 
 
 
-@frappe.whitelist()
+
 def get_attributes_combination_html(product, orderid, attribute):
 	data= frappe.db.get_value("Product Variant Combination",{"attribute_id":attribute},"attribute_html")
 	item_qty=frappe.db.get_value('Order Item',
@@ -296,7 +295,7 @@ def get_attributes_combination_html(product, orderid, attribute):
 								'quantity')
 	return data, item_qty
 
-@frappe.whitelist()
+
 def get_attributes_combination(product, orderid = None):
 	order_item=frappe.db.get_all('Order Item',filters={'item':product, 'parent': orderid},fields=['attribute_ids'])
 	orderattr = ",".join(['"' + x.attribute_ids + '"' for x in order_item if x.attribute_ids])
@@ -323,14 +322,14 @@ def get_attributes_combination(product, orderid = None):
 	return combination,item_qty
 
 
-@frappe.whitelist()
+
 def get_nextstatus(next_status_level):
 	next_status=frappe.db.get_all('Return Request Status',fields=["name", "status_level"],
 										filters={'status_level':next_status_level})
 	return next_status
 
 
-@frappe.whitelist()
+
 def get_eliglible_orders(doctype, txt, searchfield, start, page_len, filters):
 	try:
 		if not txt:
@@ -366,7 +365,7 @@ def get_eliglible_orders(doctype, txt, searchfield, start, page_len, filters):
 		frappe.log_error(frappe.get_traceback(), "Error in doctype.return_request.get_eliglible_orders") 
 
 
-@frappe.whitelist()
+
 def get_order_items(doctype, txt, searchfield, start, page_len, filters):
 	try:
 		condition = ""
@@ -394,7 +393,7 @@ def get_order_items(doctype, txt, searchfield, start, page_len, filters):
 		frappe.log_error(frappe.get_traceback(), "Error in doctype.return_request.get_order_items") 
 
 
-@frappe.whitelist()
+
 def get_return_order_items(order_id, return_type, return_created):
 	try:
 		condition = ""
@@ -419,7 +418,7 @@ def get_return_order_items(order_id, return_type, return_created):
 		frappe.log_error(frappe.get_traceback(), "Error in doctype.return_request.get_return_order_items") 
 
 
-@frappe.whitelist()
+
 def get_order_item_info(order_item):
 	try:
 		query = f""" SELECT 

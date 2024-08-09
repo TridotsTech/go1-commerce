@@ -241,7 +241,7 @@ def update_user(self):
 	return self.user_id
 
 
-@frappe.whitelist()
+
 def add_arole(self, email=None):
 	if not email:
 		email = self.email	
@@ -256,8 +256,6 @@ def add_arole(self, email=None):
 			"role": "Customer"
 			}).insert(ignore_permissions = True)
 
-
-@frappe.whitelist(allow_guest=True)
 def insert_user(self):
 	from frappe.utils import random_string
 	key = random_string(32)
@@ -284,7 +282,6 @@ def insert_user(self):
 	frappe.db.commit()
 	return result
 
-@frappe.whitelist(allow_guest=True)
 def update_password(new_password, logout_all_sessions=0, key=None, old_password=None,user=None):
 	try:
 		if not user: user= frappe.session.user
@@ -341,7 +338,7 @@ def reset_user_data(user):
 	except Exception:
 		frappe.log_error(frappe.get_traceback(), "Error in doctype.customers.reset_user_data") 
 
-@frappe.whitelist(allow_guest=True)
+
 def check_location(self):
 	try:
 		if self.table_6:
@@ -355,7 +352,6 @@ def check_location(self):
 	except Exception:
 		frappe.log_error(frappe.get_traceback(), "Error in doctype.customers.check_location") 
 
-@frappe.whitelist(allow_guest=True)
 def update_checkout_guest_customer(first_name, email, phone,address_data=None):
 	try:
 		customers = frappe.db.get_all("Customers",filters={"email":email})
@@ -421,7 +417,6 @@ def get_random_string(length):
 	result_str = ''.join(random.choice(letters) for i in range(length))
 	return result_str
 
-@frappe.whitelist(allow_guest=True)
 def update_guest_customer_data(customer_id, first_name, email, phone, address_data=None):
 	try:
 		customer = frappe.get_doc('Customers', customer_id)
@@ -494,7 +489,7 @@ def delete_guest_customers():
 					cart_info.delete()
 			customer.delete()
 
-@frappe.whitelist()
+
 def get_children(doctype, parent=None, is_root=False, is_tree=False):
 	filters = []
 	fields = ['name as value', 'full_name as title', 'full_name', 'last_name', 
@@ -519,13 +514,14 @@ def generate_keys(doc, method):
 	user_details.api_secret = api_secret
 	user_details.save(ignore_permissions=True)
 
+@frappe.whitelist()
 def has_website_permission(doc, ptype, user, verbose=False):
 	if not user: user = frappe.session.user	
 	if doc.user_id == user:
 		return True
 	return False
 
-@frappe.whitelist()
+
 def add_customer_withparent(data, parent):
 	data = json.loads(data)
 	new_doc = frappe.new_doc('Customers')
@@ -617,7 +613,7 @@ def get_custom_query(user):
 			and (email not in(select parent from `tabHas Role` where parenttype='User' \
 			and (role='Admin' or role='System Manager')) or email is NULL))"
 
-@frappe.whitelist()
+
 def get_all_roles(include=None):
 	""" get the roles set in the  """
 	filters={}
@@ -629,7 +625,7 @@ def get_all_roles(include=None):
 	active_roles = [row.get("name") for row in roles]
 	return active_roles
 
-@frappe.whitelist()
+
 def make_customers_dashboard(name):
 	try:
 		data = get_order_count(name)
@@ -678,7 +674,7 @@ def get_order_count(name):
 	all_count = len(all_order_list)
 	return [today_orders_count,all_count,source]
 
-@frappe.whitelist()
+
 def get_customer_orders(customer_id):
 	condition = ''
 	dt = 'Order'
@@ -702,11 +698,11 @@ def get_customer_orders(customer_id):
        		'currency':rupee
 			}
 
-@frappe.whitelist()
+
 def get_order_settings():
 	order_settings = get_settings('Order Settings')
 	return order_settings
-@frappe.whitelist()
+
 def impersonate_customer(customer_id):
 	frappe.local.cookie_manager.set_cookie('impersonate_customer', "1")
 	frappe.local.cookie_manager.set_cookie('impersonate_old_customer', frappe.session.user)
@@ -727,14 +723,12 @@ def impersonate_customer(customer_id):
 	frappe.local.cookie_manager.set_cookie('customer_id', customer_id)
 	return "success"
 
-@frappe.whitelist(allow_guest=True)
 def impersonate_customer_logout(user):
 	frappe.local.cookie_manager.delete_cookie(["impersonate_old_customer","impersonate_customer"])
 	frappe.local.login_manager.user = user
 	frappe.local.login_manager.post_login()
 	return "success"
 
-@frappe.whitelist()
 def get_sales_executives(route):
 	return frappe.db.sql("""SELECT group_concat(SE.se_name) AS names 
 							FROM `tabRoute SE` SE 

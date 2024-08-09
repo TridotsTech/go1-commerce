@@ -19,7 +19,6 @@ def set_old_logs_as_seen():
 	frappe.db.sql("""DELETE FROM `tabAPI Log` 
                		WHERE `creation` < (NOW() - INTERVAL '30' DAY)""")
 
-@frappe.whitelist()
 def clear_api_logs():
 	'''Flush all API Logs'''
 	frappe.only_for('System Manager')
