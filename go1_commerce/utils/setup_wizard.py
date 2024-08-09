@@ -84,31 +84,18 @@ def setup_complete(args):
 
 def setup_business(args):
 	try:
-		if "Single Vendor" in args.get('domains') or args.get('sample_data'):
-			doc = frappe.new_doc('Business')
-			doc.restaurant_name = args.get('business')
-			doc.contact_person = args.get('business')
-			doc.contact_number = args.get('contact_number')
-			doc.business_phone = args.get('contact_number')
-			doc.contact_email = args.get('contact_email')
-			doc.business_address = args.get('address')
-			doc.city = args.get('city')
-			doc.country = args.get('country')
-			doc.save(ignore_permissions=True)
-		else:
-			catalog_settings = get_settings_from_domain('Catalog Settings')
-			if catalog_settings:
-				catalog_settings.site_name = args.get('business')
-				catalog_settings.meta_title = args.get('business')
-				catalog_settings.meta_description = args.get('business')
-				catalog_settings.save(ignore_permissions=True)
-			themes = frappe.db.get_all('Web Theme', filters={'is_active': 1})
-			if themes:
-				web_theme = frappe.get_doc('Web Theme', themes[0].name)
-				web_theme.footer_email = args.get('contact_email')
-				web_theme.footer_phone = args.get('contact_number')
-				web_theme.footer_address = '{0}\n{1}\n{2}'.format(args.get('address'),args.get('city'),args.get('country'))
-				web_theme.save(ignore_permissions=True)
+		
+		doc = frappe.new_doc('Business')
+		doc.restaurant_name = args.get('business')
+		doc.contact_person = args.get('business')
+		doc.contact_number = args.get('contact_number')
+		doc.business_phone = args.get('contact_number')
+		doc.contact_email = args.get('contact_email')
+		doc.business_address = args.get('address')
+		doc.city = args.get('city')
+		doc.country = args.get('country')
+		doc.save(ignore_permissions=True)
+		
 	except Exception as e:
 		frappe.log_error(frappe.get_traceback(), str(e))
 

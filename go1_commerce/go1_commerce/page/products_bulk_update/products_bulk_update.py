@@ -5,10 +5,10 @@ from frappe import _
 from go1_commerce.utils.setup import get_settings_from_domain, get_theme_settings
 
 @frappe.whitelist()
-def get_all_products_with_attributes(category=None, brand=None, item_name=None, active=None, featured=None, business=None, page_start=0, page_end=20):
+def get_all_products_with_attributes(category=None, brand=None, item_name=None, active=None, featured=None, page_start=0, page_end=20):
 	try:
 		lists=[]
-		subcat=get_products(category=category, brand=brand, item_name=item_name, active=active, featured=featured, business=business, page_start=page_start, page_end=page_end)
+		subcat=get_products(category=category, brand=brand, item_name=item_name, active=active, featured=featured, page_start=page_start, page_end=page_end)
 		if subcat:
 			for subsub in subcat:
 				subsub.indent=0
@@ -34,7 +34,7 @@ def get_product_attributes(name):
 		frappe.log_error(frappe.get_traceback(), "go1_commerce.go1_commerce.page.products_bulk_update.get_product_attributes") 
 
 @frappe.whitelist()
-def get_products(category=None,brand=None,cat_doctype=None,brand_doctype=None,item_name=None,active=None,featured=None, business=None, page_start=0, page_end=20):
+def get_products(category=None,brand=None,cat_doctype=None,brand_doctype=None,item_name=None,active=None,featured=None, page_start=0, page_end=20):
 	if category or brand:
 		filters = ''
 		joins = ''
@@ -59,8 +59,7 @@ def get_products(category=None,brand=None,cat_doctype=None,brand_doctype=None,it
 			else:
 				featured=0
 			filters += ' and P.display_home_page=%s' % (featured)
-		if business:
-			filters += ' and P.restaurant = "{0}"'.format(business)
+		
 		query = '''select P.name,P.item,P.price,P.sku,P.old_price,P.stock,P.inventory_method,P.name as docname,CASE WHEN P.is_active>0 THEN 'Yes' ELSE 'No' END as is_active,CASE WHEN P.display_home_page>0 THEN 'Yes' ELSE 'No' END as display_home_page,P.name as id,P.name as name1 from `tabProduct` P {joins} where P.name!='' {condition} limit {start}, {limit}'''.format(start=page_start, limit=page_end, condition=filters, joins=joins)
 		p = frappe.db.sql(query,as_dict=1)
 		for items in p:
@@ -88,7 +87,7 @@ def get_products(category=None,brand=None,cat_doctype=None,brand_doctype=None,it
 			else:
 				featured=0
 			filters += ' and P.display_home_page=%s' % (featured)
-		if business: filters += ' and P.restaurant = "{0}"'.format(business)
+		
 		query = '''select P.name,P.item,P.price,P.sku,P.old_price,P.stock,P.inventory_method,P.name as docname,CASE WHEN P.is_active>0 THEN 'Yes' ELSE 'No' END as is_active,CASE WHEN P.display_home_page>0 THEN 'Yes' ELSE 'No' END as display_home_page,P.name as id,P.name as name1 from `tabProduct` P where P.name!= '' {condition} limit {start}, {limit}'''.format(start=page_start, limit=page_end, condition=filters)
 		p = frappe.db.sql(query,as_dict=1)
 		for items in p:

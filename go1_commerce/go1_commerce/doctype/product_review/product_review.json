@@ -8,7 +8,6 @@
  "field_order": [
   "product",
   "product_name",
-  "business",
   "contact_email",
   "column_break_2",
   "customer",
@@ -43,13 +42,6 @@
    "fieldtype": "Data",
    "label": "Product Name",
    "read_only": 1
-  },
-  {
-   "fieldname": "business",
-   "fieldtype": "Link",
-   "hidden": 1,
-   "label": "Business",
-   "options": "Business"
   },
   {
    "fieldname": "contact_email",
@@ -149,7 +141,7 @@
   }
  ],
  "links": [],
- "modified": "2023-11-01 16:52:37.903124",
+ "modified": "2024-08-09 20:38:58.129148",
  "modified_by": "Administrator",
  "module": "Go1 Commerce",
  "name": "Product Review",

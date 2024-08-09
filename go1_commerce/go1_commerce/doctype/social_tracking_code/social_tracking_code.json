@@ -1,10 +1,11 @@
 {
+ "actions": [],
  "creation": "2020-02-14 15:24:30.606017",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "business",
+  "column_break_zzxt",
   "column_break_2",
   "google_site_verification",
   "section_break_2",
@@ -24,12 +25,6 @@
   "header_script"
  ],
  "fields": [
-  {
-   "fieldname": "business",
-   "fieldtype": "Link",
-   "label": "Business",
-   "options": "Business"
-  },
   {
    "fieldname": "column_break_2",
    "fieldtype": "Column Break"
@@ -114,9 +109,14 @@
    "fieldtype": "Long Text",
    "ignore_xss_filter": 1,
    "label": "Header Script"
+  },
+  {
+   "fieldname": "column_break_zzxt",
+   "fieldtype": "Column Break"
   }
  ],
- "modified": "2021-06-29 19:07:39.232368",
+ "links": [],
+ "modified": "2024-08-09 21:20:27.633225",
  "modified_by": "Administrator",
  "module": "Go1 Commerce",
  "name": "Social Tracking Code",
@@ -134,5 +134,6 @@
   }
  ],
  "sort_field": "modified",
- "sort_order": "DESC"
+ "sort_order": "DESC",
+ "states": []
 }

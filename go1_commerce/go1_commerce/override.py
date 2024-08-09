@@ -53,7 +53,7 @@ class CustomFile(File):
 
 class PageSection(Document):
 	
-	def section_data(self, customer=None, add_info=None,store_business=None):
+	def section_data(self, customer=None, add_info=None):
 	 
 		json_obj = {}
 		json_obj['section'] = self.name
@@ -72,26 +72,26 @@ class PageSection(Document):
 		json_obj['layout_json'] = self.layout_json
 		if self.section_type == 'Predefined Section' and not self.is_login_required:
 			if self.predefined_section=="Recommended Items":
-				json_obj['data'] = get_recommended_products(self.query, self.reference_document, self.no_of_records, business=self.business, customer=customer, add_info=add_info,store_business=store_business)
+				json_obj['data'] = get_recommended_products(self.query, self.reference_document, self.no_of_records, customer=customer, add_info=add_info)
 				json_obj['reference_document'] = self.reference_document
 			else:
-				json_obj['data'] = get_data_source(self.query, self.reference_document, self.no_of_records, business=self.business, customer=customer, add_info=add_info,store_business=store_business)
+				json_obj['data'] = get_data_source(self.query, self.reference_document, self.no_of_records, customer=customer, add_info=add_info)
 				json_obj['reference_document'] = self.reference_document
 		elif self.section_type == 'Custom Section':
-			frappe.log_error("--1--", self.content_type)
+			
 			if self.content_type == 'Static':
 				if self.reference_document == 'Product Category':
 					json_obj['route'] = frappe.db.get_value(self.reference_document, self.reference_name, "route")
 				json_obj['data'] = json.loads(self.custom_section_data)
 			else:
-				frappe.log_error("--2--", self.reference_document)
+				
 				if self.reference_document == 'Product Category' and self.dynamic_data==0:
 					json_obj['data'] = json.loads(self.custom_section_data)
 				else:
 					json_obj['reference_document'] = self.reference_document
 					json_obj['reference_name'] = self.reference_name
-					json_obj['data'] = get_dynamic_data_source(self, customer=customer,store_business=store_business)
-					frappe.log_error("--3--", json_obj['data'])
+					json_obj['data'] = get_dynamic_data_source(self, customer=customer)
+					
 					json_obj['fetch_product'] = self.fetch_product
 					if len(json_obj['data']) > 0 and self.reference_name:
 						field = None
@@ -120,7 +120,7 @@ class PageSection(Document):
 					item['name'] = item.get('tab_item').lower().replace(' ', '_')
 					query_item = frappe.db.get_value(self.reference_document, item.get('tab_item'), 'query')
 					query='''{query} limit {limit}'''.format(query=query_item,limit=no_of_records)
-					result = frappe.db.sql(query, {"business":self.business}, as_dict=1)
+					result = frappe.db.sql(query, as_dict=1)
 					result = get_product_details(result, customer=customer)
 					item['products'] = result
 					org_datas = []
@@ -131,7 +131,7 @@ class PageSection(Document):
 		elif self.section_type == 'Lists':
 			if 'erp_ecommerce_business_store' in frappe.get_installed_apps():
 				from erp_ecommerce_business_store.erp_ecommerce_business_store.page_section import get_list_data
-				json_obj['data'] = get_list_data(self, customer=None, add_info=None,store_business=None)
+				json_obj['data'] = get_list_data(self, customer=None, add_info=None)
 
 		
 		if self.content:

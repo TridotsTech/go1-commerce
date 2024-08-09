@@ -192,17 +192,7 @@ core.gettingStarted = class gettingStarted {
                 this.$contentDiv.find('div[data-key="' + f.key + '"]').css('background-image', 'url("' + f.bg_image + '")');
             }
         });
-        if(frappe.boot.sysdefaults.business_defaults && frappe.boot.sysdefaults.business_defaults[this.business]) {
-            let progress = frappe.boot.sysdefaults.business_defaults[this.business];
-            progress = JSON.parse(progress);
-            let current_progress = progress.length * 100 / this.menu_items.length;
-            this.progress = parseInt(current_progress);
-            if(this.$progressDiv)
-                this.set_progress();
-            $(progress).each((k, v) => {
-                this.$menuDiv.find('li[data-key="' + v + '"]').addClass('verified');
-            })
-        }
+       
     }
 
     get_menu_list() {

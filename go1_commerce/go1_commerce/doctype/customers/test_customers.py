@@ -16,11 +16,11 @@ class TestCustomer(unittest.TestCase):
 def make_customer():
 	business1 = frappe.get_value("Business", {"restaurant_name": "Test Business 1", "contact_email":"test_business_1@test.com"}, "name")
 	business2 = frappe.get_value("Business", {"restaurant_name": "Test Business 2", "contact_email":"test_business_2@test.com"}, "name")
-	if not frappe.db.get_value("Customers", { "business": business1, "email":"testcustomer1@gmail.com"}):
+	if not frappe.db.get_value("Customers", {  "email":"testcustomer1@gmail.com"}):
 		cust1 = frappe.get_doc(dict(first_name="Test Customer 1",doctype= "Customers", 
 				phone="9087654321", 
 				gender="Female", 
-				business=business1, 
+				
 				email="testcustomer1@gmail.com", 
 				last_name="Test", 
 				set_new_password="#Admin123#",
@@ -29,11 +29,11 @@ def make_customer():
 				country="India", zipcode="600022", phone="9087654321")]
 		)).insert()
 		cust1.reload()
-	if not frappe.db.get_value("Customers", { "business": business2, "email":"testcustomer2@gmail.com"}):
+	if not frappe.db.get_value("Customers", { "email":"testcustomer2@gmail.com"}):
 		cust2 = frappe.get_doc(dict(first_name="Test Customer 2", doctype= "Customers",
 				phone="9087654322", 
 				gender="Female", 
-				business=business2, 
+				
 				email="testcustomer2@gmail.com", 
 				last_name="Test", 
 				set_new_password="#Admin123#",

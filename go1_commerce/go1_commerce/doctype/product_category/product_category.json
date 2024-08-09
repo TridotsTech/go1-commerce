@@ -12,8 +12,6 @@
   "product_image_size",
   "minimum_order_amount",
   "products_per_row_in_list",
-  "business",
-  "business_name",
   "column_break_2",
   "display_order",
   "default_view",
@@ -84,13 +82,6 @@
    "fieldtype": "Int",
    "hidden": 1,
    "label": "Product Image Size (List)"
-  },
-  {
-   "fieldname": "business",
-   "fieldtype": "Link",
-   "hidden": 1,
-   "label": "Seller",
-   "options": "Business"
   },
   {
    "fieldname": "column_break_2",
@@ -326,14 +317,6 @@
    "options": "1\n2\n3\n4\n5"
   },
   {
-   "fetch_from": "business.restaurant_name",
-   "fieldname": "business_name",
-   "fieldtype": "Data",
-   "hidden": 1,
-   "label": "Seller Name",
-   "read_only": 1
-  },
-  {
    "default": "0",
    "fieldname": "template_saved",
    "fieldtype": "Check",
@@ -435,7 +418,7 @@
  "is_published_field": "is_active",
  "is_tree": 1,
  "links": [],
- "modified": "2024-02-15 11:49:05.956141",
+ "modified": "2024-08-09 20:36:32.420141",
  "modified_by": "Administrator",
  "module": "Go1 Commerce",
  "name": "Product Category",
@@ -465,7 +448,7 @@
   }
  ],
  "route": "category_name",
- "search_fields": "category_name, business_name",
+ "search_fields": "category_name",
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],

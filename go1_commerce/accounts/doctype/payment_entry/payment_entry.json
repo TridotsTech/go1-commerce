@@ -14,7 +14,6 @@
   "posting_date",
   "source_from",
   "cost_center",
-  "business",
   "party_section",
   "party_type",
   "type",
@@ -451,13 +450,6 @@
    "options": "ref_doctype"
   },
   {
-   "fieldname": "business",
-   "fieldtype": "Link",
-   "hidden": 1,
-   "label": "Business",
-   "options": "Business"
-  },
-  {
    "fieldname": "column_break_k8ls",
    "fieldtype": "Column Break"
   },
@@ -479,7 +471,7 @@
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2023-06-03 11:45:10.039657",
+ "modified": "2024-08-09 19:16:46.515321",
  "modified_by": "Administrator",
  "module": "Accounts",
  "name": "Payment Entry",

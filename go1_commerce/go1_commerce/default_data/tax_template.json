@@ -1,7 +1,6 @@
 [
 {
     "title": "GST",
-    "business": null,
     "name": "GST",
     "doctype": "Product Tax Template",
     "tax_rates": [

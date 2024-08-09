@@ -45,8 +45,7 @@ def get_columns():
 def get_data(filters):
 	data = []
 	condition = ' and year(posting_date) = "%s"' % filters.get('year')
-	if filters.get('business'):
-		condition += ' and business = "%s"' % filters.get('business')
+	
 	income_entries = frappe.db.sql('''select monthname(posting_date) as month, sum(paid_amount) as amount from `tabPayment Entry` where docstatus = 1 and payment_type = "Receive" {} group by monthname(posting_date)'''.format(condition), as_dict=1)
 	expense_entries = frappe.db.sql('''select monthname(posting_date) as month, sum(paid_amount) as amount from `tabPayment Entry` where docstatus = 1 and payment_type = "Pay" {} group by monthname(posting_date)'''.format(condition), as_dict=1)
 	for item in month_list:

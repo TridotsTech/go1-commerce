@@ -696,58 +696,13 @@ def get_query_condition(user):
 	if "System Manager" in frappe.get_roles(user):
 		return None
 
-	if "Manager" in frappe.get_roles(user) or "Vendor" in frappe.get_roles(user):
-		user_info = frappe.db.sql('''
-						SELECT restaurant 
-						FROM `tabShop User` 
-						WHERE name = %(name)s
-					''', {'name': user}, as_dict=1)
-
-		if user_info and user_info[0].restaurant:
-			user_query = ''
-			if "Vendor" in frappe.get_roles(user):
-				return '''(`tabDiscounts`.owner = "{0}")'''.format(user)
-			else:
-				users_list = frappe.db.sql_list('''
-								SELECT name 
-								FROM `tabShop User` 
-								WHERE restaurant = %(restaurant)s
-							''', {'restaurant': user_info[0].restaurant})
-
-				if users_list:
-					user_query = ','.join([('"' + x + '"') for x in users_list])
-				else:
-					user_query = '"{0}"'.format(user)
-				return '''(`tabDiscounts`.owner in ({0}))'''.format(user_query)
-		else:
-			return '''(`tabDiscounts`.owner = "{0}")'''.format(user)
+	
 
 
 def has_permission(doc, user):
 	if "System Manager" in frappe.get_roles(user):
 		return True
 	
-	if "Vendor" in frappe.get_roles(user):
-		if doc.owner == user:
-			return True
-		else:
-			return False
-	if "Manager" in frappe.get_roles(user):
-		user_info = frappe.db.sql('''
-			SELECT restaurant 
-			FROM `tabShop User` 
-			WHERE name = %(name)s
-		''', {'name': user}, as_dict=1)
-		if user_info and user_info[0].restaurant:
-			users_list = frappe.db.sql_list('''
-						SELECT name 
-						FROM `tabShop User` 
-						WHERE restaurant = %(restaurant)s
-					''', {'restaurant': user_info[0].restaurant})
-			if doc.owner in users_list:
-				return True
-			else:
-				return False
 	return True
 
 

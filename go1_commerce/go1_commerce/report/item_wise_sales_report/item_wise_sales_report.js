@@ -16,19 +16,9 @@ frappe.query_reports["Item Wise Sales Report"] = {
 			"label": __("To Date"),
 			"fieldtype": "Date",
 			"default": frappe.datetime.get_today()
-		},
-		{
-			"fieldname": "business",
-			"fieldtype": "Link",
-			"label": __("Business"),
-			"options": "Business"
-		},
+		}
 	],
 	"onload": function() {
-		var business_filter = frappe.query_report.get_filter('business');
-		if(frappe.session.user != 'Administrator' && has_common(['Vendor'], frappe.user_roles)){
-			business_filter.df.hidden = 1;
-			business_filter.refresh();
-		}
+		
 	}
 };

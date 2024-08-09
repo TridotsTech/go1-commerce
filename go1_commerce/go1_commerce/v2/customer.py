@@ -623,7 +623,7 @@ def validate_cancel_order(Orders,customer_id,customer,**kwargs):
 		Orders.save(ignore_permissions=True)
 		centre = frappe.db.get_value("Customers",Orders.customer,"center")
 		old_items = frappe.db.sql(  """ SELECT 
-											TM.item, TM.quantity, TM.business, TM.attribute_ids 
+											TM.item, TM.quantity, TM.attribute_ids 
 										FROM 
 											`tabOrder Item` TM 
 										WHERE TM.parent = %(order_id)s""",
@@ -702,7 +702,7 @@ def update_recently_viewed_products(guest_id, customer_id):
 										fields=['product', 'viewed_date', 'name'],
 										filters={'parent': guest_id}, order_by='viewed_date desc')
 	for x in recently_viewed_products:
-		frappe.enqueue("ecommerce_business_store.ecommerce_business_store.api.delete_viewed_products",customer_id=customer_id, name=x.name, product=x.product)
+		frappe.enqueue("go1_commerce.go1_commerce.api.delete_viewed_products",customer_id=customer_id, name=x.name, product=x.product)
 
 @frappe.whitelist(allow_guest=True)
 def delete_viewed_products(customer_id, name, product):

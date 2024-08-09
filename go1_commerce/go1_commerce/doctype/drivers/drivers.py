@@ -100,8 +100,7 @@ class Drivers(Document):
 		frappe.publish_realtime('check_active_drivers', {
 															'name': self.name, 
 															'driver_status': self.driver_status, 
-															'working_status': self.working_status,
-															'business_list':self.business_list
+															'working_status': self.working_status
 														})
 def update_user(self):	
 	add_arole(self,'Driver')

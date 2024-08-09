@@ -14,16 +14,14 @@ class TestReturnPolicy(unittest.TestCase):
 		
 		
 
-def make_return_policy(name, business=None):
-	if not frappe.db.get_value("Return Policy", { "heading": name, "business":business}):
+def make_return_policy(name):
+	if not frappe.db.get_value("Return Policy", { "heading": name}):
 		return_policy = frappe.get_doc({
 			"doctype": "Return Policy",
 			"heading": name,
-			"business": business,
 			"description": "Test Return Policy Description",
-			"no_of_days": 5,
-			"business_name":""
+			"no_of_days": 5
 		}).insert()
 		return return_policy.name
 	else:
-		return frappe.get_value("Return Policy", { "heading": name, "business":business}, "name")
+		return frappe.get_value("Return Policy", { "heading": name}, "name")

@@ -1,4 +1,5 @@
 {
+ "actions": [],
  "autoname": "SH-.YY.-.MM.-.#####",
  "creation": "2019-12-18 17:19:38.959005",
  "doctype": "DocType",
@@ -8,7 +9,6 @@
   "document_type",
   "document_name",
   "driver",
-  "business",
   "column_break_4",
   "payment_status",
   "shipped_date",
@@ -50,13 +50,6 @@
    "in_list_view": 1,
    "label": "Driver",
    "options": "Drivers"
-  },
-  {
-   "fieldname": "business",
-   "fieldtype": "Link",
-   "hidden": 1,
-   "label": "Business",
-   "options": "Business"
   },
   {
    "fieldname": "column_break_4",
@@ -169,7 +162,8 @@
   }
  ],
  "is_submittable": 1,
- "modified": "2021-05-05 16:08:58.850200",
+ "links": [],
+ "modified": "2024-08-09 20:43:23.380938",
  "modified_by": "Administrator",
  "module": "Go1 Commerce",
  "name": "Shipment",
@@ -193,5 +187,6 @@
  ],
  "sort_field": "modified",
  "sort_order": "DESC",
+ "states": [],
  "track_changes": 1
 }

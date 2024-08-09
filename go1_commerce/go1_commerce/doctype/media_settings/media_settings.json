@@ -7,7 +7,6 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "business",
   "section_break_2",
   "list_thumbnail_size",
   "detail_image_size",
@@ -29,13 +28,6 @@
   "email_thumbnail"
  ],
  "fields": [
-  {
-   "fieldname": "business",
-   "fieldtype": "Link",
-   "hidden": 1,
-   "label": "Business",
-   "options": "Business"
-  },
   {
    "fieldname": "section_break_2",
    "fieldtype": "Section Break"
@@ -154,7 +146,7 @@
  ],
  "issingle": 1,
  "links": [],
- "modified": "2024-02-12 19:01:44.833551",
+ "modified": "2024-08-09 21:43:41.202420",
  "modified_by": "Administrator",
  "module": "Go1 Commerce",
  "name": "Media Settings",

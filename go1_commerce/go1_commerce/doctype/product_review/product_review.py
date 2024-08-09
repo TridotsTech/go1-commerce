@@ -120,7 +120,4 @@ def convert_product_image(image_name,size,productid):
 # updated by Kavitha on 28 Nov 2020
 def get_query_condition(user):
 	if not user: user = frappe.session.user
-	if "Vendor" in frappe.get_roles(user):
-		shop_users = frappe.db.get_all('Shop User', filters={'email': user}, fields=['restaurant'])
-		if shop_users:
-			return "(`tabProduct Review`.business='{0}')".format((shop_users[0].restaurant or ''))
+	

@@ -632,7 +632,7 @@ frappe.ui.form.on('Order', {
         frappe.call({
             method: 'go1_commerce.go1_commerce.v2.orders.get_checkout_attributes',
             args: {
-                'business': (frm.doc.business || null)
+              
             },
             async: false,
             callback: function(r) {
@@ -1135,13 +1135,12 @@ frappe.ui.form.on("Order Addons", {
     }
 })
 
-var change_status = function(docname, order_status, restaurant_status, driver_status) {
+var change_status = function(docname, order_status, driver_status) {
     frappe.call({
         method: 'go1_commerce.go1_commerce.v2.orders.update_order_status',
         args: {
             name: docname,
             order_status: order_status,
-            restaurant_status: restaurant_status,
             driver_status: driver_status
         },
         callback: function(data) {
@@ -1383,26 +1382,10 @@ function validate_status(frm){
         args: {},
         async: false,
         callback: function(d) {
-            if(d.message.is_restaurant == true && d.message.is_restaurant_driver == 1){
-                $(".form-footer").hide();
-                $('[data-label="Cancel"]').parent().hide();
-                $('[data-page-route="Form/Order"] .row.form-section.visible-section:nth-child(10)').hide();
-                $('[data-page-route="Form/Order"] .row.form-section.visible-section:nth-child(17)').hide();
-                $(".layout-main-section").hide();
-                $(".layout-main-section-wrapper").append('<div class="loading" style="float:left;position: absolute;font-size: 16px;text-align: center;margin-top: 20%;width: 100%;">Loading...</div>')
-                setTimeout(function(){ 
-                    $(".layout-main-section").show();$(".form-footer").show();
-                    $(".layout-main-section-wrapper .loading").hide();
-                    frm.set_df_property('commission_info', 'hidden', 0)
-                    frm.set_df_property('browser_details', 'hidden', 0);
-                    $(".driver-template").show();
-                    $(".default-template").hide();
-                    $('head').append('<style type="text/css">.form-footer{display:none !important}');
-                    $(".form-inner-toolbar button").hide();}, 100);
-                }
-            else{
+          
+            
                 $('[data-fieldname="browser"]').parent().parent().parent().parent().show();
-            }
+           
             frm.check_order_settings = d.message.order_settings;
         }
     })

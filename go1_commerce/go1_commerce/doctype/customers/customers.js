@@ -199,12 +199,8 @@ frappe.ui.form.on('Customers', {
                 $('.table .recent_orders td').css('padding','10px 14px');
                 var s_no = 0;
                 $('.view_orders').click(function(){
-                    if(frm.doc.business){
                         window.open('/app/order?customer='+frm.doc.name, '_blank')
-                    }
-                    else{
-                        window.open('/app/order?customer='+frm.doc.name, '_blank')
-                    }
+                   
                 })
                 if (val.length > 0) {
                     $('.view_orders').css('display','block')

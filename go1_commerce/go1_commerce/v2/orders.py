@@ -97,8 +97,7 @@ def retrigger_notify_drivers(order):
                             frappe.publish_realtime('check_active_drivers', {
                                                                     'name': assigned_driver.driver, 
                                                                     'driver_status': doc.driver_status, 
-                                                                    'working_status': doc.working_status,
-                                                                    'business_list':doc.business_list
+                                                                    'working_status': doc.working_status
                                                                 })
     except Exception as e:
         frappe.log_error('Error in api.retrigger_notify_drivers', frappe.get_traceback())
@@ -1189,7 +1188,7 @@ def set_discount_amount(order,request,order_total,coupon_code,discount_data):
     order.discount = float(request.get('discount_amount'))
     order_total = order_total - float(request.get('discount_amount'))
     if request.get('discount'):
-        (use_type, percent, amount, max_discount, dis_business,
+        (use_type, percent, amount, max_discount,
         website_type, provided_by, price_or_product_discount) = frappe.db.get_value('Discounts',
                                                 request.get('discount'),['percent_or_amount',
                                                                         'discount_percentage',
@@ -1214,7 +1213,7 @@ def set_discount_amount(order,request,order_total,coupon_code,discount_data):
     if coupon_code:
         if frappe.db.get_all("Discounts",filters={"name":coupon_code}):
             (use_type_c, percent_c, amount_c,
-            max_discount_c, c_business,
+            max_discount_c,
             c_web_type, c_provided_by) = frappe.db.get_value('Discounts',
                                                             coupon_code,
                                                             ['percent_or_amount',

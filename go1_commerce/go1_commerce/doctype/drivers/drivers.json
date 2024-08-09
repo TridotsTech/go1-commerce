@@ -9,9 +9,6 @@
   "driver_name",
   "driver_email",
   "driver_phone",
-  "select_all_business",
-  "add__edit_business",
-  "mapped_business",
   "column_break_3",
   "driver_status",
   "address",
@@ -257,28 +254,10 @@
    "fieldname": "insurance_expiry_image",
    "fieldtype": "Attach Image",
    "label": "Vehicle Insurance Expiry Date (Attach Insurance copies)"
-  },
-  {
-   "default": "0",
-   "fieldname": "select_all_business",
-   "fieldtype": "Check",
-   "hidden": 1,
-   "label": "Select All Business"
-  },
-  {
-   "fieldname": "mapped_business",
-   "fieldtype": "Small Text",
-   "label": "Business",
-   "read_only": 1
-  },
-  {
-   "fieldname": "add__edit_business",
-   "fieldtype": "Button",
-   "label": "Add / Edit Business"
   }
  ],
  "links": [],
- "modified": "2024-03-14 17:04:57.743626",
+ "modified": "2024-08-09 21:42:37.952961",
  "modified_by": "Administrator",
  "module": "Go1 Commerce",
  "name": "Drivers",

@@ -9,7 +9,7 @@
  "is_standard": "Yes", 
  "modified": "2019-08-09 21:26:08.864981", 
  "modified_by": "Administrator", 
- "module": "Ecommerce Business Store SingleVendor", 
+ "module": "Go1 Commerce", 
  "name": "sample table", 
  "owner": "Administrator", 
  "query": "select p.item,p.tax_category,p.price,p.old_price,p.short_description,p.full_description,p.sku,p.name,p.route,p.inventory_method,p.minimum_order_qty,p.maximum_order_qty,p.stock,\n\t\t\t\t(select list_image from `tabProduct Image` i where parent=p.name order by is_primary desc \n\t\t\t\tlimit 1) as product_image, (select detail_thumbnail from `tabProduct Image` i where parent=p.name order by is_primary desc \n\t\t\t\tlimit 1) as detail_thumbnail,(select brand_name from `tabProduct Brand Mapping` where parent=p.name \n\t\t\t\tlimit 1) as product_brand,\n\t\t\t\t(select B.route from `tabProduct Brand Mapping` MP\n\t\t\t\t\t\t\t\t\tinner join `tabProduct Brand` B on MP.brand=B.name\n\t\t\t\t\t\t\t\t\twhere MP.parent=p.name and B.published=1 limit 1) as brand_route,\n\t\t\t\tsum(oi.quantity) as qty from `tabProduct` p inner join `tabOrder Item` oi \n\t\t\t\ton oi.item=p.name where p.is_active=1 group by p.name order by qty desc", 

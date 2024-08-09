@@ -30,11 +30,7 @@ def get_columns(enable_tip):
 		_("Order Id") + ":Data:120",
 		_("Order Date") + ":Date:120"				
 	]
-	if "Admin" in frappe.get_roles(frappe.session.user) or "Super Admin" in frappe.get_roles(frappe.session.user):
-		columns+=[ 
-			_("Business") + ":Link/Business:120",
-			_("Business Name") + ":Data:120"
-		]
+	
 	columns += [
 		_("Order Type") + ":Data:120",
 		_("Order Status") + ":Data:120",
@@ -155,20 +151,6 @@ def get_order_list(status,year,month,month_list,day_list):
 			else:
 				values.append(0)	
 	return values		
-
-@frappe.whitelist(allow_guest=True)
-def check_domain(domain_name):
-	try:
-		from frappe.core.doctype.domain_settings.domain_settings import get_active_domains
-		domains_list=get_active_domains()
-		domains=frappe.cache().hget('domains','domain_constants')
-		if not domains:
-			domains=get_domains_data()
-		if domains[domain_name] in domains_list:
-			return True
-		return False
-	except Exception as e:
-		frappe.log_error(frappe.get_traceback(), "go1_commerce.go1_commerce.api.check_domain")
 
 @frappe.whitelist()
 def get_years():

@@ -3,20 +3,10 @@
 
 frappe.ui.form.on('Checkout Attributes', {
 	refresh: function(frm) {
-		if (has_common(frappe.user_roles, ['Admin', 'System Manager'])) {
-            frm.toggle_display(['business'], true);
-            if(frm.doc.__islocal)
-                frm.set_value('business', '');
-        } else {
-            frm.toggle_display(['business'], false);
-            if(frm.doc.__islocal)
-                frm.set_value('business', frappe.boot.user.defaults.business);
-        }
         frm.set_query("parent_attribute", function () {
             let filters = {};
             filters.is_group = 1;
-            if(frm.doc.business)
-                filters.business = frm.doc.business
+            
             return {
                 "filters": filters
             }
@@ -71,7 +61,7 @@ frappe.ui.form.on('Checkout Attributes', {
             frm.doc.checkout_attribute_requirements.map(f => {
                 let dt = get_doctype_for_requirement(f.requirement_type);
                 let dt_txt = dt;
-                not_business()
+               
                 if (dt != 'Business') {
                     dt = dt + 's'
                 }

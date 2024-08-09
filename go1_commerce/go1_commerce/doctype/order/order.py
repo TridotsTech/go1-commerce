@@ -595,27 +595,15 @@ class Order(Document):
 		discount_requirements = frappe.db.get_all("Discount Requirements",
 								filters = {"parent":res.get('discount_rule')},
 								fields = ['items_list','discount_requirement'])
-		business_list = []
 		customer_list = []
 		if discount_requirements:
 			for dr in discount_requirements:
-				if dr.discount_requirement == "Limit to business":
-					items = json.loads(dr.items_list)
-					business_list = [i.get('item') for i in items]
 				if dr.discount_requirement == "Limit to customer":
 					items = json.loads(dr.items_list)
 					customer_list = [i.get('item') for i in items]
-		if not discount_requirements:
-			if discount_info[0].discount_type == "Assigned to Business":
-				discount_requirements = frappe.db.get_all("Discount Business",
-									filters = {"parent":res.get('discount_rule')},
-									fields = ['business'])
-				if discount_requirements:
-					business_list = [i.get('business') for i in discount_requirements]
+		
 		is_allowed = 1
-		if business_list:
-			if item.business not in business_list:
-				is_allowed = 0
+		
 		if customer_list:
 			if self.customer not in customer_list:
 				is_allowed = 0
@@ -1976,18 +1964,11 @@ def get_order_status(doctype,txt,searchfield,start,page_len,filters):
 		condition = ''
 		if txt:
 			condition += ' AND name LIKE "%{txt}%"'.format(txt = txt)
-		active_domains = ''
-		from frappe.core.doctype.domain_settings.domain_settings import get_active_domains
-		domains_list = get_active_domains()
-		for item in domains_list:
-			if item:
-				active_domains += '"' + item + '",'
 		query = '''SELECT name
 					FROM `tabOrder Status`
-					WHERE (CASE WHEN domain_based = 1
-					THEN domain IN ({active_domains}) ELSE 1 = 1 END) {condition}
+					WHERE shipping_status IS NOT NULL AND {condition}
 					ORDER BY display_order
-				'''.format(active_domains = active_domains[:-1], condition = condition)
+				'''.format(condition = condition)
 		results = frappe.db.sql('''{query}'''.format(query = query))
 		return results
 	except Exception:
@@ -2149,8 +2130,7 @@ def cancel_order(order):
 		frappe.db.set_value('Order', order, 'workflow_state', 'Order Cancelled')
 		frappe.publish_realtime('order_tracking',{
 													'name':OrderDetail.name, 
-													'workflow_state':'Order Cancelled',
-													'business':OrderDetail.business
+													'workflow_state':'Order Cancelled'
 												})
 	return {'status': 'Success'}
 
@@ -2951,7 +2931,7 @@ def get_discount_list():
 									FROM `tabDiscounts`
 									WHERE (discount_type = 'Assigned to Products'
 										OR discount_type = 'Assigned to Categories'
-										OR discount_type = 'Assigned to Business')
+										)
 										AND (CASE WHEN start_date IS NOT NULL
 											THEN start_date <= "{today}" ELSE 1 = 1 end)
 										AND (CASE WHEN end_date IS NOT NULL

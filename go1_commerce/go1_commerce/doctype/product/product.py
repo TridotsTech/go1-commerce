@@ -1058,43 +1058,6 @@ def approve_products(names,status):
 	except Exception:
 		frappe.log_error(frappe.get_traceback(), "Error in doctype.product.approve_products") 
 
- 
-def save_as_template(names, selected_business):
-	try:
-		import json
-		data = json.loads(names)
-		if len(data)==0:
-			frappe.msgprint(_('Please select any items'))
-		else:
-			for item in data:
-				doc = frappe.get_doc('Product', item).as_dict()
-				if doc.template_saved!=1:
-					vertical_name = re.sub('[^a-zA-Z0-9 ]', '', selected_business).lower().replace(' ','_')
-					vertical_name1 = vertical_name+".json"
-					path = frappe.get_module_path("go1_commerce")
-					path_parts=path.split('/')
-					path_parts=path_parts[:-1]
-					url='/'.join(path_parts)
-					if not os.path.exists(os.path.join(url,'verticals')):
-						frappe.create_folder(os.path.join(url,'verticals'))
-					file_path = os.path.join(url, 'verticals', vertical_name1)
-					data = []
-					if os.path.exists(file_path):
-						with open(file_path, 'r') as f:
-							data = json.load(f)
-							data.append(doc)
-						with open(os.path.join(url,'verticals', (vertical_name+'.json')), "w") as f:
-							f.write(frappe.as_json(data))
-					else:
-						doc1 = []
-						doc1.append(doc)
-						with open(os.path.join(url,'verticals', (vertical_name+'.json')), "w") as f:
-							f.write(frappe.as_json(doc1))
-					frappe.db.set_value('Product',item,'template_saved',1)
-	except Exception:
-		frappe.log_error(frappe.get_traceback(), "Error in doctype.product.save_as_template") 
-
-
 def get_product_attributes_with_options(product):
 	attributes=frappe.db.get_all('Product Attribute Mapping',filters={'parent':product},
 							  fields=['name','product_attribute','is_required','control_type',
@@ -1961,33 +1924,6 @@ def delete_option(name):
 						name = %(name)s ''', {'name': name})
 	return "success"
 
-
-def insert_json(selected_business,name):
-	doc = frappe.get_doc('Product', name).as_dict()
-	vertical_name = re.sub('[^a-zA-Z0-9 ]', '', selected_business).lower().replace(' ','_')
-	vertical_name1 = vertical_name+".json"
-	path = frappe.get_module_path("go1_commerce")
-	path_parts=path.split('/')
-	path_parts=path_parts[:-1]
-	url='/'.join(path_parts)
-	if not os.path.exists(os.path.join(url,'verticals')):
-		frappe.create_folder(os.path.join(url,'verticals'))
-	file_path = os.path.join(url, 'verticals', vertical_name1)
-	data = []
-	if os.path.exists(file_path):
-		with open(file_path, 'r') as f:
-			data = json.load(f)
-			data.append(doc)
-		with open(os.path.join(url,'verticals', (vertical_name+'.json')), "w") as f:
-			f.write(frappe.as_json(data))
-	else:
-		doc1 = []
-		doc1.append(doc)
-		with open(os.path.join(url,'verticals', (vertical_name+'.json')), "w") as f:
-			f.write(frappe.as_json(doc1))
-	frappe.db.set_value('Product',doc.name,'template_saved',1)
-
-
 def get_order_settings():
 	check_file_uploader = 0
 	apps = frappe.get_installed_apps()
@@ -2317,7 +2253,7 @@ def clear_test_records(dt):
 
 
 
-def product_detail_onscroll(productid, layout, domain=None):
+def product_detail_onscroll(productid, layout):
 	from go1_commerce.go1_commerce.V2.product \
 		import get_product_other_info, get_customer_recently_viewed_products
 	contexts = {}
@@ -2368,7 +2304,7 @@ def product_detail_onscroll(productid, layout, domain=None):
 	a_product_category = categories_list[0] if categories_list else {}
 	if catalog_settings.customers_who_bought or catalog_settings.enable_best_sellers or \
 														catalog_settings.enable_related_products:
-		additional_info = get_product_other_info(productid, domain)
+		additional_info = get_product_other_info(productid)
 		a_related_products = additional_info['related_products']
 		a_best_seller_category = additional_info['best_seller_category']
 		a_products_purchased_together = additional_info['products_purchased_together']
@@ -2376,7 +2312,7 @@ def product_detail_onscroll(productid, layout, domain=None):
 	contexts['bestseller_item'] = a_best_seller_category
 	contexts['show_best_sellers'] = a_products_purchased_together
 	contexts['product_category'] = a_product_category
-	contexts['recent_viewed_products'] = get_customer_recently_viewed_products(domain=domain)
+	contexts['recent_viewed_products'] = get_customer_recently_viewed_products()
 	if layout=="Meat Layout":
 		product_enquiry = get_product_scroll(productid, 1, 5)
 		contexts['product_enquiry'] = product_enquiry

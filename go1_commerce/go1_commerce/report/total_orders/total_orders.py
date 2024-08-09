@@ -139,20 +139,6 @@ def get_order_list(status,year,month,month_list,day_list):
 				values.append(0)	
 	return values		
 
-@frappe.whitelist(allow_guest=True)
-def check_domain(domain_name):
-	try:
-		from frappe.core.doctype.domain_settings.domain_settings import get_active_domains
-		domains_list=get_active_domains()
-		domains=frappe.cache().hget('domains','domain_constants')
-		if not domains:
-			domains=get_domains_data()
-		if domains[domain_name] in domains_list:
-			return True
-		return False
-	except Exception as e:
-		frappe.log_error(frappe.get_traceback(), "go1_commerce.go1_commerce.api.check_domain")
-
 @frappe.whitelist()
 def get_years():
 	year_list = frappe.db.sql_list('''select distinct year(order_date) as years from `tabOrder` where naming_series !="SUB-ORD-"''')

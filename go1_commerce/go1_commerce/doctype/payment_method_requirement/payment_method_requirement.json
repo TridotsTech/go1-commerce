@@ -58,7 +58,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Requirement Type",
-   "options": "Spend x amount\nSpecific price range\nHas any one product in cart\nHas all these products in cart\nLimit to business\nLimit to role\nSpecific Shipping Method",
+   "options": "Spend x amount\nSpecific price range\nHas any one product in cart\nHas all these products in cart\nLimit to role\nSpecific Shipping Method",
    "reqd": 1,
    "set_only_once": 1
   }

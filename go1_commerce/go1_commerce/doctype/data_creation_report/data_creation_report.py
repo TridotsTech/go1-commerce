@@ -14,9 +14,8 @@ class DataCreationReport(Document):
 			res_json = json.loads(self.result_json)
 		return res_json
 
-def create_data_report(business, data_type='Default Data'):
+def create_data_report(data_type='Default Data'):
 	doc = frappe.new_doc('Data Creation Report')
-	doc.business = business
 	doc.started_at = get_datetime()
 	doc.data_type = data_type
 	doc.is_completed = 0
@@ -31,7 +30,7 @@ def update_data_report(name, results):
 	doc.completed_at = get_datetime()
 	doc.is_completed = 1
 	doc.save(ignore_permissions=True)
-	webpage_builders = frappe.db.get_all("Web Page Builder",filters={"business":doc.business})
+	webpage_builders = frappe.db.get_all("Web Page Builder")
 	frappe.log_error(webpage_builders,'page builder') 
 	for x in webpage_builders:
 		webpage_builder = frappe.get_doc("Web Page Builder",x.name)

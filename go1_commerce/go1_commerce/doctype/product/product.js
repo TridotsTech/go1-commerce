@@ -513,7 +513,7 @@ frappe.ui.form.on('Product', {
     get_templates: function(frm) {
         frappe.call({
             method: 'go1_commerce.go1_commerce.doctype.product.product.get_product_templates',
-            args: {business:frm.vendor_business},
+            args: {},
             async: false,
             callback: function(r) {
                 var templates_list = r.message;
@@ -1504,7 +1504,6 @@ frappe.ui.form.on('Product', {
                 "label": "Variant Name",
                 "doctype": "Product",
                 "reference_doc": "Product Attribute",
-                "business": cur_frm.doc.restaurant,
                 "reference_fields": escape(JSON.stringify(["name", "attribute_name"])),
                 "filters":JSON.stringify(cur_frm.doc.product_categories),
                 "search_fields": "attribute_name",
@@ -1647,80 +1646,24 @@ frappe.ui.form.on('Product', {
                 "fieldname": "min_allowed_options",
                 "fieldtype": "Int",
                 "label": __("Minimum Allowed Options"),
-                "hidden": (frappe.boot.active_domains.includes(frappe.boot.sysdefaults.domain_constants.restaurant) ? 0 : 1),
+                "hidden": 1,
                 "depends_on": "eval:  doc.control_type == 'Checkbox List' "
             },
             {
                 "fieldname": "max_allowed_options",
                 "fieldtype": "Int",
                 "label": __("Maximum Allowed Options"),
-                "hidden": (frappe.boot.active_domains.includes(frappe.boot.sysdefaults.domain_constants.restaurant) ? 0 : 1),
+                "hidden": 1,
                 "depends_on": "eval:  doc.control_type == 'Checkbox List' "
             }
         ];
-        if(frappe.boot.active_domains.includes(frappe.boot.sysdefaults.domain_constants.restaurant)) {
-            dialog_fields.push({'fieldtype': 'Column Break', 'fieldname': 'cb_2'});
-            dialog_fields.push({
-                "fieldtype": "Link", "label": __("Parent Attribute"),
-                "fieldname": "parent_attribute", "reqd": 0, "options": "Product Attribute",
-                "onchange": function () {
-                    let val = this.get_value();
-                    if (val) {
-                        frappe.call({
-                            method: 'frappe.client.get_value',
-                            args: {
-                                'doctype': "Product Attribute",
-                                'filters': { 'name': val },
-                                'fieldname': "attribute_name"
-                            },
-                            callback: function (r) {
-                                if (r.message) {
-                                    on_attribute_name = r.message.attribute_name
-                                    $(dialog2.$wrapper).find('[data-fieldname="parent_attribute_name"]').val(on_attribute_name);
-                                }
-                            }
-                        })
-                    }
-                }
-            });
-            dialog_fields.push({
-                "fieldtype": "Data", "label": __("Parent Attribute Name"),
-                "fieldname": "parent_attribute_name", "reqd": 0
-            });
-            dialog_fields.push({
-                "fieldtype": "Link", "label": __("Attribute Group"),
-                "fieldname": "attribute_group", "reqd": 0, "options": "Product Attribute Group",
-                "onchange": function () {
-                    let val = this.get_value();
-                    if (val) {
-                        frappe.call({
-                            method: 'frappe.client.get_value',
-                            args: {
-                                'doctype': "Product Attribute Group",
-                                'filters': { 'name': val },
-                                'fieldname': "group_name"
-                            },
-                            callback: function (r) {
-                                if (r.message) {
-                                    on_attribute_name = r.message.group_name
-                                    $(dialog2.$wrapper).find('[data-fieldname="group_name"]').val(on_attribute_name);
-                                }
-                            }
-                        })
-                    }
-                }
-            });
-            dialog_fields.push({
-                "fieldtype": "Data", "label": __("Attribute Group Name"),
-                "fieldname": "group_name", "reqd": 0
-            });
-        } 
+        
         
         let dialog2 = new frappe.ui.Dialog({
             title: __("Product Attribute"),
             fields: dialog_fields
         });
-        $(dialog2.$wrapper).find('.modal-dialog').css("width", (frappe.boot.active_domains.includes(frappe.boot.sysdefaults.domain_constants.restaurant) ? "70%" : "60%"));
+        $(dialog2.$wrapper).find('.modal-dialog').css("width", ("60%"));
         dialog2.set_primary_action(__("Save"), function () {
             let values = dialog2.get_values();
             var unique_name1 = '';
@@ -2640,7 +2583,7 @@ frappe.ui.form.on('Product', {
                                     if(c.hasimage == 1 && c.imagefield){
                                         var img_src = v[c.imagefield]
                                         if(!c.imagefield || !v[c.imagefield] || c.imagefield=="null" || v[c.imagefield]=="null" || v[c.imagefield]==null || v[c.imagefield]==undefined){
-                                            img_src = "/assets/ecommerce_business_store/images/no-image-60x50.png"
+                                            img_src = "/assets/go1_commerce/images/no-image-60x50.png"
                                             
                                         }
                                         drp_html += `<img src="${img_src}" alt="" style="float: left;width: 35px;padding: 5px;height: 35px;">`;
@@ -2664,7 +2607,7 @@ frappe.ui.form.on('Product', {
                                     if(c.hasimage == 1 && c.imagefield){
                                         var img_src = v[c.imagefield]
                                         if(!c.imagefield || !v[c.imagefield] || c.imagefield=="null" || v[c.imagefield]=="null" || v[c.imagefield]==null || v[c.imagefield]==undefined){
-                                            img_src = "/assets/ecommerce_business_store/images/no-image-60x50.png"
+                                            img_src = "/assets/go1_commerce/images/no-image-60x50.png"
                                             
                                         }
                                         drp_html += `<img src="${img_src}" alt="" style="float: left;width: 35px;padding: 5px;height: 35px;">`;
@@ -4305,7 +4248,7 @@ var ProductTemplateWizard = Class.extend({
                         let rows = frappe.model.add_child(me.template_detail, "Multi Vendor Variant Pricing", "vendor_variant_pricing");
                         rows.combination_html = f.attribute_html;
                         rows.combination = f.attribute_id;
-                        rows.vendor_id = cur_frm.vendor_business
+                        
                         let row = $(`<tr>
                                     <td style="width: 35%;">${__(f.attribute_html)}</td>
                                     <td><div class="stock_html"></div></td>
@@ -4429,7 +4372,7 @@ var ProductTemplateWizard = Class.extend({
         if (slide_type == 'add') { 
             this.wizard.values = this.template_detail;
             let rows = frappe.model.add_child(this.template_detail, "Multi Vendor Pricing", "pricing_details");
-            rows.vendor_id = cur_frm.vendor_business
+            
             rows.price = parseFloat(this.template_detail.price);
             rows.stock = parseInt(this.template_detail.stock);
             this.wizard.values["pricing_details"].push(rows)
@@ -4598,7 +4541,7 @@ var UppyUploadComponent = Class.extend({
     get_doc_files: function(dt, dn) {
         let me = this;
         frappe.call({
-            method: 'ecommerce_business_store.ecommerce_business_store.doctype.product.product.get_doc_images',
+            method: 'go1_commerce.go1_commerce.doctype.product.product.get_doc_images',
             args: {
                 dt: dt,
                 dn: dn
@@ -4708,7 +4651,7 @@ var UppyUploadComponent = Class.extend({
                 }
                 else{
                 let row = $(`<div class="col-md-3 gal-items" style="cursor: pointer;margin-bottom: 10px;width: 15%; height: 100px;padding: 0px;">
-                                <img src="/assets/ecommerce_business_store/images/folder.png" style="width: 85px;height: 75px;"/>
+                                <img src="/assets/go1_commerce/images/folder.png" style="width: 85px;height: 75px;"/>
                                     <span style="float: center;text-align: center;position: absolute;
                                         margin: 43px;margin-left: 22px;font-size: 11px;font-weight: 500;">
                                         ${f.file_name}
@@ -4778,7 +4721,7 @@ var UppyUploadComponent = Class.extend({
         setTimeout(function() {
             uploader.find('#uploader'+random+' .uppy-Root.uppy-DragDrop-container').css({"width": "10%", "padding": "8px"});
             uploader.find('#uploader'+random+' .uppy-Root.uppy-DragDrop-container .uppy-DragDrop-inner').
-                        prepend('<img id="upload-input" src="/assets/ecommerce_business_store/images/icons8-plus-+-50.png" style="cursor: pointer" />');
+                        prepend('<img id="upload-input" src="/assets/go1_commerce/images/icons8-plus-+-50.png" style="cursor: pointer" />');
             uploader.find('#upload-input').on("click", function(){
                 uploader.find('input.uppy-DragDrop-input').click();
             })

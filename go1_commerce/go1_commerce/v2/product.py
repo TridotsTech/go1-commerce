@@ -81,18 +81,11 @@ def get_parent_categories():
 		if item_group:
 			for item in item_group:
 				filter1 = {'parent_product_category': item.name, 'is_active': 1}
-				if business:
-					filter1 = {'parent_product_category': item.name, 'is_active': 1, 'business': business}
-				if business:
-					child = frappe.db.sql('''SELECT * from `tabProduct Category` where parent_product_category=%(parent_category)s and is_active=1 and business=%(business)s  order by mega_menu_column,display_order''',{'parent_category':item.name,'business':business},as_dict=1)
-				else:
-					child = frappe.db.sql('''SELECT * from `tabProduct Category` where parent_product_category=%(parent_category)s and is_active=1  order by mega_menu_column,display_order''',{'parent_category':item.name},as_dict=1)
+				child = frappe.db.sql('''SELECT * from `tabProduct Category` where parent_product_category=%(parent_category)s and is_active=1  order by mega_menu_column,display_order''',{'parent_category':item.name},as_dict=1)
 
 				if child:
 					for cat in child:
 						filter2 = {'parent_product_category': cat.name, 'is_active': 1}
-						if business:
-							filter2 = {'parent_product_category': cat.name, 'is_active': 1, 'business': business}
 						cat.child = frappe.db.get_all('Product Category', fields=['category_image', 'name', 'category_name', 'mobile_image', 'show_attributes_inlist', 'products_per_row_for_mobile_app','full_description','default_view','type_of_category'],
 								filters=filter2, order_by='mega_menu_column,display_order', limit_page_length=50)
 				item.child = child
@@ -104,21 +97,13 @@ def get_parent_categories():
 
 
 @frappe.whitelist(allow_guest=True)
-def get_customer_recently_viewed_products(customer=None, domain=None, isMobile=0,business=None):
+def get_customer_recently_viewed_products(customer=None, isMobile=0):
 	products = []
 	if not customer:
 		if frappe.request.cookies.get('customer_id'):
 			customer = unquote(frappe.request.cookies.get('customer_id'))
 	if customer:
 		cond = ''
-		if domain:
-			business = get_business_from_web_domain(domain)
-			if business:
-				cond = ' and p.restaurant = "{0}"'.format(business)
-		if business:
-			cond = ' and p.restaurant = "{0}"'.format(business)
-
-
 		recently_viewed_products = frappe.db.sql('''select c.product from `tabCustomer Viewed Product` c inner join tabProduct p on p.name = c.product where c.parent = %(parent)s {cond} order by viewed_date desc'''.format(cond=cond),{'parent': customer}, as_dict=1)
 		books_join_query = ''
 		books_columns_query = ''
@@ -158,26 +143,23 @@ def get_customer_recently_viewed_products(customer=None, domain=None, isMobile=0
 
 
 @frappe.whitelist(allow_guest=True)
-def get_product_other_info(item, domain=None, isMobile=0, business=None):
+def get_product_other_info(item, isMobile=0):
 	'''
 		To get additional product information to show in product detail page
 
 		param: item: product id
 	'''
-	if domain:
-		business = None
-		business = get_business_from_web_domain(domain)
 
 	customer_bought = best_sellers = related_products = []
 	categories_list = frappe.db.sql('''select category, category_name, (select route from `tabProduct Category` c where c.name = pcm.category) as route from `tabProduct Category Mapping` pcm where parent = %(parent)s order by idx limit 1''', {'parent': item}, as_dict=1)
 	if catalog_settings.customers_who_bought:
-		customer_bought = get_products_bought_together(item, business=business, isMobile=isMobile)
+		customer_bought = get_products_bought_together(item, isMobile=isMobile)
 	if catalog_settings.enable_best_sellers:
 		if categories_list and categories_list[0].category:
-			best_sellers = get_category_based_best_sellers(categories_list[0].category, item, business=business, isMobile=isMobile)
+			best_sellers = get_category_based_best_sellers(categories_list[0].category, item, isMobile=isMobile)
 	if catalog_settings.enable_related_products:
 		if categories_list:
-			related_products = get_category_products(categories_list[0].category, productsid=item, page_size=18, domain=domain, isMobile=isMobile)
+			related_products = get_category_products(categories_list[0].category, productsid=item, page_size=18, isMobile=isMobile)
 	return {
 		'best_seller_category': best_sellers,
 		'related_products': related_products,
@@ -185,10 +167,8 @@ def get_product_other_info(item, domain=None, isMobile=0, business=None):
 		'product_category': (categories_list[0] if categories_list else {}),
 		}
 
-def get_products_bought_together(item, business=None, isMobile=0):
+def get_products_bought_together(item, isMobile=0):
 	cond = ''
-	if business:
-		cond = ' and p.restaurant = "{0}"'.format(business)
 	items = frappe.db.sql('''SELECT p.item, p.tax_category, p.price, p.old_price, p.restaurant,
 		p.short_description, p.full_description, p.sku, p.name, p.route, p.inventory_method,
 		p.minimum_order_qty, p.maximum_order_qty, p.stock, p.disable_add_to_cart_button,p.approved_total_reviews, 
@@ -267,8 +247,7 @@ def get_list_product_details(products,customer = None):
 		today_date = get_today_date(replace=True)
 		discount_list =frappe.db.sql(""" SELECT name FROM `tabDiscounts` WHERE 
 											(discount_type = 'Assigned to Products' OR 
-											discount_type = 'Assigned to Categories' OR 
-											discount_type = 'Assigned to Business')
+											discount_type = 'Assigned to Categories')
 										AND (
 											CASE WHEN 
 												start_date IS NOT NULL 
@@ -586,8 +565,7 @@ def get_discount_list(today_date):
 											`tabDiscounts` 
 										WHERE 
 											(discount_type = 'Assigned to Products' OR 
-											discount_type = 'Assigned to Categories' OR 
-											discount_type = 'Assigned to Business')
+											discount_type = 'Assigned to Categories')
 										AND (CASE WHEN 
 												start_date IS NOT NULL 
 											THEN start_date <= "{today_date}"ELSE 1 = 1 end) AND
@@ -1472,7 +1450,7 @@ def get_category_page_data(	category = None, sort_by = None, page_no = 1,
 
 
 @frappe.whitelist(allow_guest=True)
-def get_category_page_filters(category, brands='', ratings='', min_price='', max_price='', domain=None):
+def get_category_page_filters(category, brands='', ratings='', min_price='', max_price=''):
 	'''
 		To get all available filters in category list page
 
@@ -1483,12 +1461,10 @@ def get_category_page_filters(category, brands='', ratings='', min_price='', max
 		param: max_price: maximum price upto which products must display
 		param: domain: to get data based on the current doamin (for saas model)		 
 	'''
-	business = None
-	if domain:		
-		business = get_business_from_web_domain(domain)
-	from ecommerce_business_store.ecommerce_business_store.api import item_attribute_filters, get_brands_category_based, get_categories_sidemenu
-	attribute_filters = item_attribute_filters(category, brands, ratings, min_price, max_price, business=business)
-	brand_filters = get_brands_category_based(category, '', ratings, min_price, max_price, '', business=business)
+	
+	from go1_commerce.go1_commerce.api import item_attribute_filters, get_brands_category_based, get_categories_sidemenu
+	attribute_filters = item_attribute_filters(category, brands, ratings, min_price, max_price)
+	brand_filters = get_brands_category_based(category, '', ratings, min_price, max_price, '')
 	category_list = get_categories_sidemenu(category)
 	return {'attribute_list': attribute_filters, 'brand_list': brand_filters, 'category_list': category_list}
 

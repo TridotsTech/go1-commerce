@@ -107,7 +107,7 @@ frappe.ui.form.on('Payment Method', {
 		})
 	},
 	requirements: function(frm) {
-        let options = 'Spend x amount\nSpecific price range\nHas any one product in cart\nHas all these products in cart\nLimit to business\nLimit to role\nSpecific Shipping Method';
+        let options = 'Spend x amount\nSpecific price range\nHas any one product in cart\nHas all these products in cart\nLimit to role\nSpecific Shipping Method';
         frappe.meta.get_docfield('Payment Method Requirement', 'requirement_type', cur_frm.doc.name).options = options;
         frm.trigger('requirement_html');
     },
@@ -319,10 +319,7 @@ var get_requirements = function(limit, check_role) {
         requirements.push('Specific price range');
         requirements.push('Has any one product in cart');
         requirements.push('Has all these products in cart');
-        if(allow){
-            if (has_common(frappe.user_roles, ['Admin', 'System Manager']))
-                requirements.push('Limit to business');
-        }
+        
         if (has_common(frappe.user_roles, ['Admin', 'System Manager'])){
             requirements.push('Limit to role');
         }

@@ -2,13 +2,7 @@ frappe.provide("frappe.treeview_settings")
 
 frappe.treeview_settings['Customers'] = {
 	filters: [
-		{
-			fieldname: "business",
-			fieldtype:"Link",
-			options: "Business",
-			label: __("Business"),
-			default: ""
-		}
+		
 	],
 	get_tree_nodes: "go1_commerce.go1_commerce.doctype.customers.customers.get_children",
 	add_tree_node: "go1_commerce.go1_commerce.doctype.customers.customers.add_node",
@@ -43,7 +37,6 @@ frappe.treeview_settings['Customers'] = {
 			},
 			click: function(node) {
 				this.data = [];
-				let business = frappe.treeview_settings['Customers'].treeview.page.fields_dict.business.get_value();
 				const dialog = new frappe.ui.Dialog({
 					title: __("Add Customers"),
 					fields: [
@@ -82,14 +75,6 @@ frappe.treeview_settings['Customers'] = {
 							options: "Email",
 							label: __("Email ID"),
 						},
-						{
-							fieldname: "business",
-							fieldtype:"Link",
-							options: "Business",
-							label: __("Business"),
-							read_only:1,
-							hidden:1
-						},
 					],
 					primary_action: function() {
 						dialog.hide();
@@ -106,7 +91,7 @@ frappe.treeview_settings['Customers'] = {
 					},
 					primary_action_label: __('Create')
 				});
-				dialog.get_field("business").set_value(business);
+				
 				dialog.show();
 			}
 		},
@@ -146,9 +131,7 @@ frappe.treeview_settings['Customers'] = {
 
 		frappe.treeview_settings['Customers'].treeview = {};
 		$.extend(frappe.treeview_settings['Customers'].treeview, treeview);
-		function get_company() {
-			return treeview.page.fields_dict.business.get_value();
-		}
+		
 	},
 	post_render: function() {
 	},

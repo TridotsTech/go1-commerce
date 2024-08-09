@@ -4,12 +4,7 @@
 frappe.require("assets/go1_commerce/css/toggle-slider.css");
 frappe.ui.form.on('Shipping City', {
 	refresh: function(frm) {
-		if( frappe.session.user == 'Administrator' || frappe.user.has_role('Admin')) {
-            frm.set_df_property('business', 'hidden', 0);
-        } 
-        else {
-            frm.set_df_property('business', 'hidden', 1);
-        }
+		
 		frm.trigger('generate_area_html')
 		$('button[data-fieldname="add_area"]').css({"background":"#1b8fdb", "color":"white",
                 "padding":"5px 10px"});
@@ -171,7 +166,7 @@ frappe.ui.form.on('Shipping City', {
                                     arr = JSON.parse(cur_dialog.fields_dict[field].get_value());
                                 }
                                 if ($.inArray(v[c.link_name], arr) == -1) {
-                                    drp_html += '<li style="display: block; border-bottom: 1px solid #dfdfdf; cursor:auto;"><a style="display: none;"><strong>' + v[c.link_name] + '</strong></a><label class="switch" style="float:right; margin:0px; cursor:pointer;"><input type="checkbox" class="popupCheckBox" name="vehicle1" value="0" id="' + v[c.link_name] + '" data-doctype="' + c.doctype + '" data-child="' + c.is_child + '" data-reference_doc="' + c.reference_doc + '" data-reference_fields="' + c.reference_fields + '" data-search_fields="' + c.search_fields + '"  data-business="' + c.business + '" data-child_link="' + c.child_tab_link + '" onchange="selected_multiselect_lists($(this))"><span class=" slider round"></span></label><p style="font-size: 14px;">';
+                                    drp_html += '<li style="display: block; border-bottom: 1px solid #dfdfdf; cursor:auto;"><a style="display: none;"><strong>' + v[c.link_name] + '</strong></a><label class="switch" style="float:right; margin:0px; cursor:pointer;"><input type="checkbox" class="popupCheckBox" name="vehicle1" value="0" id="' + v[c.link_name] + '" data-doctype="' + c.doctype + '" data-child="' + c.is_child + '" data-reference_doc="' + c.reference_doc + '" data-reference_fields="' + c.reference_fields + '" data-search_fields="' + c.search_fields + '" data-child_link="' + c.child_tab_link + '" onchange="selected_multiselect_lists($(this))"><span class=" slider round"></span></label><p style="font-size: 14px;">';
                                     if (v["parent_categories"]) {
                                         drp_html += '' + v["parent_categories"] + '</span></p></li>';                                 
                                     } 
@@ -179,7 +174,7 @@ frappe.ui.form.on('Shipping City', {
                                         drp_html += '' + v[c.search_fields] + '</span></p></li>';                                  
                                     }
                                 } else {
-                                    drp_html += '<li style="display: block; border-bottom: 1px solid #dfdfdf; cursor:auto;"><a style="display: none;"><strong>' + v[c.link_name] + '</strong></a><label class="switch" style="float:right; margin:0px; cursor:pointer;"><input type="checkbox" class="popupCheckBox" name="vehicle1" value="0" id="' + v[c.link_name] + '" data-doctype="' + c.doctype + '" data-child="' + c.is_child + '" data-reference_doc="' + c.reference_doc + '" data-reference_fields="' + c.reference_fields + '" data-search_fields="' + c.search_fields + '"  data-business="' + c.business + '" data-child_link="' + c.child_tab_link + '" onchange="selected_multiselect_lists($(this))" checked><span class=" slider round"></span></label><p style="font-size: 14px;">';
+                                    drp_html += '<li style="display: block; border-bottom: 1px solid #dfdfdf; cursor:auto;"><a style="display: none;"><strong>' + v[c.link_name] + '</strong></a><label class="switch" style="float:right; margin:0px; cursor:pointer;"><input type="checkbox" class="popupCheckBox" name="vehicle1" value="0" id="' + v[c.link_name] + '" data-doctype="' + c.doctype + '" data-child="' + c.is_child + '" data-reference_doc="' + c.reference_doc + '" data-reference_fields="' + c.reference_fields + '" data-search_fields="' + c.search_fields + '" data-child_link="' + c.child_tab_link + '" onchange="selected_multiselect_lists($(this))" checked><span class=" slider round"></span></label><p style="font-size: 14px;">';
                                     if (v["parent_categories"]) {
                                         drp_html += '' + v["parent_categories"] + '</span></p></li>';                   
                                     } 
@@ -255,7 +250,6 @@ function area_dialog(frm) {
         "title": "Search area here...",
         "label": "Choose Area",
         "doctype": "Shipping City",
-        "business": cur_frm.doc.business,
         "reference_doc": "Area",
         "reference_fields": escape(JSON.stringify(["name", "area", "city", "zipcode"])),
         "search_fields": "area",

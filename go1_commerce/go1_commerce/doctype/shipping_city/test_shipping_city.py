@@ -11,7 +11,7 @@ class TestShippingCity(unittest.TestCase):
 		make_shipping_city()
 
 def make_shipping_city():
-	# from go1_commerce.go1_commerce.api import check_domain
+	
 	if not frappe.db.get_value('Country', {'name': "India", 'enabled': 1}):
 		frappe.db.set_value('Country', "India", "enabled", 1)
 
@@ -28,7 +28,6 @@ def make_shipping_city():
 			'city': "Chennai",
 			'state': state1
 		}).insert()
-	business = frappe.get_value("Business", {"restaurant_name": "Test Business 1", "contact_email":"test_business_1@test.com"}, "name")
 	if not frappe.db.get_value('Shipping City', {'city': "Test City 1"}, "name"):
 		city1 = frappe.db.get_value('City', {'city': "Chennai"}, "name")
 		shipping_city = frappe.get_doc({
@@ -37,8 +36,4 @@ def make_shipping_city():
 			'core_city': city1,
 			'zipcode_range':600116
 		}).insert()
-		# if not check_domain('saas') and check_domain('multi_vendor'):
-		# 	shipping_city.append("vendor_list",{"vendor":business})
-		# else:
-		shipping_city.business = business
 		shipping_city.save()

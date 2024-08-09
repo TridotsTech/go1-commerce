@@ -8,20 +8,6 @@ frappe.provide("frappe.treeview_settings")
 frappe.treeview_settings['Product Category'] = {
 	
 	filters: [
-		// {
-		// 	fieldname: "product_category",
-		// 	fieldtype:"Link",
-		// 	options: "Product Category",
-		// 	label: __("Product Category"),
-		// 	default: "All Categories"
-		// },
-		{
-			fieldname: "business",
-			fieldtype:"Link",
-			options: "Business",
-			label: __("Business"),
-			default: ""
-		}
 	],
 	get_tree_nodes: "go1_commerce.go1_commerce.doctype.product_category.product_category.get_children",
 	add_tree_node: "go1_commerce.go1_commerce.doctype.product_category.product_category.add_node",
@@ -33,7 +19,7 @@ frappe.treeview_settings['Product Category'] = {
 	show_expand_all: true,
 	show_collapse_all: true,
 	get_label: function(node) {
-		console.log(node)
+		
 		if(node.data.label) {
 			return node.data.label+ "("+node.data.value+")";
 		} else {

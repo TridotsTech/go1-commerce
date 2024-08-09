@@ -14,7 +14,6 @@ class BulkEdit {
         this.item_name;
         this.is_active;
         this.is_featured;
-        this.business;
         this.restaurant = false;
         this.page_limit = 20;
         this.doc_count = 0;
@@ -108,7 +107,7 @@ class BulkEdit {
             method: 'go1_commerce.go1_commerce.page.products_bulk_update.products_bulk_update.get_all_products_with_attributes',
             args: {
                 category: me.category, brand: me.brand, item_name: me.item_name,
-                active: me.is_active, featured: me.is_featured, business: me.business,
+                active: me.is_active, featured: me.is_featured,
                 page_start: me.doc_count, page_end: me.page_limit
             },
             callback: function(r) {
@@ -625,7 +624,6 @@ function category_dialog1(data1) {
         "label": "Choose Category",
         "doctype": "Product",
         "reference_doc": "Product Category",
-        "business": data1.restaurant,
         "reference_fields": escape(JSON.stringify(["name", "category_name"])),
         "search_fields": "category_name",
         "reference_method": "go1_commerce.go1_commerce.doctype.product.product.get_category_list",
@@ -734,8 +732,7 @@ function build_multi_selector(data1, possible_val) {
             url: window.location.origin + url,
             data: {
                 "reference_doc": c.reference_doc,
-                "reference_fields": ref_fields,
-                "business": c.business
+                "reference_fields": ref_fields
             },
             dataType: "json",
             async: false,
@@ -747,7 +744,7 @@ function build_multi_selector(data1, possible_val) {
                 var drp_html = '<div class="' + c.cls + '" style="padding: 0px;"><div class="awesomplete">';
                 drp_html += '<input type="text"  class="multi-drp" id="myInput" autocomplete="nope" onfocus="select_list_detail($(this))" onfocusout="disable_select_list($(this))" onkeyup="selected_lists_values($(this))" ';
                 drp_html += 'placeholder="' + c.title + '" title="' + c.title + '" style="background-position: 10px 12px;background-repeat: no-repeat;width: 100%;font-size: 16px;padding: 10px 15px 10px 10px;border: 1px solid #d1d8dd;border-radius: 4px !important;;margin: 0px;" ';
-                drp_html += 'data-class="' + c.cls + '" data-field="' + c.tab_field + '" data-doctype="' + c.doctype + '" data-child="' + c.is_child + '" data-linkfield="' + c.link_name + '" data-reference_doc="' + c.reference_doc + '" data-reference_fields="' + c.reference_fields + '" data-search_fields="' + c.search_fields + '" data-reference_method="' + c.reference_method + '" data-business="' + c.business + '" data-child_link="' + c.child_tab_link + '">'
+                drp_html += 'data-class="' + c.cls + '" data-field="' + c.tab_field + '" data-doctype="' + c.doctype + '" data-child="' + c.is_child + '" data-linkfield="' + c.link_name + '" data-reference_doc="' + c.reference_doc + '" data-reference_fields="' + c.reference_fields + '" data-search_fields="' + c.search_fields + '" data-reference_method="' + c.reference_method + '" data-child_link="' + c.child_tab_link + '">'
                 drp_html += '<h4 style="padding: 10px 10px;border: 1px solid #ddd;border-bottom: none;margin: 30px 0px 0px 0px;background: #f8f8f8;">' + c.label + '</h4>'
                 drp_html += '<ul role="listbox" id="assets" class= "assets" style="list-style-type: none;position: absolute;width: 43%;margin: 0;background: rgb(255, 255, 255);min-height:350px;height:350px;box-shadow:none;">'
                 var k = 0
@@ -771,14 +768,14 @@ function build_multi_selector(data1, possible_val) {
                             arr = JSON.parse(cur_dialog.fields_dict[field].get_value());
                         }
                         if ($.inArray(v[c.link_name], arr) == -1) {
-                            drp_html += '<li style="display: block; border-bottom: 1px solid #dfdfdf; cursor:auto;"><a style="display: none;"><strong>' + v[c.link_name] + '</strong></a><label class="switch" style="float:right; margin:0px; cursor:pointer;"><input type="checkbox" class="popupCheckBox" name="vehicle1" value="0" id="' + v[c.link_name] + '" data-doctype="' + c.doctype + '" data-name="' + c.name + '" data-child="' + c.is_child + '" data-reference_doc="' + c.reference_doc + '" data-reference_fields="' + c.reference_fields + '" data-search_fields="' + c.search_fields + '"  data-business="' + c.business + '" data-child_link="' + c.child_tab_link + '" onclick="selected_multiselect_lists1($(this))"><span class=" slider round"></span></label><p style="font-size: 14px;">';
+                            drp_html += '<li style="display: block; border-bottom: 1px solid #dfdfdf; cursor:auto;"><a style="display: none;"><strong>' + v[c.link_name] + '</strong></a><label class="switch" style="float:right; margin:0px; cursor:pointer;"><input type="checkbox" class="popupCheckBox" name="vehicle1" value="0" id="' + v[c.link_name] + '" data-doctype="' + c.doctype + '" data-name="' + c.name + '" data-child="' + c.is_child + '" data-reference_doc="' + c.reference_doc + '" data-reference_fields="' + c.reference_fields + '" data-search_fields="' + c.search_fields + '"  data-child_link="' + c.child_tab_link + '" onclick="selected_multiselect_lists1($(this))"><span class=" slider round"></span></label><p style="font-size: 14px;">';
                             if (v["parent_categories"]) {
                                     drp_html += '' + v["parent_categories"] + '</span></p></li>';
                             } else {
                                     drp_html += '' + v[c.search_fields] + '</span></p></li>';
                             }
                         } else {
-                            drp_html += '<li style="display: block; border-bottom: 1px solid #dfdfdf; cursor:auto;"><a style="display: none;"><strong>' + v[c.link_name] + '</strong></a><label class="switch" style="float:right; margin:0px; cursor:pointer;"><input type="checkbox" class="popupCheckBox" name="vehicle1" value="0" id="' + v[c.link_name] + '" data-doctype="' + c.doctype + '" data-name="' + c.name + '" data-child="' + c.is_child + '" data-reference_doc="' + c.reference_doc + '" data-reference_fields="' + c.reference_fields + '" data-search_fields="' + c.search_fields + '"  data-business="' + c.business + '" data-child_link="' + c.child_tab_link + '" onclick="selected_multiselect_lists1($(this))" checked><span class=" slider round"></span></label><p style="font-size: 14px;">';
+                            drp_html += '<li style="display: block; border-bottom: 1px solid #dfdfdf; cursor:auto;"><a style="display: none;"><strong>' + v[c.link_name] + '</strong></a><label class="switch" style="float:right; margin:0px; cursor:pointer;"><input type="checkbox" class="popupCheckBox" name="vehicle1" value="0" id="' + v[c.link_name] + '" data-doctype="' + c.doctype + '" data-name="' + c.name + '" data-child="' + c.is_child + '" data-reference_doc="' + c.reference_doc + '" data-reference_fields="' + c.reference_fields + '" data-search_fields="' + c.search_fields + '" data-child_link="' + c.child_tab_link + '" onclick="selected_multiselect_lists1($(this))" checked><span class=" slider round"></span></label><p style="font-size: 14px;">';
                             if (v["parent_categories"]) {
                                     drp_html += '' + v["parent_categories"] + '</span></p></li>';
                             } else {
@@ -949,13 +946,12 @@ function select_list_detail(e) {
     var field = $(e).attr('data-field');
     var linkedfield = $(e).attr('data-linkfield');
     var reference_doc = $(e).attr('data-reference_doc');
-    var business = $(e).attr('data-business');
     var reference_fields = unescape($(e).attr('data-reference_fields'));
     var search_fields = $(e).attr('data-search_fields');
     var reference_method = $(e).attr('data-reference_method');
     var child_tab_link = $(e).attr('data-child_link');
     var input, ul, txtValue;
-    build_filter_list(row_id, cls, field, linkedfield, doctype_name, is_child, reference_doc, reference_fields, reference_method, child_tab_link, search_fields, business);
+    build_filter_list(row_id, cls, field, linkedfield, doctype_name, is_child, reference_doc, reference_fields, reference_method, child_tab_link, search_fields);
     if (parseInt(is_child) == 1) {
         $('div[data-name="' + row_id + '"]').find('.' + cls + ' #assets').css('display', 'block');
     } else {

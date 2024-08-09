@@ -30,21 +30,6 @@ def best_selling(filters):
 def get_items():	
 	return frappe.db.sql('''select p.name from `tabProduct` p left join `tabOrder Item` o on o.item=p.name and o.parenttype="Order"  group by p.name having sum(o.quantity)>0 order by p.name desc''')
 
-@frappe.whitelist(allow_guest=True)
-def check_domain(domain_name):
-	try:
-		from frappe.core.doctype.domain_settings.domain_settings import get_active_domains
-		domains_list=get_active_domains()
-		domains=frappe.cache().hget('domains','domain_constants')
-		if not domains:
-			domains=get_domains_data()
-		if domains[domain_name] in domains_list:
-			return True
-		return False
-	except Exception as e:
-		frappe.log_error(frappe.get_traceback(), "go1_commerce.go1_commerce.api.check_domain")
-
-
 def get_chart_data(items,data):
 	
 	if not items:

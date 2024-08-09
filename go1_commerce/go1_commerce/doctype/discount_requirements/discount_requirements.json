@@ -20,7 +20,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Discount Requirement Type",
-   "options": "Spend x amount\nSpend x weight\nSpecific price range\nHas any one product in cart\nHas all these products in cart\nLimit to business\nLimit to customer\nLimit to role\nSpecific Shipping Method\nSpecific Payment Method",
+   "options": "Spend x amount\nSpend x weight\nSpecific price range\nHas any one product in cart\nHas all these products in cart\nLimit to customer\nLimit to role\nSpecific Shipping Method\nSpecific Payment Method",
    "reqd": 1,
    "set_only_once": 1
   },

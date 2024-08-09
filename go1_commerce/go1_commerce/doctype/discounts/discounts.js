@@ -910,7 +910,7 @@ var get_doctype_for_requirement = function(req) {
 var get_requirements = function(limit, check_role,discount_type) {
     let requirements = [];
     let allow = false;
-    if(discount_type!="Assigned to Products" && discount_type!="Assigned to Categories" && discount_type!="Assigned to Business"){
+    if(discount_type!="Assigned to Products" && discount_type!="Assigned to Categories"){
         if (limit) {
             requirements.push('Limit to customer');
             requirements.push('Spend x amount');
@@ -932,9 +932,9 @@ var get_requirements = function(limit, check_role,discount_type) {
         }
     }
     else{
-        if(discount_type!="Assigned to Business"){
+        
             requirements.push('Limit to customer');
-        }
+       
     }
     return requirements;
 }

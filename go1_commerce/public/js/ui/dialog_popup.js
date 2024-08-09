@@ -96,17 +96,13 @@ function build_load_list(selected, cls, field, linkedfield, doctype_name, is_chi
                             drp_html += '<p style="font-size: 14px;">';
 
                             if (v[link_field]) {
-                                // if (frappe.boot.active_domains.includes(frappe.boot.sysdefaults.domain_constants.restaurant)) {
-                                //     drp_html += '' + v[link_field] + ' (' + v.name + ') '+ business_div +'</p></li>';
-                                // } else {
+                                
                                     drp_html += '' + v[link_field] + ' ' + business_div + '</p></li>';
-                                // }
+                               
                             } else {
-                                // if (frappe.boot.active_domains.includes(frappe.boot.sysdefaults.domain_constants.restaurant)) {
-                                //     drp_html += '' + v[search_fields] + ' (' + v.name + ') '+ business_div +'</p></li>';
-                                // } else {
+                                
                                     drp_html += '' + v[search_fields] + ' ' + business_div + '</p></li>';
-                                // }
+                               
                             }
                         } else {
                             k += 1;

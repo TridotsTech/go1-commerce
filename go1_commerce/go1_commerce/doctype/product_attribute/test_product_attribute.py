@@ -19,19 +19,19 @@ def make_attributes():
 	print("---------direct")
 	business1 = frappe.get_value("Business", {"restaurant_name": "Test Business 1", "contact_email":"test_business_1@test.com"}, "name")
 	business2 = frappe.get_value("Business", {"restaurant_name": "Test Business 2", "contact_email":"test_business_2@test.com"}, "name")
-	attr1 = make_attribute("Test Product Attribute 1", business1)
-	attr2 = make_attribute("Test Product Attribute 2", business2)
+	attr1 = make_attribute("Test Product Attribute 1")
+	attr2 = make_attribute("Test Product Attribute 2")
 	attr1_doc = frappe.get_doc("Product Attribute", attr1).reload()
 	attr2_doc = frappe.get_doc("Product Attribute", attr2).reload()		
 
-def make_attribute(attr_name, business=None):
-	if not frappe.db.get_value("Product Attribute", { "attribute_name": attr_name, "business":business}):
+def make_attribute(attr_name):
+	if not frappe.db.get_value("Product Attribute", { "attribute_name": attr_name}):
 		attr = frappe.get_doc({
 			"doctype": "Product Attribute",
 			"attribute_name": attr_name,
-			"business": business,
+			
 			"business_name":""
 		}).insert()
 		return attr.name
 	else:
-		return frappe.get_value("Product Attribute", { "attribute_name": attr_name, "business":business}, "name")
+		return frappe.get_value("Product Attribute", { "attribute_name": attr_name}, "name")

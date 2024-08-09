@@ -29,12 +29,7 @@
   "favicon",
   "column_break_8pdpx",
   "default_sharing_logo",
-  "header_and_footer_section",
-  "default_header",
-  "column_break_zzppc",
-  "default_footer",
   "setting_section",
-  "business",
   "website_url",
   "column_break_ebpfx",
   "static_pb",
@@ -183,38 +178,10 @@
    "label": "Default Sharing Logo"
   },
   {
-   "fieldname": "header_and_footer_section",
-   "fieldtype": "Section Break",
-   "label": "Header and Footer"
-  },
-  {
-   "fieldname": "default_header",
-   "fieldtype": "Link",
-   "label": "Default Header",
-   "options": "Header Component"
-  },
-  {
-   "fieldname": "column_break_zzppc",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "default_footer",
-   "fieldtype": "Link",
-   "label": "Default Footer",
-   "options": "Footer Component"
-  },
-  {
    "fieldname": "setting_section",
    "fieldtype": "Section Break",
    "hidden": 1,
    "label": "Mobile App Setting"
-  },
-  {
-   "fieldname": "business",
-   "fieldtype": "Link",
-   "hidden": 1,
-   "label": "Business",
-   "options": "Business"
   },
   {
    "fieldname": "website_url",
@@ -402,7 +369,7 @@
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2024-05-24 17:03:14.845380",
+ "modified": "2024-08-09 21:44:31.144003",
  "modified_by": "Administrator",
  "module": "Go1 Commerce",
  "name": "Mobile App Setting",

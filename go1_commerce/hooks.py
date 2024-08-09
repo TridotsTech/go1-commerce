@@ -162,7 +162,6 @@ fixtures = [
 				"Country-min_zipcode_length",
 				"Country-max_zipcode_length",
 				"Notification-allow_user_modify",
-				"Email Group Member-business",
 				"Google Settings-restrict_to_countries",
 				"Google Settings-countries",
 				"Google Settings-default_address",
@@ -171,7 +170,6 @@ fixtures = [
 				"Google Settings-marker_icon",
 				"Help Article-doctype_name",
 				"Help Article-domain_name",
-				"Email Group-business",
 				"Builder Settings-custom_server_script",
 
 			)]

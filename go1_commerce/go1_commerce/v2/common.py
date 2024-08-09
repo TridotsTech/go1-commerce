@@ -371,13 +371,7 @@ def get_doc_meta(doctype):
 		other_exception("Error in v2.common.get_doc_meta")
 
 @frappe.whitelist(allow_guest=True)
-def send_user_forget_pwd_mail(user, domain=None):
-	if not domain:
-		try:
-			domain = frappe.get_request_header('host')
-		except Exception as e:
-			pass
-
+def send_user_forget_pwd_mail(user):
 	if frappe.db.get_value('User', user):
 		doc = frappe.get_doc('User', user)
 		return reset_password(doc, send_email=True)
@@ -873,21 +867,6 @@ def no_stock_products_yuery(items_filter,conditions,seller_classify_cond):
 					WHEN (P.has_variants = 0 THEN 1 = 1 ELSE 1 = 0 END) 
 			AND P.name IN (%s) %s  """ % (items_filter, conditions)
 	return query
-
-@frappe.whitelist(allow_guest=True)
-def check_domain(domain_name):
-	try:
-		from frappe.core.doctype.domain_settings.domain_settings import get_active_domains
-		domains_list = get_active_domains()
-		domains = frappe.cache().hget('domains', 'domain_constants')
-		if not domains:
-			return False
-		if domains[domain_name] in domains_list:
-			return True
-		return False
-	except Exception as e:
-		frappe.log_error(message=frappe.get_traceback(), title='Error in check_domain')
-
 
 def get_page_header_info(header_id):
 	header_list = frappe.db.get_all("Header Component",
@@ -1484,12 +1463,12 @@ def move_cart_items(customer, guest_id=None):
 		if guest:
 			guest_cart = frappe.db.get_all('Shopping Cart', 
 								  filters={'customer': guest, 'cart_type': 'Shopping Cart'}, 
-								  fields=['name', 'business'])
+								  fields=['name'])
 			if guest_cart:
 				update_cart('Shopping Cart', customer, guest, guest_cart)
 			guest_cart2 = frappe.db.get_all('Shopping Cart', 
 								   filters={'customer': guest, 'cart_type': 'Wishlist'}, 
-								   fields=['name', 'business'])
+								   fields=['name'])
 			if guest_cart2:
 				update_cart('Wishlist', customer, guest, guest_cart2)
 			recently_viewed_products = frappe.get_all('Customer Viewed Product',
@@ -1678,19 +1657,7 @@ def get_custom_translations(messages, language):
 	return messages
 
 
-def get_business_defaults():
-	defaults = frappe.cache().hget("defaults", 'Business')
 
-	if not defaults:
-		res = frappe.db.sql("""SELECT defkey, defvalue, parent 
-								FROM `tabDefaultValue`
-								WHERE parenttype = %s 
-								ORDER BY creation
-							""", ('Business'), as_dict=1)
-		defaults = frappe._dict({})
-		for d in res:
-			defaults[d.parent] = d.defvalue
-		frappe.cache().hset("defaults", 'business', defaults)
 	return defaults
 
 
@@ -1717,7 +1684,7 @@ def boot_session(bootinfo):
 		domains = get_domains_data()
 		bootinfo.sysdefaults.domain_constants = domains
 		bootinfo['__messages'] = get_custom_translations(bootinfo['__messages'], bootinfo.lang)
-		bootinfo.sysdefaults.business_defaults = get_business_defaults()
+		
 		apps = frappe.get_installed_apps()
 		for app in apps:
 			module_name = frappe.db.sql(''' SELECT * 
