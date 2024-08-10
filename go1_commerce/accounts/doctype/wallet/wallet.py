@@ -386,7 +386,7 @@ def get_counter_apy_counters(vendor):
 						 		""", vendor, as_dict = 1)
 		return get_if_provider(source, vendor)
 
-
+@frappe.whitelist()
 def get_wallet_settings():
 	return frappe.get_single("Wallet Settings")
 
