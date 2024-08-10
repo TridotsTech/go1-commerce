@@ -1,5 +1,6 @@
 import frappe
 from frappe.utils import getdate, nowdate,add_days
+from frappe.query_builder import DocType
 
 @frappe.whitelist()
 def create_data_import(document_type):
@@ -17,9 +18,14 @@ def on_update_shopping_cart(doc, method):
 			enable_campaign = frappe.db.get_value('Email Campaign Settings', None, 'enable_campaign')
 			if enable_campaign:
 				if doc.items and doc.naming_series != 'GC- ':
-					check_campaign = frappe.db.sql('''
-										select name from `tabEmail Campaign` where email_campaign_for = "Shopping Cart" 
-											and recipient = %(recipient)s and (status = "In Progress" OR status = "Scheduled") ''',{'recipient': doc.name}, as_dict=1)
+					EmailCampaign = DocType('Email Campaign')
+				    check_campaign = frappe.qb.select(EmailCampaign.name).from_(EmailCampaign) \
+				        .where(
+				            (EmailCampaign.email_campaign_for == "Shopping Cart") &
+				            (EmailCampaign.recipient == recipient) &
+				            ((EmailCampaign.status == "In Progress") | (EmailCampaign.status == "Scheduled"))
+				        ).run(as_dict=True)
+				    
 					if not check_campaign:
 						campaign = frappe.db.get_value('Email Campaign Settings', None, 'shopping_cart')
 						if campaign:

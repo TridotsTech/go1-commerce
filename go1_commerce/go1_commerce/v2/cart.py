@@ -498,10 +498,11 @@ def delete_cart_items(name,customer_id = None):
 															'discount_rule': doc.discount_rule})
 			if check_free_doc:
 				for del_item in check_free_doc:
-					frappe.db.sql('''DELETE FROM `tabCart Items` WHERE name = %(name)s''',
-											{'name': del_item.name})
+					item_doc = frappe.get_doc('Cart Items', del_item.name)
+					item_doc.delete()
 					frappe.db.commit()
-			frappe.db.sql(f''' DELETE FROM `tabCart Items` WHERE name = '{doc.name}' ''')
+			item_doc = frappe.get_doc('Cart Items', doc.name)
+			item_doc.delete()
 			frappe.db.commit()
 			parent_doc = frappe.get_doc('Shopping Cart', doc.parent)
 			parent_doc.save(ignore_permissions=True)

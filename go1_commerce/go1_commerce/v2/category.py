@@ -24,19 +24,25 @@ def get_category_products_count(category):
 				if not child_categories.index(x)==len(child_categories)-1:
 					category_filter+=","
 	try:
-		category_product_counts = frappe.db.sql(
-					   '''SELECT 
-							COUNT(P.name) AS COUNT 
-						  FROM `tabProduct` P 
-						  INNER JOIN 
-							`tabProduct Category Mapping` CM ON P.name=CM.parent 
-						  WHERE 
-							P.is_active=1 AND P.status='Approved'
-							AND CM.category IN(%s) 
-						  GROUP BY 
-							P.name'''%(category_filter),
-					   as_dict=1)
-		return category_product_counts
+		
+		categories = [cat.strip() for cat in category_filter.split(',')]
+		product_names = frappe.get_all(
+	        'Product',
+	        filters={
+	            'is_active': 1,
+	            'status': 'Approved',
+	            'name': ['in', frappe.get_all(
+	                'Product Category Mapping',
+	                filters={'category': ['in', categories]},
+	                fields=['parent']
+	            )]
+	        },
+	        fields=['name']
+	    )
+	    product_count = len(set(item['name'] for item in product_names))
+	    
+	    return {'COUNT': product_count}
+		
 	except Exception:
 		frappe.log_error(title=_("Error fetching category product counts"),message=frappe.get_traceback())
 
@@ -71,8 +77,17 @@ def get_parent_categorie(category):
 	try:
 		count = frappe.db.get_value('Product Category', category, ['lft', 'rgt'], as_dict=True)
 		if count:
-			query = 'select name from `tabProduct Category` where is_active = 1 and disable_in_website = 0 and lft <= {lft} and rgt >= {rgt}'.format(lft=count.lft, rgt=count.rgt)
-			return frappe.db.sql('''{query}'''.format(query=query), as_dict=1)
+			query = frappe.qb.from_("tabProduct Category")
+	            .select("name")
+	            .where(
+	                (frappe.qb.col("is_active") == 1) &
+	                (frappe.qb.col("disable_in_website") == 0) &
+	                (frappe.qb.col("lft") <= count.lft) &
+	                (frappe.qb.col("rgt") >= count.rgt)
+	            )
+        
+        	 result = query.run(as_dict=True)
+        	 return result
 		else:
 			return []
 	except Exception:
@@ -320,20 +335,26 @@ def get_attribute_conditions(ratings, brands, min_price, max_price, searchTxt=''
 
 def get_category_option_query(products_filter, attributes):
 	for x in attributes:
-		optionquery = """SELECT 
-					PAO.unique_name,PAO.option_value,
-					COUNT(distinct P.name) AS item_count 
-				FROM `tabProduct` P 
-				INNER JOIN 
-					`tabProduct Attribute Mapping` PAM ON P.name = PAM.parent 
-				INNER JOIN 
-					`tabProduct Attribute Option` PAO ON PAO.parent=P.name AND PAO.attribute=PAM.product_attribute 
-				WHERE 
-					PAO.parent IN  ({products_filter}) 
-					AND PAO.attribute='{attribute_id}'
-				GROUP BY PAO.unique_name
-				""".format(products_filter=products_filter,attribute_id=x.product_attribute)
-		x.options = frappe.db.sql(optionquery,as_dict=1)
+		
+		products_filter_list = products_filter.strip('[]').split(',')
+        query = frappe.qb.from_("tabProduct Attribute Option") 
+            .select(
+                "PAO.unique_name",
+                "PAO.option_value",
+                frappe.qb.fn.CountDistinct("P.name").as_("item_count")
+            ) 
+            .inner_join("tabProduct Attribute Mapping as PAM")
+            .on("PAO.parent = P.name")
+            .and_on("PAO.attribute = PAM.product_attribute") 
+            .inner_join("tabProduct as P")
+            .on("P.name = PAM.parent") 
+            .where(
+                (frappe.qb.col("PAO.parent").is_in(products_filter_list)) &
+                (frappe.qb.col("PAO.attribute") == attribute_id)
+            ) 
+            .group_by("PAO.unique_name")
+        x.options = query.run(as_dict=True)
+        
 	return attributes
 
 
@@ -342,34 +363,40 @@ def get_category_item_attribute_filter(product_ids):
 	if product_ids:
 		products_filter = ','.join(['"' + x.product + '"' 
 						  for x in product_ids])
-		attributes = []
-		query = """SELECT 
-						attribute, product_attribute, 
-						PA.attribute_unique_name as attribute_unique_name
-					FROM `tabProduct Attribute Mapping`	PA
-					INNER JOIN 
-						`tabProduct Attribute` AT ON AT.name = PA.product_attribute
-					WHERE 
-						parent IN ({products_filter}) 
-					GROUP BY product_attribute""".format(products_filter=products_filter)
 		
-		attributes = frappe.db.sql(query,as_dict=1)
+		products_filter_list = products_filter.strip('[]').split(',')
+        query = frappe.qb.from_("tabProduct Attribute Mapping as PA") 
+            .select(
+                "PA.attribute",
+                "PA.product_attribute",
+                "PA.attribute_unique_name"
+            ) 
+            .inner_join("tabProduct Attribute as AT") 
+            .on("AT.name = PA.product_attribute") 
+            .where(
+                frappe.qb.col("PA.parent").is_in(products_filter_list)
+            ) 
+            .group_by("PA.product_attribute")
+        attributes = query.run(as_dict=True)
+
 		attribute = get_category_option_query(products_filter, attributes)
 		return attributes
 	return []
 
 def get_category_product_ids(category_filter):
-	query = """ SELECT 
-					P.name AS product 
-				FROM `tabProduct` P 
-				INNER JOIN 
-					`tabProduct Category Mapping` CM ON CM.parent=P.name
-				INNER JOIN 
-					`tabProduct Category` pc ON CM.category=pc.name 
-				WHERE 
-					P.is_active=1 AND P.status='Approved'
-					AND CM.category IN(%s) """% (category_filter)
-	return frappe.db.sql(query,as_dict=1)
+	category_filter_list = category_filter.strip('[]').split(',')
+    query = frappe.qb.from_("tabProduct as P") 
+        .inner_join("tabProduct Category Mapping as CM") 
+        .on("CM.parent = P.name") 
+        .inner_join("tabProduct Category as pc") 
+        .on("CM.category = pc.name") 
+        .select("P.name as product") 
+        .where(
+            (frappe.qb.col("P.is_active") == 1) &
+            (frappe.qb.col("P.status") == 'Approved') &
+            (frappe.qb.col("CM.category").is_in(category_filter_list))
+        )
+    result = query.run(as_dict=True)
 
 def get_category_brands_filter(product_ids):
 	products_filter = ""
@@ -389,3 +416,24 @@ def get_category_brands_filter(product_ids):
 							BR.name,BR.brand_name,BR.unique_name """.format(products_filter=products_filter[:-1])
 		return frappe.db.sql(query,as_dict=1)
 	return []
+
+Copy code
+def get_category_brands_filter(product_ids):
+    
+    product_names = [x['product'] for x in product_ids]
+
+    if not product_names:
+        return []
+    query = frappe.qb.from_("tabProduct as P") 
+        .inner_join("tabProduct Brand as BR") 
+        .on("P.brand = BR.name") 
+        .select(
+            "BR.name as brand",
+            "BR.brand_name",
+            "BR.unique_name",
+            frappe.qb.func.count("P.name").as_("item_count")
+        ) 
+        .where(frappe.qb.col("P.name").is_in(product_names)) 
+        .group_by("BR.name", "BR.brand_name", "BR.unique_name")
+    result = query.run(as_dict=True)
+    return result

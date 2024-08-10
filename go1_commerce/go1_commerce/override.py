@@ -118,9 +118,14 @@ class PageSection(Document):
 					if item.get('no_of_records'):
 						no_of_records = item.get('no_of_records')
 					item['name'] = item.get('tab_item').lower().replace(' ', '_')
+					
 					query_item = frappe.db.get_value(self.reference_document, item.get('tab_item'), 'query')
-					query='''{query} limit {limit}'''.format(query=query_item,limit=no_of_records)
-					result = frappe.db.sql(query, as_dict=1)
+				    EmailCampaign = DocType('Email Campaign')  # Replace with actual DocType if needed
+					qb = frappe.qb.from_(EmailCampaign)
+				    qb = qb.select(query_item)
+				    qb = qb.limit(no_of_records)
+					result = qb.run(as_dict=True)
+
 					result = get_product_details(result, customer=customer)
 					item['products'] = result
 					org_datas = []

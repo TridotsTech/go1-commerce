@@ -10,6 +10,7 @@ import frappe.desk.form.meta
 from frappe import _
 from frappe.model.meta import is_single
 from frappe.modules import load_doctype_module
+from frappe.query_builder import DocType
 
 #created by sivaranjani
 @frappe.whitelist()
@@ -312,14 +313,22 @@ def delete_linked_docs(doctype, name, linkinfo=None, for_doctype=None):
 				# 		ret = None
 
 				elif link.get("child_doctype"):
-					query = '''update `tab{doctype}` set {setfield}="" where {confield}="{fieldval}"'''.format(doctype=link.get('child_doctype'), setfield=link.get("fieldname")[0], confield=link.get("fieldname")[0], fieldval=name)
-					frappe.db.sql('{query}'.format(query=query))
+					setfield=link.get("fieldname")[0] 
+					confield=link.get("fieldname")[0] 
+					fieldval=name
+					
+				    Doctype = DocType(link.get('child_doctype'))
+				    frappe.qb.update(Doctype).set({setfield: ""}).where(Doctype[confield] == fieldval).run()
 				else:
 					link_fieldnames = link.get("fieldname")
 					if link_fieldnames:
 						if isinstance(link_fieldnames, string_types): link_fieldnames = [link_fieldnames]
-						query = '''update `tab{doctype}` set {setfield}="" where {confield}="{fieldval}"'''.format(doctype=dt, setfield=link_fieldnames[0], confield=link_fieldnames[0], fieldval=name)
-						frappe.db.sql('{query}'.format(query=query))
+						
+						setfield=link_fieldnames[0]
+						confield=link_fieldnames[0]
+						fieldval=name
+						Doctype = DocType(dt)
+					    frappe.qb.update(Doctype).set({setfield: ""}).where(Doctype[confield] == fieldval).run()
 					else:
 						ret = None
 
