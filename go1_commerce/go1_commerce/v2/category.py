@@ -353,7 +353,7 @@ def get_category_option_query(products_filter, attributes):
 				(frappe.qb.col("PAO.parent").is_in(products_filter_list)) &
 				(frappe.qb.col("PAO.attribute") == attribute_id)
 			) 
-			.group_by("PAO.unique_name")
+			.groupby("PAO.unique_name")
 			.run(as_dict=True))
 		 
 		
@@ -378,7 +378,7 @@ def get_category_item_attribute_filter(product_ids):
 			.where(
 				frappe.qb.col("PA.parent").is_in(products_filter_list)
 			) 
-			.group_by("PA.product_attribute")
+			.groupby("PA.product_attribute")
 			.run(as_dict=True))
 		attribute = get_category_option_query(products_filter, attributes)
 		return attributes
@@ -436,7 +436,7 @@ def get_category_brands_filter(product_ids):
 			frappe.qb.func.count("P.name").as_("item_count")
 		) 
 		.where(frappe.qb.col("P.name").is_in(product_names)) 
-		.group_by("BR.name", "BR.brand_name", "BR.unique_name")
+		.groupby("BR.name", "BR.brand_name", "BR.unique_name")
 		.run(as_dict=True))
 	
 	return result

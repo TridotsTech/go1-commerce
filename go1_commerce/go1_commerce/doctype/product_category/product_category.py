@@ -11,7 +11,7 @@ from frappe.website.utils import clear_cache
 import os,re
 import json
 from frappe import _
-from frappe.query_builder import DocType, Field
+from frappe.query_builder import DocType,Field, Order
 
 nsm_parent_field = 'parent_product_category'
 
@@ -21,6 +21,18 @@ class ProductCategory(WebsiteGenerator, NestedSet):
 		self.name = make_autoname(naming_series+'.#####', doc=self)
 		
 	def validate(self):
+		product_category = DocType('Product')
+		query = (
+			frappe.qb.from_(product_category)
+			.select(
+				product_category.name
+			)
+			.where(
+				(product_category.is_active == 1)
+			).orderby(product_category.name)
+		)
+		results = query.run(as_dict=True)
+		print(results)
 		self.product_category_name = self.category_name
 		if not self.parent_product_category:
 			self.parent_category_name = None
@@ -155,7 +167,7 @@ def update_image_thumbnail(doc):
 			.inner_join('Product Category Mapping', 'Product.name = Product Category Mapping.parent')
 			.select('Product.name')
 			.where('Product Category Mapping.category = %s', doc.name)
-			.group_by('Product.name')
+			.groupby('Product.name')
 			.run(as_dict=True)
 		)
 		if all_products:
@@ -197,15 +209,20 @@ def get_parent_product_categories(item_group_name):
 	if not item_group_name:
 		return base_parents
 	item_group = frappe.get_doc("Product Category", item_group_name)
-	parent_groups = (
-		frappe.qb.from_('Product Category')
-		.select('name', 'route')
-		.where('lft <= %s', item_group.lft)
-		.where('rgt >= %s', item_group.rgt)
-		.where('is_active = 1')
-		.order_by('lft ASC')
-		.run(as_dict=True)
+	print(item_group_name)
+	print(item_group.lft)
+	print(item_group.rgt)
+	ProductCategory = DocType('Product Category')
+	res = (
+		frappe.qb.from_(ProductCategory)
+		.select(ProductCategory.name, ProductCategory.route)
+		.where(ProductCategory.lft <= item_group.lft)
+		.where(ProductCategory.rgt >= item_group.rgt)
+		.where(ProductCategory.is_active == 1)
+		.orderby(ProductCategory.lft)
 	)
+
+	parent_groups = res.run(as_dict=True)
 	return base_parents + parent_groups
 
 

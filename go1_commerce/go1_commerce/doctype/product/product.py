@@ -17,6 +17,8 @@ from urllib.parse import unquote
 from six import string_types
 from go1_commerce.utils.setup import get_settings, get_settings_value
 from frappe.desk.reportview import get_match_cond, get_filters_cond
+from frappe.query_builder import DocType, Field, functions as fn
+
 
 class Product(WebsiteGenerator):
 	website = frappe._dict(
@@ -35,6 +37,7 @@ class Product(WebsiteGenerator):
 
 
 	def validate(self):
+		
 		self.make_route()
 		self.insert_search_words()
 		self.validate_order_qty()
@@ -72,7 +75,7 @@ class Product(WebsiteGenerator):
 					x.unique_name = self.brand_unique_name
 			else:
 				self.append("product_brands",{"brand":self.brand,"brand_name":self.brand_name,
-								  						"unique_name":self.brand_unique_name})
+														"unique_name":self.brand_unique_name})
 		if not self.sku and self.has_variants == 0:
 			self.sku = self.name.split('ITEM-')[1] + "000"
 		self.set_default_image()
@@ -117,10 +120,13 @@ class Product(WebsiteGenerator):
 						else:
 							data += s.fieldname
 					count=count+1
-				products = frappe.db.sql('''SELECT {0} 
-											FROM `tabProduct` 
-											WHERE name = "{1}"
-										'''.format(data, self.name), as_dict=1)
+				Product = DocType('Product')
+				result_query = (
+					frappe.qb.from_(Product)
+					.select(*data.split(','))  
+					.where(Product.name == self.name)
+				)
+				products = result_query.run(as_dict=True)
 				if products:
 					for item in products:
 						for key, value in item.items():
@@ -183,10 +189,15 @@ class Product(WebsiteGenerator):
 										  filters={"route": self.route},ignore_permissions =True)
 			check_route = self.scrub(self.item) + "-" + str(len(check_category_exist))
 			routes='"{route}","{check_route}"'.format(route=self.route,check_route=check_route)
-			check_exist = frappe.db.sql('''SELECT name 
-											FROM `tabProduct` 
-											WHERE route IN ({0}) AND name != "{1}"
-										'''.format(routes, self.name), as_dict=1)
+			Product = DocType('Product')
+			route_list = routes.split(',')
+			check_exist_query = (
+				frappe.qb.from_(Product)
+				.select(Product.name)
+				.where(Product.route.isin(route_list))
+				.where(Product.name != self.name)
+			)
+			check_exist = check_exist_query.run(as_dict=True)
 
 			if check_exist and len(check_exist) > 0:
 				st = str(len(check_exist))
@@ -278,7 +289,7 @@ class Product(WebsiteGenerator):
 			for x in self.product_brands:
 				if not x.unique_name:
 					frappe.db.set_value("Product Brand Mapping",x.name,
-						 				"unique_name",self.scrub(x.brand))
+										"unique_name",self.scrub(x.brand))
 			frappe.db.commit()  
 		if self.attribute_options:
 			for x in self.attribute_options:
@@ -287,7 +298,7 @@ class Product(WebsiteGenerator):
 						 self.scrub(frappe.db.get_value(
 														"Product Attribute",
 														x.attribute,
-									  					"attribute_name"
+														"attribute_name"
 													).lstrip())+"_" + self.scrub(x.option_value.lstrip()))
 				if not x.attribute_id:
 					p_attr_id = frappe.db.get_all("Product Attribute Mapping",
@@ -311,10 +322,13 @@ class Product(WebsiteGenerator):
 			lists = ''
 			for item in self.product_attributes:
 				if not item.get('__islocal'):
-					check_attributes = frappe.db.sql('''SELECT name 
-														FROM `tabProduct Attribute Option` 
-														WHERE attribute_id = %(name)s
-													''', {'name': item.name})
+					ProductAttributeOption = DocType('Product Attribute Option')
+					check_attributes_query = (
+						frappe.qb.from_(ProductAttributeOption)
+						.select(ProductAttributeOption.name)
+						.where(ProductAttributeOption.attribute_id == item.name)
+					)
+					check_attributes = check_attributes_query.run()
 
 					if not check_attributes and (item.control_type != "Text Box" and \
 								  item.control_type != "Multi Line Text"):
@@ -341,10 +355,10 @@ class Product(WebsiteGenerator):
 					if stock_avail.attribute_id:
 						attribute_id = stock_avail.attribute_id.strip()
 						check_data = next((x for x in self.variant_combination \
-						 		if x.attribute_id == stock_avail.attribute_id), None)
+								if x.attribute_id == stock_avail.attribute_id), None)
 						if check_data and check_data.stock > 0:
 							availability = frappe.get_doc("Product Availability Notification",
-									 			stock_avail.name)
+												stock_avail.name)
 							availability.is_email_send=1
 							availability.save()
 
@@ -386,13 +400,22 @@ class Product(WebsiteGenerator):
 					'attribute_id':attribute.name},order_by='display_order',limit_page_length=50)           
 			for op in options:
 				txt = '"%' + op.name + '%"'
-				varients = frappe.db.sql("""SELECT name, attributes_json, attribute_id, 
-												option_color, parent, image_list 
-											FROM `tabProduct Variant Combination` 
-											WHERE parent = "{0}" 
-												AND attribute_id LIKE "{1}" 
-											ORDER BY idx ASC
-										""".format(self.name, txt), as_dict=1)
+				ProductVariantCombination = DocType('Product Variant Combination')
+				varients_query = (
+					frappe.qb.from_(ProductVariantCombination)
+					.select(
+						ProductVariantCombination.name,
+						ProductVariantCombination.attributes_json,
+						ProductVariantCombination.attribute_id,
+						ProductVariantCombination.option_color,
+						ProductVariantCombination.parent,
+						ProductVariantCombination.image_list
+					)
+					.where(ProductVariantCombination.parent == self.name)
+					.where(ProductVariantCombination.attribute_id.like(txt))
+					.orderby(ProductVariantCombination.idx)
+				)
+				varients = varients_query.run(as_dict=True)
 				if op.is_pre_selected == 1:
 					if op.product_title and op.product_title != '-':
 						attr_product_title = op.product_title
@@ -417,12 +440,19 @@ class Product(WebsiteGenerator):
 		size_charts = frappe.db.get_all('Size Chart',
 										filters = {'name':attribute.size_chart},
 										fields = ['size_chart_image','name'])
-		size_chart = frappe.db.sql('''SELECT TRIM(attribute_values) AS attribute_values, 
-										chart_title, chart_value, name 
-									FROM `tabSize Chart Content` 
-									WHERE parent = %(parent)s 
-									ORDER BY display_order
-								''', {'parent': attribute.size_chart}, as_dict=1)
+		SizeChartContent = DocType('Size Chart Content')
+		size_chart_query = (
+			frappe.qb.from_(SizeChartContent)
+			.select(
+				Field('attribute_values').trim().as_('attribute_values'),
+				SizeChartContent.chart_title,
+				SizeChartContent.chart_value,
+				SizeChartContent.name
+			)
+			.where(SizeChartContent.parent == attribute.size_chart)
+			.orderby(SizeChartContent.display_order)
+		)
+		size_chart = size_chart_query.run(as_dict=True)
 		unique_sizes = list(set([x.chart_title for x in size_chart]))
 		unique_attr = []
 		for uni in size_chart:
@@ -502,14 +532,25 @@ class Product(WebsiteGenerator):
 		if self.status != 'Approved':
 			frappe.local.flags.redirect_location = '/404'
 			raise frappe.Redirect
-		context.brands = frappe.db.sql('''SELECT B.name, B.brand_name, B.brand_logo, B.route, 
-											B.warranty_information AS warranty_info, B.description 
-										FROM `tabProduct Brand` AS B 
-										INNER JOIN `tabProduct Brand Mapping` AS PBM 
-											ON B.name = PBM.brand 
-										WHERE PBM.parent = %(parent)s 
-										GROUP BY B.name 
-										ORDER BY PBM.idx ''', {'parent': self.name}, as_dict = 1)
+		ProductBrand = DocType('Product Brand')
+		ProductBrandMapping = DocType('Product Brand Mapping')
+		brands_query = (
+			frappe.qb.from_(ProductBrand)
+			.inner_join(ProductBrandMapping)
+			.on(ProductBrand.name == ProductBrandMapping.brand)
+			.select(
+				ProductBrand.name,
+				ProductBrand.brand_name,
+				ProductBrand.brand_logo,
+				ProductBrand.route,
+				ProductBrand.warranty_information.as_('warranty_info'),
+				ProductBrand.description
+			)
+			.where(ProductBrandMapping.parent == self.name)
+			.groupby(ProductBrand.name)
+			.orderby(ProductBrandMapping.idx)
+		)
+		context.brands = brands_query.run(as_dict=True)
 		self.get_product_reviews(context)
 		productattributes = frappe.db.get_all('Product Attribute Mapping',
 												fields = ["*"], 
@@ -542,15 +583,20 @@ class Product(WebsiteGenerator):
 											import get_enquiry_product_detail
 		context.type_of_category = get_enquiry_product_detail(self.name)
 		specification_group = []
-		specification_attribute = frappe.db.sql_list('''SELECT DISTINCT SAM.spec_group_name,
-															SG.display_order 
-														FROM  `tabSpecification Group` SG 
-														INNER JOIN 
-															`tabProduct Specification Attribute Mapping` SAM 
-															ON SG.name = SAM.spec_group_name1 
-														WHERE SAM.parent = %(name)s 
-														ORDER BY SAM.idx
-													''', {'name': self.name})
+		SpecificationGroup = DocType('Specification Group')
+		ProductSpecAttrMapping = DocType('Product Specification Attribute Mapping')
+		specification_attribute_query = (
+			frappe.qb.from_(ProductSpecAttrMapping)
+			.inner_join(SpecificationGroup)
+			.on(SpecificationGroup.name == ProductSpecAttrMapping.spec_group_name1)
+			.select(
+				ProductSpecAttrMapping.spec_group_name.distinct(),
+				SpecificationGroup.display_order
+			)
+			.where(ProductSpecAttrMapping.parent == self.name)
+			.orderby(ProductSpecAttrMapping.idx)
+		)
+		specification_attribute = specification_attribute_query.run(as_dict=True)
 		if specification_attribute:
 			for item in specification_attribute:
 				groups = frappe.db.get_all('Product Specification Attribute Mapping',
@@ -605,22 +651,29 @@ class Product(WebsiteGenerator):
 		custom_values = []
 		if catalog_settings.display_custom_fields == 1:
 			if frappe.db.get_all("Custom Field",filters={"dt":"Product"}):
-				custom_fields = frappe.db.sql('''SELECT label, fieldname 
-													FROM `tabCustom Field` 
-													WHERE dt = "Product" 
-														AND fieldtype <> "Table" 
-														AND fieldtype <> "Section Break" 
-														AND fieldtype <> "Column Break" 
-														AND fieldtype <> "HTML"  
-														AND fieldtype <> "Check" 
-														AND fieldtype <> "Text Editor" 
-											''', as_dict=1)
+				CustomField = DocType('Custom Field')
+				custom_fields_query = (
+					frappe.qb.from_(CustomField)
+					.select(CustomField.label, CustomField.fieldname)
+					.where(
+						(CustomField.dt == 'Product') &
+						(CustomField.fieldtype != 'Table') &
+						(CustomField.fieldtype != 'Section Break') &
+						(CustomField.fieldtype != 'Column Break') &
+						(CustomField.fieldtype != 'HTML') &
+						(CustomField.fieldtype != 'Check') &
+						(CustomField.fieldtype != 'Text Editor')
+					)
+				)
+				custom_fields = custom_fields_query.run(as_dict=True)
 				for field in custom_fields:
-					query = f"""SELECT '{field.fieldname}'
-								FROM `tabProduct`
-								WHERE name = '{self.name}'
-							"""
-					custom_value = frappe.db.sql(query,as_dict=1)
+					Product = DocType('Product')
+					custom_value_query = (
+						frappe.qb.from_(Product)
+						.select(Field(field.fieldname))
+						.where(Product.name == self.name)
+					)
+					custom_value = custom_value_query.run(as_dict=True)
 					custom_values.append({
 											"field":field.fieldname,
 											"label":field.label,
@@ -652,11 +705,15 @@ class Product(WebsiteGenerator):
 		context.allow_review = allow_review
 		ziprange = frappe.request.cookies.get("ziprange")
 		context.ziprange = ziprange
-		categories_list = frappe.db.sql('''SELECT category, category_name 
-											FROM `tabProduct Category Mapping` 
-											WHERE parent = %(parent)s 
-											ORDER BY idx 
-											LIMIT 1 ''', {'parent': self.name}, as_dict=1)
+		ProductCategoryMapping = DocType('Product Category Mapping')
+		categories_list_query = (
+			frappe.qb.from_(ProductCategoryMapping)
+			.select(ProductCategoryMapping.category, ProductCategoryMapping.category_name)
+			.where(ProductCategoryMapping.parent == self.name)
+			.orderby(ProductCategoryMapping.idx)
+			.limit(1)
+		)
+		categories_list = categories_list_query.run(as_dict=True)
 		if categories_list:
 			product_category = frappe.db.get_all('Product Category',
 												fields = ["*"], 
@@ -681,12 +738,22 @@ class Product(WebsiteGenerator):
 	def get_product_reviews(self, context):     
 		context.approved_reviews = get_product_reviews_list(self.name, 0, 10)
 		if context.catalog_settings.upload_review_images:
-			review_images = frappe.db.sql('''SELECT RI.review_thumbnail, RI.image, RI.list_image, 
-								 				RI.parent, RI.name, PR.product 
-											FROM `tabProduct Review` PR 
-											INNER JOIN `tabReview Image` RI ON PR.name = RI.parent 
-											WHERE PR.product = %(product)s
-										''', {'product': self.name}, as_dict=1)
+			ProductReview = DocType('Product Review')
+			ReviewImage = DocType('Review Image')
+			review_images_query = (
+				frappe.qb.from_(ProductReview)
+				.inner_join(ReviewImage).on(ProductReview.name == ReviewImage.parent)
+				.select(
+					ReviewImage.review_thumbnail,
+					ReviewImage.image,
+					ReviewImage.list_image,
+					ReviewImage.parent,
+					ReviewImage.name,
+					ProductReview.product
+				)
+				.where(ProductReview.product == self.name)
+			)
+			review_images = review_images_query.run(as_dict=True)
 			context.review_img = review_images
 
 
@@ -765,13 +832,16 @@ class Product(WebsiteGenerator):
 
 	def check_commission(self):     
 		if self.commission_category:
-			commission=frappe.db.sql('''SELECT * 
-										FROM `tabVendor Detail` 
-										WHERE parent = %(category)s 
-											AND (CASE WHEN product IS NOT NULL 
-												THEN product = %(product)s ELSE 1 = 1 END)
-									''', {'product': self.name, 'category': self.commission_category}, 
-										as_dict = 1)
+			VendorDetail = DocType('Vendor Detail')
+			commission_query = (
+				frappe.qb.from_(VendorDetail)
+				.select('*')
+				.where(VendorDetail.parent == self.commission_category)
+				.where(
+					(VendorDetail.product.is_null() | (VendorDetail.product == self.name))
+				)
+			)
+			commission = commission_query.run(as_dict=True)
 			if commission:
 				self.commission_rate=commission[0].rate
 				self.commission_amount=self.price*commission[0].rate/100
@@ -829,6 +899,7 @@ def get_location_details(zipcode):
 				city = item.get('long_name')
 	return zipcode, city, state, country
 
+@frappe.whitelist()
 def get_all_tags():
 	""" get the tags set in the  """
 	tags = frappe.get_all("Product Tag",
@@ -839,26 +910,34 @@ def get_all_tags():
 
 def get_product_attribute_options(attribute,product,attribute_id):
 	try:
-		attributeoptions = frappe.db.sql("""SELECT * 
-											FROM `tabProduct Attribute Option` 
-											WHERE parent = %(product)s 
-											AND attribute = %(attribute)s 
-											AND attribute_id = %(attribute_id)s
-										""", {"product": product, "attribute": attribute, 
-											"attribute_id": attribute_id}, as_dict = 1)
+		filters = {
+			'parent': product,
+			'attribute': attribute,
+			'attribute_id': attribute_id
+		}
+		attributeoptions = frappe.get_all(
+			'Product Attribute Option',
+			filters=filters,
+			fields=['*']
+		)
 		return attributeoptions
 	except Exception:
 		frappe.log_error(frappe.get_traceback(),
 				   "Error in doctype.product.get_product_attribute_options") 
 
+@frappe.whitelist()
 def get_parent_product_attribute_options(attribute,product):
 	try:
-		query = f"""SELECT *
-					FROM `tabProduct Attribute Option`
-					WHERE parent = '{product}' AND attribute = '{attribute}'
-					ORDER BY idx ASC
-				"""
-		attributeoptions = frappe.db.sql(query, as_dict = 1)
+		filters = {
+			'parent': product,
+			'attribute': attribute
+		}
+		attributeoptions = frappe.get_all(
+			'Product Attribute Option',
+			filters=filters,
+			fields=['*'],
+			order_by='idx ASC'
+		)
 		return attributeoptions
 	except Exception:
 		frappe.log_error(frappe.get_traceback(),
@@ -867,11 +946,14 @@ def get_parent_product_attribute_options(attribute,product):
 
 def get_product_specification_attribute_options(attribute):
 	try:
-		attributeoptions = frappe.db.sql(""" SELECT option_value 
-											FROM `tabSpecification Attribute Option` 
-											WHERE parent = %(attribute)s 
-											ORDER BY display_order
-										""", {"attribute": attribute}, as_dict = 1)
+		spec_option = DocType('Specification Attribute Option')
+		query = (
+			frappe.qb.from_(spec_option)
+			.select(spec_option.option_value)
+			.where(spec_option.parent == attribute)
+			.orderby(spec_option.display_order)
+		)
+		attributeoptions = query.run(as_dict=True)
 		return attributeoptions
 	except Exception:
 		frappe.log_error(frappe.get_traceback(),
@@ -883,13 +965,17 @@ def insert_product_attribute_options(attribute,product,option,display_order,pric
 									product_title,parent_option=None,attribute_id = None,
 									disable=None,available_datetime=None):
 	try:
-		attributeoptions = frappe.db.sql("""SELECT * 
-											FROM `tabProduct Attribute Option` 
-											WHERE parent = %(product)s 
-								   			AND attribute = %(attribute)s 
-								   			AND attribute_id = %(attribute_id)s
-										""", {"product": product, "attribute": attribute, 
-												"attribute_id": attribute_id}, as_dict = 1)
+		attribute_option = DocType('Product Attribute Option')
+		query = (
+			frappe.qb.from_(attribute_option)
+			.select('*')
+			.where(
+				(attribute_option.parent == product) &
+				(attribute_option.attribute == attribute) &
+				(attribute_option.attribute_id == attribute_id)
+			)
+		)
+		attributeoptions = query.run(as_dict=True)
 		if len(attributeoptions) == 0:
 			pre_selected = 1
 		else:
@@ -901,13 +987,18 @@ def insert_product_attribute_options(attribute,product,option,display_order,pric
 		insert_product_attribute_option(attribute,product,option,display_order,price_adjustment,
 									weight_adjustment,image,pre_selected,attribute_color,product_title,
 									parent_option,attribute_id,disable,available_datetime)
-		return frappe.db.sql("""SELECT * 
-								FROM `tabProduct Attribute Option` 
-								WHERE parent = %(product)s 
-								AND attribute = %(attribute)s 
-								AND attribute_id = %(attribute_id)s
-							""", {"product": product, "attribute": attribute, 
-			 					"attribute_id": attribute_id}, as_dict = 1)
+		attribute_option = DocType('Product Attribute Option')
+		query = (
+			frappe.qb.from_(attribute_option)
+			.select('*')
+			.where(
+				(attribute_option.parent == product) &
+				(attribute_option.attribute == attribute) &
+				(attribute_option.attribute_id == attribute_id)
+			)
+		)
+		results = query.run(as_dict=True)
+		return results
 	except Exception:
 		frappe.log_error(frappe.get_traceback(),
 				   "Error in doctype.product.insert_product_attribute_options")
@@ -944,25 +1035,34 @@ def update_product_attribute_options(attribute,product,option,display_order,pric
 									product_title,parent_option=None,attribute_id = None, 
 									disable=None,available_datetime=None):
 	try:
-		attributeoptions = frappe.db.sql("""SELECT * 
-											FROM `tabProduct Attribute Option` 
-											WHERE parent = %(product)s 
-								   			AND attribute = %(attribute)s 
-								   			AND attribute_id = %(attribute_id)s
-										""", {"product": product, "attribute": attribute, 
-											"attribute_id": attribute_id}, as_dict = 1)
+		attribute_option = DocType('Product Attribute Option')
+		query = (
+			frappe.qb.from_(attribute_option)
+			.select('*')
+			.where(
+				(attribute_option.parent == product) &
+				(attribute_option.attribute == attribute) &
+				(attribute_option.attribute_id == attribute_id)
+			)
+		)
+		attributeoptions = query.run(as_dict=True)
+		
 
 		update_product_attribute_option(attributeoptions,attribute,product,option,display_order,
 									price_adjustment,weight_adjustment,optionid,image,pre_selected,
 									attribute_color,product_title,parent_option=None,
 									attribute_id = None,disable=None,available_datetime=None)
-		attributeoptions = frappe.db.sql("""SELECT * 
-											FROM `tabProduct Attribute Option` 
-											WHERE parent = %(product)s 
-											AND attribute = %(attribute)s 
-											AND attribute_id = %(attribute_id)s
-										""", {"product": product, "attribute": attribute, 
-											"attribute_id": attribute_id}, as_dict = 1)
+		attribute_option = DocType('Product Attribute Option')
+		query = (
+			frappe.qb.from_(attribute_option)
+			.select('*')  # Select all columns
+			.where(
+				(attribute_option.parent == product) &
+				(attribute_option.attribute == attribute) &
+				(attribute_option.attribute_id == attribute_id)
+			)
+		)
+		attributeoptions = query.run(as_dict=True)
 		return attributeoptions
 	except Exception:
 		frappe.log_error(frappe.get_traceback(),
@@ -996,13 +1096,23 @@ def update_product_attribute_option(attributeoptions,attribute,product,option,di
 	doc.is_pre_selected=pre_selected
 	doc.save()
 
-
+@frappe.whitelist()
 def get_all_brands():
 	try:
-		return frappe.db.sql('''SELECT brand_logo, name, brand_name, published 
-								FROM `tabProduct Brand` 
-								WHERE published = 1 
-								ORDER BY brand_name''')
+		product_brand = DocType('Product Brand')
+		query = (
+			frappe.qb.from_(product_brand)
+			.select(
+				product_brand.brand_logo,
+				product_brand.name,
+				product_brand.brand_name,
+				product_brand.published
+			)
+			.where(product_brand.published == 1)
+			.orderby(product_brand.brand_name)
+		)
+		results = query.run(as_dict=True)
+		return results
 	except Exception:
 		frappe.log_error(frappe.get_traceback(), "Error in doctype.product.get_all_brands") 
 
@@ -1011,11 +1121,23 @@ def get_all_brands():
 def get_all_category_list():    
 	try:
 		lists=[]
-		cat = frappe.db.sql('''SELECT category_image, category_name, parent_category_name, is_active, name 
-								FROM `tabProduct Category` 
-								WHERE is_active = 1 
-					  			AND (parent_product_category IS NULL OR parent_product_category = "")
-							''', as_dict=1)
+		product_category = DocType('Product Category')
+		query = (
+			frappe.qb.from_(product_category)
+			.select(
+				product_category.category_image,
+				product_category.category_name,
+				product_category.parent_category_name,
+				product_category.is_active,
+				product_category.name
+			)
+			.where(
+				(product_category.is_active == 1) &
+				((product_category.parent_product_category.isnull()) |
+				 (product_category.parent_product_category == ""))
+			)
+		)
+		cat = query.run(as_dict=True)
 		if cat:
 			for sub in cat:
 				sub.indent = 0
@@ -1036,12 +1158,23 @@ def get_all_category_list():
 
 def get_sub_category_list(category):    
 	try:
-		s = frappe.db.sql('''SELECT 
-								category_image, category_name, parent_category_name, is_active, name 
-							FROM `tabProduct Category` 
-							WHERE is_active = 1 AND parent_product_category = %(category)s
-						''', {"category": category}, as_dict=1)
-		return s
+		product_category = DocType('Product Category')
+		query = (
+			frappe.qb.from_(product_category)
+			.select(
+				product_category.category_image,
+				product_category.category_name,
+				product_category.parent_category_name,
+				product_category.is_active,
+				product_category.name
+			)
+			.where(
+				(product_category.is_active == 1) &
+				(product_category.parent_product_category == category)
+			)
+		)
+		results = query.run(as_dict=True)
+		return results
 	except Exception:
 		frappe.log_error(frappe.get_traceback(), "Error in doctype.product.get_sub_category_list") 
 
@@ -1058,10 +1191,11 @@ def approve_products(names,status):
 	except Exception:
 		frappe.log_error(frappe.get_traceback(), "Error in doctype.product.approve_products") 
 
+@frappe.whitelist()
 def get_product_attributes_with_options(product):
 	attributes=frappe.db.get_all('Product Attribute Mapping',filters={'parent':product},
 							  fields=['name','product_attribute','is_required','control_type',
-				 				'attribute_unique_name','attribute'],order_by='display_order')
+								'attribute_unique_name','attribute'],order_by='display_order')
 	if attributes:
 		for item in attributes:
 			item.options=get_product_attribute_options(item.product_attribute,product,item.name)            
@@ -1148,39 +1282,63 @@ def get_attributes_text(attributes_json):
 def get_category_based_attributes(txt,filters):
 	condition=''
 	if filters.get('productId'):
-		category_list = frappe.db.sql('''SELECT GROUP_CONCAT(CONCAT('"', category, '"')) category 
-										FROM `tabProduct Category Mapping` 
-										WHERE parent = %(product)s
-									''', {'product': filters.get('productId')}, as_dict=1)
-		if txt:
-			condition += ' and (a.name like %(txt)s or a.attribute_name like %(txt)s)'      
+		category_mapping = DocType('Product Category Mapping')
+		query = (
+			frappe.qb.from_(category_mapping)
+			.select(
+				fn.GroupConcat(fn.Concat('"', category_mapping.category, '"')).as_("category")
+			)
+			.where(category_mapping.parent == filters.get('productId'))
+		)
+		category_list = query.run(as_dict=True)
+		main_doc = DocType(doctype)
+		business_category = DocType('Business Category')
 		cat_list = '""'
 		if category_list and category_list[0].category:
 			cat_list = category_list[0].category
-		return frappe.db.sql('''SELECT A.name, A.attribute_name 
-								FROM `tab{doctype}` A 
-								LEFT JOIN `tabBusiness Category` C 
-								ON A.name = C.parent 
-								WHERE (CASE WHEN C.category IS NOT NULL 
-										THEN C.category IN ({category}) ELSE 1=1 END ) {condition}
-							'''.format(category=cat_list, doctype=filters.get('type'), 
-								condition=condition), {'txt': '%' + txt + '%'})
-	return frappe.db.sql('''SELECT name 
-							FROM 
-								`tab{doctype}` '''.format(doctype=filters.get('type')))
+		query = (
+			frappe.qb.from_(main_doc)
+			.left_join(business_category)
+			.on(main_doc.name == business_category.parent)
+			.select(main_doc.name, main_doc.attribute_name)
+			.where(
+				(fn.If(business_category.category.isnotnull(), 
+						business_category.category.in_(cat_list), 
+						1)) &
+				(fn.If(txt, 
+					   (main_doc.name.like(f"%{txt}%")) | (main_doc.attribute_name.like(f"%{txt}%")), 
+					   1))
+			)
+		)
+		results = query.run(as_dict=True)
+		return results
+	doc = DocType(filters.get('type'))
+	query = (
+		frappe.qb.from_(doc)
+		.select(doc.name)
+	)
+	return query.run(as_dict=True)
+	
 
 
 def get_vendor_based_tax_templates():
-	return frappe.db.sql('''SELECT name 
-							FROM 
-								`tabProduct Tax Template` ''')
+	tax_template = DocType('Product Tax Template')
+	query = (
+		frappe.qb.from_(tax_template)
+		.select(tax_template.name)
+	)
+	results = query.run(as_dict=True)
+	return [row['name'] for row in results]
 
 
 def get_vendor_based_return_policy():
-	return frappe.db.sql('''SELECT name 
-							FROM 
-								`tabReturn Policy` ''')
-
+	ReturnPolicy = DocType('Return Policy')
+	query = (
+		frappe.qb.from_(ReturnPolicy)
+		.select(ReturnPolicy.name)
+	)
+	results = query.run(as_dict=True)
+	return [row['name'] for row in results]
 
 def update_image(imageId,image_name,is_primary):
 	doc=frappe.get_doc('Product Image',imageId)
@@ -1191,12 +1349,13 @@ def update_image(imageId,image_name,is_primary):
 
 def delete_product_attribute_option(option):
 	try:
-		attribute_video = frappe.db.sql('''SELECT name, option_id 
-											FROM 
-												`tabProduct Attribute Option Video` 
-											WHERE 
-												option_id = %(option_id)s
-										''', {'option_id': option}, as_dict=1)
+		attribute_option_video = DocType('Product Attribute Option Video')
+		query = (
+			frappe.qb.from_(attribute_option_video)
+			.select(attribute_option_video.name, attribute_option_video.option_id)
+			.where(attribute_option_video.option_id == option)
+		)
+		attribute_video = query.run(as_dict=True)
 		if attribute_video:
 			for video in attribute_video:
 				video_doc = frappe.get_doc('Product Attribute Option Video',video.name)
@@ -1216,11 +1375,16 @@ def delete_product_attribute_option(option):
 
 def delete_product_attribute_option_image(ref_doctype, file_url):
 	try:
-		frappe.db.sql('''DELETE FROM `tabFile` 
-						WHERE 
-							attached_to_doctype = %(ref_doctype)s 
-							AND file_url = %(file_url)s
-					''', {'file_url': file_url, 'ref_doctype': ref_doctype})
+		file_doc = DocType('File')
+		query = (
+			frappe.qb.from_(file_doc)
+			.delete()
+			.where(
+				(file_doc.attached_to_doctype == ref_doctype) &
+				(file_doc.file_url == file_url)
+			)
+		)
+		query.run()
 		return {'status': "Success"}
 	except Exception as e:
 		frappe.log_error(frappe.get_traceback(),
@@ -1236,10 +1400,15 @@ def randomStringDigits(stringLength=6):
 
 
 def update_product_categories(category1,name):
-	frappe.db.sql('''DELETE 
-					FROM `tabProduct Category Mapping` 
-					WHERE 
-						parent = %(name)s ''', {'name': name})
+	ProductCategoryMapping = DocType('Product Category Mapping')
+	query = (
+		frappe.qb.from_(ProductCategoryMapping)
+		.delete()
+		.where(
+			(ProductCategoryMapping.name == name)
+		)
+	)
+	query.run()
 	for x in json.loads(category1):
 		paper_question = frappe.new_doc("Product Category Mapping")
 		paper_question.category=x['category']
@@ -1252,10 +1421,15 @@ def update_product_categories(category1,name):
 
 
 def update_product_categories1(category1,name):
-	frappe.db.sql('''DELETE FROM 
-						`tabProduct Category Mapping` 
-					WHERE 
-						parent = %(name)s ''', {'name': name})
+	ProductCategoryMapping = DocType('Product Category Mapping')
+	query = (
+		frappe.qb.from_(ProductCategoryMapping)
+		.delete()
+		.where(
+			(ProductCategoryMapping.name == name)
+		)
+	)
+	query.run()
 
 	for x in json.loads(category1):
 		paper_question = frappe.new_doc("Product Category Mapping")
@@ -1287,23 +1461,31 @@ def format_convertion(price=None):
 def get_product_scroll(item, page_no, page_len):
 	try:
 		start = (int(page_no) - 1) * int(page_len)
-		product_enquiry = frappe.db.sql('''SELECT PQ.name, PQ.user_name, PQ.email, PQ.phone, 
-												PQ.product, PQ.question, 
-												DATE_FORMAT(PQ.creation, "%d, %b %Y") as creation,
-												GROUP_CONCAT(PA.answer SEPARATOR ";") as ans_list 
-											FROM 
-												`tabProduct Enquiry` PQ 
-											LEFT JOIN 
-												`tabProduct Enquiry Answers` PA 
-											ON 
-												PQ.name = PA.parent 
-											WHERE 
-												PQ.product = "{name}" 
-												AND is_approved=1 
-											GROUP BY 
-												PQ.name 
-											LIMIT {start}, {limit}
-										'''.format(start=start, limit=page_len, name=item), as_dict=1)
+		limit = int(page_len)
+		product_enquiry = DocType('Product Enquiry')
+		enquiry_answers = DocType('Product Enquiry Answers')
+		query = (
+			frappe.qb.from_(product_enquiry)
+			.left_join(enquiry_answers)
+			.on(product_enquiry.name == enquiry_answers.parent)
+			.select(
+				product_enquiry.name,
+				product_enquiry.user_name,
+				product_enquiry.email,
+				product_enquiry.phone,
+				product_enquiry.product,
+				product_enquiry.question,
+				Function('DATE_FORMAT', product_enquiry.creation, "%d, %b %Y").as_('creation'),
+				Function('GROUP_CONCAT', enquiry_answers.answer, Function('SEPARATOR', ";")).as_('ans_list')
+			)
+			.where(
+				(product_enquiry.product == item) &
+				(product_enquiry.is_approved == 1)
+			)
+			.groupby(product_enquiry.name)
+			.limit(start, limit)
+		)
+		product_enquiry = query.run(as_dict=True)
 		return product_enquiry
 	except Exception as e:
 		frappe.log_error(frappe.get_traceback(), "Error in doctype.product.product.get_product_scroll")
@@ -1311,60 +1493,78 @@ def get_product_scroll(item, page_no, page_len):
 
 
 def get_review_scroll(item, page_no, page_len):
-	start=(int(page_no)-1)*int(page_len)
-	dateformat='%b %d, %Y'
-	Reviews=frappe.db.sql('''SELECT RI.review_thumbnail,RI.image,RI.list_image, PR.customer,RI.email,
-								DATE_FORMAT(PR.creation, %(format)s) as date,
-								PR.review_title,PR.review_message,PR.rating,PR.name 
-							FROM 
-								`tabProduct Review` PR 
-							INNER JOIN 
-								`tabReview Image` RI 
-							ON 
-								PR.name = RI.parent 
-							WHERE 
-								PR.product = %(item)s 
-							ORDER BY 
-								PR.creation DESC 
-							LIMIT {start}, {limit}
-						'''.format(start=start, limit=page_len), {'item': item, 
-												'format': dateformat}, as_dict=1)
+	start = (int(page_no) - 1) * int(page_len)
+	limit = int(page_len)
+	product_review = DocType('Product Review')
+	review_image = DocType('Review Image')
+	date_format = '%b %d, %Y'
+	query = (
+		frappe.qb.from_(product_review)
+		.inner_join(review_image)
+		.on(product_review.name == review_image.parent)
+		.select(
+			review_image.review_thumbnail,
+			review_image.image,
+			review_image.list_image,
+			product_review.customer,
+			review_image.email,
+			Function('DATE_FORMAT', product_review.creation, date_format).as_('date'),
+			product_review.review_title,
+			product_review.review_message,
+			product_review.rating,
+			product_review.name
+		)
+		.where(product_review.product == item)
+		.orderby(product_review.creation.desc())
+		.limit(start, limit)
+	)
+	Reviews = query.run(as_dict=True)
 	return Reviews
 
 
  
 def get_review_images(name,product):
-	dateformat='%b %d, %Y'
-	approved_reviews1 = frappe.db.sql('''SELECT RI.review_thumbnail,RI.image,RI.list_image,RI.name,
-											RI.parent,PR.*,
-											DATE_FORMAT(PR.creation, %(format)s) as date 
-										FROM 
-											`tabProduct Review` PR 
-										INNER JOIN 
-											`tabReview Image` RI 
-										ON 
-											PR.name = RI.parent 
-										WHERE 
-											PR.product = %(product)s
-									''', {'product': product, 'format': dateformat}, as_dict=1)
+	product_review = DocType('Product Review')
+	review_image = DocType('Review Image')
+	date_format = '%b %d, %Y'
+	query = (
+		frappe.qb.from_(product_review)
+		.inner_join(review_image)
+		.on(product_review.name == review_image.parent)
+		.select(
+			review_image.review_thumbnail,
+			review_image.image,
+			review_image.list_image,
+			review_image.name,
+			review_image.parent,
+			*product_review.fields,
+			Function('DATE_FORMAT', product_review.creation, date_format).as_('date')
+		)
+		.where(product_review.product == product)
+	)
+	approved_reviews1 = query.run(as_dict=True)
 	return approved_reviews1
 
 
 
 def get_curreview_images(name):
-	dateformat='%b %d, %Y'
-	approved_review = frappe.db.sql('''SELECT RI.review_thumbnail,RI.image,RI.list_image,RI.parent,PR.*,
-											DATE_FORMAT(PR.creation, %(format)s) as date 
-										FROM 
-											`tabProduct Review` PR 
-										INNER JOIN 
-											`tabReview Image` RI 
-										ON 
-											PR.name = RI.parent 
-										WHERE 
-											PR.name = %(name)s
-									''', {'name': name, 'format': dateformat}, as_dict=1)
-	return approved_review
+	dateformat = '%b %d, %Y'
+	review = DocType('Product Review')
+	review_image = DocType('Review Image')
+	query = (
+		frappe.qb.from_(review)
+		.inner_join(review_image)
+		.on(review.name == review_image.parent)
+		.select(
+			review_image.review_thumbnail,
+			review_image.image,
+			review_image.list_image,
+			review_image.parent,review.name, review.product,review.review_title,
+			Function('DATE_FORMAT', review.creation, dateformat).as_('date')
+		)
+		.where(review.name == name)
+	)
+	return query.run(as_dict=True)
 
 
 
@@ -1429,7 +1629,7 @@ def update_customer_recently_viewed(product, customer=None):
 			else:
 				check_already_viewed_update = check_already_viewed[0]
 				customer_viewed_product = frappe.get_doc("Customer Viewed Product", 
-											 	check_already_viewed_update.name)
+												check_already_viewed_update.name)
 				customer_viewed_product.viewed_date = getdate(nowdate())
 				customer_viewed_product.viewed_count = int(customer_viewed_product.viewed_count) + 1
 				customer_viewed_product.save(ignore_permissions=True)
@@ -1475,7 +1675,7 @@ def delete_attribute_option_alert(option):
 	attributes = frappe.get_doc("Product Attribute Option", option)
 	if option  in att_id_arr:   
 		frappe.throw("Cannot delete because Product Attribute Option " + attributes.option_value+ "is \
-			   												linked with Product Attribute Combination")
+															linked with Product Attribute Combination")
 	else:
 		return "Success"
 
@@ -1560,7 +1760,7 @@ def insert_attribute_option_video(option_id,video_id,video_type):
 
 	if attributeoptions_video:
 		return attributeoptions_video
-     
+	 
 def get_attribute_option_videos(option_id):
 	attributeoptions_video = frappe.db.sql("""SELECT * 
 											FROM 
@@ -1641,7 +1841,7 @@ def get_child_categories1(category):
 
 
 def get_category_list(reference_doc, reference_fields, filters=None, page_no=1, page_len=20, 
-					  								search_txt=None, search_field="name"):
+													search_txt=None, search_field="name"):
 	reference_field = json.loads(reference_fields)
 	condition = ''
 	start = (int(page_no) - 1) * int(page_len)
@@ -1669,7 +1869,7 @@ def get_category_list(reference_doc, reference_fields, filters=None, page_no=1, 
 								LIMIT 
 									{page_no}, {page_len}
 							'''.format(field=fields, dt=reference_doc, cond=condition, 
-				  						page_no=start, page_len=page_len), as_dict=1)
+										page_no=start, page_len=page_len), as_dict=1)
 	if list_name:
 		for content in list_name:
 			if content.name:
@@ -1726,7 +1926,7 @@ def get_category_attributes(reference_doc, reference_fields, filters=None,page_n
 
 
 def get_returnpolicy_list(reference_doc, reference_fields, filters=None,page_no=1, 
-						  		page_len=20, search_txt=None, search_field="name"):
+								page_len=20, search_txt=None, search_field="name"):
 	start = (int(page_no) - 1) * int(page_len)
 	reference_field = json.loads(reference_fields)
 	condition = ''
@@ -1747,7 +1947,7 @@ def get_returnpolicy_list(reference_doc, reference_fields, filters=None,page_no=
 								LIMIT 
 									{page_no}, {page_len}
 							'''.format(field=fields, dt=reference_doc, cond=condition, 
-				  						page_no=start, page_len=page_len), as_dict=1)
+										page_no=start, page_len=page_len), as_dict=1)
 	list_len = frappe.db.sql('''SELECT {field} 
 								FROM 
 									`tab{dt}` 
@@ -1758,7 +1958,7 @@ def get_returnpolicy_list(reference_doc, reference_fields, filters=None,page_no=
 
 
 def get_specification_list(reference_doc, reference_fields, filters=None,page_no=1, page_len=20, 
-						   									search_txt=None, search_field="name"):
+															search_txt=None, search_field="name"):
 	start = (int(page_no) - 1) * int(page_len)
 	reference_field = json.loads(reference_fields)
 	condition = ''
@@ -1790,7 +1990,7 @@ def get_specification_list(reference_doc, reference_fields, filters=None,page_no
 
 
 def get_brand_list(reference_doc, reference_fields, filters=None, page_no=1, page_len=20, 
-				   									search_txt=None, search_field="name"):
+													search_txt=None, search_field="name"):
 	start = (int(page_no) - 1) * int(page_len)
 	reference_field = json.loads(reference_fields)
 	fields = ','.join([x for x in reference_field])
@@ -1807,7 +2007,7 @@ def get_brand_list(reference_doc, reference_fields, filters=None, page_no=1, pag
 								LIMIT 
 									{page_no}, {page_len}
 							'''.format(field=fields, dt=reference_doc, cond=condition, page_no=start, 
-				  													page_len=page_len), as_dict=1)
+																	page_len=page_len), as_dict=1)
 
 	list_len = frappe.db.sql('''SELECT {field} 
 								FROM 
@@ -1874,18 +2074,20 @@ def insert_attribute_template(attribute,product_attr,message):
 
 def select_attribute_template(template_name,attribute,product,attribute_id):
 	try:
-		option_template = frappe.db.sql('''SELECT name,attribute_id,attribute_name 
-											FROM 
-												`tabProduct Attribute Template` 
-											WHERE 
-												name = %(name)s ''', {'name': template_name}, as_dict=1)
+		option_template = (
+		frappe.qb.from_(DocType('Product Attribute Template'))
+		.select('name', 'attribute_id', 'attribute_name')
+		.where('name = %s', template_name)
+		.run(as_dict=True)
+	)
 		if option_template:
-			opt_temp = frappe.db.sql('''SELECT * 
-										FROM 
-											`tabAttribute Option` 
-										WHERE 
-											parent = %(parent)s
-									''', {'parent': option_template[0].name}, as_dict=1)
+			
+			opt_temp = (
+				frappe.qb.from_(DocType('Attribute Option'))
+				.select('*')
+				.where('parent = %s', option_template[0].name)
+				.run(as_dict=True)
+			)
 			if opt_temp:
 				for item in opt_temp:
 					doc=frappe.get_doc({
@@ -1905,25 +2107,24 @@ def select_attribute_template(template_name,attribute,product,attribute_id):
 						"disable":item.disable,
 						"available_datetime":item.available_datetime })
 					doc.insert(ignore_permissions=True)
-				return frappe.db.sql("""SELECT * 
-										FROM 
-											`tabProduct Attribute Option` 
-										WHERE 
-											parent = %(product)s 
-											AND attribute = %(attribute)s 
-											AND attribute_id = %(attribute_id)s
-									""", {"product": product,"attribute":attribute,"attribute_id":attribute_id}, as_dict = 1)
+				result = (
+					frappe.qb.from_(DocType('Product Attribute Option'))
+					.select('*')
+					.where('parent = %s', product)
+					.where('attribute = %s', attribute)
+					.where('attribute_id = %s', attribute_id)
+					.run(as_dict=True)
+				)
+				return result
 	except Exception:
 		frappe.log_error(frappe.get_traceback(), 'Error in doctype.product.product.select_attribute_template')
 
 
 def delete_option(name):
-	frappe.db.sql('''DELETE FROM 
-						`tabProduct Attribute Mapping` 
-					WHERE 
-						name = %(name)s ''', {'name': name})
+	frappe.db.delete('Product Attribute Mapping', filters={'name': name})
 	return "success"
 
+@frappe.whitelist()
 def get_order_settings():
 	check_file_uploader = 0
 	apps = frappe.get_installed_apps()
@@ -1938,49 +2139,69 @@ def get_order_settings():
 def get_role_list(doctype, txt, searchfield, start, page_len, filters):
 	condition=''
 	if filters.get('productId'):
-		category_list = frappe.db.sql('''SELECT group_concat(concat('"', category, '"')) category 
-										FROM 
-											`tabProduct Category Mapping` 
-										WHERE 
-											parent = %(product)s
-									''', {'product': filters.get('productId')}, as_dict=1)
+		product = filters.get('productId')
+		categories = (
+			frappe.qb.from_(DocType('Product Category Mapping'))
+			.select('category')
+			.where('parent = %s', product)
+			.run(as_dict=True)
+		)
+		category_list = {
+			'category': ','.join(f'"{row["category"]}"' for row in categories)
+		}
 		if txt:
 			condition += ' and (A.name like %(txt)s or A.attribute_name like %(txt)s)'      
 		cat_list = '""'
 		if category_list and category_list[0].category:
 			cat_list = category_list[0].category
-		return frappe.db.sql('''SELECT A.name, A.attribute_name 
-								FROM 
-									`tab{doctype}` A 
-								LEFT JOIN 
-									`tabBusiness Category` C ON A.name = C.parent 
-								WHERE (CASE 
-										WHEN C.category IS NOT NULL THEN C.category IN ({category}) 
-										ELSE 1 = 1 END) {condition}
-							'''.format(category=cat_list, doctype=filters.get('type'), 
-				  						condition=condition), {'txt': '%' + txt + '%'})
+		doctype = filters.get('type')
+		cat_list = ','.join(f'"{category}"' for category in filters.get('category_list', []))  # Assuming filters.get('category_list') returns a list of categories
+		condition = filters.get('condition', '')  # Assuming condition is a string that gets appended to the query
+		txt = filters.get('txt', '')
+		query = (
+			frappe.qb.from_(DocType(doctype).alias('A'))
+			.left_join(DocType('Business Category').alias('C'), 'A.name = C.parent')
+			.select('A.name', 'A.attribute_name')
+			.where(
+				frappe.qb.cond(
+					'C.category IN %s', (tuple(filters.get('category_list', [])) if filters.get('category_list') else None)
+				).or_('C.category IS NULL')
+			)
+			.run(as_dict=True)
+		)
+		filtered_results = [row for row in query if condition in row['attribute_name'] and txt in row['name']]
+		result = filtered_results
 	conditions = []
-	return frappe.db.sql("""SELECT name 
-							FROM 
-								`tabRole`
-							WHERE 
-								disabled = 0 
-								AND name NOT IN ("System Manager", "Administrator")
-								AND ({key} LIKE %(txt)s)
-								{fcond} {mcond}
-							ORDER BY
-								IF(LOCATE(%(_txt)s, name), 
-									LOCATE(%(_txt)s, name), 99999), idx DESC,name
-							LIMIT %(start)s, %(page_len)s
-						""".format(**{'key': searchfield,'fcond': get_filters_cond(doctype, filters, conditions),
-							'mcond': get_match_cond(doctype)}), {'txt': "%%%s%%" % txt,
-							'_txt': txt.replace("%", ""),'start': start,'page_len': page_len})
+	role = DocType('Role')
+	query = (
+		frappe.qb.from_(role)
+		.select(role.name)
+		.where(role.disabled == 0)
+		.where(role.name.notin(["System Manager", "Administrator"]))
+	)
+	query = query.where(getattr(role, searchfield).like(f"%{txt}%"))
+	query = query.where(get_filters_cond(doctype, filters, conditions))
+	query = query.where(get_match_cond(doctype))
+	query = query.orderby(
+		frappe.qb.case()
+		.when(role.name.like(f"%{txt.replace('%', '')}%"), 
+			  role.name.locate(f"%{txt.replace('%', '')}%"))
+		.else_(99999)
+		.desc(),
+		role.idx.desc(),
+		role.name
+	)
+	query = query.limit(start, page_len)
+	results = query.run(as_dict=True)
+
+	return results
+	
 
 
 def get_models(reference_doc, reference_fields):
 	reference_field = json.loads(reference_fields)
 	list_name = frappe.db.get_all(reference_doc,fields=reference_field,filters={"is_active":1},
-							   									limit_page_length=2000)
+																limit_page_length=2000)
 	return {"list_name":list_name}
 
 
@@ -1988,7 +2209,7 @@ def get_all_products_with_attributes(category=None, brand=None, item_name=None, 
 	try:
 		lists=[]
 		subcat=get_products(category=category, brand=brand, item_name=item_name, active=active, 
-					  														featured=featured)
+																			featured=featured)
 		if subcat:
 			for subsub in subcat:
 				subsub.indent=0
@@ -2007,130 +2228,104 @@ def get_all_products_with_attributes(category=None, brand=None, item_name=None, 
 
 def get_product_attributes(name):   
 	try:
-		query = '''SELECT AO.name AS docname,
-						CONCAT_WS(' - ', PA.attribute, AO.parent_option) AS name,
-						AO.option_value AS item, AO.parent_option,AO.price_adjustment AS price,AO.attribute 
-					FROM 
-						`tabProduct Attribute Option` AO 
-					INNER JOIN 
-						`tabProduct Attribute Mapping` PA 
-					ON 
-						AO.attribute_id = PA.name 
-					WHERE 
-						PA.parent = "{parent}" 
-					ORDER BY 
-						PA.display_order, name '''.format(parent=name)
-		s= frappe.db.sql(query,as_dict=1)
-		return s
+		parent_name  = name
+		attribute_option = DocType('Product Attribute Option')
+		attribute_mapping = DocType('Product Attribute Mapping')
+		query = (
+			frappe.qb.from_(attribute_option)
+			.join(attribute_mapping)
+			.on(attribute_option.attribute_id == attribute_mapping.name)
+			.select(
+				attribute_option.name.as_('docname'),
+				frappe.qb.concat_ws(' - ', attribute_mapping.attribute, attribute_option.parent_option).as_('name'),
+				attribute_option.option_value.as_('item'),
+				attribute_option.parent_option,
+				attribute_option.price_adjustment.as_('price'),
+				attribute_option.attribute
+			)
+			.where(attribute_mapping.parent == parent_name)
+			.orderby(attribute_mapping.display_order, 'name')
+		)
+		
+		results = query.run(as_dict=True)
+		
+		return results
+		
 	except Exception:
 		frappe.log_error(frappe.get_traceback(), "Error in doctype.product.get_product_attributes") 
 
 
-def get_products(category=None,brand=None,cat_doctype=None,brand_doctype=None,item_name=None,
-				 												active=None,featured=None):
+def get_products(category=None, brand=None, item_name=None, active=None, featured=None):
+	# Define DocTypes
+	product = DocType('Product')
+	product_category_mapping = DocType('Product Category Mapping')
+	product_brand_mapping = DocType('Product Brand Mapping')
+	
+	# Base query
+	query = frappe.qb.from_(product)
+	
+	# Joins and Filters
 	if category or brand:
-		filters = ''
-		joins = ''
 		if category:
-			joins += ' inner join `tabProduct Category Mapping` PCM on PCM.parent=P.name'
-			filters += " and PCM.category='{category}'".format(category=category)
+			query = query.join(product_category_mapping).on(product.name == product_category_mapping.parent)
+			query = query.where(product_category_mapping.category == category)
 		if brand:
-			joins += ' inner join `tabProduct Brand Mapping` PBM on PBM.parent=P.name'
-			filters += ' and PBM.brand="{brand}"'.format(brand=brand)
-		if item_name:
-			item_name = '"%' + item_name + '%"'
-			filters += ' and P.item like %s' % (item_name)
-		if active:
-			if active=="Yes":
-				active=1
-			else:
-				active=0
-			filters += ' and P.is_active=%s' % (active)
-		if featured:
-			if featured=="Yes":
-				featured=1
-			else:
-				featured=0
-			filters += ' and P.display_home_page=%s' % (featured)
-		query = '''SELECT P.name,P.item,P.price,P.sku,P.old_price,P.stock,
-						P.inventory_method,P.name AS docname,
-						CASE 
-							WHEN P.is_active > 0 THEN 'Yes' 
-							ELSE 'No' 
-						END AS is_active,
-						CASE 
-							WHEN P.display_home_page > 0 THEN 'Yes' 
-							ELSE 'No' 
-						END AS display_home_page,
-						P.name AS id,P.name AS name1 
-					FROM `tabProduct` P {joins} 
-					WHERE P.name != '' {condition}
-				'''.format(condition=filters, joins=joins)
-		p = frappe.db.sql(query,as_dict=1)
-		for items in p:
-			images = frappe.db.sql('''	SELECT detail_thumbnail,detail_image 
-										FROM `tabProduct Image` 
-										WHERE parent = %(name)s 
-										ORDER BY is_primary DESC
-									''', {'name': items.name}, as_dict=1)
-			image = '<div class="row">'
-			for img in images:
-				if img.detail_thumbnail:
-					image += '<div class="col-md-4 popup" data-poster="'+img.detail_image+'\
-						" data-src='+img.detail_image+' style="margin-bottom:10px;padding-left:0px;\
-							padding-right:0px;"><a href="'+img.detail_image+'"><img class=\
-								"img-responsive" id="myImg" src="'+ img.detail_thumbnail +'"\
-									onclick=showPopup("'+img.detail_image+'")></a></div>'
-			image+='</div>'
-			items.image = image
-	else:
-		filters = ''
-		if item_name:
-			item_name = '"%' + item_name + '%"'
-			filters += ' and P.item like %s' % (item_name)
-		if active:
-			if active=="Yes":
-				active=1
-			else:
-				active=0
-			filters += ' and P.is_active=%s' % (active)
-		if featured:
-			if featured=="Yes":
-				featured=1
-			else:
-				featured=0
-			filters += ' and P.display_home_page=%s' % (featured)
-		query = '''SELECT P.name,P.item,P.price,P.sku,P.old_price,P.stock,
-						P.inventory_method,P.name AS docname,
-						CASE 
-							WHEN P.is_active > 0 THEN 'Yes' 
-							ELSE 'No' 
-						END AS is_active,
-						CASE 
-							WHEN P.display_home_page > 0 THEN 'Yes' 
-							ELSE 'No' 
-						END AS display_home_page,
-						P.name AS id,P.name AS name1 
-					FROM`tabProduct` P 
-					WHEREP.name != '' {condition} '''.format(condition=filters)
-		p = frappe.db.sql(query,as_dict=1)
-		for items in p:
-			images = frappe.db.sql('''SELECT detail_thumbnail,detail_image 
-										FROM `tabProduct Image` 
-										WHERE parent = %(name)s 
-										ORDER BY is_primary DESC
-									''', {'name': items.name}, as_dict=1)
-			image = '<div class="row">'
-			for img in images:
-				if img.detail_thumbnail:
-					image += '<div class="col-md-4 popup" data-poster="'+img.detail_image+'"\
-						  data-src='+img.detail_image+' style="margin-bottom:10px;padding-left:0px;\
-							padding-right:0px;"><a href="'+img.detail_image+'"><img class=\
-								"img-responsive" id="myImg" src="'+ img.detail_thumbnail +'" \
-									onclick=showPopup("'+img.detail_image+'")></a></div>'
-			image+='</div>'
-			items.image = image
-	return p
+			query = query.join(product_brand_mapping).on(product.name == product_brand_mapping.parent)
+			query = query.where(product_brand_mapping.brand == brand)
+	
+	# Adding filters
+	if item_name:
+		query = query.where(product.item.like(f"%{item_name}%"))
+	if active is not None:
+		active_value = 1 if active == "Yes" else 0
+		query = query.where(product.is_active == active_value)
+	if featured is not None:
+		featured_value = 1 if featured == "Yes" else 0
+		query = query.where(product.display_home_page == featured_value)
+	
+	# Select and Order
+	query = (
+		query.select(
+			product.name,
+			product.item,
+			product.price,
+			product.sku,
+			product.old_price,
+			product.stock,
+			product.inventory_method,
+			product.name.as_('docname'),
+			frappe.qb.case()
+			.when(product.is_active > 0, 'Yes')
+			.else_('No')
+			.as_('is_active'),
+			frappe.qb.case()
+			.when(product.display_home_page > 0, 'Yes')
+			.else_('No')
+			.as_('display_home_page'),
+			product.name.as_('id'),
+			product.name.as_('name1')
+		)
+	)
+	
+	# Execute the query
+	results = query.run(as_dict=True)
+	
+	# Process images for each product
+	for item in results:
+		images = frappe.qb.from_('tabProduct Image').select('detail_thumbnail', 'detail_image').where('parent', item['name']).orderby('is_primary', 'DESC').run(as_dict=True)
+		image_html = '<div class="row">'
+		for img in images:
+			if img.get('detail_thumbnail'):
+				image_html += (
+					f'<div class="col-md-4 popup" data-poster="{img["detail_image"]}" '
+					f'data-src="{img["detail_image"]}" style="margin-bottom:10px;padding-left:0px;padding-right:0px;">'
+					f'<a href="{img["detail_image"]}"><img class="img-responsive" id="myImg" '
+					f'src="{img["detail_thumbnail"]}" onclick="showPopup(\'{img["detail_image"]}\')"></a></div>'
+				)
+		image_html += '</div>'
+		item['image'] = image_html
+	
+	return results
 
 
 def update_bulk_data(doctype,docname,fieldname,value):
@@ -2154,20 +2349,20 @@ def update_bulk_data(doctype,docname,fieldname,value):
 
 
 def get_gallery_list(parent, name=None):
-	condition = ""
+	product_image = DocType('Product Image')
+	query = frappe.qb.from_(product_image)
 	if parent:
-		condition += 'where parent =%(parent)s'
+		query = query.where(product_image.parent == parent)
 	if name:
-		condition += 'and name =%(name)s'
-	else:
-		name = ""
-	return frappe.db.sql('''SELECT * 
-							FROM 
-								`tabProduct Image` 
-							{condition} 
-							ORDER BY 
-								idx ASC
-						''', {"parent": parent, "name" : name}, as_dict=1)
+		query = query.where(product_image.name == name)
+	query = (
+		query.select('*')
+		.orderby(product_image.idx)
+	)
+   
+	results = query.run(as_dict=True)
+	
+	return results
 
 
 def get_product_template(name=None):
@@ -2225,30 +2420,33 @@ def get_query_condition(user):
 	
 			
 def get_record_count(dt):
-	condition = ''
-	d = frappe.db.sql('''SELECT (CASE 
-								WHEN is_test_record = 0 THEN "actual" 
-								ELSE "test" 
-							END) AS record_type, 
-							COUNT(*) count 
-						FROM 
-							`tab{dt}` {cond} 
-						GROUP BY 
-							is_test_record'''.format(dt=dt, cond=condition), as_dict=1)
+	doc = DocType(dt)
+	query = frappe.qb.from_(doc)
+	query = (
+		query.select(
+			frappe.qb.case()
+			.when(doc.is_test_record == 0, 'actual')
+			.else_('test')
+			.as_('record_type'),
+			frappe.qb.functions.Count('*').as_('count')
+		)
+		.groupby(doc.is_test_record)
+	)
+	results = query.run(as_dict=True)
 	out = {}
-	for item in d:
-		out[item.record_type] = item.count
+	for item in results:
+		out[item['record_type']] = item['count']
 	return out
 
 
 def clear_test_records(dt):
 	test_records = frappe.db.get_all(dt, filters={'is_test_record': 1}, limit_page_length=500, 
-								  						order_by='creation desc')
+														order_by='creation desc')
 	docs = len(test_records)
 	for i, item in enumerate(test_records):
 		frappe.delete_doc(dt, item.name)
 		frappe.publish_progress(float(i) * 100 / docs, title='Deleting sample records', 
-						  							description='Please wait...')
+													description='Please wait...')
 	return {'status': 'Success'}
 
 
@@ -2273,22 +2471,25 @@ def product_detail_onscroll(productid, layout):
 		contexts['product_box'] = frappe.db.get_value('Product Box', catalog_settings.product_boxes, 'route')
 	else:
 		contexts['product_box'] = None
-	categories_list = frappe.db.sql('''SELECT PCMcategory, PCMcategory_name, 
-											(SELECT C.route 
-												FROM 
-													`tabProduct Category` C 
-												WHERE 
-													C.name = PCM.category) AS route 
-										FROM 
-											`tabProduct Category Mapping` PCM 
-										WHERE 
-											PCM.parent = %(parent)s 
-										ORDER BY 
-											PCM.idx 
-										LIMIT 1 ''', {'parent': productid}, as_dict=1)
+	category_mapping = DocType('Product Category Mapping')
+	category = DocType('Product Category')
+	query = (
+		frappe.qb.from_(category_mapping)
+		.join(category)
+		.on(category.name == category_mapping.category)
+		.select(
+			category_mapping.category,
+			category_mapping.category_name,
+			category.route.as_('route')
+		)
+		.where(category_mapping.parent == productid)
+		.orderby(category_mapping.idx)
+		.limit(1)
+	)
+	categories_list = query.run(as_dict=True)
 	for category in categories_list:
 		check_product_box = frappe.db.get_value("Product Category",category.category,
-										  				'product_box_for_list_view')
+														'product_box_for_list_view')
 		if check_product_box:
 			contexts['product_box']=frappe.db.get_value('Product Box',check_product_box,'route')
 		else:
@@ -2319,16 +2520,23 @@ def product_detail_onscroll(productid, layout):
 		contexts['approved_reviews'] = get_product_reviews_list(productid, 0, 10)
 		contexts['approved_total_reviews'] = frappe.db.get_value('Product',productid,'approved_total_reviews')
 		if catalog_settings.upload_review_images:
-			review_images = frappe.db.sql('''SELECT RI.review_thumbnail,RI.image,RI.list_image,
-												RI.parent,RI.name,PR.product 
-											FROM 
-												`tabProduct Review` PR 
-											INNER JOIN 
-												`tabReview Image` RI 
-											ON 
-												PR.name = RI.parent 
-											WHERE 
-												PR.product = %(product)s ''', {'product': productid}, as_dict=1)
+			review = DocType('Product Review')
+			review_image = DocType('Review Image')
+			query = (
+				frappe.qb.from_(review)
+				.join(review_image)
+				.on(review.name == review_image.parent)
+				.select(
+					review_image.review_thumbnail,
+					review_image.image,
+					review_image.list_image,
+					review_image.parent,
+					review_image.name,
+					review.product
+				)
+				.where(review.product == productid)
+			)
+			review_images = query.run(as_dict=True)
 			contexts['review_img'] = review_images
 		template = frappe.render_template(
 						"/templates/pages/DetailPage/detailpage_otherinfo_meat.html", contexts)
@@ -2403,30 +2611,48 @@ def insert_product_attribute_and_options(doc):
 
 def get_doc_images(dt, dn):
 	if dt == "Product Category":        
-		products = frappe.db.sql_list('''SELECT M.parent 
-										FROM 
-											`tabProduct Category Mapping` M 
-										INNER JOIN 
-											tabProduct P ON P.name = M.parent 
-										WHERE M.category = %(name)s 
-										GROUP BY P.name ''', {'name': dn})
+		category_mapping = DocType('Product Category Mapping')
+		product = DocType('Product')
+		query = (
+			frappe.qb.from_(category_mapping)
+			.join(product)
+			.on(product.name == category_mapping.parent)
+			.select(category_mapping.parent)
+			.where(category_mapping.category == category_name)
+			.groupby(product.name)
+		)
+		results = query.run(as_dict=True)
+		products= [row['parent'] for row in results]
 	elif dt == "Product Brand":
-		products = frappe.db.sql_list('''SELECT M.parent 
-										FROM 
-											`tabProduct Brand Mapping` M 
-										INNER JOIN 
-											tabProduct P ON P.name = M.parent 
-										WHERE M.brand = %(name)s 
-										GROUP BY P.name ''', {'name': dn})
+		brand_mapping = DocType('Product Brand Mapping')
+		product = DocType('Product')
+		query = (
+			frappe.qb.from_(brand_mapping)
+			.join(product)
+			.on(product.name == brand_mapping.parent)
+			.select(brand_mapping.parent)
+			.where(brand_mapping.brand == brand_name)
+			.groupby(product.name)
+		)
+		results = query.run(as_dict=True)
+		products= [row['parent'] for row in results]
 	elif dt == "Product":
 		products = [dn]
 	if products and len(products) > 0:
 		product_list = ",".join(['"' + i + '"' for i in products])
-		return frappe.db.sql('''SELECT list_image, detail_thumbnail AS thumbnail, product_image 
-								FROM 
-									`tabProduct Image` 
-								WHERE parent IN ({PRODUCT}) 
-								ORDER BY idx'''.format(PRODUCT=product_list), as_dict=1)
+		product_image = DocType('Product Image')
+		query = (
+			frappe.qb.from_(product_image)
+			.select(
+				product_image.list_image,
+				product_image.detail_thumbnail.as_('thumbnail'),
+				product_image.product_image
+			)
+			.where(product_image.parent.isin(product_list))
+			.orderby(product_image.idx)
+		)
+		results = query.run(as_dict=True)
+		return results
 	return []
 
 
@@ -2559,13 +2785,19 @@ def delete_combination(dt, dn):
 	frappe.db.commit()
 
 def update_attr_options():
-	p_list = frappe.db.sql("""SELECT P.name 
-							FROM 
-								`tabProduct Attribute Option` O 
-							INNER JOIN 
-								`tabProduct` P ON P.name = O.parent 
-							WHERE O.attribute_id IS NULL OR O.attribute_id = '' 
-							GROUP BY P.name """, as_dict=1)
+	attribute_option = DocType('Product Attribute Option')
+	product = DocType('Product')
+	query = (
+		frappe.qb.from_(attribute_option)
+		.join(product)
+		.on(product.name == attribute_option.parent)
+		.select(product.name)
+		.where(
+			(attribute_option.attribute_id.isnull() | (attribute_option.attribute_id == ''))
+		)
+		.groupby(product.name)
+	)
+	p_list = query.run(as_dict=True)
 	for p in p_list:
 		p_doc = frappe.get_doc("Product",p.name)
 		if p_doc.attribute_options:
@@ -2601,7 +2833,7 @@ def update_product_variant_combinations():
 				product_attribute["attroptions"] = []
 				options = frappe.db.get_all("Product Attribute Option",fields=['*'],
 								filters={'parent':p_doc.name,'attribute':attr.product_attribute,
-				 				'attribute_id':attr.name},order_by='display_order',limit_page_length=50)  
+								'attribute_id':attr.name},order_by='display_order',limit_page_length=50)  
 				for p_attr_opt_doc in options:
 					product_attribute["attroptions"].append(p_attr_opt_doc)
 				if product_attribute["attroptions"]:
