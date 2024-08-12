@@ -5,6 +5,7 @@
 from __future__ import unicode_literals
 import frappe
 from frappe.model.document import Document
+from frappe.query_builder import DocType, Interval
 
 class APILog(Document):
 	def onload(self):
@@ -13,14 +14,20 @@ class APILog(Document):
 			frappe.db.commit()
 
 def set_old_logs_as_seen():
-	frappe.db.sql("""UPDATE `tabAPI Log` SET `seen` = 1
-					WHERE `seen` = 0 
-     					AND `creation` < (NOW() - INTERVAL '7' DAY)""")
-	frappe.db.sql("""DELETE FROM `tabAPI Log` 
-               		WHERE `creation` < (NOW() - INTERVAL '30' DAY)""")
+    ApiLog = DocType('API Log')
+    frappe.qb.update(ApiLog)
+        .set(ApiLog.seen, 1)
+        .where((ApiLog.seen == 0) & (ApiLog.creation < (now() - Interval(days=7))))
+        .run()
+    frappe.qb.from_(ApiLog)
+        .delete()
+        .where(ApiLog.creation < (now() - Interval(days=30)))
+        .run()
 
 def clear_api_logs():
-	'''Flush all API Logs'''
-	frappe.only_for('System Manager')
-	frappe.db.sql('''DELETE FROM `tabAPI Log`''')
-	frappe.db.sql('''DELETE FROM `tabApi Log Group`''')
+    frappe.only_for('System Manager')
+    
+    ApiLog = DocType('API Log')
+    ApiLogGroup = DocType('Api Log Group')
+    frappe.qb.from_(ApiLog).delete().run()
+    frappe.qb.from_(ApiLogGroup).delete().run()

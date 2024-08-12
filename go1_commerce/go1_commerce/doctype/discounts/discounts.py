@@ -14,6 +14,7 @@ from go1_commerce.go1_commerce.v2.common \
 from go1_commerce.utils.setup import get_settings_value
 from urllib.parse import unquote
 from six import string_types
+from frappe.query_builder import DocType, Field, functions as fn
 
 class Discounts(Document):
 	def validate(self):
@@ -63,12 +64,13 @@ class Discounts(Document):
 			discount_requirements_has_values(self)
 		elif self.discount_type == 'Assigned to Products' and self.percent_or_amount == 'Discount Amount':
 			for item in self.discount_products:
-
-				products = frappe.db.sql('''
-							SELECT P.name,P.item,P.price 
-							FROM `tabProduct` AS P 
-							WHERE P.name = "{0}"
-						'''.format(item.items), as_dict=1)
+				Product = DocType('Product')
+				query = (
+				    frappe.qb.from_(Product)
+				    .select(Product.name, Product.item, Product.price)
+				    .where(Product.name == item.items)
+				)
+				products = query.run(as_dict=True)
 
 				for pdt in products:
 					if flt(self.discount_amount) > flt(pdt.price):
@@ -101,20 +103,26 @@ class Discounts(Document):
 				category = '"' + item + '",'
 		if category == '': category = '"",'
 		category = category[:-1]
-		frappe.db.sql('''DELETE FROM `tabDiscount Categories`
-						WHERE parent_category IN ({0}) 
-							AND parent = "{1}"
-					'''.format(category, self.name))
+		DiscountCategories = DocType('Discount Categories')
+		categories_to_delete = [cat.strip() for cat in category.split(',')]
+		frappe.qb.from_(DiscountCategories)
+		    .delete()
+		    .where(
+		        (DiscountCategories.parent_category.isin(categories_to_delete)) &
+		        (DiscountCategories.parent == self.name)
+		    )
+		    .run()
 
 
 	def check_child_category(self):
 		for item in self.discount_categories:
-			child_level_1 = frappe.db.sql('''
-								SELECT P.name, P.category_name, P.is_group 
-								FROM `tabProduct Category` AS P 
-								WHERE P.parent_product_category = %(category)s
-							''', {'category': item.category}, as_dict=1)
-
+			ProductCategory = DocType('Product Category')
+			query = (
+			    frappe.qb.from_(ProductCategory)
+			    .select(ProductCategory.name, ProductCategory.category_name, ProductCategory.is_group)
+			    .where(ProductCategory.parent_product_category == item.category)
+			)
+			child_level_1 = query.run(as_dict=True)
 			for l1 in child_level_1:
 				check_record1 = next((x for x in self.discount_categories if x.category == l1.name), None)
 				if not check_record1:
@@ -126,11 +134,13 @@ class Discounts(Document):
 														'discount_value':item.discount_value
 													})
 				if l1.is_group:
-					child_level_2 = frappe.db.sql('''
-										SELECT P.name, P.category_name, P.is_group 
-										FROM `tabProduct Category` AS P 
-										WHERE P.parent_product_category = %(category)s
-									''', {'category': l1.name}, as_dict=1)
+					ProductCategory = DocType('Product Category')
+					query = (
+					    frappe.qb.from_(ProductCategory)
+					    .select(ProductCategory.name, ProductCategory.category_name, ProductCategory.is_group)
+					    .where(ProductCategory.parent_product_category == l1.name)
+					)
+					child_level_2 = query.run(as_dict=True)
 
 					for l2 in child_level_2:
 						check_record2 = next((x for x in self.discount_categories if x.category == l2.name), None)
@@ -188,11 +198,18 @@ def get_free_item(txt):
 	condition = ''
 	if txt:
 		condition += ' AND item LIKE "%{txt}%"'.format(txt=txt)
-	return frappe.db.sql('''SELECT name, item 
-							FROM `tabProduct`
-							WHERE status = "Approved" 
-								AND is_active = 1 {condition}
-						'''.format(condition=condition))
+	Product = DocType('Product')
+	query = (
+	    frappe.qb.from_(Product)
+	    .select(Product.name, Product.item)
+	    .where(
+	        (Product.status == "Approved") &
+	        (Product.is_active == 1)
+	    )
+	)
+	if condition:
+	    query = query.where(condition)
+	result = query.run(as_dict=True)
 
 
 
@@ -234,41 +251,81 @@ def get_product_discount(product, qty = 1, rate = None, customer_id = None, attr
 def get_product_discount_rule(product, qty):
 	today_date = get_today_date(replace=True)
 	categories = get_product_categories(product.name)
-	query = f'''SELECT D.*, DP.product_attribute_json,
-				IFNULL((SELECT COUNT(*) 
-						FROM `tabDiscount Requirements` DR 
-						WHERE DR.parent = D.name 
-							AND parenttype = "Discounts"), 0) AS requirements,
-				IFNULL((SELECT COUNT(*) 
-						FROM `tabDiscount Usage History` DH 
-						WHERE DH.parent = D.name 
-							AND parenttype = "Discounts"), 0) AS history 
-				FROM `tabDiscounts` AS D
-				LEFT JOIN `tabDiscount Products` AS DP ON D.name = DP.parent 
-				LEFT JOIN `tabDiscount Categories` AS DC ON D.name = DC.parent 
-				LEFT JOIN `tabDiscount Applied Product` AS DAP ON D.name = DAP.parent 
-				WHERE (CASE WHEN start_date IS NOT NULL THEN start_date <= '{getdate(today_date)}'
-						ELSE 1 = 1 END) 
-					AND (CASE WHEN end_date IS NOT NULL THEN end_date >= '{getdate(today_date)}'
-						ELSE 1 = 1 END) 
-					AND ((CASE WHEN D.discount_type = 'Assigned to Products'
-						THEN DP.items = '{product.name}'
-						WHEN D.discount_type = 'Assigned to Categories'
-						THEN DC.category IN ({categories})
-						ELSE 1 = 1 END) ) 
-					AND D.discount_type NOT IN ("Assigned to Sub Total", "Assigned to Delivery Charges") 
-					AND (D.requires_coupon_code = 0 OR D.requires_coupon_code IS NULL)
-				ORDER BY priority DESC '''
-	rule = frappe.db.sql(query, as_dict = 1)
+	Discounts = DocType('Discounts')
+	DiscountProducts = DocType('Discount Products')
+	DiscountCategories = DocType('Discount Categories')
+	DiscountRequirements = DocType('Discount Requirements')
+	DiscountUsageHistory = DocType('Discount Usage History')
+	requirements_subquery = (
+	    frappe.qb.from_(DiscountRequirements)
+	    .select(Field('count(*)'))
+	    .where(
+	        (DiscountRequirements.parent == Discounts.name) &
+	        (DiscountRequirements.parenttype == "Discounts")
+	    )
+	    .as_(Field('requirements'))
+	)
+
+	history_subquery = (
+	    frappe.qb.from_(DiscountUsageHistory)
+	    .select(Field('count(*)'))
+	    .where(
+	        (DiscountUsageHistory.parent == Discounts.name) &
+	        (DiscountUsageHistory.parenttype == "Discounts")
+	    )
+	    .as_(Field('history'))
+	)
+	query = (
+	    frappe.qb.from_(Discounts)
+	    .left_join(DiscountProducts).on(Discounts.name == DiscountProducts.parent)
+	    .left_join(DiscountCategories).on(Discounts.name == DiscountCategories.parent)
+	    .left_join(Discounts).on(Discounts.name == Discounts.parent)
+	    .select(
+	        Discounts.fields,
+	        DiscountProducts.product_attribute_json,
+	        requirements_subquery,
+	        history_subquery
+	    )
+	    .where(
+	        (frappe.qb.case()
+	            .when(Discounts.start_date.isnotnull(), Discounts.start_date <= today_date)
+	            .otherwise(True)
+	        ) &
+	        (frappe.qb.case()
+	            .when(Discounts.end_date.isnotnull(), Discounts.end_date >= today_date)
+	            .otherwise(True)
+	        ) &
+	        (frappe.qb.case()
+	            .when(Discounts.discount_type == 'Assigned to Products', DiscountProducts.items == product.name)
+	            .when(Discounts.discount_type == 'Assigned to Categories', DiscountCategories.category.isin(categories))
+	            .otherwise(True)
+	        ) &
+	        (Discounts.discount_type.notin(["Assigned to Sub Total", "Assigned to Delivery Charges"])) &
+	        ((Discounts.requires_coupon_code == 0) | (Discounts.requires_coupon_code.isnull()))
+	    )
+	    .orderby(Discounts.priority, order='desc')
+	)
+	rule = query.run(as_dict=True)
 	if rule:
 		return get_product_dixcount_rule_(rule,product)
 		
 
 def get_product_categories(product_id):
-	res = frappe.db.sql(f'''SELECT group_concat(concat('"',category,'"')) val 
-							FROM 
-								`tabProduct Category Mapping` 
-							WHERE parent=%(parent)s ''', {'parent': product_id}, as_dict=1)
+	ProductCategoryMapping = DocType('Product Category Mapping')
+	query = (
+	    frappe.qb.from_(ProductCategoryMapping)
+	    .select(
+	        frappe.qb.functions.GroupConcat(
+	            frappe.qb.functions.Concat(
+	                frappe.qb.functions.Literal('"'), 
+	                ProductCategoryMapping.category, 
+	                frappe.qb.functions.Literal('"')
+	            )
+	        ).as_('val')
+	    )
+	    .where(ProductCategoryMapping.parent == product_id)
+	)
+	res = query.run(as_dict=True)
 	if res and res[0].val:
 		return res[0].val
 	return '""'
@@ -333,20 +390,31 @@ def get_ordersubtotal_discount_forfree_item(subtotal,cart_items):
 		if discount.price_or_product_discount == 'Product':
 			out['same_product'] = 0
 			out['min_qty'] = discount.min_qty
-			nonfree_product_item = frappe.db.sql('''SELECT * 
-													FROM `tabDiscount Applied Product` 
-													WHERE parent=%(parent)s 
-													AND (discount_type="Discount Percentage" 
-													OR discount_type="Discount Amount")
-												''', {'parent': discount.name}, as_dict=1)
-
-			free_product_item = frappe.db.sql('''SELECT * 
-												FROM `tabDiscount Applied Product` 
-												WHERE parent=%(parent)s 
-												AND (discount_type!="Discount Percentage" 
-												AND discount_type!="Discount Amount")
-											''', {'parent': discount.name}, as_dict=1)
-
+			DiscountAppliedProduct = DocType('Discount Applied Product')
+			nonfree_query = (
+			    frappe.qb.from_(DiscountAppliedProduct)
+			    .select('*')
+			    .where(
+			        (DiscountAppliedProduct.parent == discount.name) &
+			        (
+			            (DiscountAppliedProduct.discount_type == 'Discount Percentage') |
+			            (DiscountAppliedProduct.discount_type == 'Discount Amount')
+			        )
+			    )
+			)
+			nonfree_product_item = nonfree_query.run(as_dict=True)
+			free_query = (
+			    frappe.qb.from_(DiscountAppliedProduct)
+			    .select('*')
+			    .where(
+			        (DiscountAppliedProduct.parent == discount.name) &
+			        (
+			            (DiscountAppliedProduct.discount_type != 'Discount Percentage') &
+			            (DiscountAppliedProduct.discount_type != 'Discount Amount')
+			        )
+			    )
+			)
+			free_product_item = free_query.run(as_dict=True)
 			out =  get_ordersubtotal_discount_fornonfree_product_item(
 																		nonfree_product_item,
 																		subtotal,
@@ -366,20 +434,26 @@ def get_ordersubtotal_discount_forfree_item(subtotal,cart_items):
 
 def get_subtotal_discount():
 	today_date = get_today_date(replace=True)
-	query = f'''SELECT d.* 
-				FROM `tabDiscounts` d  
-				WHERE 
-					(CASE WHEN start_date IS NOT NULL THEN start_date <= '{getdate(today_date)}'
-						ELSE 1 = 1 END) 
-					AND (CASE WHEN end_date IS NOT NULL THEN end_date >= '{getdate(today_date)}'
-						ELSE 1 = 1 END) 
-					AND (d.discount_type = "Assigned to Sub Total" 
-						OR (d.discount_type = "Assigned to Delivery Charges"))
-					AND (requires_coupon_code = 0 
-						OR requires_coupon_code IS NULL)
-				ORDER BY priority DESC
-			'''
-	rule = frappe.db.sql(query, as_dict=1)
+	Discounts = DocType('Discounts')
+	query = (
+	    frappe.qb.from_(Discounts)
+	    .select('*')
+	    .where(
+	        (frappe.qb.case()
+	            .when(Discounts.start_date.isnotnull(), Discounts.start_date <= today_date)
+	            .otherwise(True)
+	        ) &
+	        (frappe.qb.case()
+	            .when(Discounts.end_date.isnotnull(), Discounts.end_date >= today_date)
+	            .otherwise(True)
+	        ) &
+	        ((Discounts.discount_type == "Assigned to Sub Total") |
+	         (Discounts.discount_type == "Assigned to Delivery Charges")) &
+	        ((Discounts.requires_coupon_code == 0) | (Discounts.requires_coupon_code.isnull()))
+	    )
+	    .orderby(Discounts.priority, order='desc')
+	)
+	rule = query.run(as_dict=True)
 	return rule
 
 
@@ -413,13 +487,27 @@ def validate_requirements(discount, subtotal, customer_id, cart_items, total_wei
 	currency = frappe.db.get_value('Currency', currency_name, 'symbol')
 	order_by_fields = '"Limit to role", "Has any one product in cart", "Has all these products in cart", "Spend x amount", \
 		"Specific price range", "Specific Shipping Method", "Specific Payment Method", "Spend x weight"'
-	requirements = frappe.db.sql('''SELECT name, discount_requirement, amount_to_be_spent, min_amount, 
-										max_amount, weight_for_discount, items_list 
-									FROM `tabDiscount Requirements` 
-									WHERE parent = %(parent)s 
-										AND parenttype = "Discounts" 
-									ORDER BY field (discount_requirement, {fields})
-								'''.format(fields=order_by_fields),{'parent': discount.name}, as_dict=1)
+	DiscountRequirements = DocType('Discount Requirements')
+	query = (
+	    frappe.qb.from_(DiscountRequirements)
+	    .select(
+	        DiscountRequirements.name,
+	        DiscountRequirements.discount_requirement,
+	        DiscountRequirements.amount_to_be_spent,
+	        DiscountRequirements.min_amount,
+	        DiscountRequirements.max_amount,
+	        DiscountRequirements.weight_for_discount,
+	        DiscountRequirements.items_list
+	    )
+	    .where(
+	        (DiscountRequirements.parent == discount.name) &
+	        (DiscountRequirements.parenttype == "Discounts")
+	    )
+	    .orderby(
+	        frappe.qb.functions.Field('discount_requirement').order_by(order_by_fields)
+	    )
+	)
+	requirements = query.run(as_dict=True)
 
 	if requirements:
 		return validate_item_requirements(requirements,subtotal,total_weight,customer_id,cart_items,msg,payment_method,currency)
@@ -433,13 +521,20 @@ def get_usage_history(discount):
 								format(discount.start_date, discount.end_date)
 	elif discount.start_date and not discount.end_date:
 		condition += ' AND date(creation) >= cast(%(start_date)s AS date)'
-	return frappe.db.sql('''SELECT order_id, customer 
-							FROM `tabDiscount Usage History` 
-							WHERE parent = %(parent)s {0}
-						'''.format(condition),{'parent': discount.name, 
-												'start_date': discount.start_date}, as_dict=1)
-
-
+	DiscountUsageHistory = DocType('Discount Usage History')
+	query = (
+	    frappe.qb.from_(DiscountUsageHistory)
+	    .select(
+	        DiscountUsageHistory.order_id,
+	        DiscountUsageHistory.customer
+	    )
+	    .where(
+	        (DiscountUsageHistory.parent == discount.name)
+	    )
+	)
+	if condition:
+	    query = query.where(condition)
+	result = query.run(as_dict=True)
 
 def get_coupon_code(coupon_code, subtotal, customer_id, cart_items,discount_type=None, 
 					shipping_method=None, payment_method=None,total_weight=0,shipping_charges=0):
@@ -480,13 +575,25 @@ def validate_birthday_club(customer_id):
 	if birthday_club_settings:
 		if birthday_club_settings.beneficiary_method == "Discount":
 			customer = frappe.get_doc("Customers",customer_id)
-			members = frappe.db.sql("""SELECT B.email, B.day, B.month, C.name AS `customer_id` 
-										FROM `tabBirthDay Club Member` B
-										INNER JOIN `tabCustomers` C ON C.email = B.email 
-										INNER JOIN `tabHas Role` R ON R.parent=B.email 
-										WHERE R.role='BirthDay Club Member' 
-											AND B.email = %(customer_email)s
-									""", {'customer_email': customer.email}, as_dict=1)
+			BirthDayClubMember = DocType('BirthDay Club Member')
+			Customers = DocType('Customers')
+			HasRole = DocType('Has Role')
+			query = (
+			    frappe.qb.from_(BirthDayClubMember)
+			    .join(Customers, on=Customers.email == BirthDayClubMember.email)
+			    .join(HasRole, on=HasRole.parent == BirthDayClubMember.email)
+			    .select(
+			        BirthDayClubMember.email,
+			        BirthDayClubMember.day,
+			        BirthDayClubMember.month,
+			        Customers.name.as_('customer_id')
+			    )
+			    .where(
+			        (HasRole.role == 'BirthDay Club Member') &
+			        (BirthDayClubMember.email == customer.email)
+			    )
+			)
+			members = query.run(as_dict=True)
 			for x in members:
 				from datetime import datetime
 				birth_day  = getdate(datetime(todays_date.year, month_string_to_number(x.month.lower()), x.day, 00, 00, 00))
@@ -612,29 +719,49 @@ def check_delivery_charge_discount(
 									coupon_code = None
 								):
 	today_date = get_today_date(replace=True)
-	discounts = frappe.db.sql('''SELECT D.* 
-								FROM `tabDiscounts` AS D
-								WHERE (CASE WHEN start_date IS NOT NULL THEN start_date <= %(today)s
-										ELSE 1 = 1 END) 
-									AND (CASE WHEN end_date IS NOT NULL THEN end_date >= %(today)s
-										ELSE 1 = 1 END) 
-									AND D.discount_type = "Assigned to Delivery Charges" 
-									AND requires_coupon_code = 0
-								ORDER BY priority DESC
-							''', {'today': getdate(today_date)}, as_dict=1)
+	Discounts = DocType('Discounts')
+	today = getdate(today_date)
+	query = (
+	    frappe.qb.from_(Discounts)
+	    .select('*')
+	    .where(
+	        (frappe.qb.case()
+	            .when(Discounts.start_date.isnotnull(), Discounts.start_date <= today)
+	            .otherwise(True)
+	        ) &
+	        (frappe.qb.case()
+	            .when(Discounts.end_date.isnotnull(), Discounts.end_date >= today)
+	            .otherwise(True)
+	        ) &
+	        (Discounts.discount_type == "Assigned to Delivery Charges") &
+	        ((Discounts.requires_coupon_code == 0) | (Discounts.requires_coupon_code.isnull()))
+	    )
+	    .orderby(Discounts.priority, order='desc')
+	)
+	discounts = query.run(as_dict=True)
 
 	if is_coupon_code == 1:
-		discounts = frappe.db.sql('''SELECT D.* 
-									FROM `tabDiscounts` AS D
-									WHERE (CASE WHEN start_date IS NOT NULL THEN start_date <= %(today)s
-											ELSE 1 = 1 END) 
-										AND (CASE WHEN end_date IS NOT NULL THEN end_date >= %(today)s
-											ELSE 1 = 1 END) 
-										AND D.discount_type = "Assigned to Delivery Charges" 
-										AND requires_coupon_code = 1 
-										AND coupon_code = %(coupon_code)s
-									ORDER BY priority DESC
-								''', {'today': getdate(today_date),"coupon_code":coupon_code}, as_dict=1)
+		Discounts = DocType('Discounts')
+		today = getdate(today_date)
+		query = (
+		    frappe.qb.from_(Discounts)
+		    .select('*')
+		    .where(
+		        (frappe.qb.case()
+		            .when(Discounts.start_date.isnotnull(), Discounts.start_date <= today)
+		            .otherwise(True)
+		        ) &
+		        (frappe.qb.case()
+		            .when(Discounts.end_date.isnotnull(), Discounts.end_date >= today)
+		            .otherwise(True)
+		        ) &
+		        (Discounts.discount_type == "Assigned to Delivery Charges") &
+		        (Discounts.requires_coupon_code == 1) &
+		        (Discounts.coupon_code == coupon_code)
+		    )
+		    .orderby(Discounts.priority, order='desc')
+		)
+		discounts = query.run(as_dict=True)
 	if discounts:
 		out = check_delivery_charge_discount_(
 												discounts,
@@ -666,11 +793,20 @@ def save_as_template(discount, title):
 
 
 def update_cart():
-	carts = frappe.db.sql_list('''
-				SELECT C.name
-				FROM `tabShopping Cart` C
-				WHERE EXISTS (SELECT I.name FROM `tabCart Items` I WHERE I.parent = C.name)
-			''')
+	ShoppingCart = DocType('Shopping Cart')
+	CartItems = DocType('Cart Items')
+	query = (
+	    frappe.qb.from_(ShoppingCart)
+	    .select(ShoppingCart.name)
+	    .where(
+	        frappe.qb.exists(
+	            frappe.qb.from_(CartItems)
+	            .select(CartItems.name)
+	            .where(CartItems.parent == ShoppingCart.name)
+	        )
+	    )
+	)
+	carts = query.run(as_list=True)
 
 
 	if carts:
@@ -684,11 +820,13 @@ def update_cart():
 def get_products(doctype, txt, searchfield, start, page_len, filters):
 	if txt:
 		condition += ' and (name like "%{txt}%" or item like "%{txt}%")'.format(txt = txt)
-	return frappe.db.sql('''
-				SELECT name, item 
-				FROM `tabProduct` 
-				WHERE status = "Approved"
-			''')
+	Product = DocType('Product')
+	query = (
+	    frappe.qb.from_(Product)
+	    .select(Product.name, Product.item)
+	    .where(Product.status == "Approved")
+	)
+	result = query.run(as_dict=True)
 
 
 def get_query_condition(user):
@@ -724,12 +862,18 @@ def update_customer_wallet(order_info):
 
 
 def check_subtotal_cashback(order_info):
-	check_discounts = frappe.db.sql('''SELECT D.* 
-										FROM `tabDiscounts` D 
-										LEFT JOIN `tabDiscount Usage History` H ON D.name = H.parent 
-										WHERE H.order_id = %(order_id)s 
-											AND D.price_or_product_discount = "Cashback"
-									''', {'order_id': order_info.name}, as_dict=1)
+	Discounts = DocType('Discounts')
+	DiscountUsageHistory = DocType('Discount Usage History')
+	query = (
+	    frappe.qb.from_(Discounts)
+	    .left_join(DiscountUsageHistory, on=Discounts.name == DiscountUsageHistory.parent)
+	    .select(Discounts._all)
+	    .where(
+	        (DiscountUsageHistory.order_id == order_info.name) &
+	        (Discounts.price_or_product_discount == "Cashback")
+	    )
+	)
+	check_discounts = query.run(as_dict=True)
 	if check_discounts:
 		for item in check_discounts:
 			notes = 'Cashback Against Discount: {0}'.format(item.name)
@@ -749,11 +893,16 @@ def check_subtotal_cashback(order_info):
 def check_product_cashback(order_info):
 	for item in order_info.order_item:
 		if item.get('discount'):
-			check_discounts = frappe.db.sql('''SELECT * 
-												FROM `tabDiscounts` 
-												WHERE name = %(order_id)s 
-													AND price_or_product_discount = "Cashback"
-											''', {'order_id': item.get('discount')}, as_dict=1)
+			Discounts = DocType('Discounts')
+			query = (
+			    frappe.qb.from_(Discounts)
+			    .select('*')
+			    .where(
+			        (Discounts.name == item.get('discount')) &
+			        (Discounts.price_or_product_discount == "Cashback")
+			    )
+			)
+			check_discounts = query.run(as_dict=True)
 			if check_discounts:
 				notes = 'Cashback For {0}: {1}'.format(item.order_item_type, item.item)
 				check_wallet = check_wallet_transaction_entry(order_info, notes)
@@ -858,27 +1007,46 @@ def month_string_to_number(string):
 
 def get_product_discount_attr_items(disc,product,attribute_id,out):
 	price = frappe.db.get_value('Product', disc.product,'price')
-	all_attr = frappe.db.sql('''SELECT (IFNULL(O.price_adjustment, 0) + IFNULL(PDT.price, 0)) AS rate, 
-									O.option_value, P.attribute,O.name AS optionid, 
-									P.name AS attributeid, P.parent 
-								FROM `tabProduct Attribute Option` O 
-								LEFT JOIN `tabProduct Attribute Mapping` P ON P.name = O.attribute_id 
-								LEFT JOIN `tabProduct` PDT ON PDT.name = P.parent 
-								WHERE O.parent = %(parent)s
-							''', {'parent': disc.product}, as_dict=1)
+	ProductAttributeOption = DocType('Product Attribute Option')
+	ProductAttributeMapping = DocType('Product Attribute Mapping')
+	Product = DocType('Product')
+	query = (
+	    frappe.qb.from_(ProductAttributeOption)
+	    .left_join(ProductAttributeMapping, on=ProductAttributeMapping.name == ProductAttributeOption.attribute_id)
+	    .left_join(Product, on=Product.name == ProductAttributeMapping.parent)
+	    .select(
+	        (frappe.qb.field('IFNULL(O.price_adjustment, 0)') + frappe.qb.field('IFNULL(PDT.price, 0)')).as_('rate'),
+	        ProductAttributeOption.option_value,
+	        ProductAttributeMapping.attribute,
+	        ProductAttributeOption.name.as_('optionid'),
+	        ProductAttributeMapping.name.as_('attributeid'),
+	        ProductAttributeMapping.parent
+	    )
+	    .where(ProductAttributeOption.parent == disc.product)
+	)
+	all_attr = query.run(as_dict=True)
 	attr_items = json.loads(disc.product_attribute_json)
 	discount_item = {}
 	if len(attr_items)>0:
 		for attr in attr_items:
 			attr_name = attr['name'].split('-')
 			attribute_ids = attr_name[1]
-			options = frappe.db.sql('''SELECT O.price_adjustment, O.option_value, P.attribute 
-										FROM `tabProduct Attribute Option` O 
-										LEFT JOIN `tabProduct Attribute Mapping` P 
-											ON P.name = O.attribute_id 
-										WHERE O.name = %(name)s 
-											AND O.parent = %(parent)s
-									''', {'name': attribute_ids, 'parent': disc.product}, as_dict=1)
+			ProductAttributeOption = DocType('Product Attribute Option')
+			ProductAttributeMapping = DocType('Product Attribute Mapping')
+			query = (
+			    frappe.qb.from_(ProductAttributeOption)
+			    .left_join(ProductAttributeMapping, on=ProductAttributeMapping.name == ProductAttributeOption.attribute_id)
+			    .select(
+			        ProductAttributeOption.price_adjustment,
+			        ProductAttributeOption.option_value,
+			        ProductAttributeMapping.attribute
+			    )
+			    .where(
+			        (ProductAttributeOption.name == attribute_ids) &
+			        (ProductAttributeOption.parent == disc.product)
+			    )
+			)
+			options = query.run(as_dict=True)
 			if options:
 				price = float(price) + float(options[0].price_adjustment)
 			if disc.product==product.name and attribute_ids==attribute_id:
@@ -912,13 +1080,22 @@ def check_attr_items(attr_items, item_info, dis_list,disc):
 		attr_name = attr['name'].split('-')
 		attribute_ids = attr_name[1]
 		html = ''
-		options = frappe.db.sql('''SELECT O.price_adjustment, O.option_value, P.attribute 
-									FROM `tabProduct Attribute Option` O 
-									LEFT JOIN `tabProduct Attribute Mapping` P 
-										ON P.name = O.attribute_id 
-									WHERE O.name = %(name)s 
-										AND O.parent = %(parent)s
-								''', {'name': attribute_ids, 'parent': disc.product}, as_dict=1)
+		ProductAttributeOption = DocType('Product Attribute Option')
+		ProductAttributeMapping = DocType('Product Attribute Mapping')
+		query = (
+		    frappe.qb.from_(ProductAttributeOption)
+		    .left_join(ProductAttributeMapping, on=ProductAttributeMapping.name == ProductAttributeOption.attribute_id)
+		    .select(
+		        ProductAttributeOption.price_adjustment,
+		        ProductAttributeOption.option_value,
+		        ProductAttributeMapping.attribute
+		    )
+		    .where(
+		        (ProductAttributeOption.name == attribute_ids) &
+		        (ProductAttributeOption.parent == disc.product)
+		    )
+		)
+		options = query.run(as_dict=True)
 		if options:
 			html += '<div class="cart-attributes"><span class="attr-title">'+options[0].attribute+ \
 				' </span> : <span>'+options[0].option_value+'</span></div>'
@@ -934,12 +1111,22 @@ def check_not_attr_items(all_attr, item_info, dis_list, disc):
 		min_attr = min(all_attr, key=lambda x: x.rate)
 		if min_attr:
 			html = ''
-			options = frappe.db.sql('''SELECT O.price_adjustment, O.option_value, P.attribute 
-										FROM `tabProduct Attribute Option` O 
-										LEFT JOIN `tabProduct Attribute Mapping` P 
-											ON P.name = O.attribute_id 
-										WHERE O.name = %(name)s AND O.parent = %(parent)s
-									''', {'name': min_attr.optionid, 'parent': disc.product}, as_dict=1)
+			ProductAttributeOption = DocType('Product Attribute Option')
+			ProductAttributeMapping = DocType('Product Attribute Mapping')
+			query = (
+			    frappe.qb.from_(ProductAttributeOption)
+			    .left_join(ProductAttributeMapping, on=ProductAttributeMapping.name == ProductAttributeOption.attribute_id)
+			    .select(
+			        ProductAttributeOption.price_adjustment,
+			        ProductAttributeOption.option_value,
+			        ProductAttributeMapping.attribute
+			    )
+			    .where(
+			        (ProductAttributeOption.name == min_attr.optionid) &
+			        (ProductAttributeOption.parent == disc.product)
+			    )
+			)
+			options = query.run(as_dict=True)
 			if options:
 				html += '<div class="cart-attributes"><span class="attr-title">'+ \
 					options[0].attribute+' </span> : <span>'+options[0].option_value+'</span></div>'
@@ -957,16 +1144,23 @@ def get_product_discount_items(discount,dis_list,out):
 		'free_item': disc.product,
 		'free_qty': disc.qty
 		}
-		all_attr = frappe.db.sql('''SELECT (IFNULL(O.price_adjustment, 0) + IFNULL(PDT.price, 0)) AS rate, 
-										O.option_value,P.attribute,O.name AS optionid,
-										P.name AS attributeid
-									FROM `tabProduct Attribute Option` O
-									LEFT JOIN `tabProduct Attribute Mapping` P 
-										ON P.name = O.attribute_id
-									LEFT JOIN `tabProduct` PDT 
-										ON PDT.name = P.parent
-									WHERE O.parent = %(parent)s
-								''', {'parent': disc.product}, as_dict=1)
+		ProductAttributeOption = DocType('Product Attribute Option')
+		ProductAttributeMapping = DocType('Product Attribute Mapping')
+		Product = DocType('Product')
+		query = (
+		    frappe.qb.from_(ProductAttributeOption)
+		    .left_join(ProductAttributeMapping, on=ProductAttributeMapping.name == ProductAttributeOption.attribute_id)
+		    .left_join(Product, on=Product.name == ProductAttributeMapping.parent)
+		    .select(
+		        (frappe.qb.field('IFNULL(O.price_adjustment, 0)') + frappe.qb.field('IFNULL(PDT.price, 0)')).as_('rate'),
+		        ProductAttributeOption.option_value,
+		        ProductAttributeMapping.attribute,
+		        ProductAttributeOption.name.as_('optionid'),
+		        ProductAttributeMapping.name.as_('attributeid')
+		    )
+		    .where(ProductAttributeOption.parent == disc.product)
+		)
+		all_attr = query.run(as_dict=True)
 
 		attr_items = json.loads(disc.product_attribute_json)
 		if len(attr_items)>0:
@@ -993,12 +1187,22 @@ def get_product_discount_by_product(discount,product,attribute_id,out):
 					}
 		if attribute_id:
 			html = ''
-			options = frappe.db.sql('''SELECT O.price_adjustment, O.option_value, P.attribute 
-										FROM `tabProduct Attribute Option` O 
-										LEFT JOIN `tabProduct Attribute Mapping` P 
-											ON P.name = O.attribute_id 
-										WHERE O.name = %(name)s AND O.parent = %(parent)s
-									''', {'name': attribute_id, 'parent': product.get("name")}, as_dict=1)
+			ProductAttributeOption = DocType('Product Attribute Option')
+			ProductAttributeMapping = DocType('Product Attribute Mapping')
+			query = (
+			    frappe.qb.from_(ProductAttributeOption)
+			    .left_join(ProductAttributeMapping, on=ProductAttributeMapping.name == ProductAttributeOption.attribute_id)
+			    .select(
+			        ProductAttributeOption.price_adjustment,
+			        ProductAttributeOption.option_value,
+			        ProductAttributeMapping.attribute
+			    )
+			    .where(
+			        (ProductAttributeOption.name == attribute_id) &
+			        (ProductAttributeOption.parent == product.get("name"))
+			    )
+			)
+			options = query.run(as_dict=True)
 			if options:
 				html += '<div class="cart-attributes"><span class="attr-title">'+ \
 					options[0].attribute+' </span> : <span>'+options[0].option_value+'</span></div>'
@@ -1010,24 +1214,45 @@ def get_product_discount_by_product(discount,product,attribute_id,out):
 		out['products_list'] = dis_list
 	else:
 		dis_list = []
-		discount.non_free = frappe.db.sql('''SELECT product, product_attribute, qty, product_attribute_json, 
-												discount_type, discount_amount, discount_percentage 
-											FROM `tabDiscount Applied Product` 
-											WHERE parent = %(parent)s 
-												AND (discount_type="Discount Percentage" 
-													OR discount_type="Discount Amount")
-										''', {'parent': discount.name}, as_dict=1)
+		DiscountAppliedProduct = DocType('Discount Applied Product')
+		query = (
+		    frappe.qb.from_(DiscountAppliedProduct)
+		    .select(
+		        DiscountAppliedProduct.product,
+		        DiscountAppliedProduct.product_attribute,
+		        DiscountAppliedProduct.qty,
+		        DiscountAppliedProduct.product_attribute_json,
+		        DiscountAppliedProduct.discount_type,
+		        DiscountAppliedProduct.discount_amount,
+		        DiscountAppliedProduct.discount_percentage
+		    )
+		    .where(
+		        (DiscountAppliedProduct.parent == discount.name) &
+		        (DiscountAppliedProduct.discount_type.isin(["Discount Percentage", "Discount Amount"]))
+		    )
+		)
+		discount.non_free = query.run(as_dict=True)
 		for disc in discount.non_free:
 			if disc.product==product.name:
 				out = get_product_discount_attr_items(disc,product,attribute_id,out)
-		discount.free_items = frappe.db.sql('''SELECT product, product_attribute, qty, 
-													product_attribute_json, discount_type, 
-													discount_amount, discount_percentage 
-												FROM `tabDiscount Applied Product` 
-												WHERE parent = %(parent)s 
-													AND (discount_type!="Discount Percentage" 
-													AND discount_type!="Discount Amount")
-											''', {'parent': discount.name}, as_dict=1)
+		DiscountAppliedProduct = DocType('Discount Applied Product')
+		query = (
+		    frappe.qb.from_(DiscountAppliedProduct)
+		    .select(
+		        DiscountAppliedProduct.product,
+		        DiscountAppliedProduct.product_attribute,
+		        DiscountAppliedProduct.qty,
+		        DiscountAppliedProduct.product_attribute_json,
+		        DiscountAppliedProduct.discount_type,
+		        DiscountAppliedProduct.discount_amount,
+		        DiscountAppliedProduct.discount_percentage
+		    )
+		    .where(
+		        (DiscountAppliedProduct.parent == discount.name) &
+		        (~DiscountAppliedProduct.discount_type.isin(["Discount Percentage", "Discount Amount"]))
+		    )
+		)
+		discount.free_items = query.run(as_dict=True)
 		if discount.free_items and len(discount.free_items) > 0:
 			out = get_product_discount_items(discount,dis_list,out)
 	out['min_qty'] = discount.min_qty
@@ -1170,11 +1395,20 @@ def get_product_discount_requirement(
 	if allowed_discount:
 		req_data = ''
 		if flt(allowed_discount.requirements) == 1:
-			requirement = frappe.db.sql('''SELECT discount_requirement, items_list, min_amount, 
-												max_amount 
-											FROM `tabDiscount Requirements` 
-											WHERE parent = %(PARENT)s
-										''', {'PARENT': allowed_discount.name}, as_dict=1)
+			DiscountRequirements = DocType('Discount Requirements')
+			query = (
+			    frappe.qb.from_(DiscountRequirements)
+			    .select(
+			        DiscountRequirements.discount_requirement,
+			        DiscountRequirements.items_list,
+			        DiscountRequirements.min_amount,
+			        DiscountRequirements.max_amount
+			    )
+			    .where(
+			        DiscountRequirements.parent == allowed_discount.name
+			    )
+			)
+			requirement = query.run(as_dict=True)
 			if requirement and requirement[0].discount_requirement == "Specific Shipping Method":
 				items_list = json.loads(requirement[0].items_list)
 				req_data = ' on {0}'.format(items_list[0].get('item_name'))
@@ -1275,12 +1509,19 @@ def get_coupon_code_by_apply_discount(products_list,apply_discount):
 	for disc in apply_discount:
 		free_qty = int(disc.qty)
 		item_name, price, route= frappe.db.get_value('Product', disc.product, ['item', 'price', 'route'])
-		image = frappe.db.sql('''SELECT IFNULL(mini_cart, '') AS image 
-								FROM `tabProduct Image` 
-								WHERE parent = %(parent)s 
-								ORDER BY is_primary DESC 
-								LIMIT 1
-							''', {'parent': disc.product}, as_dict=1)
+		ProductImage = DocType('Product Image')
+		query = (
+		    frappe.qb.from_(ProductImage)
+		    .select(
+		        frappe.qb.func.ifnull(ProductImage.mini_cart, '').as_('image')
+		    )
+		    .where(
+		        ProductImage.parent == disc.product
+		    )
+		    .order_by(ProductImage.is_primary.desc())
+		    .limit(1)
+		)
+		image = query.run(as_dict=True)
 		if image:
 			image = image[0].image
 		item_info = {
@@ -1300,13 +1541,23 @@ def get_coupon_code_by_apply_discount(products_list,apply_discount):
 				attr_name = attr['name'].split('-')
 				attribute_ids = attr_name[1]
 				html = ''
-				options = frappe.db.sql('''SELECT O.price_adjustment, O.option_value, P.attribute 
-											FROM `tabProduct Attribute Option` O 
-											LEFT JOIN `tabProduct Attribute Mapping` P 
-												ON P.name = O.attribute_id 
-											WHERE O.name = %(name)s 
-												AND O.parent = %(parent)s
-										''', {'name': attribute_ids, 'parent': disc.product}, as_dict=1)
+				ProductAttributeOption = DocType('Product Attribute Option')
+				ProductAttributeMapping = DocType('Product Attribute Mapping')
+				query = (
+				    frappe.qb.from_(ProductAttributeOption)
+				    .left_join(ProductAttributeMapping)
+				    .on(ProductAttributeMapping.name == ProductAttributeOption.attribute_id)
+				    .select(
+				        ProductAttributeOption.price_adjustment,
+				        ProductAttributeOption.option_value,
+				        ProductAttributeMapping.attribute
+				    )
+				    .where(
+				        ProductAttributeOption.name == attribute_ids,
+				        ProductAttributeOption.parent == disc.product
+				    )
+				)
+				options = query.run(as_dict=True)
 
 				if options:
 					html += '<div class="cart-attributes"><span class="attr-title">'+ \
@@ -1327,9 +1578,15 @@ def get_coupon_code_price_or_product_discount(out,discount,cart_items,cartitems,
 	out['min_qty'] = discount.min_qty
 	added_product=[]
 	added_attribute=[]
-	condition_products = frappe.db.sql(f''' SELECT *
-											FROM `tabDiscount Products`
-											WHERE parent = %(parent)s''',{'parent': discount.name}, as_dict=1)
+	DiscountProducts = DocType('Discount Products')
+	query = (
+	    frappe.qb.from_(DiscountProducts)
+	    .select('*')
+	    .where(
+	        DiscountProducts.parent == discount.name
+	    )
+	)
+	condition_products = query.run(as_dict=True)
 	for x in condition_products: 
 		if x.items: added_product.append(x.get('items'))
 		if x.product_attribute_json: 
@@ -1338,14 +1595,25 @@ def get_coupon_code_price_or_product_discount(out,discount,cart_items,cartitems,
 				attr_name = atr['name'].split('-')
 				attribute_ids = attr_name[1]
 				added_attribute.append(attribute_ids)
-	nonfree_product_item = frappe.db.sql('''SELECT product, product_attribute, qty, 
-												product_attribute_json, discount_type, discount_amount,
-												discount_percentage
-											FROM `tabDiscount Applied Product`
-											WHERE parent = %(parent)s 
-												AND (discount_type = "Discount Percentage" 
-												OR discount_type = "Discount Amount")
-										''', {'parent': discount.name}, as_dict=1)
+	DiscountAppliedProduct = DocType('Discount Applied Product')
+	query = (
+	    frappe.qb.from_(DiscountAppliedProduct)
+	    .select(
+	        DiscountAppliedProduct.product,
+	        DiscountAppliedProduct.product_attribute,
+	        DiscountAppliedProduct.qty,
+	        DiscountAppliedProduct.product_attribute_json,
+	        DiscountAppliedProduct.discount_type,
+	        DiscountAppliedProduct.discount_amount,
+	        DiscountAppliedProduct.discount_percentage
+	    )
+	    .where(
+	        DiscountAppliedProduct.parent == discount.name,
+	        (DiscountAppliedProduct.discount_type == 'Discount Percentage') |
+	        (DiscountAppliedProduct.discount_type == 'Discount Amount')
+	    )
+	)
+	nonfree_product_item = query.run(as_dict=True)
 	freeitems =[]
 	for x in nonfree_product_item: 
 		if x.product: freeitems.append(x.product)
@@ -1362,15 +1630,25 @@ def get_coupon_code_price_or_product_discount(out,discount,cart_items,cartitems,
 													)
 	if data:
 		return data
-	apply_discount = frappe.db.sql('''SELECT product, product_attribute, qty, product_attribute_json, 
-											discount_type, discount_amount, discount_percentage 
-										FROM 
-											`tabDiscount Applied Product` 
-										WHERE 
-											parent = %(parent)s 
-											AND (discount_type!="Discount Percentage" 
-											AND discount_type!="Discount Amount")
-									''', {'parent': discount.name}, as_dict=1)
+	DiscountAppliedProduct = DocType('Discount Applied Product')
+	query = (
+	    frappe.qb.from_(DiscountAppliedProduct)
+	    .select(
+	        DiscountAppliedProduct.product,
+	        DiscountAppliedProduct.product_attribute,
+	        DiscountAppliedProduct.qty,
+	        DiscountAppliedProduct.product_attribute_json,
+	        DiscountAppliedProduct.discount_type,
+	        DiscountAppliedProduct.discount_amount,
+	        DiscountAppliedProduct.discount_percentage
+	    )
+	    .where(
+	        DiscountAppliedProduct.parent == discount.name,
+	        (DiscountAppliedProduct.discount_type != 'Discount Percentage') &
+	        (DiscountAppliedProduct.discount_type != 'Discount Amount')
+	    )
+	)
+	apply_discount = query.run(as_dict=True)
 	if apply_discount and len(apply_discount) > 0:
 		products_list = get_coupon_code_by_apply_discount(products_list,apply_discount)
 	out['products_list'] = products_list
@@ -1432,26 +1710,30 @@ def get_coupon_code_by_rule(out,rule, discount_type, subtotal, customer_id, cart
 
 
 def get_coupon_code_from_discount_rule(product_array,coupon_code,today_date):
-	query = f'''SELECT D.* FROM `tabDiscounts` AS D
-				LEFT JOIN `tabDiscount Products` AS DP ON D.name = DP.parent 
-				LEFT JOIN `tabDiscount Applied Product` AS DAP ON D.name = DAP.parent  
-				WHERE (CASE WHEN start_date IS NOT NULL THEN start_date <= "{today}"
-						ELSE 1 = 1 END) 
-					AND (CASE WHEN end_date IS NOT NULL THEN end_date >= "{today}"
-						ELSE 1 = 1 END) 
-					AND (D.discount_type = "Assigned to Sub Total" 
-						OR (CASE WHEN D.discount_type = 'Assigned to Products'
-								THEN DP.items IN ({product_array}) 
-							OR DAP.product IN ({product_array})
-								ELSE 1 = 1 END))
-					AND requires_coupon_code = 1 
-					AND coupon_code = "{coupon_code}"  
-				ORDER BY priority DESC '''.format(
-													product_array = product_array,
-													coupon_code = coupon_code, 
-													today = getdate(today_date)
-												)
-	rule = frappe.db.sql(query, as_dict=1)
+	Discounts = DocType('Discounts')
+	DiscountProducts = DocType('Discount Products')
+	DiscountAppliedProduct = DocType('Discount Applied Product')
+	query = (
+	    frappe.qb.from_(Discounts)
+	    .left_join(DiscountProducts).on(Discounts.name == DiscountProducts.parent)
+	    .left_join(DiscountAppliedProduct).on(Discounts.name == DiscountAppliedProduct.parent)
+	    .select(Discounts)
+	    .where(
+	        (Discounts.start_date <= today_date if Discounts.start_date.isnotnull() else True) &
+	        (Discounts.end_date >= today_date if Discounts.end_date.isnotnull() else True) &
+	        (
+	            (Discounts.discount_type == 'Assigned to Sub Total') |
+	            (
+	                (Discounts.discount_type == 'Assigned to Products') &
+	                (DiscountProducts.items.isin(product_array) | DiscountAppliedProduct.product.isin(product_array))
+	            )
+	        ) &
+	        (Discounts.requires_coupon_code == 1) &
+	        (Discounts.coupon_code == coupon_code)
+	    )
+	    .orderby(Discounts.priority, order="desc")
+	)
+	rule = query.run(as_dict=True)
 	return rule
 
 
@@ -1463,11 +1745,18 @@ def get_free_product_item(free_product_item,products_list):
 		attr_out['min_qty'] = free.qty
 		attr_out['item_name'], attr_out['price'], \
 			attr_out['route'] = frappe.db.get_value('Product', free.product, ['item', 'price', 'route'])
-		image = frappe.db.sql(f'''  SELECT IFNULL(mini_cart, '') AS image
-									FROM `tabProduct Image`
-									WHERE parent = %(parent)s
-									ORDER BY is_primary DESC
-									LIMIT 1 ''', {'parent': free.product}, as_dict=1)
+		ProductImage = DocType('Product Image')
+		image_query = (
+		    frappe.qb.from_(ProductImage)
+		    .select(
+		        fn.coalesce(ProductImage.mini_cart, '')
+		        .as_('image') 
+		    )
+		    .where(ProductImage.parent == out['free_item'])
+		    .order_by(ProductImage.is_primary, sort='desc') 
+		    .limit(1)
+		)
+		image = image_query.run(as_dict=True)
 		if image:
 			attr_out['image'] = image[0].image
 		attr_items = json.loads(free.product_attribute_json)
@@ -1477,12 +1766,22 @@ def get_free_product_item(free_product_item,products_list):
 				attribute_ids = attr_name[1]
 				attr_out['attribute_ids'] = attribute_ids
 				attrhtml = ''
-				options = frappe.db.sql(f'''SELECT O.price_adjustment, O.option_value, P.attribute
-											FROM `tabProduct Attribute Option` O
-											LEFT JOIN 
-		   										`tabProduct Attribute Mapping` P ON P.name = O.attribute_id
-											WHERE O.name = %(name)s AND O.parent = %(parent)s
-										''', {'name': attribute_ids, 'parent': free.product}, as_dict=1)
+				ProductAttributeOption = DocType('Product Attribute Option')
+				ProductAttributeMapping = DocType('Product Attribute Mapping')
+				query = (
+				    frappe.qb.from_(ProductAttributeOption)
+				    .left_join(ProductAttributeMapping).on(ProductAttributeOption.attribute_id == ProductAttributeMapping.name)
+				    .select(
+				        ProductAttributeOption.price_adjustment,
+				        ProductAttributeOption.option_value,
+				        ProductAttributeMapping.attribute
+				    )
+				    .where(
+				        (ProductAttributeOption.name == attribute_ids) &
+				        (ProductAttributeOption.parent == free.product)
+				    )
+				)
+				options = query.run(as_dict=True)
 				if options:
 					attrhtml += '<div class="cart-attributes"><span class="attr-title">'+options[0].attribute+ \
 						' </span> : <span>'+options[0].option_value+'</span></div>'
@@ -1520,17 +1819,23 @@ def get_free_product_item(free_product_item,products_list):
 def get_nonfree_product_item(nonfree_product_item,cart_items,subtotal,out):
 	for nonfree in nonfree_product_item:
 		discount_item = {}
-		all_attr = frappe.db.sql('''SELECT 
-										(IFNULL(O.price_adjustment, 0) + IFNULL(PDT.price, 0)) AS rate, 
-										O.option_value, P.attribute, O.name AS optionid, 
-										P.name AS attributeid
-									FROM `tabProduct Attribute Option` O
-									LEFT JOIN `tabProduct Attribute Mapping` P 
-										ON P.name = O.attribute_id
-									LEFT JOIN `tabProduct` PDT 
-										ON PDT.name = P.parent
-									WHERE O.parent = %(parent)s
-								''', {'parent': nonfree.product}, as_dict=1)
+		ProductAttributeOption = DocType('Product Attribute Option')
+		ProductAttributeMapping = DocType('Product Attribute Mapping')
+		Product = DocType('Product')
+		query = (
+		    frappe.qb.from_(ProductAttributeOption)
+		    .left_join(ProductAttributeMapping).on(ProductAttributeOption.attribute_id == ProductAttributeMapping.name)
+		    .left_join(Product).on(Product.name == ProductAttributeMapping.parent)
+		    .select(
+		        (frappe.qb.fn.IFNULL(ProductAttributeOption.price_adjustment, 0) + frappe.qb.fn.IFNULL(Product.price, 0)).as_("rate"),
+		        ProductAttributeOption.option_value,
+		        ProductAttributeMapping.attribute,
+		        ProductAttributeOption.name.as_("optionid"),
+		        ProductAttributeMapping.name.as_("attributeid")
+		    )
+		    .where(ProductAttributeOption.parent == nonfree.product)
+		)
+		all_attr = query.run(as_dict=True)
 		attr_items = json.loads(nonfree.product_attribute_json)
 		if len(attr_items)>0:
 			allow = False
@@ -1573,18 +1878,31 @@ def get_nonfree_product_item(nonfree_product_item,cart_items,subtotal,out):
 
 
 def get_price_or_price_product_discount(cart_items,subtotal,discount):
-	nonfree_product_item= frappe.db.sql(f'''SELECT *
-											FROM `tabDiscount Applied Product`
-											WHERE parent = %(parent)s 
-												AND (discount_type = "Discount Percentage" 
-												OR discount_type = "Discount Amount")
-										''', {'parent': discount.name}, as_dict=1)
-	free_product_item = frappe.db.sql(f'''  SELECT *
-											FROM `tabDiscount Applied Product`
-											WHERE parent = %(parent)s 
-												AND (discount_type != "Discount Percentage" 
-												AND discount_type != "Discount Amount")
-										''', {'parent': discount.name}, as_dict=1)
+	DiscountAppliedProduct = DocType('Discount Applied Product')
+	nonfree_product_item_query = (
+	    frappe.qb.from_(DiscountAppliedProduct)
+	    .select('*')
+	    .where(
+	        (DiscountAppliedProduct.parent == discount.name) &
+	        (
+	            (DiscountAppliedProduct.discount_type == "Discount Percentage") |
+	            (DiscountAppliedProduct.discount_type == "Discount Amount")
+	        )
+	    )
+	)
+	nonfree_product_item = nonfree_product_item_query.run(as_dict=True)
+	free_product_item_query = (
+	    frappe.qb.from_(DiscountAppliedProduct)
+	    .select('*')
+	    .where(
+	        (DiscountAppliedProduct.parent == discount.name) &
+	        (
+	            (DiscountAppliedProduct.discount_type != "Discount Percentage") &
+	            (DiscountAppliedProduct.discount_type != "Discount Amount")
+	        )
+	    )
+	)
+	free_product_item = free_product_item_query.run(as_dict=True)
 	free_items = []
 	cart = frappe.db.exists("Shopping Cart", cart_items[0].parent)
 	if not cart:
@@ -1650,12 +1968,16 @@ def get_product_dixcount_rule_(rule,product):
 		if discount.discount_type == "Assigned to Categories" \
 					and discount.price_or_product_discount == "Price":
 			categories = get_product_categories(product.name)
-			discount_categories = frappe.db.sql(f'''SELECT discount_value
-													FROM `tabDiscount Categories`
-													WHERE category IN %(category)s 
-														AND parent = %(parent)s
-												''', {'category': categories, 'parent': discount.name},
-													as_dict=1)
+			DiscountCategories = DocType('Discount Categories')
+			discount_categories_query = (
+			    frappe.qb.from_(DiscountCategories)
+			    .select(DiscountCategories.discount_value)
+			    .where(
+			        (DiscountCategories.category.isin(categories)) &
+			        (DiscountCategories.parent == discount.name)
+			    )
+			)
+			discount_categories = discount_categories_query.run(as_dict=True)
 			if discount_categories:
 				for x in discount_categories:
 					if x.discount_value:
@@ -1673,11 +1995,15 @@ def	get_ordersubtotal_discount_forfree_product_item(free_product_item,products_l
 	for disc in free_product_item:
 		free_qty = int(disc.qty)
 		item_name, price, route = frappe.db.get_value('Product', disc.product, ['item', 'price', 'route'])
-		image = frappe.db.sql(f'''	SELECT IFNULL(mini_cart, '') AS image
-									FROM `tabProduct Image`
-									WHERE parent = %(parent)s
-									ORDER BY is_primary DESC
-									LIMIT 1 ''', {'parent': disc.product}, as_dict=1)
+		ProductImage = DocType('Product Image')
+		image_query = (
+		    frappe.qb.from_(ProductImage)
+		    .select(Field('mini_cart').ifnull('').as_('image'))
+		    .where(ProductImage.parent == disc.product)
+		    .order_by(ProductImage.is_primary, desc=True)
+		    .limit(1)
+		)
+		image = image_query.run(as_dict=True)
 		if image:
 			image = image[0].image
 		item_info = {
@@ -1697,12 +2023,23 @@ def	get_ordersubtotal_discount_forfree_product_item(free_product_item,products_l
 				attr_name = attr['name'].split('-')
 				attribute_ids = attr_name[1]
 				html = ''
-				options = frappe.db.sql(f'''SELECT O.price_adjustment, O.option_value, P.attribute
-											FROM `tabProduct Attribute Option` O
-											LEFT JOIN `tabProduct Attribute Mapping` P 
-												ON P.name = O.attribute_id
-											WHERE O.name = %(name)s AND O.parent = %(parent)s
-										''', {'name': attribute_ids, 'parent': disc.product}, as_dict=1)
+				ProductAttributeOption = DocType('Product Attribute Option')
+				ProductAttributeMapping = DocType('Product Attribute Mapping')
+				options_query = (
+				    frappe.qb.from_(ProductAttributeOption)
+				    .left_join(ProductAttributeMapping)
+				    .on(ProductAttributeMapping.name == ProductAttributeOption.attribute_id)
+				    .select(
+				        ProductAttributeOption.price_adjustment,
+				        ProductAttributeOption.option_value,
+				        ProductAttributeMapping.attribute
+				    )
+				    .where(
+				        ProductAttributeOption.name == attribute_ids,
+				        ProductAttributeOption.parent == disc.product
+				    )
+				)
+				options = options_query.run(as_dict=True)
 				if options:
 					html += '<div class="cart-attributes"><span class="attr-title">'+ \
 						options[0].attribute+' </span> : <span>'+options[0].option_value+'</span></div>'
@@ -1994,11 +2331,17 @@ def calculate_discount_out(discount,rate,out,product,attribute_id,attribute_desc
 				out['free_qty'] = int(discount.free_qty) * int(val)
 			out['item_name'], out['price'], out['route'] =	frappe.db.get_value('Product', 
 															out['free_item'],['item', 'price', 'route'])
-			image = frappe.db.sql(f'''  SELECT IFNULL(mini_cart, '') AS image 
-										FROM `tabProduct Image` 
-										WHERE parent = %(parent)s 
-										ORDER BY is_primary DESC 
-										LIMIT 1 ''', {'parent': out['free_item']}, as_dict=1)
+			ProductImage = DocType('Product Image')
+			image_query = (
+			    frappe.qb.from_(ProductImage)
+			    .select(
+			        frappe.qb.func.coalesce(ProductImage.mini_cart, '')
+			    )
+			    .where(ProductImage.parent == out['free_item'])
+			    .order_by(ProductImage.is_primary, sort='desc') 
+			    .limit(1)
+			)
+			image = image_query.run(as_dict=True)
 			if image:
 				out['image'] = image[0].image
 	elif discount.discount_type == 'Assigned to Sub Total' \
@@ -2019,11 +2362,17 @@ def calculate_discount_out(discount,rate,out,product,attribute_id,attribute_desc
 																					'price', 
 																					'route'
 																				])
-			image = frappe.db.sql(f'''	SELECT IFNULL(mini_cart, '') AS image 
-										FROM `tabProduct Image` 
-										WHERE parent = %(parent)s 
-										ORDER BY is_primary DESC 
-										LIMIT 1 ''', {'parent': out['free_item']}, as_dict=1)
+			ProductImage = DocType('Product Image')
+			image_query = (
+			    frappe.qb.from_(ProductImage)
+			    .select(
+			        fn.coalesce(ProductImage.mini_cart, '').as_('image')
+			    )
+			    .where(ProductImage.parent == out['free_item'])
+			    .order_by(ProductImage.is_primary, sort='desc')
+			    .limit(1)
+			)
+			image = image_query.run(as_dict=True)
 			if image:
 				out['image'] = image[0].image
 	elif discount.price_or_product_discount == 'Cashback':
@@ -2041,20 +2390,38 @@ def calculate_apply_discount(apply_discount,qty,discount,products_list):
 		if val > 0:
 			free_qty = int(disc.qty) * int(val)
 		item_name, price, route= frappe.db.get_value('Product', disc.product, ['item', 'price', 'route'])
-		image = frappe.db.sql(f'''	SELECT IFNULL(mini_cart, '') AS image 
-									FROM `tabProduct Image` 
-									WHERE parent=%(parent)s 
-									ORDER BY is_primary DESC 
-									LIMIT 1 ''', {'parent': disc.product}, as_dict=1)
+		ProductImage = DocType('Product Image')
+		image_query = (
+		    frappe.qb.from_(ProductImage)
+		    .select(
+		        fn.coalesce(ProductImage.mini_cart, '').as_('image')
+		    )
+		    .where(ProductImage.parent == disc.product)
+		    .order_by(ProductImage.is_primary, sort='desc')
+		    .limit(1)
+		)
+
+		image = image_query.run(as_dict=True)
 		if image:
 			image = image[0].image
 		html = ''
-		options = frappe.db.sql(f'''SELECT O.price_adjustment, O.option_value, P.attribute 
-									FROM `tabProduct Attribute Option` AS O 
-									LEFT JOIN `tabProduct Attribute Mapping` AS P 
-									ON P.name = O.attribute_id 
-									WHERE O.name=%(name)s AND O.parent=%(parent)s
-								''', {'name': disc.product_attribute, 'parent': disc.product}, as_dict=1)
+		ProductAttributeOption = DocType('Product Attribute Option')
+		ProductAttributeMapping = DocType('Product Attribute Mapping')
+		options_query = (
+		    frappe.qb.from_(ProductAttributeOption)
+		    .left_join(ProductAttributeMapping)
+		    .on(ProductAttributeMapping.name == ProductAttributeOption.attribute_id)
+		    .select(
+		        ProductAttributeOption.price_adjustment,
+		        ProductAttributeOption.option_value,
+		        ProductAttributeMapping.attribute
+		    )
+		    .where(
+		        ProductAttributeOption.name == disc.product_attribute,
+		        ProductAttributeOption.parent == disc.product
+		    )
+		)
+		options = options_query.run(as_dict=True)
 		if options:
 			html += '<div class="cart-attributes"><span class="attr-title">'+ \
 				options[0].attribute+' </span> : <span>'+options[0].option_value+'</span></div>'
@@ -2076,12 +2443,23 @@ def calculate_apply_discount(apply_discount,qty,discount,products_list):
 				attr_name = attr['name'].split('-')
 				attribute_ids = attr_name[1]
 				html = ''
-				options = frappe.db.sql(f'''SELECT O.price_adjustment, O.option_value, P.attribute
-											FROM `tabProduct Attribute Option` O
-											LEFT JOIN 
-												`tabProduct Attribute Mapping` P ON P.name = O.attribute_id
-											WHERE O.name = %(name)s AND O.parent = %(parent)s
-										''', {'name': attribute_ids, 'parent': disc.product}, as_dict=1)
+				ProductAttributeOption = DocType('Product Attribute Option')
+				ProductAttributeMapping = DocType('Product Attribute Mapping')
+				options_query = (
+				    frappe.qb.from_(ProductAttributeOption)
+				    .left_join(ProductAttributeMapping)
+				    .on(ProductAttributeMapping.name == ProductAttributeOption.attribute_id)
+				    .select(
+				        ProductAttributeOption.price_adjustment,
+				        ProductAttributeOption.option_value,
+				        ProductAttributeMapping.attribute
+				    )
+				    .where(
+				        ProductAttributeOption.name == attribute_ids,
+				        ProductAttributeOption.parent == disc.product
+				    )
+				)
+				options = options_query.run(as_dict=True)
 				if options:
 					html += '<div class="cart-attributes"><span class="attr-title">'+ \
 						options[0].attribute+' </span> : <span>'+options[0].option_value+'</span></div>'
@@ -2108,16 +2486,25 @@ def calculate_discount_out_(discount,out,qty,products_list):
 					'type': 'Product'}
 		products_list.append(item_info)
 	else:
-		apply_discount = frappe.db.sql(f''' SELECT product, product_attribute, qty, 
-												product_attribute_json, 
-												discount_type, discount_amount, discount_percentage 
-											FROM 
-												`tabDiscount Applied Product` 
-											WHERE 
-												parent = %(parent)s 
-													AND (discount_type!="Discount Percentage" 
-													AND discount_type!="Discount Amount")
-										''', {'parent': discount.name}, as_dict=1)
+		DiscountAppliedProduct = DocType('Discount Applied Product')
+		apply_discount_query = (
+		    frappe.qb.from_(DiscountAppliedProduct)
+		    .select(
+		        DiscountAppliedProduct.product,
+		        DiscountAppliedProduct.product_attribute,
+		        DiscountAppliedProduct.qty,
+		        DiscountAppliedProduct.product_attribute_json,
+		        DiscountAppliedProduct.discount_type,
+		        DiscountAppliedProduct.discount_amount,
+		        DiscountAppliedProduct.discount_percentage
+		    )
+		    .where(
+		        DiscountAppliedProduct.parent == discount.name,
+		        (DiscountAppliedProduct.discount_type != "Discount Percentage") & 
+		        (DiscountAppliedProduct.discount_type != "Discount Amount")
+		    )
+		)
+		apply_discount = apply_discount_query.run(as_dict=True)
 		if apply_discount and len(apply_discount) > 0:
 			data = calculate_apply_discount(apply_discount,qty,discount,products_list)
 			if data:
@@ -2147,14 +2534,23 @@ def get_coupon_code_price_or_product_discount_(nonfree_product_item,added_produc
 				if attribute_ids in cartattrubutes:
 					attr_allows = True
 					attr = attribute_ids
-					options = frappe.db.sql('''SELECT O.price_adjustment, O.option_value, P.attribute
-												FROM `tabProduct Attribute Option` O
-												LEFT JOIN `tabProduct Attribute Mapping` P 
-													ON P.name = O.attribute_id
-												WHERE O.name = %(name)s 
-													AND O.parent = %(parent)s
-											''', {'name': attribute_ids, 'parent': disc.product}, 
-												as_dict=1)
+					ProductAttributeOption = DocType('Product Attribute Option')
+					ProductAttributeMapping = DocType('Product Attribute Mapping')
+					options_query = (
+					    frappe.qb.from_(ProductAttributeOption)
+					    .left_join(ProductAttributeMapping)
+					    .on(ProductAttributeMapping.name == ProductAttributeOption.attribute_id)
+					    .select(
+					        ProductAttributeOption.price_adjustment,
+					        ProductAttributeOption.option_value,
+					        ProductAttributeMapping.attribute
+					    )
+					    .where(
+					        ProductAttributeOption.name == attribute_ids,
+					        ProductAttributeOption.parent == disc.product
+					    )
+					)
+					options = options_query.run(as_dict=True)
 					if options:
 						price = float(price) + float(options[0].price_adjustment)
 		else:
@@ -2190,13 +2586,24 @@ def get_coupon_code_price_or_product_discount_(nonfree_product_item,added_produc
 
 
 def get_coupan_code_query(disc):
-    return frappe.db.sql('''SELECT (IFNULL(O.price_adjustment, 0) + IFNULL(PDT.price, 0)) AS rate,
-								O.option_value, P.attribute, O.name AS optionid, 
-								P.name AS attributeid, P.parent
-							FROM `tabProduct Attribute Option` O
-							LEFT JOIN `tabProduct Attribute Mapping` P 
-								ON P.name = O.attribute_id
-							LEFT JOIN `tabProduct` PDT 
-								ON PDT.name = P.parent
-							WHERE O.parent = %(parent)s
-						''', {'parent': disc.product}, as_dict = 1)
+    ProductAttributeOption = DocType('Product Attribute Option')
+	ProductAttributeMapping = DocType('Product Attribute Mapping')
+	Product = DocType('Product')
+	result_query = (
+	    frappe.qb.from_(ProductAttributeOption)
+	    .left_join(ProductAttributeMapping)
+	    .on(ProductAttributeMapping.name == ProductAttributeOption.attribute_id)
+	    .left_join(Product)
+	    .on(Product.name == ProductAttributeMapping.parent)
+	    .select(
+	        (frappe.qb.functions.IFNULL(ProductAttributeOption.price_adjustment, 0) +
+	         frappe.qb.functions.IFNULL(Product.price, 0)).as_("rate"),
+	        ProductAttributeOption.option_value,
+	        ProductAttributeMapping.attribute,
+	        ProductAttributeOption.name.as_("optionid"),
+	        ProductAttributeMapping.name.as_("attributeid"),
+	        ProductAttributeMapping.parent
+	    )
+	    .where(ProductAttributeOption.parent == disc.product)
+	)
+	result = result_query.run(as_dict=True)

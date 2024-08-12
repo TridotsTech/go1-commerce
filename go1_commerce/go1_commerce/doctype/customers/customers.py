@@ -10,7 +10,7 @@ from frappe.utils.password import update_password as _update_password
 from frappe.model.naming import make_autoname
 from frappe.utils.nestedset import NestedSet
 from go1_commerce.utils.setup import get_settings, get_settings_value
-
+from frappe.query_builder import DocType,Criterion, Order
 
 class Customers(NestedSet):
 	nsm_parent_field = 'parent_level'
@@ -112,9 +112,12 @@ class Customers(NestedSet):
 		if not self.user_id:
 			if self.email:
 				email = self.email
-				d = frappe.db.sql("""SELECT name 
-									FROM `tabUser` 
-         							WHERE email=%(email)s""",{'email':email})
+				User = DocType('User')
+				d = (
+				    frappe.qb.from_(User)
+				    .select(User.name)
+				    .where(User.email == email)
+				).run(as_dict=False)
 				if not d:					
 					user = insert_user(self)
 					if user:
@@ -459,15 +462,23 @@ def update_guest_customer_data(customer_id, first_name, email, phone, address_da
 def delete_guest_customers():
 	from frappe.utils import add_days, getdate, nowdate
 	check_date = add_days(getdate(nowdate()), 7)
-	customers_list = frappe.db.sql( """	SELECT name 
-										FROM `tabCustomers` 
-										WHERE NOT EXISTS (
-											SELECT name 
-											FROM `tabOrder` 
-											WHERE customer = `tabCustomers`.name) 
-										AND naming_series = "GC-" 
-										AND creation < %(date)s
-									""", {'date': check_date}, as_dict=1)
+	Customers = DocType('Customers')
+	Order = DocType('Order')
+	subquery = (
+	    frappe.qb.from_(Order)
+	    .select(Order.name)
+	    .where(Order.customer == Customers.name)
+	)
+	query = (
+	    frappe.qb.from_(Customers)
+	    .select(Customers.name)
+	    .where(
+	        Criterion.exists(subquery) &  
+	        (Customers.naming_series == "GC-") & 
+	        (Customers.creation < check_date)
+	    )
+	)
+	customers_list = query.run(as_dict=True)
 	if customers_list:
 		for item in customers_list:
 			deviceid = frappe.db.get_value('App Alert Device', {"document":"Customers", "user":item.name})
@@ -544,20 +555,28 @@ def update_custom_preference_check(order_info,customer_info,item):
 	elif item.reference_document == 'Product Category':
 		item_names = ','.join(['"' + x.item + '"' for x in order_info.order_item])
 		if order_info.order_item[0].order_item_type == 'Product':
-			category_list = frappe.db.sql(	""" SELECT DISTINCT category 
-												FROM `tabProduct Category Mapping` 
-												WHERE parent IN ({0})
-											""".format(item_names), as_dict=1)
+			ProductCategoryMapping = DocType('Product Category Mapping')
+			query = (
+			    frappe.qb.from_(ProductCategoryMapping)
+			    .select(ProductCategoryMapping.category)
+			    .distinct()
+			    .where(ProductCategoryMapping.parent.isin(item_names))
+			)
+			category_list = query.run(as_dict=True)
 			if category_list:
 				for cat in category_list:
 					check_preference('Product Category', cat.category, 'Order', customer_info)
 	elif item.reference_document == 'Product Brand':
 		item_names = ','.join(['"' + x.item + '"' for x in order_info.order_item])
 		if order_info.order_item[0].order_item_type == 'Product':
-			brand_list = frappe.db.sql(	""" SELECT DISTINCT band 
-											FROM `tabProduct Brand Mapping` 
-											WHERE parent IN ({0})
-										""".format(item_names), as_dict=1)
+			ProductBrandMapping = DocType('Product Brand Mapping')
+			query = (
+			    frappe.qb.from_(ProductBrandMapping)
+			    .select(ProductBrandMapping.band)
+			    .distinct()
+			    .where(ProductBrandMapping.parent.isin(item_names))
+			)
+			brand_list = query.run(as_dict=True)
 			if brand_list:
 				for br in brand_list:
 					check_preference('Product Brand', br.brand, 'Order', customer_info)
@@ -570,20 +589,27 @@ def update_customer_preference_from_order(order_id):
 		for item in settings.preferences:
 			update_custom_preference_check(order_info,customer_info,item)
 		for item in settings.preferences:
-			check_records = frappe.db.sql( 	"""	SELECT name, modified 
-												FROM `tabCustomer Preference` 
-												WHERE parent = %(parent)s 
-												AND reference_doctype = %(doctype)s 
-												AND preference_type = %(pre_type)s 
-												ORDER BY modified DESC
-											""", {'pre_type': item.based_on, 'doctype': item.reference_document, 
-												'parent': customer_info.name}, as_dict=1)
+			CustomerPreference = DocType('Customer Preference')
+			query = (
+			    frappe.qb.from_(CustomerPreference)
+			    .select(CustomerPreference.name, CustomerPreference.modified)
+			    .where(
+			        (CustomerPreference.parent == customer_info.name) &
+			        (CustomerPreference.reference_doctype == item.reference_document) &
+			        (CustomerPreference.preference_type == item.based_on)
+			    )
+			    .orderby(CustomerPreference.modified, order=Order.desc)
+			)
+			check_records = query.run(as_dict=True)
 
 			if len(check_records) > int(item.no_of_records):
 				delete_list = check_records[int(item.no_of_records):]
-				frappe.db.sql(	""" DELETE FROM `tabCustomer Preference` 
-									WHERE name IN ({0})
-								""".format(','.join(['"' + x.name + '"' for x in delete_list])))
+				CustomerPreference = DocType('Customer Preference')
+				names_to_delete = [x.name for x in delete_list]
+				frappe.qb.from_(CustomerPreference)
+				    .delete()
+				    .where(CustomerPreference.name.isin(names_to_delete))
+				    .run()
 			
 
 def check_preference(reference_doctype, reference_name, preference_type, customer_info):
@@ -650,24 +676,33 @@ def make_customers_dashboard(name):
 
 def get_order_count(name):
 	dt = 'Order'
-	today_order_list = frappe.db.sql("""SELECT name
-										FROM `tab{dt}`  
-										WHERE customer = %(name)s 
-										AND DATE(`creation`) = CURDATE() 
-										AND naming_series != "SUB-ORD-" 
-									""".format(dt=dt), {'name': name}, as_dict=1)
-	all_order_list = frappe.db.sql("""	SELECT name 
-										FROM `tab{dt}` s 
-										WHERE s.customer = %(name)s 
-										AND naming_series != "SUB-ORD-" 
-									""".format(dt=dt), {'name': name}, as_dict=1)
+	Doc = DocType(dt)
+	today_order_list = (
+	    frappe.qb.from_(Doc)
+	    .select(Doc.name)
+	    .where(
+	        (Doc.customer == name) &
+	        (Doc.creation.date() == frappe.utils.nowdate()) &
+	        (Doc.naming_series != "SUB-ORD-")
+	    )
+	).run(as_dict=True)
+	all_order_list = (
+	    frappe.qb.from_(Doc)
+	    .select(Doc.name)
+	    .where(
+	        (Doc.customer == name) &
+	        (Doc.naming_series != "SUB-ORD-")
+	    )
+	).run(as_dict=True)
 	source=None
 	wallet = frappe.get_single("Wallet Settings")
 	if wallet.enable_customer_wallet==1:
-		source = frappe.db.sql("""	SELECT name, user_type, current_wallet_amount, total_wallet_amount 
-									FROM `tabWallet` 
-									WHERE user = %(user)s
-								""", {'user': name}, as_dict=1)
+		Wallet = DocType('Wallet')
+		source = (
+		    frappe.qb.from_(Wallet)
+		    .select(Wallet.name, Wallet.user_type, Wallet.current_wallet_amount, Wallet.total_wallet_amount)
+		    .where(Wallet.user == name)
+		).run(as_dict=True)
 		if source:
 			source = source
 	today_orders_count = len(today_order_list)
@@ -678,14 +713,26 @@ def get_order_count(name):
 def get_customer_orders(customer_id):
 	condition = ''
 	dt = 'Order'
-	order_detail=frappe.db.sql("""	SELECT name, total_amount, payment_method_name, 
-										payment_status, order_date, status 
-									FROM `tab{dt}` 
-									WHERE customer = %(customer_id)s 
-									AND naming_series != "SUB-ORD-" {cond} 
-									ORDER BY creation 
-									LIMIT 10
-								""".format(dt=dt, cond=condition), {'customer_id': customer_id}, as_dict=1)
+	OrderDoc = DocType(dt)
+	query = (
+	    frappe.qb.from_(OrderDoc)
+	    .select(
+	        OrderDoc.name,
+	        OrderDoc.total_amount,
+	        OrderDoc.payment_method_name,
+	        OrderDoc.payment_status,
+	        OrderDoc.order_date,
+	        OrderDoc.status
+	    )
+	    .where(
+	        (OrderDoc.customer == customer_id) &
+	        (OrderDoc.naming_series != "SUB-ORD-") &
+	        (frappe.qb.custom_condition(condition))
+	    )
+	    .orderby(OrderDoc.creation)
+	    .limit(10)
+	)
+	order_detail = query.run(as_dict=True)
 	catalog_settings = get_settings('Catalog Settings')
 	currency=frappe.db.get_all('Currency',fields=["*"], 
 							filters={"name":catalog_settings.default_currency},limit_page_length=1)
@@ -730,9 +777,19 @@ def impersonate_customer_logout(user):
 	return "success"
 
 def get_sales_executives(route):
-	return frappe.db.sql("""SELECT group_concat(SE.se_name) AS names 
-							FROM `tabRoute SE` SE 
-							INNER JOIN `tabRoute` R ON R.name = SE.parent 
-							WHERE R.name = %(route)s 
-								AND SE.status = 'Active'
-						""", {"route": route}, as_dict = 1)
+	Route = DocType('Route')
+	RouteSE = DocType('Route SE')
+	query = (
+	    frappe.qb.from_(RouteSE)
+	    .inner_join(Route).on(Route.name == RouteSE.parent)
+	    .select(RouteSE.se_name)
+	    .where(
+	        (Route.name == route) &
+	        (RouteSE.status == 'Active')
+	    )
+	)
+
+	results = query.run(as_dict=True)
+	names = ','.join([row['se_name'] for row in results])
+
+	return {'names': names}

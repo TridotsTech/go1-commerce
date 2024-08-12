@@ -9,6 +9,7 @@ from frappe import _
 from frappe.utils import getdate, nowdate, add_days
 from frappe.model.document import Document
 from go1_commerce.utils.setup import get_settings
+from frappe.query_builder import DocType
 
 
 class BirthDayClubSetting(Document):
@@ -29,9 +30,12 @@ class BirthDayClubSetting(Document):
 
 
 def update_birthday_club_discount(self):
-	frappe.db.sql( """ 	DELETE FROM `tabDiscount Requirements` 
-						WHERE parent = %(discount_id)s""",
-							{"discount_id":self.discount_id})
+	
+	DiscountRequirements = DocType('Discount Requirements')
+	frappe.qb.from_(DiscountRequirements)
+	    .delete()
+	    .where(DiscountRequirements.parent == self.discount_id)
+	    .run()
 	frappe.db.commit()
 	frappe.get_doc({
 				'doctype': 'Discount Requirements',
@@ -108,13 +112,24 @@ def update_birthday_club_wallet():
 	birthday_club_settings = get_settings('BirthDay Club Setting')
 	if birthday_club_settings:
 		if birthday_club_settings.beneficiary_method == "Wallet":
-			members = frappe.db.sql(""" SELECT B.name,B.email,B.day,B.month,
-						   					B.is_email_sent,C.name AS `customer_id` 
-						   				FROM `tabBirthDay Club Member` B
-										INNER JOIN `tabCustomers` C ON C.email = B.email 
-										INNER JOIN `tabHas Role` R ON R.parent = B.email 
-						   				WHERE R.role = 'BirthDay Club Member' 
-						   			""",as_dict=1)
+			BirthDayClubMember = DocType('BirthDay Club Member')
+			Customers = DocType('Customers')
+			HasRole = DocType('Has Role')
+			query = (
+			    frappe.qb.from_(BirthDayClubMember)
+			    .inner_join(Customers).on(Customers.email == BirthDayClubMember.email)
+			    .inner_join(HasRole).on(HasRole.parent == BirthDayClubMember.email)
+			    .select(
+			        BirthDayClubMember.name,
+			        BirthDayClubMember.email,
+			        BirthDayClubMember.day,
+			        BirthDayClubMember.month,
+			        BirthDayClubMember.is_email_sent,
+			        Customers.name.as_('customer_id')
+			    )
+			    .where(HasRole.role == 'BirthDay Club Member')
+			)
+			members = query.run(as_dict=True)
 			for x in members:
 				from datetime import datetime
 				birth_day  = getdate(datetime(todays_date.year, 

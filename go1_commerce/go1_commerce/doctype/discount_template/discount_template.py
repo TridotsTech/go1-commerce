@@ -6,13 +6,18 @@ from __future__ import unicode_literals
 import frappe
 from frappe.utils import getdate
 from frappe.model.document import Document
+from frappe.query_builder import DocType
 
 class DiscountTemplate(Document):
 	pass
 
 def get_all_templates():
-	return frappe.db.sql('''SELECT name, name1, image 
-							FROM `tabDiscount Template`''', as_dict=1)
+	DiscountTemplate = DocType('Discount Template')
+	query = (
+	    frappe.qb.from_(DiscountTemplate)
+	    .select(DiscountTemplate.name, DiscountTemplate.name1, DiscountTemplate.image)
+	)
+	result = query.run(as_dict=True)
 
 def create_discount(template):
 	from frappe.model.mapper import get_mapped_doc

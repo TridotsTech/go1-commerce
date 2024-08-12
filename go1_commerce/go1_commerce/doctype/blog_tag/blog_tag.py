@@ -7,7 +7,7 @@ from __future__ import unicode_literals
 import frappe
 from frappe.website.website_generator import WebsiteGenerator
 from frappe.website.utils import clear_cache
-
+from frappe.query_builder import DocType, Order
 
 class BlogTag(WebsiteGenerator):
 	def autoname(self):
@@ -33,8 +33,13 @@ class BlogTag(WebsiteGenerator):
 		tag_item = frappe.db.get_all('Blog Tag Item',fields=['*'],filters={'blog_tag':self.name})
 		if tag_item:
 			for item in tag_item:
-				blog_tag = frappe.db.sql('''select * from `tabBlog Post` where name=%(name)s''',
-							 					{'name':item.parent},as_dict=1)
+				BlogPost = DocType('Blog Post')
+				blog_tag = (
+				    frappe.qb.from_(BlogPost)
+				    .select('*')
+				    .where(BlogPost.name == item.parent)
+				    .run(as_dict=True)
+				)
 			blog_tag1 = blog_tag
 		context.BlogList=blog_tag1
 		BlogCateogories=frappe.db.get_all('Blog Category',fields=['*'], filters={'published':1})
@@ -43,15 +48,22 @@ class BlogTag(WebsiteGenerator):
 
 def get_tag_based_blog_list(tag = None, page_no = 1, page_size = 12):
 	start = (int(page_no) - 1) * int(page_size)
-	data = frappe.db.sql(f"""SELECT B.* 
-							FROM `tabBlog Post` B 
-							LEFT JOIN `tabBlog Tag Item` C ON C.parent = B.name 
-							WHERE B.published = 1 
-								AND C.parenttype = "Blog Post" 
-								AND C.parentfield = "blog_tag" 
-								AND C.blog_tag = '{tag}' 
-							GROUP BY B.name 
-							ORDER BY B.published_on DESC 
-							LIMIT {start}, {page_size}
-						""")
+	BlogPost = DocType('Blog Post')
+	BlogTagItem = DocType('Blog Tag Item')
+	query = (
+	    frappe.qb.from_(BlogPost)
+	    .left_join(BlogTagItem).on(BlogTagItem.parent == BlogPost.name)
+	    .select(BlogPost.star)
+	    .where(
+	        (BlogPost.published == 1) &
+	        (BlogTagItem.parenttype == "Blog Post") &
+	        (BlogTagItem.parentfield == "blog_tag") &
+	        (BlogTagItem.blog_tag == tag)
+	    )
+	    .groupby(BlogPost.name)
+	    .orderby(BlogPost.published_on, order=Order.desc)
+	    .limit(page_size)
+	    .offset(start)
+	)
+	data = query.run(as_dict=True)
 	return data
