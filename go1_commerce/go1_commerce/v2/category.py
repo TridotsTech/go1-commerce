@@ -419,7 +419,6 @@ def get_category_brands_filter(product_ids):
 		return frappe.db.sql(query,as_dict=1)
 	return []
 
-Copy code
 def get_category_brands_filter(product_ids):
 	
 	product_names = [x['product'] for x in product_ids]

@@ -19,56 +19,32 @@ except Exception as e:
 	catalog_settings = None
 	no_of_records_per_page = 10
 
-class Product:
-	def get_category_products(self,category, sort_by, page_no,page_size,
-								brands, rating,min_price, max_price,attributes,
-								productsid,customer,route):
-		if route:
-			categories = frappe.db.get_value("Product Category",{"route":route},"name")
-			if categories:
-				category = categories
-		default_sort_order = get_settings_value('Catalog Settings','default_product_sort_order')
-		sort_order = get_sorted_columns(default_sort_order)
-		if sort_by:
-			sort_order = sort_by
-		category_products = self.get_sorted_category_products(category, sort_order, page_no, 
-							page_size,brands, rating, min_price, max_price, attributes,productsid)
-		if category_products:
-			category_products = get_list_product_details(category_products, customer=customer)
-		return category_products
-	
-	def get_product_list_columns(self):
-		return """ P.item, P.price, P.old_price, P.short_description,P.has_variants,
-				P.sku, P.name, P.route, P.inventory_method, P.is_gift_card, P.image AS product_image,
-				P.minimum_order_qty, P.maximum_order_qty, P.disable_add_to_cart_button, 
-				P.weight, P.approved_total_reviews,(CONCAT("/pr/",P.route)) AS b_route,P.brand_name AS brand,
-				P.brand_unique_name AS brand_route,P.route,P.brand_name AS product_brand """
-	
-	def get_sorted_category_products(self,category, sort_by, page_no, page_size, brands,
-										ratings, min_price,max_price, attributes,productsid = None):
-		catalog_settings = frappe.get_single('Catalog Settings')
-		(conditions, sort) = get_conditions_sort(brands, ratings, sort_by, min_price, max_price, attributes)
-		category_filter = "'" + category + "'"
-		if catalog_settings.include_products_from_subcategories == 1:
-			from go1_commerce.go1_commerce.v2.category \
-			import get_child_categories
-			child_categories = get_child_categories(category)
-			if child_categories:
-				category_filter = ','.join(['"' + x.name + '"' for x in child_categories])
-		if productsid:
-			conditions += ' and P.name!="{name}"'.format(name=productsid)
-		list_columns = self.get_product_list_columns()
-		query = f"""SELECT DISTINCT {list_columns}
-					FROM `tabProduct` P
-					INNER JOIN `tabProduct Category Mapping` CM ON CM.parent=P.name
-					INNER JOIN `tabProduct Category` pc ON CM.category=pc.name
-					WHERE P.is_active = 1 
-						AND P.status='Approved' 
-						AND CM.category IN ({category_filter}) {conditions}
-					GROUP BY P.name {sort}
-					LIMIT {(int(page_no) - 1)* int(page_size)},{int(page_size)}"""
-		result = frappe.db.sql(query, as_dict=True)
-		return result
+@frappe.whitelist(allow_guest=True)
+def get_category_products(category=None, sort_by=None, page_no=1,page_size=no_of_records_per_page,
+							brands=None, rating=None,min_price=None, max_price=None,attributes=None,
+							productsid=None,customer=None,route=None):
+	if route:
+		categories = frappe.db.get_value("Product Category",{"route":route},"name")
+		if categories:
+			category = categories
+	default_sort_order = get_settings_value('Catalog Settings','default_product_sort_order')
+	sort_order = get_sorted_columns(default_sort_order)
+	if sort_by:
+		sort_order = sort_by
+	category_products = get_sorted_category_products(category, sort_order, page_no, 
+						page_size,brands, rating, min_price, max_price, attributes,productsid)
+	if category_products:
+		category_products = get_list_product_details(category_products, customer=customer)
+	return category_products
+
+def get_product_list_columns():
+	return """ P.item, P.price, P.old_price, P.short_description,P.has_variants,
+			P.sku, P.name, P.route, P.inventory_method, P.is_gift_card, P.image AS product_image,
+			P.minimum_order_qty, P.maximum_order_qty, P.disable_add_to_cart_button, 
+			P.weight, P.approved_total_reviews,(CONCAT("/pr/",P.route)) AS b_route,P.brand_name AS brand,
+			P.brand_unique_name AS brand_route,P.route,P.brand_name AS product_brand """
+
+
  
 @frappe.whitelist(allow_guest=True)
 def get_parent_categories():
@@ -924,12 +900,8 @@ def get_conditions_sort(brands, ratings, sort_by, min_price, max_price,attribute
 		if brands:
 			brandarray = brands.split(',')
 			if len(brandarray) > 1:
-				condition += f"""AND P.name IN 
-									(SELECT M.parent FROM 
-										`tabProduct Model Mapping` M 
-									INNER JOIN 
-										`tabProduct Brand` B ON B.name=M.brand 
-									WHERE B.unique_name IN("""
+				condition += f"""AND P.brand_unique_name IN 
+									("""
 				for b in brandarray:
 					condition += "'"
 					condition += b
@@ -937,17 +909,9 @@ def get_conditions_sort(brands, ratings, sort_by, min_price, max_price,attribute
 						condition += "',"
 					else:
 						condition += "'"
-				condition += '))'
+				condition += ')'
 			else:
-				condition += """ AND P.name IN(SELECT M.parent 
-								FROM 
-									`tabProduct Model Mapping` M 
-								INNER JOIN 
-									`tabProduct Brand` B 
-									ON 
-										B.name=M.brand 
-								WHERE
-									B.unique_name='"{ brandarray[0] }"' )"""
+				condition += f""" AND P.brand_unique_name ='{ brandarray[0] }'"""
 		return get_sub_conditions_sort(ratings,sort_by,min_price,max_price,attributes,condition)
 	except Exception:
 		other_exception("Error in v2.product.get_conditions_sort")
@@ -1526,17 +1490,7 @@ def get_sorted_brand_products_query(page_size,conditions,brand_filter,sort_by,br
 	except Exception:
 		frappe.log_error(frappe.get_traceback(), 'api.get_sorted_brand_products')
 
-@frappe.whitelist(allow_guest=True)
-def get_category_products(category=None, sort_by=None, page_no=1,page_size=no_of_records_per_page,
-							brands=None, rating=None,min_price=None, max_price=None,attributes=None,
-							productsid=None,customer=None,route=None):
-	try:
-		get_cp_obj = Product()
-		return get_cp_obj.get_category_products(category, sort_by, page_no,page_size,
-										brands, rating,min_price, max_price,attributes,
-										productsid,customer,route)
-	except Exception:
-		other_exception("Error in v2.product.get_category_products")
+
 
 def get_sorted_category_products(category, sort_by, page_no, page_size, brands,
 	ratings, min_price,max_price, attributes,productsid=None):
@@ -1564,6 +1518,7 @@ def get_sorted_category_products(category, sort_by, page_no, page_size, brands,
 					GROUP BY P.name {sort}
 					LIMIT {(int(page_no) - 1)* int(page_size)},{int(page_size)}"""
 		result = frappe.db.sql(query, as_dict=True)
+		# frappe.log_error("category_query",query)
 		return result
 	except Exception:
 		frappe.log_error(frappe.get_traceback(), 'Error in api.get_sorted_category_products')
