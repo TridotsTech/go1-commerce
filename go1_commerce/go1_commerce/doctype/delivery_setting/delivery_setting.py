@@ -14,12 +14,12 @@ def check_category_exist_or_not():
 	category = []
 	DeliverySlotCategory = DocType('Delivery Slot Category')
 	query = (
-	    frappe.qb.from_(DeliverySlotCategory)
-	    .select(DeliverySlotCategory.category)
-	    .where(
-	        (DeliverySlotCategory.parenttype == "Delivery Setting") &
-	        (DeliverySlotCategory.parentfield == "delivery_slot_category")
-	    )
+		frappe.qb.from_(DeliverySlotCategory)
+		.select(DeliverySlotCategory.category)
+		.where(
+			(DeliverySlotCategory.parenttype == "Delivery Setting") &
+			(DeliverySlotCategory.parentfield == "delivery_slot_category")
+		)
 	)
 	is_exist = query.run(as_dict=True)
 	if is_exist:
