@@ -14,8 +14,8 @@ class DiscountTemplate(Document):
 def get_all_templates():
 	DiscountTemplate = DocType('Discount Template')
 	query = (
-	    frappe.qb.from_(DiscountTemplate)
-	    .select(DiscountTemplate.name, DiscountTemplate.name1, DiscountTemplate.image)
+		frappe.qb.from_(DiscountTemplate)
+		.select(DiscountTemplate.name, DiscountTemplate.name1, DiscountTemplate.image)
 	)
 	result = query.run(as_dict=True)
 

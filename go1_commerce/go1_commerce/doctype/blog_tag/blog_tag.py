@@ -35,10 +35,10 @@ class BlogTag(WebsiteGenerator):
 			for item in tag_item:
 				BlogPost = DocType('Blog Post')
 				blog_tag = (
-				    frappe.qb.from_(BlogPost)
-				    .select('*')
-				    .where(BlogPost.name == item.parent)
-				    .run(as_dict=True)
+					frappe.qb.from_(BlogPost)
+					.select('*')
+					.where(BlogPost.name == item.parent)
+					.run(as_dict=True)
 				)
 			blog_tag1 = blog_tag
 		context.BlogList=blog_tag1
@@ -51,19 +51,19 @@ def get_tag_based_blog_list(tag = None, page_no = 1, page_size = 12):
 	BlogPost = DocType('Blog Post')
 	BlogTagItem = DocType('Blog Tag Item')
 	query = (
-	    frappe.qb.from_(BlogPost)
-	    .left_join(BlogTagItem).on(BlogTagItem.parent == BlogPost.name)
-	    .select(BlogPost.star)
-	    .where(
-	        (BlogPost.published == 1) &
-	        (BlogTagItem.parenttype == "Blog Post") &
-	        (BlogTagItem.parentfield == "blog_tag") &
-	        (BlogTagItem.blog_tag == tag)
-	    )
-	    .groupby(BlogPost.name)
-	    .orderby(BlogPost.published_on, order=Order.desc)
-	    .limit(page_size)
-	    .offset(start)
+		frappe.qb.from_(BlogPost)
+		.left_join(BlogTagItem).on(BlogTagItem.parent == BlogPost.name)
+		.select(BlogPost.star)
+		.where(
+			(BlogPost.published == 1) &
+			(BlogTagItem.parenttype == "Blog Post") &
+			(BlogTagItem.parentfield == "blog_tag") &
+			(BlogTagItem.blog_tag == tag)
+		)
+		.groupby(BlogPost.name)
+		.orderby(BlogPost.published_on, order=Order.desc)
+		.limit(page_size)
+		.offset(start)
 	)
 	data = query.run(as_dict=True)
 	return data

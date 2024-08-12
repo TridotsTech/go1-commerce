@@ -56,18 +56,18 @@ def send_email_birthday_club_members():
 			Customers = DocType('Customers')
 			HasRole = DocType('Has Role')
 			query = (
-			    frappe.qb.from_(BirthDayClubMember)
-			    .inner_join(Customers).on(Customers.email == BirthDayClubMember.email)
-			    .inner_join(HasRole).on(HasRole.parent == BirthDayClubMember.email)
-			    .select(
-			        BirthDayClubMember.name,
-			        BirthDayClubMember.email,
-			        BirthDayClubMember.day,
-			        BirthDayClubMember.month,
-			        BirthDayClubMember.is_email_sent,
-			        Customers.name.as_('customer_id')
-			    )
-			    .where(HasRole.role == 'BirthDay Club Member')
+				frappe.qb.from_(BirthDayClubMember)
+				.inner_join(Customers).on(Customers.email == BirthDayClubMember.email)
+				.inner_join(HasRole).on(HasRole.parent == BirthDayClubMember.email)
+				.select(
+					BirthDayClubMember.name,
+					BirthDayClubMember.email,
+					BirthDayClubMember.day,
+					BirthDayClubMember.month,
+					BirthDayClubMember.is_email_sent,
+					Customers.name.as_('customer_id')
+				)
+				.where(HasRole.role == 'BirthDay Club Member')
 			)
 			members = query.run(as_dict=True)
 			for x in members:

@@ -114,9 +114,9 @@ class Customers(NestedSet):
 				email = self.email
 				User = DocType('User')
 				d = (
-				    frappe.qb.from_(User)
-				    .select(User.name)
-				    .where(User.email == email)
+					frappe.qb.from_(User)
+					.select(User.name)
+					.where(User.email == email)
 				).run(as_dict=False)
 				if not d:					
 					user = insert_user(self)
@@ -385,7 +385,7 @@ def update_address_data(first_name, email, phone,address_data=None):
 		addr = json.loads(address_data)
 		if not frappe.db.get_all("Customer Address",
 						   filters={"parent":customer.name,"latitude":addr.get('latitude'),
-				  					"longitude":addr.get('latitude')}):
+									"longitude":addr.get('latitude')}):
 			customer = frappe.get_doc("Customers",customer.name)
 			customer.append('table_6', {
 										'address': addr.get('address'),
@@ -465,18 +465,18 @@ def delete_guest_customers():
 	Customers = DocType('Customers')
 	Order = DocType('Order')
 	subquery = (
-	    frappe.qb.from_(Order)
-	    .select(Order.name)
-	    .where(Order.customer == Customers.name)
+		frappe.qb.from_(Order)
+		.select(Order.name)
+		.where(Order.customer == Customers.name)
 	)
 	query = (
-	    frappe.qb.from_(Customers)
-	    .select(Customers.name)
-	    .where(
-	        Criterion.exists(subquery) &  
-	        (Customers.naming_series == "GC-") & 
-	        (Customers.creation < check_date)
-	    )
+		frappe.qb.from_(Customers)
+		.select(Customers.name)
+		.where(
+			Criterion.exists(subquery) &  
+			(Customers.naming_series == "GC-") & 
+			(Customers.creation < check_date)
+		)
 	)
 	customers_list = query.run(as_dict=True)
 	if customers_list:
@@ -491,7 +491,7 @@ def delete_guest_customers():
 				for c in cart:
 					if "Drip Marketing" in frappe.get_installed_apps():
 						if frappe.db.exists("Email Campaign", 
-						  			{"email_campaign_for": "Shopping Cart", "recipient":c.name}):
+									{"email_campaign_for": "Shopping Cart", "recipient":c.name}):
 							camp=frappe.db.get_value("Email Campaign", 
 								{"email_campaign_for": "Shopping Cart", "recipient":c.name}, "name")
 							camp_info = frappe.get_doc('Email Campaign', camp)
@@ -504,7 +504,7 @@ def delete_guest_customers():
 def get_children(doctype, parent=None, is_root=False, is_tree=False):
 	filters = []
 	fields = ['name as value', 'full_name as title', 'full_name', 'last_name', 
-		   		'phone', 'email', "is_group as expandable", "parent_level"]
+				'phone', 'email', "is_group as expandable", "parent_level"]
 	if is_root:
 		parent = ''
 	if parent:
@@ -557,10 +557,10 @@ def update_custom_preference_check(order_info,customer_info,item):
 		if order_info.order_item[0].order_item_type == 'Product':
 			ProductCategoryMapping = DocType('Product Category Mapping')
 			query = (
-			    frappe.qb.from_(ProductCategoryMapping)
-			    .select(ProductCategoryMapping.category)
-			    .distinct()
-			    .where(ProductCategoryMapping.parent.isin(item_names))
+				frappe.qb.from_(ProductCategoryMapping)
+				.select(ProductCategoryMapping.category)
+				.distinct()
+				.where(ProductCategoryMapping.parent.isin(item_names))
 			)
 			category_list = query.run(as_dict=True)
 			if category_list:
@@ -571,10 +571,10 @@ def update_custom_preference_check(order_info,customer_info,item):
 		if order_info.order_item[0].order_item_type == 'Product':
 			ProductBrandMapping = DocType('Product Brand Mapping')
 			query = (
-			    frappe.qb.from_(ProductBrandMapping)
-			    .select(ProductBrandMapping.band)
-			    .distinct()
-			    .where(ProductBrandMapping.parent.isin(item_names))
+				frappe.qb.from_(ProductBrandMapping)
+				.select(ProductBrandMapping.band)
+				.distinct()
+				.where(ProductBrandMapping.parent.isin(item_names))
 			)
 			brand_list = query.run(as_dict=True)
 			if brand_list:
@@ -591,14 +591,14 @@ def update_customer_preference_from_order(order_id):
 		for item in settings.preferences:
 			CustomerPreference = DocType('Customer Preference')
 			query = (
-			    frappe.qb.from_(CustomerPreference)
-			    .select(CustomerPreference.name, CustomerPreference.modified)
-			    .where(
-			        (CustomerPreference.parent == customer_info.name) &
-			        (CustomerPreference.reference_doctype == item.reference_document) &
-			        (CustomerPreference.preference_type == item.based_on)
-			    )
-			    .orderby(CustomerPreference.modified, order=Order.desc)
+				frappe.qb.from_(CustomerPreference)
+				.select(CustomerPreference.name, CustomerPreference.modified)
+				.where(
+					(CustomerPreference.parent == customer_info.name) &
+					(CustomerPreference.reference_doctype == item.reference_document) &
+					(CustomerPreference.preference_type == item.based_on)
+				)
+				.orderby(CustomerPreference.modified, order=Order.desc)
 			)
 			check_records = query.run(as_dict=True)
 
@@ -607,15 +607,15 @@ def update_customer_preference_from_order(order_id):
 				CustomerPreference = DocType('Customer Preference')
 				names_to_delete = [x.name for x in delete_list]
 				frappe.qb.from_(CustomerPreference)
-				    .delete()
-				    .where(CustomerPreference.name.isin(names_to_delete))
-				    .run()
+					.delete()
+					.where(CustomerPreference.name.isin(names_to_delete))
+					.run()
 			
 
 def check_preference(reference_doctype, reference_name, preference_type, customer_info):
 	check_val = next((x for x in customer_info.customer_preference \
 				   if (x.reference_doctype == reference_doctype and x.reference_name == reference_name \
-		   								and x.preference_type == preference_type)), None)
+										and x.preference_type == preference_type)), None)
 	if check_val:
 		frappe.db.set_value('Customer Preference', check_val.name, 'count', check_val.count + 1)
 	else:
@@ -666,10 +666,10 @@ def make_customers_dashboard(name):
 		else:
 			rupee = "₹"
 		return {
-      			'today_orders_count':today_orders_count,
-         		'all_count':all_count,
+				'today_orders_count':today_orders_count,
+				'all_count':all_count,
 				'currency':rupee,
-		  		'source':source
+				'source':source
 				}
 	except Exception:
 		frappe.log_error(frappe.get_traceback(), "Error in doctype.customers.make_customers_dashboard")
@@ -678,30 +678,30 @@ def get_order_count(name):
 	dt = 'Order'
 	Doc = DocType(dt)
 	today_order_list = (
-	    frappe.qb.from_(Doc)
-	    .select(Doc.name)
-	    .where(
-	        (Doc.customer == name) &
-	        (Doc.creation.date() == frappe.utils.nowdate()) &
-	        (Doc.naming_series != "SUB-ORD-")
-	    )
+		frappe.qb.from_(Doc)
+		.select(Doc.name)
+		.where(
+			(Doc.customer == name) &
+			(Doc.creation.date() == frappe.utils.nowdate()) &
+			(Doc.naming_series != "SUB-ORD-")
+		)
 	).run(as_dict=True)
 	all_order_list = (
-	    frappe.qb.from_(Doc)
-	    .select(Doc.name)
-	    .where(
-	        (Doc.customer == name) &
-	        (Doc.naming_series != "SUB-ORD-")
-	    )
+		frappe.qb.from_(Doc)
+		.select(Doc.name)
+		.where(
+			(Doc.customer == name) &
+			(Doc.naming_series != "SUB-ORD-")
+		)
 	).run(as_dict=True)
 	source=None
 	wallet = frappe.get_single("Wallet Settings")
 	if wallet.enable_customer_wallet==1:
 		Wallet = DocType('Wallet')
 		source = (
-		    frappe.qb.from_(Wallet)
-		    .select(Wallet.name, Wallet.user_type, Wallet.current_wallet_amount, Wallet.total_wallet_amount)
-		    .where(Wallet.user == name)
+			frappe.qb.from_(Wallet)
+			.select(Wallet.name, Wallet.user_type, Wallet.current_wallet_amount, Wallet.total_wallet_amount)
+			.where(Wallet.user == name)
 		).run(as_dict=True)
 		if source:
 			source = source
@@ -715,22 +715,22 @@ def get_customer_orders(customer_id):
 	dt = 'Order'
 	OrderDoc = DocType(dt)
 	query = (
-	    frappe.qb.from_(OrderDoc)
-	    .select(
-	        OrderDoc.name,
-	        OrderDoc.total_amount,
-	        OrderDoc.payment_method_name,
-	        OrderDoc.payment_status,
-	        OrderDoc.order_date,
-	        OrderDoc.status
-	    )
-	    .where(
-	        (OrderDoc.customer == customer_id) &
-	        (OrderDoc.naming_series != "SUB-ORD-") &
-	        (frappe.qb.custom_condition(condition))
-	    )
-	    .orderby(OrderDoc.creation)
-	    .limit(10)
+		frappe.qb.from_(OrderDoc)
+		.select(
+			OrderDoc.name,
+			OrderDoc.total_amount,
+			OrderDoc.payment_method_name,
+			OrderDoc.payment_status,
+			OrderDoc.order_date,
+			OrderDoc.status
+		)
+		.where(
+			(OrderDoc.customer == customer_id) &
+			(OrderDoc.naming_series != "SUB-ORD-") &
+			(frappe.qb.custom_condition(condition))
+		)
+		.orderby(OrderDoc.creation)
+		.limit(10)
 	)
 	order_detail = query.run(as_dict=True)
 	catalog_settings = get_settings('Catalog Settings')
@@ -741,8 +741,8 @@ def get_customer_orders(customer_id):
 	else:
 		rupee = "₹"
 	return {
-     		'order_detail':order_detail,
-       		'currency':rupee
+			'order_detail':order_detail,
+			'currency':rupee
 			}
 
 
@@ -780,13 +780,13 @@ def get_sales_executives(route):
 	Route = DocType('Route')
 	RouteSE = DocType('Route SE')
 	query = (
-	    frappe.qb.from_(RouteSE)
-	    .inner_join(Route).on(Route.name == RouteSE.parent)
-	    .select(RouteSE.se_name)
-	    .where(
-	        (Route.name == route) &
-	        (RouteSE.status == 'Active')
-	    )
+		frappe.qb.from_(RouteSE)
+		.inner_join(Route).on(Route.name == RouteSE.parent)
+		.select(RouteSE.se_name)
+		.where(
+			(Route.name == route) &
+			(RouteSE.status == 'Active')
+		)
 	)
 
 	results = query.run(as_dict=True)

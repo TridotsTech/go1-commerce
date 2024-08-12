@@ -33,9 +33,9 @@ def update_birthday_club_discount(self):
 	
 	DiscountRequirements = DocType('Discount Requirements')
 	frappe.qb.from_(DiscountRequirements)
-	    .delete()
-	    .where(DiscountRequirements.parent == self.discount_id)
-	    .run()
+		.delete()
+		.where(DiscountRequirements.parent == self.discount_id)
+		.run()
 	frappe.db.commit()
 	frappe.get_doc({
 				'doctype': 'Discount Requirements',
@@ -116,18 +116,18 @@ def update_birthday_club_wallet():
 			Customers = DocType('Customers')
 			HasRole = DocType('Has Role')
 			query = (
-			    frappe.qb.from_(BirthDayClubMember)
-			    .inner_join(Customers).on(Customers.email == BirthDayClubMember.email)
-			    .inner_join(HasRole).on(HasRole.parent == BirthDayClubMember.email)
-			    .select(
-			        BirthDayClubMember.name,
-			        BirthDayClubMember.email,
-			        BirthDayClubMember.day,
-			        BirthDayClubMember.month,
-			        BirthDayClubMember.is_email_sent,
-			        Customers.name.as_('customer_id')
-			    )
-			    .where(HasRole.role == 'BirthDay Club Member')
+				frappe.qb.from_(BirthDayClubMember)
+				.inner_join(Customers).on(Customers.email == BirthDayClubMember.email)
+				.inner_join(HasRole).on(HasRole.parent == BirthDayClubMember.email)
+				.select(
+					BirthDayClubMember.name,
+					BirthDayClubMember.email,
+					BirthDayClubMember.day,
+					BirthDayClubMember.month,
+					BirthDayClubMember.is_email_sent,
+					Customers.name.as_('customer_id')
+				)
+				.where(HasRole.role == 'BirthDay Club Member')
 			)
 			members = query.run(as_dict=True)
 			for x in members:
@@ -162,13 +162,13 @@ def update_birthday_club_wallet():
 					email_template = frappe.get_doc("Email Template",birthday_club_settings.email_template)
 					doc = frappe.get_doc("BirthDay Club Member",x.name)
 					sender = frappe.db.get_value("Email Account", birthday_club_settings.sender, 
-								  														'email_id')
+																						'email_id')
 					make(doctype = "BirthDay Club Member", name = x.name,
 						subject = frappe.render_template(email_template.get("subject"),{'doc': doc}),
 						content = frappe.render_template(email_template.get("body"),{'doc': doc}),
 						sender = sender, recipients = x.email,
 						communication_medium = "Email", send_email = True )
-     
+	 
 
 def month_string_to_number(string):
 	m = {

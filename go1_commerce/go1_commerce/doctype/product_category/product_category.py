@@ -11,6 +11,7 @@ from frappe.website.utils import clear_cache
 import os,re
 import json
 from frappe import _
+from frappe.query_builder import DocType, Field
 
 nsm_parent_field = 'parent_product_category'
 
@@ -63,7 +64,7 @@ class ProductCategory(WebsiteGenerator, NestedSet):
 		self.route = ''
 		if self.parent_product_category:
 			parent_product_category = frappe.get_doc('Product Category', 
-										 		self.parent_product_category)
+												self.parent_product_category)
 			if parent_product_category:
 				self.route = self.scrub(parent_product_category.category_name) + '-'
 				if parent_product_category.parent_product_category:
@@ -89,15 +90,15 @@ def get_children(doctype, parent=None, is_root=False):
 			parent = ""
 		if is_root:
 			parent = ""
-		product_category = frappe.db.sql("""
-											SELECT 
-								   				name AS value, category_name AS label, 
-								   				is_group AS expandable 
-											FROM `tabProduct Category` 
-											WHERE IFNULL(`parent_product_category`, '') = %(parent)s 
-											
-											ORDER BY name
-										""", {'parent': parent}, as_dict=1)
+		filters = {
+			'parent_product_category': ['=', parent]
+		}
+		product_category = frappe.get_all(
+			'Product Category',
+			filters=filters,
+			fields=['name AS value', 'category_name AS label', 'is_group AS expandable'],
+			order_by='name'
+		)
 
 		return product_category
 	except Exception:
@@ -149,14 +150,14 @@ def make_cat_tree_args(**kwarg):
 
 def update_image_thumbnail(doc):
 	try:
-		all_products=frappe.db.sql("""
-									SELECT P.name 
-									FROM tabProduct P 
-									INNER JOIN `tabProduct Category Mapping` CM ON P.name = CM.parent 
-									WHERE CM.category = %(category)s 
-									GROUP BY P.name
-								""", {'category': doc.name}, as_dict=1)
-
+		all_products = (
+			frappe.qb.from_('Product')
+			.inner_join('Product Category Mapping', 'Product.name = Product Category Mapping.parent')
+			.select('Product.name')
+			.where('Product Category Mapping.category = %s', doc.name)
+			.group_by('Product.name')
+			.run(as_dict=True)
+		)
 		if all_products:
 			for item in all_products:
 				product=frappe.get_doc('Product',item.name)
@@ -196,15 +197,15 @@ def get_parent_product_categories(item_group_name):
 	if not item_group_name:
 		return base_parents
 	item_group = frappe.get_doc("Product Category", item_group_name)
-	parent_groups = frappe.db.sql("""
-									SELECT name, route 
-									FROM `tabProduct Category`
-									WHERE lft <= %(lft)s 
-									AND rgt >= %(rgt)s
-									AND is_active = 1
-									ORDER BY lft ASC
-								""", {'lft': item_group.lft, 'rgt': item_group.rgt}, as_dict=True)
-
+	parent_groups = (
+		frappe.qb.from_('Product Category')
+		.select('name', 'route')
+		.where('lft <= %s', item_group.lft)
+		.where('rgt >= %s', item_group.rgt)
+		.where('is_active = 1')
+		.order_by('lft ASC')
+		.run(as_dict=True)
+	)
 	return base_parents + parent_groups
 
 

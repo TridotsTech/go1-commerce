@@ -9,6 +9,7 @@ from requests.exceptions import SSLError
 from builtins import OSError
 from typing import Type, Union
 from PIL import Image,ImageOps
+from frappe.query_builder import DocType, Interval
 
 
 class CustomFile(File):
@@ -120,10 +121,10 @@ class PageSection(Document):
 					item['name'] = item.get('tab_item').lower().replace(' ', '_')
 					
 					query_item = frappe.db.get_value(self.reference_document, item.get('tab_item'), 'query')
-				    EmailCampaign = DocType('Email Campaign')  # Replace with actual DocType if needed
+					EmailCampaign = DocType('Email Campaign') 
 					qb = frappe.qb.from_(EmailCampaign)
-				    qb = qb.select(query_item)
-				    qb = qb.limit(no_of_records)
+					qb = qb.select(query_item)
+					qb = qb.limit(no_of_records)
 					result = qb.run(as_dict=True)
 
 					result = get_product_details(result, customer=customer)
