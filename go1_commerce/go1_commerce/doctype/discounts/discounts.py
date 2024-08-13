@@ -105,13 +105,13 @@ class Discounts(Document):
 		category = category[:-1]
 		DiscountCategories = DocType('Discount Categories')
 		categories_to_delete = [cat.strip() for cat in category.split(',')]
-		frappe.qb.from_(DiscountCategories)
+		qry = (frappe.qb.from_(DiscountCategories)
 			.delete()
 			.where(
 				(DiscountCategories.parent_category.isin(categories_to_delete)) &
 				(DiscountCategories.parent == self.name)
 			)
-			.run()
+			.run())
 
 
 	def check_child_category(self):
