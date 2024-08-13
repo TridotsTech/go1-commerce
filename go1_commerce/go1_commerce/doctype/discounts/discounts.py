@@ -14,7 +14,8 @@ from go1_commerce.go1_commerce.v2.common \
 from go1_commerce.utils.setup import get_settings_value
 from urllib.parse import unquote
 from six import string_types
-from frappe.query_builder import DocType, Field, functions as fn
+from frappe.query_builder import DocType,Order, Field, functions as fn
+from pypika.terms import Case
 
 class Discounts(Document):
 	def validate(self):
@@ -256,6 +257,7 @@ def get_product_discount_rule(product, qty):
 	DiscountCategories = DocType('Discount Categories')
 	DiscountRequirements = DocType('Discount Requirements')
 	DiscountUsageHistory = DocType('Discount Usage History')
+	
 	requirements_subquery = (
 		frappe.qb.from_(DiscountRequirements)
 		.select(Field('count(*)'))
@@ -287,18 +289,18 @@ def get_product_discount_rule(product, qty):
 			history_subquery
 		)
 		.where(
-			(frappe.qb.case()
+			(Case()
 				.when(Discounts.start_date.isnotnull(), Discounts.start_date <= today_date)
-				.otherwise(True)
+				.else_(True)
 			) &
-			(frappe.qb.case()
+			(Case()
 				.when(Discounts.end_date.isnotnull(), Discounts.end_date >= today_date)
-				.otherwise(True)
+				.else_(True)
 			) &
-			(frappe.qb.case()
+			(Case()
 				.when(Discounts.discount_type == 'Assigned to Products', DiscountProducts.items == product.name)
 				.when(Discounts.discount_type == 'Assigned to Categories', DiscountCategories.category.isin(categories))
-				.otherwise(True)
+				.else_(True)
 			) &
 			(Discounts.discount_type.notin(["Assigned to Sub Total", "Assigned to Delivery Charges"])) &
 			((Discounts.requires_coupon_code == 0) | (Discounts.requires_coupon_code.isnull()))
@@ -308,28 +310,19 @@ def get_product_discount_rule(product, qty):
 	rule = query.run(as_dict=True)
 	if rule:
 		return get_product_dixcount_rule_(rule,product)
-		
 
 def get_product_categories(product_id):
 	ProductCategoryMapping = DocType('Product Category Mapping')
 	query = (
 		frappe.qb.from_(ProductCategoryMapping)
-		.select(
-			frappe.qb.custom.GroupConcat(
-				frappe.qb.functions.Concat(
-					frappe.qb.functions.Literal('"'), 
-					ProductCategoryMapping.category, 
-					frappe.qb.functions.Literal('"')
-				)
-			).as_('val')
-		)
+		.select(ProductCategoryMapping.category)
 		.where(ProductCategoryMapping.parent == product_id)
 	)
-	res = query.run(as_dict=True)
-	if res and res[0].val:
-		return res[0].val
-	return '""'
-
+	results = query.run(as_dict=True)
+	categories = [result['category'] for result in results]
+	concatenated_categories = ','.join(f'"{cat}"' for cat in categories)
+	
+	return concatenated_categories or '""'
 
 
 def get_order_subtotal_discount(subtotal, customer_id, cart_items, total_weight=0,
