@@ -315,7 +315,7 @@ def get_product_categories(product_id):
 	query = (
 		frappe.qb.from_(ProductCategoryMapping)
 		.select(
-			frappe.qb.functions.GroupConcat(
+			frappe.qb.custom.GroupConcat(
 				frappe.qb.functions.Concat(
 					frappe.qb.functions.Literal('"'), 
 					ProductCategoryMapping.category, 
