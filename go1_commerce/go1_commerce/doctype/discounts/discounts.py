@@ -15,7 +15,9 @@ from go1_commerce.utils.setup import get_settings_value
 from urllib.parse import unquote
 from six import string_types
 from frappe.query_builder import DocType,Order, Field, functions as fn
-from pypika.terms import Case
+from frappe.query_builder import Case
+from frappe.query_builder import DocType, Order
+from frappe.query_builder.functions import IfNull, Count
 
 class Discounts(Document):
 	def validate(self):
@@ -250,64 +252,63 @@ def get_product_discount(product, qty = 1, rate = None, customer_id = None, attr
 
 
 def get_product_discount_rule(product, qty):
+	
 	today_date = get_today_date(replace=True)
 	categories = get_product_categories(product.name)
 	Discounts = DocType('Discounts')
 	DiscountProducts = DocType('Discount Products')
 	DiscountCategories = DocType('Discount Categories')
+	DiscountAppliedProduct = DocType('Discount Applied Product')
 	DiscountRequirements = DocType('Discount Requirements')
 	DiscountUsageHistory = DocType('Discount Usage History')
-	
+
 	requirements_subquery = (
 		frappe.qb.from_(DiscountRequirements)
-		.select(Field('count(*)'))
+		.select(Count('*'))
 		.where(
 			(DiscountRequirements.parent == Discounts.name) &
 			(DiscountRequirements.parenttype == "Discounts")
 		)
-		.as_(Field('requirements'))
 	)
 
 	history_subquery = (
 		frappe.qb.from_(DiscountUsageHistory)
-		.select(Field('count(*)'))
+		.select(Count('*'))
 		.where(
 			(DiscountUsageHistory.parent == Discounts.name) &
 			(DiscountUsageHistory.parenttype == "Discounts")
 		)
-		.as_(Field('history'))
 	)
+
 	query = (
 		frappe.qb.from_(Discounts)
 		.left_join(DiscountProducts).on(Discounts.name == DiscountProducts.parent)
 		.left_join(DiscountCategories).on(Discounts.name == DiscountCategories.parent)
-		.left_join(Discounts).on(Discounts.name == Discounts.parent)
+		.left_join(DiscountAppliedProduct).on(Discounts.name == DiscountAppliedProduct.parent)
 		.select(
-			Discounts.fields,
+			Discounts.star,
 			DiscountProducts.product_attribute_json,
-			requirements_subquery,
-			history_subquery
+			IfNull(requirements_subquery, 0).as_('requirements'),
+			IfNull(history_subquery, 0).as_('history')
 		)
 		.where(
-			(Case()
-				.when(Discounts.start_date.isnotnull(), Discounts.start_date <= today_date)
-				.else_(True)
-			) &
-			(Case()
-				.when(Discounts.end_date.isnotnull(), Discounts.end_date >= today_date)
-				.else_(True)
-			) &
-			(Case()
-				.when(Discounts.discount_type == 'Assigned to Products', DiscountProducts.items == product.name)
-				.when(Discounts.discount_type == 'Assigned to Categories', DiscountCategories.category.isin(categories))
-				.else_(True)
-			) &
-			(Discounts.discount_type.notin(["Assigned to Sub Total", "Assigned to Delivery Charges"])) &
-			((Discounts.requires_coupon_code == 0) | (Discounts.requires_coupon_code.isnull()))
+			Case()
+			.when(Discounts.start_date.isnotnull(), Discounts.start_date <= today_date)
+			.else_(True)
 		)
-		.orderby(Discounts.priority, order='desc')
+		.where(
+			Case()
+			.when(Discounts.end_date.isnotnull(), Discounts.end_date >= today_date)
+			.else_(True)
+		)
+		
+		.where(Discounts.discount_type.notin(["Assigned to Sub Total", "Assigned to Delivery Charges"]))
+		.where((Discounts.requires_coupon_code == 0) | (Discounts.requires_coupon_code.isnull()))
+		.orderby(Discounts.priority, order=Order.desc)
 	)
+
 	rule = query.run(as_dict=True)
+	
 	if rule:
 		return get_product_dixcount_rule_(rule,product)
 
