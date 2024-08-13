@@ -1201,7 +1201,7 @@ def get_product_attributes_with_options(product):
 			item.options=get_product_attribute_options(item.product_attribute,product,item.name)            
 	return attributes
 
-
+@frappe.whitelist()
 def create_variant_combinations(attributes):
 	try:
 		import json
@@ -1885,7 +1885,7 @@ def get_category_list(reference_doc, reference_fields, filters=None, page_no=1, 
 	return {"list_name":list_name, "list_len":len(list_len)}
 
 
-
+@frappe.whitelist()
 def get_category_attributes(reference_doc, reference_fields, filters=None,page_no=1, page_len=20, 
 															search_txt=None, search_field="name"):
 	condition = ''
@@ -2545,7 +2545,7 @@ def product_detail_onscroll(productid, layout):
 						"/templates/pages/DetailPage/additional_product_info.html", contexts)
 	return template
 
-
+@frappe.whitelist()
 def insert_product_attribute_and_options(doc):
 	try:
 		if isinstance(doc, string_types):

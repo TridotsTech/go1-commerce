@@ -606,10 +606,7 @@ def update_customer_preference_from_order(order_id):
 				delete_list = check_records[int(item.no_of_records):]
 				CustomerPreference = DocType('Customer Preference')
 				names_to_delete = [x.name for x in delete_list]
-				frappe.qb.from_(CustomerPreference)
-					.delete()
-					.where(CustomerPreference.name.isin(names_to_delete))
-					.run()
+				frappe.qb.from_(CustomerPreference).delete().where(CustomerPreference.name.isin(names_to_delete)).run()
 			
 
 def check_preference(reference_doctype, reference_name, preference_type, customer_info):

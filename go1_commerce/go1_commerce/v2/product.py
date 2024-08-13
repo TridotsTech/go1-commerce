@@ -40,7 +40,7 @@ def get_category_products(category=None, sort_by=None, page_no=1,page_size=no_of
 def get_product_list_columns():
 	return """ P.item, P.price, P.old_price, P.short_description,P.has_variants,
 			P.sku, P.name, P.route, P.inventory_method, P.is_gift_card, P.image AS product_image,
-			P.minimum_order_qty, P.maximum_order_qty, P.disable_add_to_cart_button, 
+			P.minimum_order_qty, P.maximum_order_qty, P.disable_add_to_cart_button,P.stock, 
 			P.weight, P.approved_total_reviews,(CONCAT("/pr/",P.route)) AS b_route,P.brand_name AS brand,
 			P.brand_unique_name AS brand_route,P.route,P.brand_name AS product_brand """
 
@@ -1508,6 +1508,7 @@ def get_sorted_category_products(category, sort_by, page_no, page_size, brands,
 		if productsid:
 			conditions += ' and P.name!="{name}"'.format(name=productsid)
 		list_columns = get_product_list_columns()
+		frappe.log_error("list_columns",list_columns)
 		query = f"""SELECT DISTINCT {list_columns}
 					FROM `tabProduct` P
 					INNER JOIN `tabProduct Category Mapping` CM ON CM.parent=P.name
@@ -1518,18 +1519,14 @@ def get_sorted_category_products(category, sort_by, page_no, page_size, brands,
 					GROUP BY P.name {sort}
 					LIMIT {(int(page_no) - 1)* int(page_size)},{int(page_size)}"""
 		result = frappe.db.sql(query, as_dict=True)
-		# frappe.log_error("category_query",query)
+		frappe.log_error("category_query",query)
+		frappe.log_error("result",result)
 		return result
 	except Exception:
 		frappe.log_error(frappe.get_traceback(), 'Error in api.get_sorted_category_products')
 
  
-def get_product_list_columns():
-	return """P.item, P.price, P.old_price, P.short_description,P.has_variants,
-			P.sku, P.name, P.route, P.inventory_method, P.is_gift_card, P.image AS product_image,
-			P.minimum_order_qty, P.maximum_order_qty, P.disable_add_to_cart_button, 
-			P.weight, P.approved_total_reviews,
-			P.brand_unique_name AS brand_route,P.route,P.brand_name AS product_brand"""
+
    
 @frappe.whitelist(allow_guest=True)
 def insert_stockavail_notification(data):

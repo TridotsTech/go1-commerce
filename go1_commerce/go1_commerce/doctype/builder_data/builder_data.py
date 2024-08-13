@@ -4,10 +4,16 @@
 import frappe
 from frappe.model.document import Document
 
-
+try:
+	catalog_settings = get_settings('Catalog Settings')
+	no_of_records_per_page = catalog_settings.no_of_records_per_page
+except Exception as e:
+	catalog_settings = None
+	no_of_records_per_page = 10
+	
 class BuilderData(Document):
 	def get_category_products(self,category=None, sort_by=None, page_no=1,
-							 page_size=6,
+							 page_size=no_of_records_per_page,
 							brands=None, rating=None,min_price=None, 
 							max_price=None,attributes=None,
 							productsid=None,customer=None,route=None):
