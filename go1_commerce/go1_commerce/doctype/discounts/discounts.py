@@ -16,8 +16,8 @@ from urllib.parse import unquote
 from six import string_types
 from frappe.query_builder import DocType,Order, Field, functions as fn
 from frappe.query_builder import Case
-from frappe.query_builder import DocType, Order
 from frappe.query_builder.functions import IfNull, Count
+from frappe.query_builder.utils import PseudoColumn
 
 class Discounts(Document):
 	def validate(self):
@@ -429,26 +429,32 @@ def get_ordersubtotal_discount_forfree_item(subtotal,cart_items):
 def get_subtotal_discount():
 	today_date = get_today_date(replace=True)
 	Discounts = DocType('Discounts')
+
 	query = (
 		frappe.qb.from_(Discounts)
 		.select('*')
 		.where(
-			(frappe.qb.case()
-				.when(Discounts.start_date.isnotnull(), Discounts.start_date <= today_date)
-				.otherwise(True)
-			) &
-			(frappe.qb.case()
-				.when(Discounts.end_date.isnotnull(), Discounts.end_date >= today_date)
-				.otherwise(True)
-			) &
-			((Discounts.discount_type == "Assigned to Sub Total") |
-			 (Discounts.discount_type == "Assigned to Delivery Charges")) &
-			((Discounts.requires_coupon_code == 0) | (Discounts.requires_coupon_code.isnull()))
+			Case()
+			.when(Discounts.start_date.isnotnull(), Discounts.start_date <= today_date)
+			.else_(True)
 		)
-		.orderby(Discounts.priority, order='desc')
+		.where(
+			Case()
+			.when(Discounts.end_date.isnotnull(), Discounts.end_date >= today_date)
+			.else_(True)
+		)
+		.where(
+			(Discounts.discount_type.isin(["Assigned to Sub Total", "Assigned to Delivery Charges"]))
+		)
+		.where(
+			(Discounts.requires_coupon_code == 0) | (Discounts.requires_coupon_code.isnull())
+		)
+		.orderby(Discounts.priority, order=PseudoColumn('desc'))
 	)
+	
 	rule = query.run(as_dict=True)
 	return rule
+
 
 
 def validate_requirements(discount, subtotal, customer_id, cart_items, total_weight, shipping_method=None, payment_method=None):
@@ -498,7 +504,7 @@ def validate_requirements(discount, subtotal, customer_id, cart_items, total_wei
 			(DiscountRequirements.parenttype == "Discounts")
 		)
 		.orderby(
-			frappe.qb.functions.Field('discount_requirement').order_by(order_by_fields)
+			frappe.qb.functions.Field('discount_requirement').orderby(order_by_fields)
 		)
 	)
 	requirements = query.run(as_dict=True)
@@ -702,60 +708,50 @@ def calculate_discount(discount, product, qty, rate, attribute_id = None, attrib
 
 
 def check_delivery_charge_discount(
-									customer_id, 
-									subtotal, 
-									cart_items, 
-									shipping_charges, 
-									shipping_method, 
-									out,
-									payment_method = None, 
-									is_coupon_code = 0,
-									coupon_code = None
-								):
-	today_date = get_today_date(replace=True)
-	Discounts = DocType('Discounts')
-	today = getdate(today_date)
-	query = (
-		frappe.qb.from_(Discounts)
-		.select('*')
-		.where(
-			(frappe.qb.case()
-				.when(Discounts.start_date.isnotnull(), Discounts.start_date <= today)
-				.otherwise(True)
-			) &
-			(frappe.qb.case()
-				.when(Discounts.end_date.isnotnull(), Discounts.end_date >= today)
-				.otherwise(True)
-			) &
-			(Discounts.discount_type == "Assigned to Delivery Charges") &
-			((Discounts.requires_coupon_code == 0) | (Discounts.requires_coupon_code.isnull()))
-		)
-		.orderby(Discounts.priority, order='desc')
-	)
-	discounts = query.run(as_dict=True)
+    customer_id, 
+    subtotal, 
+    cart_items, 
+    shipping_charges, 
+    shipping_method, 
+    out,
+    payment_method=None, 
+    is_coupon_code=0,
+    coupon_code=None
+):
+    today_date = get_today_date(replace=True)
+    Discounts = DocType('Discounts')
+    today = getdate(today_date)
 
-	if is_coupon_code == 1:
-		Discounts = DocType('Discounts')
-		today = getdate(today_date)
-		query = (
-			frappe.qb.from_(Discounts)
-			.select('*')
-			.where(
-				(frappe.qb.case()
-					.when(Discounts.start_date.isnotnull(), Discounts.start_date <= today)
-					.otherwise(True)
-				) &
-				(frappe.qb.case()
-					.when(Discounts.end_date.isnotnull(), Discounts.end_date >= today)
-					.otherwise(True)
-				) &
-				(Discounts.discount_type == "Assigned to Delivery Charges") &
-				(Discounts.requires_coupon_code == 1) &
-				(Discounts.coupon_code == coupon_code)
-			)
-			.orderby(Discounts.priority, order='desc')
-		)
-		discounts = query.run(as_dict=True)
+    base_conditions = (
+        (Case()
+            .when(Discounts.start_date.isnotnull(), Discounts.start_date <= today)
+            .else_(True)
+        ) &
+        (Case()
+            .when(Discounts.end_date.isnotnull(), Discounts.end_date >= today)
+            .else_(True)
+        ) &
+        (Discounts.discount_type == "Assigned to Delivery Charges")
+    )
+
+    if is_coupon_code == 1 and coupon_code:
+        base_conditions &= (
+            (Discounts.requires_coupon_code == 1) &
+            (Discounts.coupon_code == coupon_code)
+        )
+    else:
+        base_conditions &= (
+            (Discounts.requires_coupon_code == 0) | (Discounts.requires_coupon_code.isnull())
+        )
+
+    query = (
+        frappe.qb.from_(Discounts)
+        .select('*')
+        .where(base_conditions)
+        .orderby(Discounts.priority, order=Order.desc)
+    )
+
+    discounts = query.run(as_dict=True)
 	if discounts:
 		out = check_delivery_charge_discount_(
 												discounts,
@@ -1512,7 +1508,7 @@ def get_coupon_code_by_apply_discount(products_list,apply_discount):
 			.where(
 				ProductImage.parent == disc.product
 			)
-			.order_by(ProductImage.is_primary.desc())
+			.orderby(ProductImage.is_primary.desc())
 			.limit(1)
 		)
 		image = query.run(as_dict=True)
@@ -1725,7 +1721,7 @@ def get_coupon_code_from_discount_rule(product_array,coupon_code,today_date):
 			(Discounts.requires_coupon_code == 1) &
 			(Discounts.coupon_code == coupon_code)
 		)
-		.orderby(Discounts.priority, order="desc")
+		.orderby(Discounts.priority, order=Order.desc)
 	)
 	rule = query.run(as_dict=True)
 	return rule
@@ -1747,7 +1743,7 @@ def get_free_product_item(free_product_item,products_list):
 				.as_('image') 
 			)
 			.where(ProductImage.parent == out['free_item'])
-			.order_by(ProductImage.is_primary, sort='desc') 
+			.orderby(ProductImage.is_primary, sort='desc') 
 			.limit(1)
 		)
 		image = image_query.run(as_dict=True)
@@ -1994,7 +1990,7 @@ def	get_ordersubtotal_discount_forfree_product_item(free_product_item,products_l
 			frappe.qb.from_(ProductImage)
 			.select(Field('mini_cart').ifnull('').as_('image'))
 			.where(ProductImage.parent == disc.product)
-			.order_by(ProductImage.is_primary, desc=True)
+			.orderby(ProductImage.is_primary, desc=True)
 			.limit(1)
 		)
 		image = image_query.run(as_dict=True)
@@ -2332,7 +2328,7 @@ def calculate_discount_out(discount,rate,out,product,attribute_id,attribute_desc
 					frappe.qb.func.coalesce(ProductImage.mini_cart, '')
 				)
 				.where(ProductImage.parent == out['free_item'])
-				.order_by(ProductImage.is_primary, sort='desc') 
+				.orderby(ProductImage.is_primary, sort='desc') 
 				.limit(1)
 			)
 			image = image_query.run(as_dict=True)
@@ -2363,7 +2359,7 @@ def calculate_discount_out(discount,rate,out,product,attribute_id,attribute_desc
 					fn.coalesce(ProductImage.mini_cart, '').as_('image')
 				)
 				.where(ProductImage.parent == out['free_item'])
-				.order_by(ProductImage.is_primary, sort='desc')
+				.orderby(ProductImage.is_primary, sort='desc')
 				.limit(1)
 			)
 			image = image_query.run(as_dict=True)
@@ -2391,7 +2387,7 @@ def calculate_apply_discount(apply_discount,qty,discount,products_list):
 				fn.coalesce(ProductImage.mini_cart, '').as_('image')
 			)
 			.where(ProductImage.parent == disc.product)
-			.order_by(ProductImage.is_primary, sort='desc')
+			.orderby(ProductImage.is_primary, sort='desc')
 			.limit(1)
 		)
 
