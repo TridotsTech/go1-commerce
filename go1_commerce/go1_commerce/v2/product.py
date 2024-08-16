@@ -1476,7 +1476,7 @@ def get_sorted_brand_products_query(page_size,conditions,brand_filter,sort_by,br
 	try:
 		(conditions, sort) = get_conditions_sort(brand_filter, ratings, sort_by, min_price, max_price, attributes)
 		list_columns = get_product_list_columns()
-		frappe.log_error("brand_filter",brand_filter)
+		# frappe.log_error("brand_filter",brand_filter)
 		query = f"""SELECT DISTINCT {list_columns}
 				FROM `tabProduct` P
 				LEFT JOIN `tabProduct Search Keyword` s ON s.parent = P.name
@@ -1508,7 +1508,7 @@ def get_sorted_category_products(category, sort_by, page_no, page_size, brands,
 		if productsid:
 			conditions += ' and P.name!="{name}"'.format(name=productsid)
 		list_columns = get_product_list_columns()
-		frappe.log_error("list_columns",list_columns)
+		# frappe.log_error("list_columns",list_columns)
 		query = f"""SELECT DISTINCT {list_columns}
 					FROM `tabProduct` P
 					INNER JOIN `tabProduct Category Mapping` CM ON CM.parent=P.name
@@ -1519,8 +1519,6 @@ def get_sorted_category_products(category, sort_by, page_no, page_size, brands,
 					GROUP BY P.name {sort}
 					LIMIT {(int(page_no) - 1)* int(page_size)},{int(page_size)}"""
 		result = frappe.db.sql(query, as_dict=True)
-		frappe.log_error("category_query",query)
-		frappe.log_error("result",result)
 		return result
 	except Exception:
 		frappe.log_error(frappe.get_traceback(), 'Error in api.get_sorted_category_products')
