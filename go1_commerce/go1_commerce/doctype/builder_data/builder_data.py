@@ -3,7 +3,6 @@
 
 import frappe
 from frappe.model.document import Document
-from frappe.query_builder import Field,DocType
 
 try:
 	catalog_settings = get_settings('Catalog Settings')
@@ -45,34 +44,18 @@ class BuilderData(Document):
 		if options_data:
 			options_filter = ','.join(['"' + x + '"' for x in options_data if x])
 		# frappe.log_error("options_filter",options_filter)
-		# selected_options_data = frappe.db.sql(f""" 
-		# 							SELECT 
-		# 								CONCAT(A.attribute_name," : ") AS attribute_name ,
-		# 								PAO.option_value,
-		# 								PAO.unique_name
-		# 							FROM 
-		# 								`tabProduct Attribute Option` PAO
-		# 							INNER JOIN 
-		# 								`tabProduct Attribute` A
-		# 							ON 
-		# 								PAO.attribute = A.name
-		# 							WHERE PAO.unique_name IN ({options_filter})
-		# 						""",as_dict=1)
+		selected_options_data = frappe.db.sql(f""" 
+									SELECT 
+										CONCAT(A.attribute_name," : ") AS attribute_name ,
+										PAO.option_value,
+										PAO.unique_name
+									FROM 
+										`tabProduct Attribute Option` PAO
+									INNER JOIN 
+										`tabProduct Attribute` A
+									ON 
+										PAO.attribute = A.name
+									WHERE PAO.unique_name IN ({options_filter})
+								""",as_dict=1)
 		# frappe.log_error("selected_options_data",selected_options_data)
-		ProductAttributeOption = DocType('Product Attribute Option')
-		ProductAttribute = DocType('Product Attribute')
-
-		query = (
-			frappe.qb.from_(ProductAttributeOption)
-			.inner_join(ProductAttribute)
-			.on(ProductAttributeOption.attribute == ProductAttribute.name)
-			.select(
-				(ProductAttribute.attribute_name.concat(" : ")).as_("attribute_name"),
-				ProductAttributeOption.option_value,
-				ProductAttributeOption.unique_name
-			)
-			.where(ProductAttributeOption.unique_name.isin(options_filter))
-		)
-
-		selected_options_data = query.run(as_dict=True)
 		return selected_options_data
