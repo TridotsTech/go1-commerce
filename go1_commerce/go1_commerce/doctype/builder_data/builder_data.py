@@ -17,11 +17,10 @@ class BuilderData(Document):
 							brands=None, rating=None,min_price=None, 
 							max_price=None,attributes=None,
 							productsid=None,customer=None,route=None):
-		frappe.log_error("check_category",category)
-		frappe.log_error("brands",brands)
-		frappe.log_error("attributes",attributes)
+		if not customer and frappe.request.cookies.get('customer_id'):
+			customer = frappe.request.cookies.get('customer_id')
 		from go1_commerce.go1_commerce.v2.product import get_category_products as _get_category_products
-		return _get_category_products(category=category, 
+		product_list = _get_category_products(category=category, 
 							sort_by=sort_by, 
 							page_no=page_no,
 							page_size=page_size,
@@ -32,6 +31,23 @@ class BuilderData(Document):
 							attributes=attributes,
 							customer=customer,
 							route=route)
+		if customer:
+			customer_cart = self.get_customer_cart_items(customer)
+			for x in product_list:
+				x.in_cart = False
+				x.in_wishlist = False
+				x.in_cart_qty = 0
+				if customer_cart.get("cart") and customer_cart.get("cart").get("items"):
+					check_exist = list(filter(lambda ci: ci.product == x.name, customer_cart.get("cart").get("items")))
+					if check_exist:
+						x.in_cart = True
+						x.in_cart_qty = check_exist[0].quantity
+				if customer_cart.get("wishlist") and customer_cart.get("wishlist").get("items"):
+					check_exist = list(filter(lambda ci: ci.product == x.name, customer_cart.get("wishlist").get("items")))
+					if check_exist:
+						x.in_wishlist = True
+
+		return product_list
 	def get_product_details(self,route):
 		from go1_commerce.go1_commerce.v2.product import get_product_details as _get_product_details
 		return _get_product_details(route=route)
@@ -57,5 +73,9 @@ class BuilderData(Document):
 										PAO.attribute = A.name
 									WHERE PAO.unique_name IN ({options_filter})
 								""",as_dict=1)
-		# frappe.log_error("selected_options_data",selected_options_data)
 		return selected_options_data
+
+	def get_customer_cart_items(self,customer):
+		from go1_commerce.go1_commerce.v2.cart import get_cart_items
+		return get_cart_items(customer)
+
