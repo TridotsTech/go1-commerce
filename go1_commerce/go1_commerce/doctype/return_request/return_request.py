@@ -9,6 +9,7 @@ import datetime
 from frappe.utils import flt, nowdate, getdate,now
 from go1_commerce.utils.setup import get_settings
 from frappe.query_builder import DocType, Field
+from frappe.query_builder.functions import Concat, IfNull
 
 class ReturnRequest(Document):
 	def validate(self):		
@@ -445,9 +446,9 @@ def get_order_items(doctype, txt, searchfield, start, page_len, filters):
 			.inner_join(Product).on(Product.name == OrderItem.item)
 			.select(
 				OrderItem.name,
-				frappe.qb.fn.Concat(OrderItem.item, "<br/>", OrderItem.item_name, frappe.qb.fn.IfNull(OrderItem.attribute_description, ''))\
+				Concat(OrderItem.item, "<br/>", OrderItem.item_name, IfNull(OrderItem.attribute_description, ''))\
 					.as_("item_name"),
-				frappe.qb.fn.Concat("<br/>SKU:", OrderItem.item_sku).as_("item_sku")
+				Concat("<br/>SKU:", OrderItem.item_sku).as_("item_sku")
 			)
 			.where(
 				OrderItem.return_created == 0,
@@ -482,9 +483,9 @@ def get_return_order_items(order_id, return_type, return_created):
 			query = query.where(ReplacementPolicy.eligible_for_replacement == 1)
 		query = query.select(
 			OrderItem.name,
-			frappe.qb.fn.Concat("<br/>Name:", frappe.qb.fn.IfNull(OrderItem.item_name, ''), 
-								frappe.qb.fn.IfNull(OrderItem.attribute_description, '')).as_("item_name"),
-			frappe.qb.fn.Concat("<br/>SKU:", OrderItem.item_sku).as_("item_sku")
+			Concat("<br/>Name:", IfNull(OrderItem.item_name, ''), 
+								IfNull(OrderItem.attribute_description, '')).as_("item_name"),
+			Concat("<br/>SKU:", OrderItem.item_sku).as_("item_sku")
 		)
 		query = query.where(
 			OrderItem.return_created == return_created,
