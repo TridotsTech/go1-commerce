@@ -11,6 +11,7 @@ from frappe.model.naming import make_autoname
 from frappe.utils.nestedset import NestedSet
 from go1_commerce.utils.setup import get_settings, get_settings_value
 from frappe.query_builder import DocType,Criterion, Order
+from frappe.query_builder.functions import Function
 
 class Customers(NestedSet):
 	nsm_parent_field = 'parent_level'
@@ -679,7 +680,7 @@ def get_order_count(name):
 		.select(Doc.name)
 		.where(
 			(Doc.customer == name) &
-			(Doc.creation.date() == frappe.utils.nowdate()) &
+			(Function('DATE', Doc.creation) == frappe.utils.nowdate())&
 			(Doc.naming_series != "SUB-ORD-")
 		)
 	).run(as_dict=True)
