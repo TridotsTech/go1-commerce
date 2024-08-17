@@ -7,7 +7,6 @@ from frappe.utils import flt,today
 from datetime import datetime
 from go1_commerce.utils.utils import other_exception,get_customer_from_token
 from go1_commerce.utils.setup import get_settings
-from frappe.query_builder import DocType, Field, Order
 
 class CustomerCart:
 	def insert_guest_customer(self):
@@ -17,7 +16,6 @@ class CustomerCart:
 									}).insert(ignore_permissions=True,ignore_mandatory = True)
 		frappe.local.cookie_manager.set_cookie('guest_customer', new_customer.name)
 		frappe.local.cookie_manager.set_cookie('customer_id', new_customer.name)
-		frappe.local.session['customer_id'] =  new_customer.name
 		frappe.session['customer_id'] = new_customer.name
 		return new_customer.name
 	
@@ -97,7 +95,7 @@ class CustomerCart:
 										sender_email,sender_message,recipient_email, 
 										recipient_date_of_birth,recipient_name,device_type)
 			if res.get('status'):
-				return get_customer_cart(cart_type,customer)
+				return get_cart_items(customer)
 			else:
 				return res
 		
@@ -159,7 +157,7 @@ class CustomerCart:
 			'product': product_details.name,
 			'product_name':product_details.item,
 			'old_price':product_details.old_price,
-			'quantity': int(qty),
+			'quantity': qty,
 			'price': product_details.price,
 			'attribute_description': attribute,
 			'attribute_ids': attribute_id,
@@ -539,7 +537,9 @@ def get_cart_items(customer_id = None):
 			from go1_commerce.go1_commerce.v2.product import get_bought_together
 			cart = get_customer_cart('Shopping Cart',customer)
 			wishlist = get_customer_cart('Wishlist',customer)
-			customer_bought = get_bought_together(customer)
+			customer_bought = []
+			if frappe.db.get_single_value('Shopping Cart Settings','show_bestsellers_in_shopping_cart') == 1:
+				customer_bought = get_bought_together(customer)
 			return {"status":"success",
 		   			'cart': cart,
 					'wishlist': wishlist,

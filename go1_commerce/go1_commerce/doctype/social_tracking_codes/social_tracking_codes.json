@@ -1,0 +1,143 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-08-16 13:15:58.006264",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_uyw9",
+  "google_site_verification",
+  "column_break_6bsw",
+  "google_analytics_code",
+  "column_break_jtgl",
+  "tag_manager_snippet",
+  "facebook_section",
+  "facebook_page_id",
+  "column_break_lg6n",
+  "facebook_pixel_code",
+  "column_break_t1kn",
+  "facebook_messenger",
+  "chat_section",
+  "whatsapp_snippet",
+  "column_break_ljoo",
+  "live_chat_snippet",
+  "others_section",
+  "header_script"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_uyw9",
+   "fieldtype": "Section Break",
+   "label": "Google"
+  },
+  {
+   "fieldname": "google_site_verification",
+   "fieldtype": "Data",
+   "label": "Google Site Verification"
+  },
+  {
+   "fieldname": "column_break_6bsw",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "google_analytics_code",
+   "fieldtype": "Small Text",
+   "ignore_xss_filter": 1,
+   "label": "Google Analytics Code"
+  },
+  {
+   "fieldname": "column_break_jtgl",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "tag_manager_snippet",
+   "fieldtype": "Small Text",
+   "ignore_xss_filter": 1,
+   "label": "Tag Manager Snippet"
+  },
+  {
+   "fieldname": "facebook_section",
+   "fieldtype": "Section Break",
+   "label": "Facebook"
+  },
+  {
+   "fieldname": "facebook_page_id",
+   "fieldtype": "Data",
+   "label": "Facebook Page Id"
+  },
+  {
+   "fieldname": "column_break_lg6n",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "facebook_pixel_code",
+   "fieldtype": "Small Text",
+   "label": "Facebook Pixel Code"
+  },
+  {
+   "fieldname": "column_break_t1kn",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "facebook_messenger",
+   "fieldtype": "Small Text",
+   "ignore_xss_filter": 1,
+   "label": "Facebook Messenger"
+  },
+  {
+   "fieldname": "others_section",
+   "fieldtype": "Section Break",
+   "label": "Others"
+  },
+  {
+   "fieldname": "header_script",
+   "fieldtype": "Long Text",
+   "ignore_xss_filter": 1,
+   "label": "Other Header Script"
+  },
+  {
+   "fieldname": "chat_section",
+   "fieldtype": "Section Break",
+   "label": "Chat"
+  },
+  {
+   "fieldname": "whatsapp_snippet",
+   "fieldtype": "Small Text",
+   "ignore_xss_filter": 1,
+   "label": "WhatsApp Snippet"
+  },
+  {
+   "fieldname": "column_break_ljoo",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "live_chat_snippet",
+   "fieldtype": "Small Text",
+   "ignore_xss_filter": 1,
+   "label": "Live Chat Snippet"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2024-08-16 13:21:52.701328",
+ "modified_by": "Administrator",
+ "module": "Go1 Commerce",
+ "name": "Social Tracking Codes",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

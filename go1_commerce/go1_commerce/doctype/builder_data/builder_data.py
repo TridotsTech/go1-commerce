@@ -60,38 +60,35 @@ class BuilderData(Document):
 		if options_data:
 			options_filter = ','.join(['"' + x + '"' for x in options_data if x])
 		# frappe.log_error("options_filter",options_filter)
-		# selected_options_data = frappe.db.sql(f""" 
-		# 							SELECT 
-		# 								CONCAT(A.attribute_name," : ") AS attribute_name ,
-		# 								PAO.option_value,
-		# 								PAO.unique_name
-		# 							FROM 
-		# 								`tabProduct Attribute Option` PAO
-		# 							INNER JOIN 
-		# 								`tabProduct Attribute` A
-		# 							ON 
-		# 								PAO.attribute = A.name
-		# 							WHERE PAO.unique_name IN ({options_filter})
-		# 						""",as_dict=1)
-		ProductAttributeOption = DocType('Product Attribute Option')
-		ProductAttribute = DocType('Product Attribute')
-
-		query = (
-			frappe.qb.from_(ProductAttributeOption)
-			.inner_join(ProductAttribute)
-			.on(ProductAttributeOption.attribute == ProductAttribute.name)
-			.select(
-				(ProductAttribute.attribute_name.concat(" : ")).as_("attribute_name"),
-				ProductAttributeOption.option_value,
-				ProductAttributeOption.unique_name
-			)
-			.where(ProductAttributeOption.unique_name.isin(options_filter))
-		)
-
-		selected_options_data = query.run(as_dict=True)
+		selected_options_data = frappe.db.sql(f""" 
+									SELECT 
+										CONCAT(A.attribute_name," : ") AS attribute_name ,
+										PAO.option_value,
+										PAO.unique_name
+									FROM 
+										`tabProduct Attribute Option` PAO
+									INNER JOIN 
+										`tabProduct Attribute` A
+									ON 
+										PAO.attribute = A.name
+									WHERE PAO.unique_name IN ({options_filter})
+								""",as_dict=1)
 		return selected_options_data
 
 	def get_customer_cart_items(self,customer):
 		from go1_commerce.go1_commerce.v2.cart import get_cart_items
 		return get_cart_items(customer)
 
+	def get_all_settings(self):
+		try:
+			import os,json
+			path = frappe.utils.get_files_path()
+			file_path = os.path.join(path, "settings/all_settings.json")
+			all_categories = None
+			if os.path.exists(file_path):
+					f = open(file_path)
+					all_categories = json.load(f)
+			return all_categories
+		except Exception:
+			frappe.log_error(title = "Error in get_all_settings", 
+								message = frappe.get_traceback())
