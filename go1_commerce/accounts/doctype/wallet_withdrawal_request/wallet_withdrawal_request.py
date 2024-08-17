@@ -9,6 +9,7 @@ from frappe import _
 from frappe.utils import flt, nowdate
 from frappe.utils import flt, nowdate, now
 from go1_commerce.utils.setup import get_settings_value
+from frappe.query_builder import DocType, Field, Function
 
 class WalletWithdrawalRequest(Document):
 	def validate(self):
@@ -121,13 +122,23 @@ def make_autowallet_payment(source_name):
 def transacrtion_reference(source):
 	try:
 		tran = ""
-		wallet_trans = frappe.db.sql("""SELECT balance_amount, party, name, reference, order_type, order_id 
-										FROM `tabWallet Transaction` 
-										WHERE is_settlement_paid=0 
-          									AND balance_amount>0 
-											AND transaction_type="Pay" 
-											AND party=%s
-									""", source.party, as_dict=True)
+		WalletTransaction = DocType('Wallet Transaction')
+	    query = (
+	        frappe.qb.from_(WalletTransaction)
+	        .select(
+	            WalletTransaction.balance_amount,
+	            WalletTransaction.party,
+	            WalletTransaction.name,
+	            WalletTransaction.reference,
+	            WalletTransaction.order_type,
+	            WalletTransaction.order_id
+	        )
+	        .where(WalletTransaction.is_settlement_paid == 0)
+	        .where(WalletTransaction.balance_amount > 0)
+	        .where(WalletTransaction.transaction_type == 'Pay')
+	        .where(WalletTransaction.party == source.party)
+	    )
+	    wallet_trans = query.run(as_dict=True)
 		if len(wallet_trans)>0:
 			amt = source.withdraw_amount
 			for trans in wallet_trans:

@@ -8,6 +8,7 @@ from frappe.model.document import Document
 from go1_commerce.go1_commerce.doctype.customers.customers import update_password
 from frappe.utils import nowdate
 from go1_commerce.utils.setup import get_settings
+from frappe.query_builder import DocType
 
 class Drivers(Document):
 	def validate(self):
@@ -29,14 +30,13 @@ class Drivers(Document):
 	def validate_status_change(self):
 		prev_status = frappe.db.get_value('Drivers', self.name, 'working_status')
 		if self.working_status == 'Available' and prev_status == 'On Duty':
-			check_orders_list = frappe.db.sql('''SELECT name 
-												FROM `tabOrder` 
-												WHERE driver = %(driver)s 
-													AND status NOT IN ("Completed", "Cancelled")
-											''', {'driver': self.name}, as_dict = 1)
+			query = (frappe.qb.from_("tabOrder") 
+				.select("name") 
+				.where("driver = %s", self.name) 
+				.where(frappe.qb.not_in("status", ["Completed", "Cancelled"])))
+			check_orders_list= query.run(as_dict=True)
 			if check_orders_list:
 				frappe.throw(frappe._('Status cannot be changed to Available.'))
-		
 
 	def validate_phone(self):
 		import re
@@ -76,10 +76,14 @@ class Drivers(Document):
 					update_password(new_password=self.new_password,user=self.name)
 					frappe.db.set_value('Drivers', self.name, 'set_new_password','')
 			else:					
-				d = frappe.db.sql("""SELECT name 
-									FROM `tabUser` 
-									WHERE email = %(email)s
-								""",{'email':self.driver_email})
+				User = DocType('User')
+				query = (
+					frappe.qb.from_(User)
+					.select(User.name)
+					.where(User.email == self.driver_email)
+				)
+
+				d = query.run(as_dict=True)
 				if d:
 					user_role=frappe.db.get_all('Has Role',
 									filters = {'parent':self.driver_email,'role':'Driver'}) 							
@@ -135,10 +139,12 @@ def insert_user(self):
 
 def get_shipping_manager():
 	shipping_info = ''
-	installed_apps = frappe.db.sql(''' SELECT * 
-										FROM `tabModule Def` 
-										WHERE app_name = 'shipping_providers'
-									''', as_dict = True)
+	
+	installed_apps = (
+		frappe.qb.from_("Module Def")
+		.select("*")
+		.where(frappe.qb.field("app_name") == "shipping_providers")
+	).run(as_dict=True)
 	if len(installed_apps) > 0:
 		user = frappe.session.user
 		if "Shipping Manager" in frappe.get_roles(user):
@@ -150,10 +156,12 @@ def get_shipping_manager():
 	return shipping_info
 
 def get_query_condition(user):
-	installed_apps = frappe.db.sql(''' SELECT * 
-										FROM `tabModule Def` 
-										WHERE app_name = 'shipping_providers'
-									''', as_dict = True)
+	installed_apps = (
+		frappe.qb.from_("Module Def")
+		.select("*")
+		.where(frappe.qb.field("app_name") == "shipping_providers")
+	).run(as_dict=True)
+	
 	if len(installed_apps) > 0:
 		if not user: user = frappe.session.user
 		if "Shipping Manager" in frappe.get_roles(user):
@@ -166,16 +174,17 @@ def get_query_condition(user):
 																		)
 
 def has_permission(doc, user):
-	installed_apps = frappe.db.sql(''' SELECT * 
-										FROM `tabModule Def` 
-										WHERE app_name = 'shipping_providers'
-									''', as_dict = True)
+	installed_apps = (
+		frappe.qb.from_("Module Def")
+		.select("*")
+		.where(frappe.qb.field("app_name") == "shipping_providers")
+	).run(as_dict=True)
 	if len(installed_apps) > 0:
 		if not user: user = frappe.session.user
 		if "Shipping Manager" in frappe.get_roles(user):
 			shipping_provider = frappe.db.get_all('Shipping Provider',
-                                         filters = {'email':user},
-                                         fields = ['name'])
+										 filters = {'email':user},
+										 fields = ['name'])
 			if shipping_provider:
 				if doc.shipping_provider == shipping_provider[0].name:
 					return True

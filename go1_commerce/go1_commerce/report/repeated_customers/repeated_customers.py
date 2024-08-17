@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 import frappe
 from frappe import _
 from datetime import date, timedelta, datetime
+from frappe.query_builder import DocType, Count
 
 def execute(filters=None):
 	columns, data = [], []
@@ -19,13 +20,31 @@ def get_columns():
 		_("No.Of Orders Placed") + ":Int:200",
 	]
 
+
+
 def get_data(filters):
-	conditions = ''
+	Order = DocType('Order')
+	conditions = []
 	if filters.get('from_date'):
-		conditions+=' and O.order_date>="%s"' % filters.get('from_date')
+		conditions.append(Order.order_date >= filters.get('from_date'))
 	if filters.get('to_date'):
-		conditions+=' and O.order_date<="%s"' % filters.get('to_date')
-	data = frappe.db.sql('''select O.customer_name,O.customer_email,COUNT(*) as count FROM `tabOrder` O WHERE docstatus=1 and status<>"Cancelled" and restaurant_status<>"Declined" {condition} group by O.customer_name,O.customer_email ORDER BY count DESC'''.format(condition=conditions), as_list=1)
-	return data
-
-
+		conditions.append(Order.order_date <= filters.get('to_date'))
+	query = (
+		frappe.qb.from_(Order)
+		.select(
+			Order.customer_name,
+			Order.customer_email,
+			Count('*').as_('count')
+		)
+		.where(
+			(Order.docstatus == 1) &
+			(Order.status != 'Cancelled') &
+			(Order.restaurant_status != 'Declined') &
+			*conditions
+		)
+		.groupby(Order.customer_name, Order.customer_email)
+		.orderby(Count('*'), order="Order.desc")
+	)
+	
+	results = query.run(as_dict=True)
+	return results

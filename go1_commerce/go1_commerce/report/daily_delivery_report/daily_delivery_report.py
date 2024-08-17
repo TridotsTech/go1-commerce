@@ -3,6 +3,8 @@
 
 from __future__ import unicode_literals
 import frappe
+from frappe.query_builder import DocType
+from frappe.query_builder.functions import Concat
 
 def execute(filters=None):
 	columns, data = [], []
@@ -27,26 +29,110 @@ def get_columns():
 	]
 	
 def order_report(filters):
-	condition = ' and o.order_date = "{0}"'.format(filters.get('date'))
-
-	vendor_order = frappe.db.sql('''select o.name, o.status, o.payment_status, concat(o.first_name,' ' ,o.last_name), 
-	 o.order_date, o.total_amount from `tabOrder` o inner join `tabOrder Delivery Slot` od on od.order=o.name where o.docstatus=1 {condition} '''.format(condition=condition), as_list=1)
+	Order = DocType('Order')
+	OrderDeliverySlot = DocType('Order Delivery Slot')
+	date_filter = filters.get('date')
+	query = (
+		frappe.qb.from_(Order)
+		.inner_join(OrderDeliverySlot).on(Order.name == OrderDeliverySlot.order)
+		.select(
+			Order.name,
+			Order.status,
+			Order.payment_status,
+			(Order.first_name + ' ' + Order.last_name).as_('full_name'),
+			Order.order_date,
+			Order.total_amount
+		)
+		.where(Order.docstatus == 1)
+	)
+	if date_filter:
+		query = query.where(Order.order_date == date_filter)
+	vendor_order = query.run(as_list=True)
 	return vendor_order
 
 def get_orders(filters):
-	condition = ' and o.order_date = "{0}"'.format(filters.get('date'))
-	vendor_order = frappe.db.sql('''select o.name from `tabOrder` o inner join `tabOrder Delivery Slot` od on od.order=o.name where o.docstatus=1 {condition} '''.format(condition=condition), as_list=1)
+	Order = DocType('Order')
+	OrderDeliverySlot = DocType('Order Delivery Slot')
+	date_filter = filters.get('date')
+	query = (
+		frappe.qb.from_(Order)
+		.inner_join(OrderDeliverySlot).on(Order.name == OrderDeliverySlot.order)
+		.select(Order.name)
+		.where(Order.docstatus == 1)
+	)
+	if date_filter:
+		query = query.where(Order.order_date == date_filter)
+	vendor_order = query.run(as_list=True)
+	return vendor_order
+	
+def order_report(filters):
+	Order = DocType("Order")
+	OrderDeliverySlot = DocType("Order Delivery Slot")
+	date_condition = (Order.order_date == filters.get('date'))
+	query = (
+		frappe.qb.from_(Order)
+		.join(OrderDeliverySlot)
+		.on(Order.name == OrderDeliverySlot.order)
+		.select(
+			Order.name,
+			Order.status,
+			Order.payment_status,
+			Concat(Order.first_name, " ", Order.last_name).as_("customer_name"),
+			Order.order_date,
+			Order.total_amount
+		)
+		.where(
+			(Order.docstatus == 1) &
+			date_condition
+		)
+	)
+	
+	vendor_order = query.run(as_list=True)
+	return vendor_order
+
+def get_orders(filters):
+	Order = DocType("Order")
+	OrderDeliverySlot = DocType("Order Delivery Slot")
+	date_condition = (Order.order_date == filters.get('date'))
+	query = (
+		frappe.qb.from_(Order)
+		.join(OrderDeliverySlot)
+		.on(Order.name == OrderDeliverySlot.order)
+		.select(Order.name)
+		.where(
+			(Order.docstatus == 1) &
+			date_condition
+		)
+	)
+	vendor_order = query.run(as_list=True)
 	return vendor_order
 
 def get_chart_data(orders,data, filters):
-	condition = ' and o.order_date = "{0}"'.format(filters.get('date'))
+	Order = DocType("Order")
+	OrderDeliverySlot = DocType("Order Delivery Slot")
+	date_condition = (Order.order_date == filters.get('date'))
+	
+	datasets = []
+	
 	if not orders:
 		orders = []
-	datasets = []
+
 	for item in orders:
 		if item:
-			vendor_order = frappe.db.sql('''select o.total_amount from `tabOrder` o inner join `tabOrder Delivery Slot` od on od.order=o.name where o.docstatus=1 and o.name=%s {condition}'''.format(condition=condition),(item[0]), as_list=1)
-			datasets.append(vendor_order[0][0])
+			query = (
+				frappe.qb.from_(Order)
+				.join(OrderDeliverySlot)
+				.on(Order.name == OrderDeliverySlot.order)
+				.select(Order.total_amount)
+				.where(
+					(Order.docstatus == 1) &
+					(Order.name == item[0]) &
+					date_condition
+				)
+			)
+			vendor_order = query.run(as_list=True)
+			if vendor_order:
+				datasets.append(vendor_order[0][0])
 	chart = {
 		"data": {
 			'labels': orders,

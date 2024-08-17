@@ -4,7 +4,7 @@
 from __future__ import unicode_literals
 import frappe
 from frappe import _
-
+from frappe.query_builder import DocType, Order
 
 def execute(filters=None):
 	columns, data = [], []
@@ -27,31 +27,70 @@ def get_columns(filters):
 	return columns
 
 def get_data(filters):
-	conditions = ' and o.ship_date = "{0}"'.format(filters.get('date'))
+	Orders = DocType('Order')
+	ShippingMethod = DocType('Shipping Method')
+	conditions = []
+	if filters.get('date'):
+		conditions.append(Orders.ship_date == filters.get('date'))
 	
-	query = 'select o.name, o.order_date,o.shipping_method_name,o.payment_status, o.payment_method_name,o.customer_name,o.customer_email,o.phone,'
-	query += 'o.total_amount from `tabOrder` o inner join `tabShipping Method` SM on SM.name=o.shipping_method where o.docstatus = 1 and SM.is_deliverable=0 and SM.show_in_website=1 {condition}'
-	data = frappe.db.sql(query.format(condition=conditions), as_list=1)
+	query = frappe.qb.from_(Orders)
+	query = query.inner_join(ShippingMethod).on(Orders.shipping_method == ShippingMethod.name)
+	query = query.select(
+		Orders.name,
+		Orders.order_date,
+		Orders.shipping_method_name,
+		Orders.payment_status,
+		Orders.payment_method_name,
+		Orders.customer_name,
+		Orders.customer_email,
+		Orders.phone,
+		Orders.total_amount
+	).where(
+		(Orders.docstatus == 1) &
+		(ShippingMethod.is_deliverable == 0) &
+		(ShippingMethod.show_in_website == 1) &
+		*conditions
+	)
+	data = query.run(as_list=True)
 	return data
 
 def get_orders(filters):
-	conditions = ' and o.ship_date = "{0}"'.format(filters.get('date'))
-		
-	query = 'select o.name from `tabOrder` o where o.docstatus = 1 {condition}'
-	data = frappe.db.sql(query.format(condition=conditions), as_list=1)
+	Orders = DocType('Order')
+	conditions = []
+	if filters.get('date'):
+		conditions.append(Orders.ship_date == filters.get('date'))
+	
+	query = frappe.qb.from_(Orders)
+	query = query.select(Orders.name).where(
+		(Orders.docstatus == 1) &
+		*conditions
+	)
+	data = query.run(as_list=True)
 	return data
 
 def get_chart_data(orders,data, filters):
 	if not orders:
-		orders = []
+		return []
+
+	Order = DocType('Order')
+
 	datasets = []
 	for item in orders:
 		if item:
-			conditions = ' and o.order_date = "{0}"'.format(filters.get('date'))
-				
-			query = 'select o.total_amount from `tabOrder` o where o.docstatus = 1 and o.name=%s {condition}'
-			data = frappe.db.sql(query.format(condition=conditions), (item[0]), as_list=1)
-			datasets.append(data[0][0])
+			conditions = []
+			if filters.get('date'):
+				conditions.append(Order.order_date == filters.get('date'))
+			
+			query = frappe.qb.from_(Order).select(Order.total_amount).where(
+				(Order.docstatus == 1) &
+				(Order.name == item[0]) &
+				*conditions
+			)
+			
+			result = query.run(as_list=True)
+			if result:
+				datasets.append(result[0][0])
+	
 	chart = {
 		"data": {
 			'labels': orders,
@@ -64,8 +103,14 @@ def get_chart_data(orders,data, filters):
 @frappe.whitelist()
 def get_shipping_methods(doctype,txt,searchfield,start,page_len,filters):
 	try:	
-		query='SELECT name, shipping_method_name from `tabShipping Method` where is_deliverable=0 and show_in_website=1 order by display_order'
-		results=frappe.db.sql('''{query}'''.format(query=query))
+		query = frappe.qb.from_('tabShipping Method')
+			.select('name', 'shipping_method_name')
+			.where(
+				(frappe.qb.Field('is_deliverable') == 0) &
+				(frappe.qb.Field('show_in_website') == 1)
+			)
+			.orderby('display_order')
+		results = query.run(as_dict=True)
 		return results
 	except Exception:
 		frappe.log_error(frappe.get_traceback(), "go1_commerce.go1_commerce.report.daily_sales_report.daily_sales_report.get_shipping_methods") 

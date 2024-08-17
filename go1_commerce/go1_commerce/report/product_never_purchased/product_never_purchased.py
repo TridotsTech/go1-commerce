@@ -3,6 +3,7 @@
 
 from __future__ import unicode_literals
 import frappe
+from frappe.query_builder import DocType
 
 def execute(filters=None):
 	columns, data = [], []
@@ -19,7 +20,23 @@ def get_columns():
 
 def products_never_purchased(filters):	
 	try:
-		products1 = frappe.db.sql('''select item from `tabOrder Item` where parenttype = "Order" group by item''',as_dict = 1)
-		return frappe.db.sql('''select p.name, p.item from `tabProduct` p where p.is_active=1 and p.status='Approved' and p.name not in (select item from `tabOrder Item` where parenttype = "Orders") ''', as_list = 1)
+		Product = DocType('Product')
+		OrderItem = DocType('Order Item')
+		subquery = (
+			frappe.qb.from_(OrderItem)
+			.select(OrderItem.item)
+			.where(OrderItem.parenttype == 'Orders')
+		)
+		products_query = (
+			frappe.qb.from_(Product)
+			.select(Product.name, Product.item)
+			.where(
+				(Product.is_active == 1) &
+				(Product.status == 'Approved') &
+				(Product.name.isin(subquery))
+			)
+		)
+		results = products_query.run(as_list=True)
+		return results
 	except Exception as e:
 		frappe.log_error(frappe.get_traceback(), "go1_commerce.go1_commerce.report.products_never_purchased")

@@ -9,7 +9,7 @@ from go1_commerce.utils.utils import other_exception,get_customer_from_token
 from go1_commerce.utils.setup import get_settings
 from frappe.query_builder import DocType, Field, Order
 
-class CustomerCart:
+class CrudCart:
 	def insert_guest_customer(self):
 		new_customer = frappe.get_doc({'doctype': 'Customers',
 									'naming_series': 'GC-',
@@ -17,8 +17,6 @@ class CustomerCart:
 									}).insert(ignore_permissions=True,ignore_mandatory = True)
 		frappe.local.cookie_manager.set_cookie('guest_customer', new_customer.name)
 		frappe.local.cookie_manager.set_cookie('customer_id', new_customer.name)
-		frappe.local.session['customer_id'] =  new_customer.name
-		frappe.session['customer_id'] = new_customer.name
 		return new_customer.name
 	
 	def validate_stock_min_max_qty(self,item_info,qty,attribute_ids = None):
@@ -86,6 +84,12 @@ class CustomerCart:
 		exe_cart = frappe.db.get_value('Shopping Cart',{'customer': customer,
 										'cart_type': cart_type},"name")
 		if exe_cart:
+			if cart_type == 'Shopping Cart':
+				order_settings = get_settings('Order Settings')
+				if order_settings.pre_order_not_allow_cart == 1:
+					pre_order_status = self.validate_pre_order_items(exe_cart,product_details.name)
+					if pre_order_status.get('status') == 'failed':
+						return {'status': 'failed','message': pre_order_status.get('message')}
 			return self.insert_update_cart_item(customer,product_details,exe_cart,attribute,
 											cart_type,qty,rate,qty_type,attribute_id,
 											is_gift_card,sender_name,sender_email,sender_message,
@@ -449,7 +453,7 @@ def insert_cart_items(item_code, qty, qty_type, rate = 0, cart_type = "Shopping 
 						recipient_date_of_birth = None,recipient_name = None, device_type = None,
 						customer = None):
 	try:
-		insert_cart = CustomerCart()
+		insert_cart = CrudCart()
 		return insert_cart.insert_cart_items(item_code, qty, qty_type, rate, cart_type,
 						attribute, attribute_id,is_gift_card ,sender_name ,
 						sender_email ,sender_message ,recipient_email ,
@@ -461,7 +465,7 @@ def insert_cart_items(item_code, qty, qty_type, rate = 0, cart_type = "Shopping 
 @frappe.whitelist(allow_guest = True)
 def update_cartitem(name, qty, qty_type = None):
 	try:
-		update_cart = CustomerCart()
+		update_cart = CrudCart()
 		return update_cart.update_cartitem(name, qty, qty_type)
 	except Exception:
 		other_exception("Error in v2.cart.update_cartitem")
@@ -470,7 +474,7 @@ def update_cartitem(name, qty, qty_type = None):
 @frappe.whitelist(allow_guest = True)
 def move_item_to_cart(name,customer_id = None):
 	try:
-		move_cart = CustomerCart()
+		move_cart = CrudCart()
 		return move_cart.move_item_to_cart(name,customer_id)
 	except Exception:
 		other_exception("Error in v2.carts.move_item_to_cart")
@@ -478,7 +482,7 @@ def move_item_to_cart(name,customer_id = None):
 @frappe.whitelist(allow_guest = True)
 def move_all_tocart(customer_id = None):
 	try:
-		move_all_cart = CustomerCart()
+		move_all_cart = CrudCart()
 		return move_all_cart.move_all_tocart(customer_id)
 	except Exception:
 		other_exception("Error in v2.cart.move_all_tocart")
@@ -541,7 +545,7 @@ def get_cart_items(customer_id = None):
 			wishlist = get_customer_cart('Wishlist',customer)
 			customer_bought = get_bought_together(customer)
 			return {"status":"success",
-		   			'cart': cart,
+					'cart': cart,
 					'wishlist': wishlist,
 					"you_may_like": customer_bought}
 		else:
@@ -588,7 +592,7 @@ def check_attr_id_in_item(item):
 					images = sorted(images, key = lambda x: x.get('is_primary'),reverse = True)
 					item['image'] = images[0].get('thumbnail')
 					
-def check_items_in_customer_cart(items,tax_rates,customer_cart,cart_items):
+def check_items_in_customer_cart(items,tax_rates,customer_cart,mp_items):
 	if items:
 		for item in items:
 			if item.tax_breakup:
@@ -609,8 +613,8 @@ def check_items_in_customer_cart(items,tax_rates,customer_cart,cart_items):
 			item.discount_percentage = 0
 			if float(item.old_price) > 0 and float(item.price) < float(item.old_price):
 				item.discount_percentage = int(round((item.old_price - item.price) / item.old_price * 100, 0))
-			cart_items.append(item)
-	customer_cart.items = cart_items
+			mp_items.append(item)
+	customer_cart.marketplace_items = mp_items
 	
 def get_customer_cart(cart_type,customer):
 	customer_cart = frappe.db.get_value('Shopping Cart',{'customer': customer,'cart_type': cart_type},
@@ -618,9 +622,9 @@ def get_customer_cart(cart_type,customer):
 	if customer_cart:
 		items = get_items_if_customer_cart_exist(customer_cart)
 		tax_rates = []
-		cart_items = []
+		mp_items = []
 		tax_rate = 0
-		check_items_in_customer_cart(items,tax_rates,customer_cart,cart_items)
+		check_items_in_customer_cart(items,tax_rates,customer_cart,mp_items)
 		if tax_rates:
 			tax_rate = sum(x.get('rate') for x in tax_rates)
 		customer_cart.tax_rate = tax_rate

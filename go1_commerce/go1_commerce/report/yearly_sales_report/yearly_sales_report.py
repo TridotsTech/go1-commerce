@@ -4,6 +4,8 @@
 from __future__ import unicode_literals
 import frappe
 from frappe import _
+from frappe.query_builder import DocType
+from frappe.query_builder.functions import Count, Sum, MonthName, StrToDate
 
 def execute(filters=None):
 	columns, data = [], []
@@ -21,16 +23,27 @@ def get_columns(filters):
 	]
 
 def get_data(filters):
-	conditions = ''
-	conditions = ' and year(o.creation) = "{0}"'.format(filters.get('year'))
+	Order = DocType('Order')
+	conditions = (Order.docstatus == 1) & (Order.payment_status == 'Paid')
+	if filters.get('year'):
+		conditions &= frappe.qb.functions.Year(Order.creation) == filters.get('year')
 	if filters.get('from_date'):
-		conditions+=' and o.order_date>="%s"' % filters.get('from_date')
+		conditions &= Order.order_date >= filters.get('from_date')
 	if filters.get('to_date'):
-		conditions+=' and o.order_date<="%s"' % filters.get('to_date')
-	query = '''select 
-	monthname(o.order_date), count(o.name), sum(o.total_amount), o.payment_method_name from `tabOrder` o where o.docstatus = 1 and o.payment_status = 'Paid' {condition}
-	group by monthname(o.order_date) order by o.creation'''.format(condition=conditions)
-	data = frappe.db.sql(query, as_list=1)
+		conditions &= Order.order_date <= filters.get('to_date')
+	query = (
+		frappe.qb.from_(Order)
+		.select(
+			MonthName(Order.order_date),
+			Count(Order.name),
+			Sum(Order.total_amount),
+			Order.payment_method_name
+		)
+		.where(conditions)
+		.groupby(MonthName(Order.order_date))
+		.orderby(Order.creation)
+	)
+	data = query.run(as_list=True)
 	return data
 
 def get_chart_data(filters):
@@ -52,13 +65,24 @@ def get_chart_data(filters):
 	}
 
 def get_chart_data_source(filters):
-	conditions = ' and year(o.creation) = "{0}"'.format(filters.get('year'))
-	query = '''select monthname(str_to_date(m.month,'%m')), 
-		sum(o.total_amount) from (select 1 as month union select 2 as month 
-		union select 3 as month union select 4 as month union select 5 as month union select 6 as month 
-		union select 7 as month union select 8 as month union select 9 as month union select 10 as month 
-		union select 11 as month union select 12 as month) m left join `tabOrder` o on 
-		m.month = month(o.order_date) and o.docstatus = 1 {condition}
-		group by m.month'''.format(condition=conditions)
-	data = frappe.db.sql(query, as_list=1)
+	Order = DocType('Order')
+	months = frappe.qb.from_(
+		frappe.qb.union_all(
+			*(frappe.qb.select(frappe.qb.terms.Literal(i).as_('month')) for i in range(1, 13))
+		).as_('m')
+	)
+	conditions = (Order.docstatus == 1)
+	if filters.get('year'):
+		conditions &= frappe.qb.functions.Year(Order.creation) == filters.get('year')
+	query = (
+		months.left_join(Order)
+		.on(frappe.qb.functions.Month(Order.order_date) == months.month)
+		.select(
+			MonthName(StrToDate(months.month, '%m')),
+			Sum(Order.total_amount)
+		)
+		.where(conditions)
+		.groupby(months.month)
+	)
+	data = query.run(as_list=True)
 	return data

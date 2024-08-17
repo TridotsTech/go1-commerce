@@ -8,7 +8,7 @@ import frappe, json
 import datetime
 from frappe.utils import flt, nowdate, getdate,now
 from go1_commerce.utils.setup import get_settings
-
+from frappe.query_builder import DocType, Field
 
 class ReturnRequest(Document):
 	def validate(self):		
@@ -20,11 +20,13 @@ class ReturnRequest(Document):
 			frappe.db.set_value('Order Item',x.order_item,'return_created',1)
 			frappe.db.commit()
 		current_status_level = frappe.db.get_value('Return Request Status',self.status,'status_level')
-		next_status = frappe.db.sql(""" SELECT status_level
-										FROM `tabReturn Request Status`
-										WHERE status_level > %(level)s
-										ORDER BY status_level
-										""",{'level' : int(current_status_level)}, as_dict=True)
+		ReturnRequestStatus = DocType('Return Request Status')
+		next_status = (
+			frappe.qb.from_(ReturnRequestStatus)
+			.select(ReturnRequestStatus.status_level)
+			.where(ReturnRequestStatus.status_level > int(current_status_level))
+			.orderby(ReturnRequestStatus.status_level)
+			).run(as_dict=True)
 		if next_status and next_status[0].status_level:
 			self.next_status_level = next_status[0].status_level
 		else:
@@ -33,7 +35,7 @@ class ReturnRequest(Document):
 			self.product_amount = flt(self.product_price) * int(self.quantity)
 		if self.attribute_id:
 			self.attribute_description = frappe.db.get_value("Product Variant Combination",
-                                                    {"attribute_id":self.attribute_id},"attribute_html")
+													{"attribute_id":self.attribute_id},"attribute_html")
 		is_submittable = frappe.db.get_value('Return Request Status',self.status,'is_submittable')
 		if is_submittable:
 			self.docstatus = 1
@@ -85,7 +87,7 @@ class ReturnRequest(Document):
 		for item in self.items:
 			quantity = frappe.db.get_value("Product", item.product,"stock")
 			updated_quantity = quantity + item.quantity
-			frappe.log_error("updated_quantity",updated_quantity)
+			
 			frappe.db.set_value(
 									"Product",
 									item.product,
@@ -101,14 +103,14 @@ class ReturnRequest(Document):
 			
 def make_payment(source_name = None, order = None, mode_of_payment = None, amount = None):
 	try:
-		frappe.log_error("source_name",source_name)
+		
 		default_currency = get_settings('Catalog Settings')
 		if source_name:
 			source = frappe.get_all("Order",
 								fields=["name","outstanding_amount","total_amount","customer_name","customer",
 										"customer_type"],
 								filters={"name":source_name})[0]
-		frappe.log_error("source",source)
+		
 		if order:
 			source = frappe.get_all("Order",fields=["*"],filters={"name":order})[0]
 		
@@ -150,18 +152,25 @@ def make_payment(source_name = None, order = None, mode_of_payment = None, amoun
 
 
 def update_order_status(self):
-	order_status = frappe.db.sql("""SELECT OI.name, OI.item
-									FROM `tabOrder` O
-									INNER JOIN `tabOrder Item` OI ON O.name = OI.parent
-									WHERE OI.parenttype = "Order" 
-										AND O.name = %(order_id)s 
-										AND OI.item = %(item)s
-									""", {'order_id': self.order_id, 'item': self.product}, as_dict=True)
+	Order = DocType('Order')
+	OrderItem = DocType('Order Item')
+	order_status = (
+		frappe.qb.from_(Order)
+		.inner_join(OrderItem).on(Order.name == OrderItem.parent)
+		.select(OrderItem.name, OrderItem.item)
+		.where(
+			(OrderItem.parenttype == "Order") &
+			(Order.name == self.order_id) &
+			(OrderItem.item == self.product)
+		)
+	).run(as_dict=True)
 	if order_status:
-		frappe.db.sql(""" UPDATE `tabOrder Item`
-							SET shipping_status = %(status)s
-							WHERE name = %(name)s
-							""", {'status': self.status, 'name': order_status[0]['name']})
+		OrderItem = DocType('Order Item')
+		tes = (
+			frappe.qb.update(OrderItem)
+			.set(OrderItem.shipping_status, self.status)
+			.where(OrderItem.name == order_status[0]['name'])
+		).run()
 		doc = frappe.get_doc('Order', self.order_id)
 		doc.update_order_detail_html()
 
@@ -189,10 +198,12 @@ def make_customer_payment(doc):
 def get_product_info(product,qty,order):
 	from go1_commerce.go1_commerce.v2.orders \
 		import get_Products_Tax_Template
-	order_itemdoc = frappe.db.sql(""" 	SELECT *
-										FROM `tabOrder Item`
-										WHERE parent = %s AND item = %s
-										""", (order, product), as_dict=True)
+	OrderItem = DocType('Order Item')
+	order_itemdoc = (
+		frappe.qb.from_(OrderItem)
+		.select('*')
+		.where((OrderItem.parent == order) & (OrderItem.item == product))
+	).run(as_dict=True)
 	products = frappe.db.get_all('Product',fields=["*"],
 								filters = {"is_active": 1,'name' : product},order_by = "stock desc")
 	if products:
@@ -230,17 +241,22 @@ def get_query_condition(user):
 		import get_city_based_role
 	city_basedroles = get_city_based_role()
 	if city_basedroles:
-		employee = frappe.db.sql('''SELECT email_id, name, city 
-									FROM `tabEmployee` 
-									WHERE email_id = "{user}" 
-										AND role IN ({role})
-								'''.format(user = frappe.session.user, role = city_basedroles),
-									as_dict = True)
+		Employee = DocType('Employee')
+		user_email = frappe.session.user
+		roles = city_basedroles
+		employee = (
+			frappe.qb.from_(Employee)
+			.select(Employee.email_id, Employee.name, Employee.city)
+			.where((Employee.email_id == user_email) & (Employee.role.isin(roles)))
+		).run(as_dict=True)
 		if employee:
-			data = frappe.db.sql('''SELECT name 
-									FROM `tabOrder` 
-									WHERE city = "{city}"
-								'''.format(city = employee[0].city), as_dict = 1)
+			Order = DocType('Order')
+			city = employee[0].city
+			data = (
+				frappe.qb.from_(Order)
+				.select(Order.name)
+				.where(Order.city == city)
+			).run(as_dict=True)
 			data_list = ",".join(['"' + x.name + '"' for x in data])
 			return '(`tabReturn Request`.order_id in ({data_list}))'.format(data_list = data_list)
 
@@ -271,17 +287,25 @@ def get_return_order_items(returnId, fntype, doctype = "Order"):
 		order = frappe.db.get_value("Return Request", returnId, 
 								["name", "order_id", "product", "customer", "quantity"], as_dict=True)
 		lists = []
-		lists = frappe.db.sql('''SELECT I.item, I.item_name, R.quantity, I.price, I.amount, I.name 
-								FROM `tabOrder Item` I 
-								INNER JOIN `tabReturn Request` R ON R.order_id = I.parent 
-								WHERE I.parent = %(orderId)s 
-									AND I.item = %(product)s 
-									AND R.name = %(returnId)s
-							''',{
-									"orderId":order.order_id, 
-									"returnId":returnId, 
-									"product": order.product
-								}, as_dict=1)
+		OrderItem = DocType('Order Item')
+		ReturnRequest = DocType('Return Request')
+		lists = (
+			frappe.qb.from_(OrderItem)
+			.inner_join(ReturnRequest).on(ReturnRequest.order_id == OrderItem.parent)
+			.select(
+				OrderItem.item,
+				OrderItem.item_name,
+				ReturnRequest.quantity,
+				OrderItem.price,
+				OrderItem.amount,
+				OrderItem.name
+			)
+			.where(
+				(OrderItem.parent == order.order_id) &
+				(OrderItem.item == order.product) &
+				(ReturnRequest.name == returnId)
+			)
+		).run(as_dict=True)
 		return lists	
 	except Exception:
 		frappe.log_error(frappe.get_traceback(), "Error in doctype.vendor_orders.get_vendor_order_items") 
@@ -298,12 +322,19 @@ def get_attributes_combination_html(product, orderid, attribute):
 
 def get_attributes_combination(product, orderid = None):
 	order_item=frappe.db.get_all('Order Item',filters={'item':product, 'parent': orderid},fields=['attribute_ids'])
+	ProductVariantCombination = DocType('Product Variant Combination')
 	orderattr = ",".join(['"' + x.attribute_ids + '"' for x in order_item if x.attribute_ids])
 	cond = ""
 	if orderattr:
-		cond += " and attribute_id in ({orderattr})".format(orderattr = orderattr)
-	combination=frappe.db.sql('''SELECT * from `tabProduct Variant Combination` where parent="{product}" {cond}'''.format(product=product, cond=cond), as_dict=True)
-	frappe.log_error("combination", combination)
+		cond = ProductVariantCombination.attribute_id.isin(orderattr.split(','))
+	combination = (
+		frappe.qb.from_(ProductVariantCombination)
+		.select('*')
+		.where(
+			(ProductVariantCombination.parent == product) &
+			cond
+		)
+	).run(as_dict=True)
 	for item in combination:
 		if item and item.get('attributes_json'):
 			variant = json.loads(item.get('attributes_json'))
@@ -330,37 +361,55 @@ def get_nextstatus(next_status_level):
 
 
 
-def get_eliglible_orders(doctype, txt, searchfield, start, page_len, filters):
+def get_eligible_orders(doctype, txt, searchfield, start, page_len, filters):
 	try:
 		if not txt:
 			txt = ""
-		condition = ""
-		wherecondition = ""
-		txtcondition =""
+		OrderItem = DocType('Order Item')
+		Order = DocType('Order')
+		Product = DocType('Product')
+		
+		condition = frappe.qb.InnerJoin(Product).on(Product.name == OrderItem.item)
+		wherecondition = frappe.qb.Condition()
+		txtcondition = frappe.qb.Condition()
+		
 		if filters.get('return_type') == "Return":
-			condition += " INNER JOIN `tabReturn Policy` R ON R.name=P.return_policy "
-			wherecondition += " AND R.eligible_for_return = 1"
+			ReturnPolicy = DocType('Return Policy')
+			condition = condition.inner_join(ReturnPolicy).on(ReturnPolicy.name == Product.return_policy)
+			wherecondition &= ReturnPolicy.eligible_for_return == 1
+
 		if filters.get('return_type') == "Replacement":
-			condition += " INNER JOIN `tabReplacement Policy` R ON R.name=P.replacement_name "
-			wherecondition += " AND R.eligible_for_replacement = 1 "
+			ReplacementPolicy = DocType('Replacement Policy')
+			condition = condition.inner_join(ReplacementPolicy).on(ReplacementPolicy.name == Product.replacement_name)
+			wherecondition &= ReplacementPolicy.eligible_for_replacement == 1
+
 		if txt:
-			txtcondition += ' AND (OI.parent like %(txt)s)'
-		query = f'''SELECT O.name 
-					FROM `tabOrder Item` OI 
-					INNER JOIN `tabOrder` O ON O.name = OI.parent
-					INNER JOIN `tabProduct` P ON P.name = OI.item 
-					{condition} 
-					WHERE 
-						OI.return_created = 0 AND O.payment_status = 'Paid' 
-						AND (O.status='Delivered' OR O.status = 'Completed')
-						{wherecondition}
-						{txtcondition} 
-						GROUP BY OI.parent HAVING COUNT(OI.name) > 0'''
-		frappe.log_error("return_query",query)
-		order_list = frappe.db.sql(query,{'txt':'%'+txt+'%'})
-		frappe.log_error("order_list",order_list)
+			txtcondition = OrderItem.parent.like('%' + txt + '%')
+
+		order_list_query = (
+			frappe.qb.from_(OrderItem)
+			.inner_join(Order).on(Order.name == OrderItem.parent)
+			.inner_join(Product).on(Product.name == OrderItem.item)
+			.select(Order.name)
+			.where(
+				OrderItem.return_created == 0,
+				Order.payment_status == 'Paid',
+				(Order.status == 'Delivered') | (Order.status == 'Completed'),
+				wherecondition,
+				txtcondition
+			)
+			.groupby(OrderItem.parent)
+			.having(frappe.qb.fn.Count(OrderItem.name) > 0)
+			.limit(page_len).offset(start) 
+		)
+
+		order_list = order_list_query.run(as_dict=True)
+		
 		if order_list:
 			return order_list
+	except Exception as e:
+		frappe.log_error(message=str(e), title="Error in get_eligible_orders")
+		return []
 	except Exception:
 		frappe.log_error(frappe.get_traceback(), "Error in doctype.return_request.get_eliglible_orders") 
 
@@ -368,52 +417,86 @@ def get_eliglible_orders(doctype, txt, searchfield, start, page_len, filters):
 
 def get_order_items(doctype, txt, searchfield, start, page_len, filters):
 	try:
-		condition = ""
-		wherecondition = ""
-		txtcondition =""
-		orderid=filters.get('order_id')
+		OrderItem = DocType('Order Item')
+		Product = DocType('Product')
+		
+		condition = frappe.qb.InnerJoin(Product).on(Product.name == OrderItem.item)
+		wherecondition = frappe.qb.Condition()
+		txtcondition = frappe.qb.Condition()
+		orderid = filters.get('order_id')
+		
 		if filters.get('return_type') == "Return":
-			condition += " INNER JOIN `tabReturn Policy` R ON R.name=P.return_policy "
-			wherecondition += " AND R.eligible_for_return = 1"
-		if filters.get('return_type') == "Replacement":
-			condition += " INNER JOIN `tabReplacement Policy` R ON R.name=P.replacement_name "
-			wherecondition += " AND R.eligible_for_replacement=1 "
-		if txt:
-			txtcondition += " AND (O.item like %(txt)s OR O.item_name like %(txt)s OR O.name like %(txt)s)"
-		query = f""" SELECT O.name,
-							(CONCAT(O.item,"<br/>",O.item_name,IFNULL(O.attribute_description,''))) item_name,
-							(CONCAT("<br/>SKU:",O.item_sku)) AS item_sku 
-					FROM `tabOrder Item` O INNER JOIN `tabProduct` P ON P.name=O.item {condition} 
-					WHERE 
-						O.return_created = 0
-						AND O.parent = '{orderid}' {wherecondition} {txtcondition} 
-						GROUP BY O.attribute_ids,O.item """
-		return frappe.db.sql(query,{'txt':'%'+txt+'%'})
-	except Exception:
-		frappe.log_error(frappe.get_traceback(), "Error in doctype.return_request.get_order_items") 
+			ReturnPolicy = DocType('Return Policy')
+			condition = condition.inner_join(ReturnPolicy).on(ReturnPolicy.name == Product.return_policy)
+			wherecondition &= ReturnPolicy.eligible_for_return == 1
 
+		if filters.get('return_type') == "Replacement":
+			ReplacementPolicy = DocType('Replacement Policy')
+			condition = condition.inner_join(ReplacementPolicy).on(ReplacementPolicy.name == Product.replacement_name)
+			wherecondition &= ReplacementPolicy.eligible_for_replacement == 1
+
+		if txt:
+			txtcondition = (OrderItem.item.like('%' + txt + '%')) | \
+							(OrderItem.item_name.like('%' + txt + '%')) | \
+							(OrderItem.name.like('%' + txt + '%'))
+		
+		order_items_query = (
+			frappe.qb.from_(OrderItem)
+			.inner_join(Product).on(Product.name == OrderItem.item)
+			.select(
+				OrderItem.name,
+				frappe.qb.fn.Concat(OrderItem.item, "<br/>", OrderItem.item_name, frappe.qb.fn.IfNull(OrderItem.attribute_description, ''))\
+					.as_("item_name"),
+				frappe.qb.fn.Concat("<br/>SKU:", OrderItem.item_sku).as_("item_sku")
+			)
+			.where(
+				OrderItem.return_created == 0,
+				OrderItem.parent == orderid,
+				wherecondition,
+				txtcondition
+			)
+			.groupby(OrderItem.attribute_ids, OrderItem.item)
+			.limit(page_len).offset(start) 
+		)
+
+		return order_items_query.run(as_dict=True)
+	except Exception as e:
+		frappe.log_error(message=str(e), title="Error in get_order_items")
+		return []
 
 
 def get_return_order_items(order_id, return_type, return_created):
 	try:
-		condition = ""
-		wherecondition = ""
-		txtcondition =""
+		OrderItem = DocType('Order Item')
+		Product = DocType('Product')
+		query = frappe.qb.from_(OrderItem)
+		query = query.inner_join(Product).on(Product.name == OrderItem.item)
 		if return_type == "Return":
-			condition += " INNER JOIN `tabReturn Policy` R ON R.name = P.return_policy "
-			wherecondition += " AND R.eligible_for_return = 1"
+			ReturnPolicy = DocType('Return Policy')
+			query = query.inner_join(ReturnPolicy).on(ReturnPolicy.name == Product.return_policy)
+			query = query.where(ReturnPolicy.eligible_for_return == 1)
+		
 		if return_type == "Replacement":
-			condition += " INNER JOIN `tabReplacement Policy` R ON R.name = P.replacement_name "
-			wherecondition += " AND R.eligible_for_replacement = 1 "
-		query = f''' SELECT O.name, O.item,
-							NVL(CONCAT("<br/>Name:",IFNULL(O.item_name,''),IFNULL(O.attribute_description,'')),'') item_name, 
-							NVL(CONCAT("<br/>SKU:",O.item_sku),'') AS item_sku 
-					FROM `tabOrder Item` O INNER JOIN `tabProduct` P ON P.name = O.item {condition} 
-					WHERE 
-						O.return_created = 0
-						AND O.parent="{order_id}" {wherecondition} {txtcondition} 
-						GROUP BY O.attribute_ids,O.item'''
-		return frappe.db.sql(query,as_dict=1)
+			ReplacementPolicy = DocType('Replacement Policy')
+			query = query.inner_join(ReplacementPolicy).on(ReplacementPolicy.name == Product.replacement_name)
+			query = query.where(ReplacementPolicy.eligible_for_replacement == 1)
+		query = query.select(
+			OrderItem.name,
+			frappe.qb.fn.Concat("<br/>Name:", frappe.qb.fn.IfNull(OrderItem.item_name, ''), 
+								frappe.qb.fn.IfNull(OrderItem.attribute_description, '')).as_("item_name"),
+			frappe.qb.fn.Concat("<br/>SKU:", OrderItem.item_sku).as_("item_sku")
+		)
+		query = query.where(
+			OrderItem.return_created == return_created,
+			OrderItem.parent == order_id
+		)
+		query = query.groupby(OrderItem.attribute_ids, OrderItem.item)
+		
+		return query.run(as_dict=True)
+	
+	except Exception as e:
+		frappe.log_error(message=str(e), title="Error in get_return_order_items")
+		return []
 	except Exception:
 		frappe.log_error(frappe.get_traceback(), "Error in doctype.return_request.get_return_order_items") 
 
@@ -421,13 +504,21 @@ def get_return_order_items(order_id, return_type, return_created):
 
 def get_order_item_info(order_item):
 	try:
-		query = f""" SELECT 
-						O.customer,O.customer_email,O.customer_name,
-						OI.item,OI.item_name,OI.attribute_description,OI.attribute_ids,OI.quantity 
-					  FROM `tabOrder Item` OI 
-						INNER JOIN `tabOrder` O ON OI.parent = O.name 
-					  WHERE OI.name = '{order_item}' """
-		resp__ = frappe.db.sql(query , as_dict = 1)
+		
+		Order = DocType('Order')
+		OrderItem = DocType('Order Item')
+		query = frappe.qb.from_(OrderItem).inner_join(Order).on(Order.name == OrderItem.parent)
+		query = query.select(
+			Order.customer,
+			Order.customer_email,
+			Order.customer_name,
+			OrderItem.item,
+			OrderItem.item_name,
+			OrderItem.attribute_description,
+			OrderItem.attribute_ids,
+			OrderItem.quantity
+		).where(OrderItem.name == order_item)
+		resp__= query.run(as_dict=True)
 		if resp__:
 			frappe.response.status = 'success'
 			frappe.response.message = resp__ [0]

@@ -6,7 +6,7 @@ from __future__ import unicode_literals
 import frappe
 from frappe.model.document import Document
 from frappe.utils import flt
-
+from frappe.query_builder import DocType
 
 class ShoppingCart(Document):
 	def validate(self):		
@@ -85,14 +85,13 @@ class ShoppingCart(Document):
 			attribute_ids = '"' + item.attribute_ids + '"'
 		else:
 			attribute_ids = '"' + '","'.join(item.attribute_ids.split('\n'))[:-2]
-		price_adjustment = frappe.db.sql(f''' SELECT SUM(price_adjustment) AS price 
-										FROM `tabProduct Attribute Option` 
-										WHERE name IN ({attribute_ids}) ''', as_dict = 1)
+		ProductAttributeOption = DocType('Product Attribute Option')
+		query = frappe.qb.from_(ProductAttributeOption).select(frappe.qb.func.sum(ProductAttributeOption.price_adjustment).as_("price")).where(ProductAttributeOption.name.isin(attribute_ids))
+		price_adjustment= query.run(as_dict=True)
 		if price_adjustment:
 			product_rate = product_rate + price_adjustment[0].price
-		attribute_opts = frappe.db.sql(f''' SELECT option_value, product_title 
-										FROM `tabProduct Attribute Option` 
-										WHERE name IN ({attribute_ids}) ''', as_dict = True)
+		query = frappe.qb.from_(ProductAttributeOption).select(ProductAttributeOption.option_value, ProductAttributeOption.product_title).where(ProductAttributeOption.name.isin(attribute_ids))
+		attribute_opts= query.run(as_dict=True)
 		if attribute_opts:
 			title = None
 			for attr_itms in attribute_opts:
@@ -139,16 +138,16 @@ class ShoppingCart(Document):
 			}
 		if discount_item.get('attribute_ids'):
 			html = ''
-			options = frappe.db.sql('''	SELECT
-											O.price_adjustment, O.option_value, P.attribute 
-										FROM 
-											`tabProduct Attribute Option` AS O 
-										LEFT JOIN `tabProduct Attribute Mapping` AS P 
-											ON P.name = O.attribute_id 
-										WHERE 
-											O.name=%(name)s AND O.parent=%(parent)s ''',
-										{'name': discount_item.get('attribute_ids'), 
-											'parent': discount_item.get('free_item')}, as_dict=1)
+			ProductAttributeOption = DocType('Product Attribute Option')
+			ProductAttributeMapping = DocType('Product Attribute Mapping')
+			query = (
+				frappe.qb.from_(ProductAttributeOption)
+				.left_join(ProductAttributeMapping).on(ProductAttributeMapping.name == ProductAttributeOption.attribute_id)
+				.select(ProductAttributeOption.price_adjustment, ProductAttributeOption.option_value, ProductAttributeMapping.attribute)
+				.where(ProductAttributeOption.name == discount_item.get('attribute_ids'))
+				.where(ProductAttributeOption.parent == discount_item.get('free_item'))
+			)
+			options= query.run(as_dict=True)
 			if options:
 				html += '<div class="cart-attributes"><span class="attr-title">'+ options[0].attribute + \
 						' </span> : <span>' + options[0].option_value +'</span></div>'
@@ -189,14 +188,20 @@ class ShoppingCart(Document):
 			attr = price_info.get('products_list')
 			if len(attr)>0 and attr[0]['attribute_ids']:
 				html = ''
-				options = frappe.db.sql('''	SELECT 
-												O.price_adjustment, O.option_value, P.attribute 
-											FROM 
-												`tabProduct Attribute Option` AS O 
-											LEFT JOIN `tabProduct Attribute Mapping` AS P 
-												ON P.name = O.attribute_id WHERE O.name=%(name)s 
-											AND O.parent=%(parent)s ''',{'name': attr[0]['attribute_ids'],
-														'parent': price_info.get('free_item')}, as_dict = 1)
+				ProductAttributeOption = DocType('Product Attribute Option')
+				ProductAttributeMapping = DocType('Product Attribute Mapping')
+				query = (
+					frappe.qb.from_(ProductAttributeOption)
+					.left_join(ProductAttributeMapping).on(ProductAttributeMapping.name == ProductAttributeOption.attribute_id)
+					.select(
+						ProductAttributeOption.price_adjustment,
+						ProductAttributeOption.option_value,
+						ProductAttributeMapping.attribute
+					)
+					.where(ProductAttributeOption.name == attr[0]['attribute_ids'])
+					.where(ProductAttributeOption.parent == price_info.get('free_item'))
+				)
+				options= query.run(as_dict=True)
 				if options:
 					html += '<div class="cart-attributes"><span class="attr-title">'+options[0].attribute+' </span> : <span>'\
 							+options[0].option_value+'</span></div>'

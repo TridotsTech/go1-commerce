@@ -8,6 +8,7 @@ from frappe.model.document import Document
 from frappe.utils import flt
 from frappe.model.naming import make_autoname
 from go1_commerce.utils.setup import get_settings
+from frappe.query_builder import DocType, Field
 
 class ProductReview(Document):
 	def autoname(self):
@@ -25,12 +26,18 @@ class ProductReview(Document):
 		
 	def on_update(self):		
 		product=frappe.get_doc("Product",self.product)
-		review=frappe.db.sql("""
-								SELECT SUM(rating) AS sum, COUNT(rating) AS cnt 
-								FROM `tabProduct Review` 
-								WHERE is_approved = %(approve)s 
-								AND product = %(product)s
-							""", {'product': self.product, 'approve': 1}, as_dict=1)	
+		ProductReview = DocType('Product Review')
+		review = (
+			frappe.qb.from_(ProductReview)
+			.select(
+				ProductReview.rating.sum().as_('sum'),
+				frappe.qb.functions.Count(ProductReview.rating).as_('cnt')
+			)
+			.where(
+				(ProductReview.is_approved == 1) &
+				(ProductReview.product == self.product)
+			)
+		).run(as_dict=True)	
 		star=0
 		if review:
 			if int(review[0].cnt)>0:				
@@ -65,12 +72,18 @@ class ProductReview(Document):
 			
 	def on_trash(self):		
 		product=frappe.get_doc("Product",self.product)
-		review=frappe.db.sql("""
-								SELECT SUM(rating) AS sum, COUNT(rating) AS cnt 
-								FROM `tabProduct Review` 
-								WHERE is_approved = %(approve)s 
-								AND product = %(product)s
-							""", {'product': self.product, 'approve': 1}, as_dict=1)
+		ProductReview = DocType('Product Review')
+		review = (
+			frappe.qb.from_(ProductReview)
+			.select(
+				ProductReview.rating.sum().as_('sum'),
+				frappe.qb.functions.Count(ProductReview.rating).as_('cnt')
+			)
+			.where(
+				(ProductReview.is_approved == 1) &
+				(ProductReview.product == self.product)
+			)
+		).run(as_dict=True)
 			
 		star=0
 		if review:
@@ -112,7 +125,7 @@ def convert_product_image(image_name,size,productid):
 				})
 		if org_file_doc:
 			org_file_doc.make_thumbnail(set_as_thumbnail=False,width=size,height=size,
-							   					suffix=str(size)+"x"+str(size))
+												suffix=str(size)+"x"+str(size))
 	except Exception:
 		frappe.log_error(frappe.get_traceback(), 
 			"Error in doctype.product_review.convert_product_image") 

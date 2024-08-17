@@ -4,9 +4,10 @@ from frappe import _
 from frappe.utils import flt, getdate,nowdate
 from datetime import datetime
 from go1_commerce.utils.utils import \
-    role_auth,customer_reg_auth,get_auth_token,get_customer_from_token,\
+	role_auth,customer_reg_auth,get_auth_token,get_customer_from_token,\
 	other_exception,authentication_exception,doesnotexist_exception,\
 	permission_exception,validation_exception
+from frappe.query_builder import DocType, Field, Order
 
 @frappe.whitelist(allow_guest = True)
 def login(usr,pwd):
@@ -18,9 +19,12 @@ def login(usr,pwd):
 		if token and token.get("api_secret"):
 			has_role = frappe.db.get_all('Has Role',filters={'parent': usr, 'role': "Customer"})
 			if has_role:
-				customer = frappe.db.sql(''' SELECT customer_status FROM `tabCustomers` 
-							 					WHERE email = %(email)s 
-										''', {'email': usr}, as_dict = 1)
+				Customers = DocType('Customers')
+				customer = (frappe.qb.from_(Customers)
+							  .select(Customers.customer_status)
+							  .where(Customers.email == usr)
+						   ).run(as_dict=True)
+				
 				if customer[0].customer_status != "Approved":
 					frappe.local.response.http_status_code = 200
 					frappe.local.response.status = "Failed"
@@ -42,28 +46,36 @@ def login(usr,pwd):
 	except Exception:
 		other_exception("Error in customer login")
 
+def get_list_period_wise(dt, condition, customer_id):
+	Doc = DocType(dt)
+	week_order_list = (frappe.qb.from_(Doc)
+						.select(Doc.name)
+						.where(Doc.customer == customer_id)
+						.where(frappe.qb.func.YEARWEEK(Doc.creation, 1) == frappe.qb.func.YEARWEEK(frappe.qb.func.CURDATE(), 1))
+						.where(Doc.naming_series != "SUB-ORD-")
+						.where(condition)
+					  ).run(as_dict=True)
+	month_order_list = (frappe.qb.from_(Doc)
+						 .select(Doc.name)
+						 .where(Doc.customer == customer_id)
+						 .where(frappe.qb.func.MONTH(Doc.creation) == frappe.qb.func.MONTH(frappe.qb.func.CURDATE()))
+						 .where(Doc.naming_series != "SUB-ORD-")
+						 .where(condition)
+					   ).run(as_dict=True)
+	today_order_list = (frappe.qb.from_(Doc)
+						 .select(Doc.name)
+						 .where(Doc.customer == customer_id)
+						 .where(frappe.qb.func.DATE(Doc.creation) == frappe.qb.func.CURDATE())
+						 .where(Doc.naming_series != "SUB-ORD-")
+						 .where(condition)
+					   ).run(as_dict=True)
+	all_order_list = (frappe.qb.from_(Doc)
+					   .select(Doc.name)
+					   .where(Doc.customer == customer_id)
+					   .where(Doc.naming_series != "SUB-ORD-")
+					   .where(condition)
+					 ).run(as_dict=True)
 
-def get_list_period_wise(dt,condition,customer_id):
-	week_order_list = frappe.db.sql(''' SELECT name FROM `tab{dt}` S
-											WHERE S.customer = %(customer)s AND YEARWEEK(S.creation, 1) = YEARWEEK(CURDATE(), 1) 
-										AND naming_series != "SUB-ORD-" {cond} 
-									'''.format(dt=dt, cond=condition),{'customer': customer_id},
-										as_dict=1)
-	month_order_list = frappe.db.sql(''' SELECT name FROM `tab{dt}` S
-											WHERE S.customer = %(customer)s AND MONTH(S.creation) = MONTH(CURDATE())
-										AND naming_series != "SUB-ORD-" {cond} 
-									'''.format(dt=dt, cond=condition),{'customer': customer_id},
-										as_dict=1)
-	today_order_list = frappe.db.sql(''' SELECT name FROM `tab{dt}` S
-											WHERE S.customer = %(customer)s AND DATE(S.creation) = CURDATE()
-										AND naming_series != "SUB-ORD-" {cond} 
-									'''.format(dt=dt, cond=condition),{'customer': customer_id},
-										as_dict=1)
-	all_order_list = frappe.db.sql('''  SELECT name FROM `tab{dt}` S
-											WHERE S.customer = %(customer)s 
-										AND naming_series != "SUB-ORD-" {cond} 
-									'''.format(dt=dt, cond=condition),{'customer': customer_id},
-										as_dict=1)
 	return [week_order_list, month_order_list, today_order_list, all_order_list]
 
 @frappe.whitelist()
@@ -118,18 +130,34 @@ def check_condition_in_order_list(customer,status,driver,date,shipping_method,
 	return condition
 @frappe.whitelist()
 def get_orders_list(page_no=1,page_length=10,no_subscription_order=0,order_from=None,language=None,
-		    		status=None,shipping_method=None,date=None,driver=None,allow_draft=1,
+					status=None,shipping_method=None,date=None,driver=None,allow_draft=1,
 					exclude_order_from=None):
 	try:
 		customer = get_customer_from_token()
-		condition = check_condition_in_order_list(customer,status,driver,date,shipping_method,
-								  no_subscription_order,order_from,exclude_order_from,allow_draft, language)
-		query = """	SELECT * FROM `tabOrder` 
-					WHERE total_amount > 0 {condition}
-		    		ORDER BY creation DESC 
-					LIMIT {page_no},{page_size} """.format(condition=condition,page_no=((int(page_no) - 1)
-				* int(page_length)),page_size=page_length)
-		orders = frappe.db.sql(query,as_dict=True,)
+		
+		Orders = DocType("Order")
+		query = frappe.qb.from_(Orders).select('*').where(Orders.total_amount > 0)
+		if customer:
+			query = query.where(Orders.customer == customer)
+		if status and status == 'Pending':
+			query = query.where(Orders.status.notin(["Completed", "Cancelled"]))
+		if driver:
+			query = query.where(Orders.driver == driver)
+		if date:
+			query = query.where(Orders.order_date == getdate(date))
+		if shipping_method:
+			query = query.where((Orders.shipping_method == shipping_method) | (Orders.shipping_method_name == shipping_method))
+		if no_subscription_order:
+			query = query.where(Orders.naming_series != "SUB-ORD-")
+		if order_from:
+			query = query.where(Orders.order_from == order_from)
+		if exclude_order_from:
+			query = query.where(Orders.order_from != exclude_order_from)
+		if not allow_draft:
+			query = query.where(Orders.docstatus > 0)
+		query = query.orderby(Orders.creation, order=Order.desc)
+		query = query.limit(page_length).offset((int(page_no) - 1) * int(page_length))
+		orders = query.run(as_dict=True)
 		get_orders_items(orders)
 		return orders
 	except Exception:
@@ -139,12 +167,14 @@ def get_orders_items(orders):
 	get_time_log = 1
 	if orders:
 		for item in orders:
-			item.items = frappe.db.sql("""	SELECT 
-												return_created, shipping_status, item_name
-											FROM 
-												`tabOrder Item` 
-											WHERE parent = %(parent)s""",
-										{'parent': item.name},as_dict=1)
+			
+			OrderItem = DocType("Order Item")
+			query = (frappe.qb.from_(OrderItem).select(
+				OrderItem.return_created,
+				OrderItem.shipping_status,
+				OrderItem.item_name
+			).where(OrderItem.parent == item.name))
+			item.items = query.run(as_dict=True)
 			for it in item['items']:
 				if it.return_created==1:
 					if it.shipping_status == "Pending":
@@ -158,11 +188,16 @@ def get_orders_items(orders):
 					if it.shipping_status == "Rejected":
 						it.return_status = "Request Rejected"
 			item.status_history=[]
-			payment_entry = frappe.db.sql_list('''	SELECT DISTINCT p.mode_of_payment 
-													FROM `tabPayment Entry` p 
-													LEFT JOIN `tabPayment Reference` pr ON p.name=pr.parent
-													WHERE pr.reference_doctype="Order" AND 
-													pr.reference_name=%(orderid)s''',{'orderid':item.name})
+			PaymentEntry = DocType("Payment Entry")
+			PaymentReference = DocType("Payment Reference")
+			query = (frappe.qb.from_(PaymentEntry)
+				.distinct()
+				.select(PaymentEntry.mode_of_payment)
+				.left_join(PaymentReference)
+				.on(PaymentEntry.name == PaymentReference.parent)
+				.where(PaymentReference.reference_doctype == "Order")
+				.where(PaymentReference.reference_name == item.name))
+			payment_entry = query.run(as_list=True)
 			if payment_entry:
 				item.payment_modes = payment_entry
 			else:
@@ -215,15 +250,15 @@ def get_order_payment_info(item):
 				
 def get_order_delivery_slots(item):
 	delivery_slot = frappe.db.get_all('Order Delivery Slot',
-				    fields=['order_date', 'from_time', 'to_time','product_category'],
+					fields=['order_date', 'from_time', 'to_time','product_category'],
 					filters={'order': item.name})
 	delivery_slot_list = []
 	if delivery_slot:
 		for x in delivery_slot:
 			from_dt = datetime.strptime(str(getdate(x.order_date)) + ' ' +
-			       	  str(x.from_time), '%Y-%m-%d %H:%M:%S')
+					  str(x.from_time), '%Y-%m-%d %H:%M:%S')
 			to_dt = datetime.strptime(str(getdate(x.order_date)) + ' ' +
-			     	str(x.to_time), '%Y-%m-%d %H:%M:%S')
+					str(x.to_time), '%Y-%m-%d %H:%M:%S')
 			category = ''
 			if x.product_category:
 				category = frappe.get_value('Product Category', x.product_category, 
@@ -245,11 +280,17 @@ def get_customer_address():
 	try:
 		customer_id = get_customer_from_token()
 		if customer_id:
-			addresses = frappe.db.sql('''SELECT * 
-											FROM  `tabCustomer Address` 
-										WHERE parent = %(parent)s
-										ORDER BY FIELD(is_default, 1, 0)''',
-										{'parent': customer_id},as_dict=True)
+			CustomerAddress = DocType('Customer Address')
+			query = (
+				frappe.qb.from_(CustomerAddress)
+				.select('*')
+				.where(CustomerAddress.parent == customer_id)
+				.orderby(
+					frappe.qb.field(CustomerAddress.is_default).desc(),
+					CustomerAddress.name
+				)
+			)
+			addresses = query.run(as_dict=True)
 			return addresses
 		else:
 			return {"status":"failed","message":"Customer not found."}
@@ -389,11 +430,10 @@ def update_address(data):
 		
 
 def set_default_address(customer_name):
-	existing_address = frappe.db.sql('''SELECT a.name 
-										FROM 
-											`tabCustomer Address` a
-										WHERE a.parent=%(customer)s 
-									''',{'customer': customer_name},as_dict=1)
+	CustomerAddress = DocType("Customer Address")
+	query = (frappe.qb.from_(CustomerAddress).select(CustomerAddress.name).where(
+		CustomerAddress.parent == customer_name))
+	existing_address = query.run(as_dict=True)
 	for address in existing_address:
 		addr = frappe.get_doc('Customer Address', address.name)
 		addr.is_default = 0
@@ -465,14 +505,22 @@ def get_customer_info(user=None, email=None, doctype=None, guest_id=None, phone=
 
 
 def set_customer(Customer,doctype,guest_id):
-	Customer[0].address = frappe.db.sql(
-							'''SELECT * FROM `tabCustomer Address` WHERE 
-							parent = %(parent)s ''', 
-							{'parent': Customer[0].name}, as_dict=1)
+	CustomerAddress = DocType("Customer Address")
+	Customer[0].address = (
+		frappe.qb.from_(CustomerAddress)
+		.select("*")
+		.where(CustomerAddress.parent == Customer[0].name)
+		.run(as_dict=True)
+	)
 	if doctype == 'Customers':
-		roles_list = frappe.db.sql_list(
-						'''SELECT role FROM `tabCustomer Role` WHERE 
-						parent = %(parent)s''', {'parent': Customer[0].name})
+		CustomerRole = DocType("Customer Role")
+		roles_list = (
+			frappe.qb.from_(CustomerRole)
+			.select(CustomerRole.role)
+			.where(CustomerRole.parent == Customer[0].name)
+			.pluck(CustomerRole.role)
+		)
+		
 		if not roles_list or len(roles_list) == 0: roles_list = ['Customer']
 		Customer[0].roles_list = roles_list
 	if guest_id and Customer[0].name != guest_id:
@@ -622,12 +670,14 @@ def validate_cancel_order(Orders,customer_id,customer,**kwargs):
 		Orders.update(kwargs)
 		Orders.save(ignore_permissions=True)
 		centre = frappe.db.get_value("Customers",Orders.customer,"center")
-		old_items = frappe.db.sql(  """ SELECT 
-											TM.item, TM.quantity, TM.attribute_ids 
-										FROM 
-											`tabOrder Item` TM 
-										WHERE TM.parent = %(order_id)s""",
-											{"order_id": kwargs.get("order_id")},as_dict=1)
+		
+		OrderItem = DocType("Order Item")
+		old_items = (
+			frappe.qb.from_(OrderItem)
+			.select(OrderItem.item, OrderItem.quantity, OrderItem.attribute_ids)
+			.where(OrderItem.parent == kwargs.get("order_id"))
+			.run(as_dict=True)
+		)
 		frappe.db.commit()
 		if Orders.paid_using_wallet>0:
 			wallet = frappe.db.get_all("Wallet",filters={"user":Orders.customer})
@@ -808,10 +858,13 @@ def update_registration_details(**kwargs):
 def get_wallet_details():
 	try:
 		customer = get_customer_from_token()
-		wallet_amount = frappe.db.sql(	''' SELECT * 
-											FROM 
-												`tabWallet` 
-											WHERE user = %(user)s''',{'user': customer},as_dict=True)
+		Wallet = DocType("Wallet")
+		wallet_amount = (
+			frappe.qb.from_(Wallet)
+			.select("*")
+			.where(Wallet.user == customer)
+			.run(as_dict=True)
+		)
 		if wallet_amount:
 			return wallet_amount
 	except Exception:
@@ -843,11 +896,13 @@ def insert_address(data):
 			filters = {'user_id': frappe.session.user}
 		customers = frappe.db.get_all('Customers', filters = filters, fields = ['*'])
 		if response.get('is_default') == 1:
-			existing_address = frappe.db.sql('''SELECT A.* 
-												FROM 
-													`tabCustomer Address` A 
-												WHERE A.parent = %(customer)s''', 
-													{'customer': customers[0].name}, as_dict=1)
+			CustomerAddress = DocType("Customer Address")
+			existing_address = (
+				qb.from_(CustomerAddress)
+				.select("*")
+				.where(CustomerAddress.parent == customers[0].name)
+				.run(as_dict=True)
+			)
 			if existing_address:
 				for address in existing_address:
 					addr = frappe.get_doc('Customer Address', address.name)
@@ -913,9 +968,14 @@ def delete_address(id, customer):
 								 filters={'parent': customer,
 								 'name': id})
 		if addr:
-			frappe.db.sql("""DELETE FROM 
-							`tabCustomer Address` 
-							WHERE name = %(addr_id)s""",{"addr_id": addr[0].name})
+		
+			CustomerAddress = DocType('Customer Address')
+			query = (
+				frappe.qb.from_(CustomerAddress)
+				.delete()
+				.where(CustomerAddress.name == addr[0].name)
+			)
+			query.run()
 			frappe.db.commit()
 			return 'Success'
 	except Exception:
@@ -958,12 +1018,14 @@ def update_address(data):
 		customers = frappe.db.get_all('Customers',
 				filters={'name': response.get('parent')}, fields=['*'])
 		if response.get('is_default') == 1:
-			existing_adddress = frappe.db.sql(	''' SELECT A.* 
-													FROM 
-														`tabCustomer Address` A 
-													WHERE 
-														A.parent = %(customer)s''',
-														{'customer': customers[0].name}, as_dict=1)
+			
+			CustomerAddress = DocType('Customer Address')
+			query = (
+				frappe.qb.from_(CustomerAddress)
+				.select("*")
+				.where(CustomerAddress.parent == customers[0].name)
+			)
+			existing_adddress= query.run(as_dict=True)
 			for address in existing_adddress:
 				addr = frappe.get_doc('Customer Address', address.name)
 				addr.is_default = 0

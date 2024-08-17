@@ -708,50 +708,50 @@ def calculate_discount(discount, product, qty, rate, attribute_id = None, attrib
 
 
 def check_delivery_charge_discount(
-    customer_id, 
-    subtotal, 
-    cart_items, 
-    shipping_charges, 
-    shipping_method, 
-    out,
-    payment_method=None, 
-    is_coupon_code=0,
-    coupon_code=None
+	customer_id, 
+	subtotal, 
+	cart_items, 
+	shipping_charges, 
+	shipping_method, 
+	out,
+	payment_method=None, 
+	is_coupon_code=0,
+	coupon_code=None
 ):
-    today_date = get_today_date(replace=True)
-    Discounts = DocType('Discounts')
-    today = getdate(today_date)
+	today_date = get_today_date(replace=True)
+	Discounts = DocType('Discounts')
+	today = getdate(today_date)
 
-    base_conditions = (
-        (Case()
-            .when(Discounts.start_date.isnotnull(), Discounts.start_date <= today)
-            .else_(True)
-        ) &
-        (Case()
-            .when(Discounts.end_date.isnotnull(), Discounts.end_date >= today)
-            .else_(True)
-        ) &
-        (Discounts.discount_type == "Assigned to Delivery Charges")
-    )
+	base_conditions = (
+		(Case()
+			.when(Discounts.start_date.isnotnull(), Discounts.start_date <= today)
+			.else_(True)
+		) &
+		(Case()
+			.when(Discounts.end_date.isnotnull(), Discounts.end_date >= today)
+			.else_(True)
+		) &
+		(Discounts.discount_type == "Assigned to Delivery Charges")
+	)
 
-    if is_coupon_code == 1 and coupon_code:
-        base_conditions &= (
-            (Discounts.requires_coupon_code == 1) &
-            (Discounts.coupon_code == coupon_code)
-        )
-    else:
-        base_conditions &= (
-            (Discounts.requires_coupon_code == 0) | (Discounts.requires_coupon_code.isnull())
-        )
+	if is_coupon_code == 1 and coupon_code:
+		base_conditions &= (
+			(Discounts.requires_coupon_code == 1) &
+			(Discounts.coupon_code == coupon_code)
+		)
+	else:
+		base_conditions &= (
+			(Discounts.requires_coupon_code == 0) | (Discounts.requires_coupon_code.isnull())
+		)
 
-    query = (
-        frappe.qb.from_(Discounts)
-        .select('*')
-        .where(base_conditions)
-        .orderby(Discounts.priority, order=Order.desc)
-    )
+	query = (
+		frappe.qb.from_(Discounts)
+		.select('*')
+		.where(base_conditions)
+		.orderby(Discounts.priority, order=Order.desc)
+	)
 
-    discounts = query.run(as_dict=True)
+	discounts = query.run(as_dict=True)
 	if discounts:
 		out = check_delivery_charge_discount_(
 												discounts,
@@ -856,8 +856,8 @@ def check_subtotal_cashback(order_info):
 	DiscountUsageHistory = DocType('Discount Usage History')
 	query = (
 		frappe.qb.from_(Discounts)
-		.left_join(DiscountUsageHistory, on=Discounts.name == DiscountUsageHistory.parent)
-		.select(Discounts._all)
+		.left_join(DiscountUsageHistory).on(Discounts.name == DiscountUsageHistory.parent)
+		.select('*')
 		.where(
 			(DiscountUsageHistory.order_id == order_info.name) &
 			(Discounts.price_or_product_discount == "Cashback")

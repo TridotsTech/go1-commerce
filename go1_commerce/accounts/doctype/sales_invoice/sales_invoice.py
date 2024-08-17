@@ -7,6 +7,7 @@ import frappe
 from frappe.model.document import Document
 from frappe import _
 from go1_commerce.utils.setup import get_settings
+from frappe.query_builder import DocType
 
 class SalesInvoice(Document):
 	def autoname(self): 
@@ -33,7 +34,12 @@ class SalesInvoice(Document):
 				doc.paid_amount = self.paid_amount
 				self.outstanding_amount = outstanding_amount
 				doc.db_update()
-				frappe.db.sql('''UPDATE `tabOrder` SET outstanding_amount = %(outstanding_amount)s , 
-							  payment_status= %(payment_status)s WHERE name = %(doc_name)s''',
-							  {"payment_status":"Paid", "doc_name":self.reference, "outstanding_amount": outstanding_amount})
+				Order = DocType("Order")
+				query =(
+					frappe.db.update(Order)
+					.set(Order.outstanding_amount, outstanding_amount)
+					.set(Order.payment_status,"Paid")
+					.where(Order.name,self.reference)
+				).run()
+				
 				frappe.db.commit()

@@ -77,10 +77,32 @@ def search_product(search_txt,page_no = 1,page_length = 10):
 		p_ids = p_ids[:-1]
 		p_list = []
 		if p_ids:
-			p_query = search_product_query(p_ids)
-			p_search_list  = frappe.db.sql(p_query,as_dict = 1)
-			from go1_commerce.go1_commerce.v2.product \
-				import get_list_product_details
+			Product = DocType('Product')
+			ProductBrandMapping = DocType('Product Brand Mapping')
+			ProductVariantCombination = DocType('Product Variant Combination')
+			p_query = (
+			    frappe.qb.from_(Product).select(
+			        Product.item.as_('product'),Product.item,
+			        Product.image.as_('product_image'),Product.sku,
+			        Product.name,Product.route,Product.price,
+			        Product.old_price,Product.has_variants,Product.short_description,
+			        Product.tax_category,Product.full_description,Product.inventory_method,
+			        Product.disable_add_to_cart_button,Product.weight,
+			        Product.gross_weight,Product.approved_total_reviews,Product.route.as_('brand_route'),
+			        (frappe.qb.from_(ProductBrandMapping)
+			         .select(ProductBrandMapping.brand_name)
+			         .where(ProductBrandMapping.parent == Product.name)
+			         .limit(1)).as_('product_brand'))
+			    .where(Product.is_active == 1)
+			    .where(Product.show_in_market_place == 1)
+			    .where(Product.status == 'Approved')
+			    .where((((Product.has_variants == 1) & (frappe.qb.from_(ProductVariantCombination)
+			              .select(ProductVariantCombination.name)
+			              .where(ProductVariantCombination.show_in_market_place == 1)
+			              .where(ProductVariantCombination.disabled == 0)
+			              .exists())) |((Product.has_variants == 0) & Product.exists()))))
+			p_search_list = p_query.run(as_dict=True)
+			from go1_commerce.go1_commerce.v2.product import get_list_product_details
 			p_list = get_list_product_details(p_search_list)
 		frappe.response.status = "Success"
 		return p_list
@@ -88,32 +110,6 @@ def search_product(search_txt,page_no = 1,page_length = 10):
 		frappe.response.status = 'Failed'
 		frappe.response.message = 'something went wrong'
 		frappe.log_error('Error in search product api ',frappe.get_traceback())
-
-def search_product_query(p_ids):
-	p_query = f'''	SELECT DISTINCT P.item as product, P.item, 
-						P.image AS product_image,P.sku, P.name, P.route, 
-						P.price, P.old_price,
-						P.has_variants, P.short_description, P.tax_category, P.full_description,
-						P.inventory_method, P.disable_add_to_cart_button, P.weight,
-						P.gross_weight, P.approved_total_reviews, P.route AS brand_route,
-						(SELECT brand_name FROM `tabProduct Brand Mapping`
-							WHERE parent = P.name LIMIT 1) AS product_brand
-					FROM 
-						`tabProduct` P
-					WHERE P.is_active = 1 AND 
-						P.show_in_market_place = 1 AND 
-						P.status = 'Approved'
-					AND (CASE
-							WHEN (P.has_variants = 1 AND
-								EXISTS (SELECT VC.name FROM `tabProduct Variant Combination` VC 
-										WHERE VC.show_in_market_place = 1 AND VC.disabled = 0))
-							THEN 1 = 1
-							WHEN (P.has_variants = 0 AND EXISTS )
-							THEN 1 = 1
-							ELSE 1 = 0
-						END)
-					'''
-	return p_query
 
 def get_paginated_data(data_list, page_number, page_size):
     start_index = (int(page_number) - 1) * int(page_size)

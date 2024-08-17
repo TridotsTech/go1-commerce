@@ -3,6 +3,7 @@
 
 from __future__ import unicode_literals
 import frappe
+from frappe.query_builder import DocType, Count
 
 def execute(filters=None):
 	columns, data = [], []
@@ -18,5 +19,21 @@ def get_columns():
 	]
 
 def products_report():
-	report = frappe.db.sql('''select  p.restaurant ,p.item, count(o.name) as qty from `tabProduct` p left join `tabOrder Item` o on o.item=p.name and o.parenttype="Order" group by p.name''', as_list = 1)	
-	return report
+	Product = DocType('Product')
+    OrderItem = DocType('Order Item')
+    query = (
+        frappe.qb.from_(Product)
+        .left_join(OrderItem)
+        .on(
+            (OrderItem.item == Product.name) &
+            (OrderItem.parenttype == "Order")
+        )
+        .select(
+            Product.restaurant,
+            Product.item,
+            Count(OrderItem.name).as_("qty")
+        )
+        .groupby(Product.name)
+    )
+    results = query.run(as_dict=True)
+	return results

@@ -3,6 +3,7 @@
 
 from __future__ import unicode_literals
 import frappe
+from frappe.query_builder import DocType, Field
 
 def execute(filters=None):
 	columns, data = [], []
@@ -30,20 +31,38 @@ def get_columns():
 	return columns
 	
 def customer_report(filters):
-	condition=''
+	Order = DocType('Order')
+	query = (
+		frappe.qb.from_(Order)
+		.select(
+			Order.name,
+			Order.order_date,
+			Order.status,
+			Order.payment_status,
+			(Order.first_name + ' ' + Order.last_name).as_field('customer_name'),
+			Order.customer_email,
+			Order.phone,
+			Order.total_amount,
+			Order.order_from
+		)
+		.where(Order.naming_series != "SUB-ORD-")
+		.where(Order.docstatus == 1)
+	)
 	if filters.get('from_date'):
-		condition+=' and order_date>="%s"' % filters.get('from_date')
+		query = query.where(Order.order_date >= filters.get('from_date'))
+
 	if filters.get('to_date'):
-		condition+=' and order_date<="%s"' % filters.get('to_date')
+		query = query.where(Order.order_date <= filters.get('to_date'))
+
 	if filters.get('status'):
-		condition+=' and status="%s"' % filters.get('status')
+		query = query.where(Order.status == filters.get('status'))
+
 	if filters.get('payment_status'):
-		condition+=' and payment_status="%s"' % filters.get('payment_status') 
+		query = query.where(Order.payment_status == filters.get('payment_status'))
+
 	if filters.get('order_from'):
-		condition+=' and order_from="%s"' % filters.get('order_from') 
-	customer_order = frappe.db.sql('''select name, order_date,status, payment_status, concat(first_name,' ' ,last_name), 
-		 customer_email,phone,total_amount,order_from from 
-		`tabOrder` where naming_series !="SUB-ORD-" and docstatus=1 {condition} '''.format(condition=condition),as_list=1)
+		query = query.where(Order.order_from == filters.get('order_from'))
+	customer_order = query.run(as_list=True)
 	return customer_order
 
 def get_chart_data(filters):
@@ -64,20 +83,31 @@ def get_chart_data(filters):
 	}
 
 def get_chart_data_source(filters):
-	condition=''
+	Order = DocType('Order')
+	query = (
+		frappe.qb.from_(Order)
+		.select(
+			Order.order_date,
+			Order.total_amount
+		)
+		.where(Order.naming_series != "SUB-ORD-")
+		.where(Order.docstatus == 1)
+	)
 	if filters.get('from_date'):
-		condition+=' and order_date>="%s"' % filters.get('from_date')
+		query = query.where(Order.order_date >= filters.get('from_date'))
+
 	if filters.get('to_date'):
-		condition+=' and order_date<="%s"' % filters.get('to_date')
+		query = query.where(Order.order_date <= filters.get('to_date'))
+
 	if filters.get('status'):
-		condition+=' and status="%s"' % filters.get('status')
+		query = query.where(Order.status == filters.get('status'))
+
 	if filters.get('payment_status'):
-		condition+=' and payment_status="%s"' % filters.get('payment_status') 
+		query = query.where(Order.payment_status == filters.get('payment_status'))
+
 	if filters.get('order_from'):
-		condition+=' and order_from="%s"' % filters.get('order_from') 
-	customer_order = frappe.db.sql('''select order_date,total_amount from 
-		`tabOrder` where naming_series !="SUB-ORD-" and docstatus=1 {condition} '''.format(condition=condition),as_list=1)
-	
+		query = query.where(Order.order_from == filters.get('order_from'))
+	customer_order = query.run(as_list=True)
 	return customer_order
 
 

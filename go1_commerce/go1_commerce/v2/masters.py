@@ -4,11 +4,12 @@ from frappe import _
 from frappe.utils import get_datetime, getdate
 from datetime import datetime
 from go1_commerce.utils.utils import other_exception,get_today_date
+from frappe.query_builder import DocType
 
 def failed_msg_resp(message,code = None):
 	frappe.response.http_status_code = code if code else 404
 	return {"status":"Failed",
-         	"error_message":message,"data":[]}
+			"error_message":message,"data":[]}
 
 def failed_msg_400_resp(message):
 	frappe.response.http_status_code = 400
@@ -18,8 +19,12 @@ def failed_msg_400_resp(message):
 @frappe.whitelist()
 def get_countries():
 	try:
-		query = """ SELECT name,time_zones FROM `tabCountry` WHERE docstatus=0 """
-		data = frappe.db.sql(query,as_dict=1)
+		Country = DocType('Country')
+		data = (
+			frappe.qb.from_(Country)
+			.select(Country.name, Country.time_zones)
+			.where(Country.docstatus == 0)
+		).run(as_dict=True)
 		if data:
 			return format_output(label="name",value="name",data=data)
 		else:
@@ -31,12 +36,12 @@ def get_countries():
 @frappe.whitelist()
 def get_states(country=None):
 	try:
-		condition = ""
+		
+		State = DocType('State')
+		query = (frappe.qb.from_(State).select(State.name, State.country).where(State.docstatus == 0))
 		if country:
-			condition = " AND country ='"+country+"'"
-		query = """ SELECT name,country FROM `tabState` WHERE docstatus=0
-	                {condition}	""".format(condition=condition)
-		data = frappe.db.sql(query,as_dict=1)
+			query = query.where(State.country == country)
+		data = query.run(as_dict=True)
 		if data:
 			return format_output(label="name",value="name",data=data)
 		else:
@@ -47,12 +52,11 @@ def get_states(country=None):
 @frappe.whitelist()
 def get_cities(state=None):
 	try:
-		condition = ""
+		City = DocType('City')
+		query = (frappe.qb.from_(City).select(City.name, City.state).where(City.docstatus == 0))
 		if state:
-			condition = " AND state ='"+state+"'"
-		query = """ SELECT name,state FROM `tabCity` WHERE docstatus=0
-	                {condition} """.format(condition=condition)
-		data = frappe.db.sql(query,as_dict=1)
+			query = query.where(City.state == state)
+		data = query.run(as_dict=True)
 		if data:
 			return format_output(label="name",value="name",data = data)
 		else:
@@ -63,16 +67,24 @@ def get_cities(state=None):
 @frappe.whitelist(allow_guest=True)
 def get_centres(city=None):
 	try:
-		condition = ""
+		
+		Warehouse = DocType('Warehouse')
+		query = frappe.qb.from_(Warehouse).select(
+			Warehouse.name,Warehouse.approval_status, 
+			Warehouse.center_code, Warehouse.contact_name, 
+			Warehouse.mobile_no, Warehouse.owned_by, 
+			Warehouse.city, Warehouse.state, 
+			Warehouse.country, Warehouse.pin
+		).where(
+			(Warehouse.docstatus == 0) &
+			(Warehouse.disabled == 0) &
+			(Warehouse.allow_product_listing == 1) &
+			(Warehouse.approval_status == 'Approved') &
+			(Warehouse.fulfillment_center == 1)
+		)
 		if city:
-			condition = " AND city ='"+city+"'"
-		query = """ SELECT name,approval_status,center_code,contact_name,mobile_no,
-	                owned_by,city,state,country,pin FROM `tabWarehouse` 
-		            WHERE docstatus=0 AND disabled=0 AND allow_product_listing=1 
-		            AND approval_status='Approved'
-		            AND fulfillment_center=1 {condition} 
-					""".format(condition=condition)
-		data = frappe.db.sql(query,as_dict=1)
+			query = query.where(Warehouse.city == city)
+		data = query.run(as_dict=True)
 		if data:
 			return format_output(label="name",value="name",data = data)
 		else:
@@ -83,13 +95,18 @@ def get_centres(city=None):
 @frappe.whitelist()
 def get_zones(city=None):
 	try:
-		condition = ""
+		Zone = DocType('Zone')
+		query = frappe.qb.from_(Zone).select(
+			Zone.name, 
+			Zone.zone_name, 
+			Zone.city, 
+			Zone.state
+		).where(
+			(Zone.docstatus == 0)
+		)
 		if city:
-			condition = " AND city ='"+city+"'"
-		query = """ SELECT name,zone_name,city,state FROM `tabZone` 
-					WHERE docstatus=0 {condition} 
-					""".format(condition=condition)
-		data = frappe.db.sql(query,as_dict=1)
+			query = query.where(Zone.city == city)
+		data = query.run(as_dict=True)
 		if data:
 			return format_output(label="name",value="name",data = data)
 		else:
@@ -100,13 +117,19 @@ def get_zones(city=None):
 @frappe.whitelist()
 def get_areas(zone_name=None):
 	try:
-		condition = ""
+		Area = DocType('Area')
+		query = frappe.qb.from_(Area).select(
+			Area.name, 
+			Area.area, 
+			Area.zone_name, 
+			Area.city, 
+			Area.state
+		).where(
+			(Area.docstatus == 0)
+		)
 		if zone_name:
-			condition = " AND zone_name ='"+zone_name+"'"
-		query = """ SELECT name,area,zone_name,city,state FROM `tabArea` 
-	                WHERE docstatus=0 {condition} 
-					""".format(condition=condition)
-		data = frappe.db.sql(query,as_dict=1)
+			query = query.where(Area.zone_name == zone_name)
+		data = query.run(as_dict=True)
 		if data:
 			return format_output(label="name",value="name",data = data)
 		else:
@@ -117,13 +140,20 @@ def get_areas(zone_name=None):
 @frappe.whitelist()
 def get_subareas(area=None):
 	try:
-		condition = ""
+		SubArea = DocType('Sub Area')
+		query = frappe.qb.from_(SubArea).select(
+			SubArea.name, 
+			SubArea.sub_area, 
+			SubArea.area, 
+			SubArea.area_name, 
+			SubArea.city, 
+			SubArea.zone
+		).where(
+			(SubArea.docstatus == 0)
+		)
 		if area:
-			condition = " AND area ='"+area+"'"
-		query = """ SELECT name,sub_area,area,area_name,city,zone 
-	                FROM `tabSub Area` WHERE docstatus=0 {condition} 
-		            """.format(condition=condition)
-		data = frappe.db.sql(query,as_dict=1)
+			query = query.where(SubArea.area == area)
+		data = query.run(as_dict=True)
 		if data:
 			return format_output(label="name",value="name",data = data)
 		else:
@@ -134,12 +164,17 @@ def get_subareas(area=None):
 @frappe.whitelist()
 def get_routes(centre=None):
 	try:
-		condition = ""
+		Route = DocType('Route')
+		query = frappe.qb.from_(Route).select(
+			Route.name,
+			Route.centre,
+			Route.route_name
+		).where(
+			(Route.docstatus == 0)
+		)
 		if centre:
-			condition = " AND centre ='"+centre+"'"
-		query = """ SELECT name,centre,route_name FROM `tabRoute` WHERE docstatus=0 
-	                {condition} """.format(condition=condition)
-		data = frappe.db.sql(query,as_dict=1)
+			query = query.where(Route.centre == centre)
+		data = query.run(as_dict=True)
 		if data:
 			return format_output(label="name",value="name",data = data)
 		else:
@@ -152,9 +187,9 @@ def get_routes(centre=None):
 @frappe.whitelist()
 def get_seller_types():
 	try:
-		query = """ SELECT name FROM `tabSeller Type` 
-		            WHERE docstatus=0 """
-		data = frappe.db.sql(query,as_dict=1)
+		SellerType = DocType('Seller Type')
+		query = (frappe.qb.from_(SellerType).select(SellerType.name).where(SellerType.docstatus == 0))
+		data = query.run(as_dict=True)
 		if data:
 			return format_output(label="name",value="name",data = data)
 		else:
@@ -165,8 +200,10 @@ def get_seller_types():
 @frappe.whitelist()
 def get_cancel_reasons():
 	try:
-		query = """ SELECT name FROM `tabOrder Cancel Reason`"""
-		data = frappe.db.sql(query,as_dict=1)
+		OrderCancelReason = DocType('Order Cancel Reason')
+		query = (frappe.qb.from_(OrderCancelReason).select(OrderCancelReason.name))
+		data = query.run(as_dict=True)
+		
 		if data:
 			return format_output(label="name",value="name",data = data)
 		else:
@@ -177,8 +214,10 @@ def get_cancel_reasons():
 @frappe.whitelist()
 def get_lead_dropped_reasons():
 	try:
-		query = """ SELECT name FROM `tabReason For Lead`"""
-		data = frappe.db.sql(query,as_dict=1)
+		ReasonForLead = DocType('Reason For Lead')
+		query = (frappe.qb.from_(ReasonForLead).select(ReasonForLead.name))
+		data = query.run(as_dict=True)
+		
 		if data:
 			return format_output(label="name",value="name",data = data)
 		else:
@@ -189,9 +228,14 @@ def get_lead_dropped_reasons():
 @frappe.whitelist()
 def get_buyer_business_type():
 	try:
-		query = """ SELECT name FROM `tabBuyer Business Type` 
-		            WHERE docstatus=0 """
-		data = frappe.db.sql(query,as_dict=1)
+		BuyerBusinessType = DocType('Buyer Business Type')
+		query = (frappe.qb.from_(BuyerBusinessType)
+			.select(BuyerBusinessType.name)
+			.where(
+			(BuyerBusinessType.docstatus == 0)
+		))
+		data = query.run(as_dict=True)
+		
 		if data:
 			return format_output(label="name",value="name",data = data)
 		else:
@@ -202,9 +246,14 @@ def get_buyer_business_type():
 @frappe.whitelist()
 def get_purpose_of_visits():
 	try:
-		query = """ SELECT name FROM `tabVisit of Purpose` 
-		            WHERE docstatus=0 """
-		data = frappe.db.sql(query,as_dict=1)
+		VisitofPurpose = DocType('Visit of Purpose')
+		query = (frappe.qb.from_(VisitofPurpose)
+			.select(VisitofPurpose.name)
+			.where(
+			(VisitofPurpose.docstatus == 0)
+		))
+		data = query.run(as_dict=True)
+		
 		if data:
 			return format_output(label="name",value="name",data = data)
 		else:
@@ -215,9 +264,15 @@ def get_purpose_of_visits():
 @frappe.whitelist()
 def get_customer_purpose_of_visits():
 	try:
-		query = """ SELECT name,vis_of_purps FROM `tabVisit of Purpose` 
-		            WHERE type="Customer" ORDER BY name  """
-		data = frappe.db.sql(query,as_dict=1)
+		VisitofPurpose = DocType('Visit of Purpose')
+		query = (frappe.qb.from_(VisitofPurpose)
+			.select(VisitofPurpose.name,VisitofPurpose.vis_of_purps)
+			.where(
+			(VisitofPurpose.type == "Customer"))
+			.orderby(VisitofPurpose.name)
+		)
+		data = query.run(as_dict=True)
+		
 		if data:
 			return format_output(label="vis_of_purps",value="name",data = data)
 		else:
@@ -228,9 +283,15 @@ def get_customer_purpose_of_visits():
 @frappe.whitelist()
 def get_lead_purpose_of_visits():
 	try:
-		query = """ SELECT name,vis_of_purps FROM `tabVisit of Purpose` 
-		            WHERE type="Lead" ORDER BY name """
-		data = frappe.db.sql(query,as_dict=1)
+		VisitofPurpose = DocType('Visit of Purpose')
+		query = (frappe.qb.from_(VisitofPurpose)
+			.select(VisitofPurpose.name,VisitofPurpose.vis_of_purps)
+			.where(
+			(VisitofPurpose.type == "Lead"))
+			.orderby(VisitofPurpose.name)
+		)
+		data = query.run(as_dict=True)
+		
 		if data:
 			return format_output(label="vis_of_purps",value="name",data = data)
 		else:
@@ -241,9 +302,14 @@ def get_lead_purpose_of_visits():
 @frappe.whitelist()
 def get_visit_status():
 	try:
-		query = """ SELECT name FROM `tabVisit Status` 
-		            WHERE 1=1 """
-		data = frappe.db.sql(query,as_dict=1)
+		VisitStatus = DocType('Visit Status')
+		query = (frappe.qb.from_(VisitStatus)
+			.select(VisitStatus.name)
+			.where(
+			(VisitStatus.name != "")
+		))
+		data = query.run(as_dict=True)
+		
 		if data:
 			return format_output(label="name",value="name",data = data)
 		else:
@@ -254,18 +320,28 @@ def get_visit_status():
 @frappe.whitelist()
 def get_unsuccessful_delivered_reasons():
 	try:
-		query = """ SELECT name FROM `tabReturn Request Reasons` 
-		            WHERE docstatus=0 and enable_unsful_dc_order =1"""
-		return format_output(label="name",value="name",data=frappe.db.sql(query,as_dict=1))
+		ReturnRequestReasons = DocType('Return Request Reasons')
+		query = (frappe.qb.from_(ReturnRequestReasons)
+			.select(ReturnRequestReasons.name)
+			.where(
+			(ReturnRequestReasons.docstatus == 0))
+			.where(
+			(ReturnRequestReasons.enable_unsful_dc_order == 1)))
+		data = query.run(as_dict=True)
+		
+		return format_output(label="name",value="name",data=data)
 	except Exception:
 		other_exception("get_return_request_reasons")
 		
 @frappe.whitelist()
 def get_lead_source():
 	try:
-		query = """ SELECT name FROM `tabLead Source` 
-		            WHERE 1=1 """
-		data = frappe.db.sql(query,as_dict=1)
+		LeadSource = DocType('Lead Source')
+		query = (frappe.qb.from_(LeadSource)
+			.select(LeadSource.name)
+			)
+		data = query.run(as_dict=True)
+		
 		if data:
 			return format_output(label="name",value="name",data = data)
 		else:
@@ -276,9 +352,14 @@ def get_lead_source():
 @frappe.whitelist()
 def get_payment_methods():
 	try:
-		query = """ SELECT name FROM `tabPayment Method` 
-		            WHERE docstatus=0 """
-		data = frappe.db.sql(query,as_dict=1)
+		PaymentMethod = DocType('Payment Method')
+		query = (frappe.qb.from_(PaymentMethod)
+			.select(PaymentMethod.name)
+			.where(
+			(PaymentMethod.docstatus == 0))
+			)
+		data = query.run(as_dict=True)
+		
 		if data:
 			return format_output(label="name",value="name",data = data)
 		else:
@@ -289,8 +370,14 @@ def get_payment_methods():
 @frappe.whitelist()
 def get_payment_modes():
 	try:
-		query = """ SELECT name FROM `tabMode Of Payments`"""
-		data = frappe.db.sql(query,as_dict=1)
+		ModeOfPayments = DocType('Mode Of Payments')
+		query = (frappe.qb.from_(PaymentMethod)
+			.select(ModeOfPayments.name)
+			.where(
+			(ModeOfPayments.name != ""))
+			)
+		data = query.run(as_dict=True)
+		
 		if data:
 			return format_output(label="name",value="name",data = data)
 		else:
@@ -300,9 +387,14 @@ def get_payment_modes():
 @frappe.whitelist()
 def get_return_request_reasons():
 	try:
-		query = """ SELECT name FROM `tabReturn Request Reasons` 
-		            WHERE docstatus=0 """
-		data = frappe.db.sql(query,as_dict=1)
+		ReturnRequestReasons = DocType('Return Request Reasons')
+		query = (frappe.qb.from_(ReturnRequestReasons)
+			.select(ReturnRequestReasons.name)
+			.where(
+			(ReturnRequestReasons.docstatus == 0))
+			)
+		data = query.run(as_dict=True)
+		
 		if data:
 			return format_output(label="name",value="name",data = data)
 		else:
@@ -313,9 +405,14 @@ def get_return_request_reasons():
 @frappe.whitelist()
 def get_replacement_request_reasons():
 	try:
-		query = """ SELECT name FROM `tabReplacement Request Reasons` 
-		            WHERE docstatus=0 """
-		data = frappe.db.sql(query,as_dict=1)
+		ReplacementRequestReasons = DocType('Replacement Request Reasons')
+		query = (frappe.qb.from_(ReplacementRequestReasons)
+			.select(ReplacementRequestReasons.name)
+			.where(
+			(ReplacementRequestReasons.docstatus == 0))
+			)
+		data = query.run(as_dict=True)
+		
 		if data:
 			return format_output(label="name",value="name",data = data)
 		else:
@@ -326,9 +423,14 @@ def get_replacement_request_reasons():
 @frappe.whitelist()
 def get_order_status():
 	try:
-		query = """ SELECT name FROM `tabOrder Status` 
-		            WHERE docstatus=0 """
-		data = frappe.db.sql(query,as_dict=1)
+		OrderStatus = DocType('Order Status')
+		query = (frappe.qb.from_(OrderStatus)
+			.select(OrderStatus.name)
+			.where(
+			(OrderStatus.docstatus == 0))
+			)
+		data = query.run(as_dict=True)
+		
 		if data:
 			return format_output(label="name",value="name",data = data)
 		else:
@@ -339,9 +441,14 @@ def get_order_status():
 @frappe.whitelist()
 def get_return_request_status():
 	try:
-		query = """ SELECT name FROM `tabReturn Request Status` 
-		            WHERE docstatus=0 """
-		data = frappe.db.sql(query,as_dict=1)
+		ReturnRequestStatus = DocType('Return Request Status')
+		query = (frappe.qb.from_(ReturnRequestStatus)
+			.select(ReturnRequestStatus.name)
+			.where(
+			(ReturnRequestStatus.docstatus == 0))
+			)
+		data = query.run(as_dict=True)
+		
 		if data:
 			return format_output(label="name",value="name",data = data)
 		else:
@@ -352,9 +459,14 @@ def get_return_request_status():
 @frappe.whitelist()
 def get_replacement_request_status():
 	try:
-		query = """ SELECT name FROM `tabReplacement Status` 
-		            WHERE docstatus=0 """
-		data = frappe.db.sql(query,as_dict=1)
+		ReplacementStatus = DocType('Replacement Status')
+		query = (frappe.qb.from_(ReplacementStatus)
+			.select(ReplacementStatus.name)
+			.where(
+			(ReplacementStatus.docstatus == 0))
+			)
+		data = query.run(as_dict=True)
+		
 		if data:
 			return format_output(label="name",value="name",data = data)
 		else:
@@ -539,15 +651,21 @@ def upload_file(**kwargs):
 
 @frappe.whitelist()
 def get_checkout_settings():
-	category_condition = ship_condition = ""
+	category_condition = ""
 	default_delivery_slots = []
-	delivery_list = frappe.db.sql(
-				    '''SELECT SH.parent FROM `tabDelivery Slot Shipping Method` SH
-					INNER JOIN `tabDelivery Setting` DS ON DS.name = SH.parent
-					WHERE enable=1 {0}'''.format(ship_condition), as_dict=1)
+	DeliverySlotShippingMethod = DocType('Delivery Slot Shipping Method')
+	DeliverySetting = DocType('Delivery Setting')
+	query = (
+		qb.from_(DeliverySlotShippingMethod)
+		.inner_join(DeliverySetting).on(DeliverySetting.name == DeliverySlotShippingMethod.parent)
+		.select(DeliverySlotShippingMethod.parent)
+		.where(DeliverySetting.enable == 1)
+	)
+	
+	delivery_list = query.run(as_dict=True)
 	for x in delivery_list:
 		if not frappe.db.get_all("Delivery Slot Category",
-	     	   filters={"parent":x.parent}):
+			   filters={"parent":x.parent}):
 			(dates_lists, blocked_day_list) = get_delivery_slots_list(x.parent)
 			x.dates_lists = dates_lists
 			x.blocked_day_list = blocked_day_list
@@ -612,7 +730,7 @@ def get_slot_lists(slots = None, date = None, min_time = None, restrict = None, 
 				if allow:
 					doc = item.__dict__
 					doc['time_format'] = '{0} - {1}'.format(from_date.strftime('%I:%M %p'), 
-					     									to_date.strftime('%I:%M %p'))
+															to_date.strftime('%I:%M %p'))
 					slot_list.append(doc)
 	if slot_list:
 		return slot_list
@@ -630,18 +748,18 @@ def get_delivery_slots_list(name):
 		if delivery.enable_start_date and delivery.no_of_dates_start_from>0:
 			today_date = frappe.utils.add_days(today_date, int(delivery.no_of_dates_start_from))
 			slots_list = get_slot_lists(delivery.delivery_slots, today_date, 
-			       						delivery.min_time, delivery.restrict_slot, 
+										delivery.min_time, delivery.restrict_slot, 
 										delivery.max_booking_slot)
 			if slots_list:
 				dates_list.append({'date': today_date, 'slots': slots_list, 
-		       					  'format_date': today_date.strftime('%b %d, %Y')})
+								  'format_date': today_date.strftime('%b %d, %Y')})
 		if delivery.slot_for_current_date and today_date == currentdate:
 			slots_list = get_slot_lists(delivery.delivery_slots, today_date, 
-			       						delivery.min_time, delivery.restrict_slot, 
+										delivery.min_time, delivery.restrict_slot, 
 										delivery.max_booking_slot)
 			if slots_list:
 				dates_list.append({'date': today_date, 
-		       					   'slots': slots_list, 
+								   'slots': slots_list, 
 								   'format_date': today_date.strftime('%b %d, %Y')})
 		data = get_deivery_slots(dates_list,delivery)
 		dates_list = data[0]

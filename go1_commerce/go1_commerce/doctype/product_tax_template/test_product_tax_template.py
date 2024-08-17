@@ -29,7 +29,13 @@ def make_tax_template(tax_name):
 				'doctype': "Product Tax Template",
 				'title': tax_name
 			})
-			installed_apps=frappe.db.sql(''' select * from `tabModule Def` where app_name='accounts' ''',as_dict=True)
+			ModuleDef = DocType('Module Def')
+			query = (
+				frappe.qb.from_(ModuleDef)
+				.select('*')
+				.where(ModuleDef.app_name == 'accounts')
+			)
+			installed_apps = query.run(as_dict=True)
 			if len(installed_apps)>0:
 				if not frappe.db.get_value('Account', {'account_name': "Test Account 1"}):
 					account = frappe.get_doc({

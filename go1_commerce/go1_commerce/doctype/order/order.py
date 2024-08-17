@@ -5,6 +5,7 @@
 from __future__ import unicode_literals
 from urllib.error import HTTPError
 import frappe, json, math, os
+from frappe.query_builder import DocType, functions as fn, Order
 from frappe.model.document import Document
 from frappe.utils import flt, nowdate, getdate, now, get_datetime, touch_file
 from datetime import datetime, timedelta
@@ -194,15 +195,19 @@ class Order(Document):
 					frappe.db.commit()
 				elif has_variants == 1:
 					attr_id = update_variant_id(item.item, item.varaint_txt)
-					query = """SELECT VC.stock, VC.product_title, VC.name
-								FROM `tabProduct Variant Combination` VC
-								INNER JOIN `tabProduct Attribute Option` AO 
-									ON VC.attribute_id = %(attribute_id)s
-								WHERE VC.parent = %(parent_item)s
-								LIMIT 1
-							"""
-					params = {"attribute_id": attr_id, "parent_item": item.item}
-					variant_stock = frappe.db.sql(query, params, as_dict = True)
+					ProductVariantCombination = DocType('Product Variant Combination')
+					ProductAttributeOption = DocType('Product Attribute Option')
+
+					query = (
+						frappe.qb.from_(ProductVariantCombination)
+						.join(ProductAttributeOption)
+						.on(ProductVariantCombination.attribute_id == ProductAttributeOption.name)
+						.select(ProductVariantCombination.stock, ProductVariantCombination.product_title, ProductVariantCombination.name)
+						.where((ProductVariantCombination.attribute_id == attr_id) & 
+							(ProductVariantCombination.parent == item.item))
+						.limit(1)
+					)
+					variant_stock = query.run(as_dict=True)
 					if variant_stock:
 						variant_stock = variant_stock[0]
 						if variant_stock.stock >= item.quantity:
@@ -346,11 +351,16 @@ class Order(Document):
 
 
 	def check_attr_ids(self,item,attr_ids):
-		combination = frappe.db.sql(''' SELECT weight,sku,attribute_html
-										FROM `tabProduct Variant Combination`
-										WHERE parent = %(name)s
-											AND attribute_id = %(attribute_id)s
-									''',{'name': item.item,'attribute_id': item.attribute_ids},as_dict=1)
+		ProductVariantCombination = DocType('Product Variant Combination')
+		query = (
+			frappe.qb.from_(ProductVariantCombination)
+			.select(ProductVariantCombination.weight, ProductVariantCombination.sku, ProductVariantCombination.attribute_html)
+			.where(
+				(ProductVariantCombination.parent == item.item) &
+				(ProductVariantCombination.attribute_id == item.attribute_ids)
+			)
+		)
+		combination = query.run(as_dict=True)
 		if combination:
 			if combination[0].sku:
 				item_sku = combination[0].sku
@@ -372,10 +382,13 @@ class Order(Document):
 		if self.docstatus == 0:
 			self.total_tax_amount = tax
 			frappe.db.set_value(self.doctype,self.name,'total_tax_amount',tax)
-			frappe.db.sql("""UPDATE `tabOrder`
-							SET total_tax_amount = %(total_tax_amount)s
-							WHERE name = %(orderid)s
-						""", {'total_tax_amount': self.total_tax_amount, 'orderid': self.name})
+			Order = DocType('Order')
+			update_query = (
+				frappe.qb.update(Order)
+				.set(Order.total_tax_amount, self.total_tax_amount)
+				.where(Order.name == self.name)
+			)
+			update_query.run()
 			frappe.db.commit()
 		else:
 			self.total_tax_amount = tax
@@ -442,10 +455,14 @@ class Order(Document):
 						for i in attr_ids:
 							if i: id_list.append(i)
 						ids = ",".join(['"' + x + '"' for x in id_list])
-						options = frappe.db.sql(""" SELECT *
-													FROM `tabProduct Attribute Option`
-													WHERE parent = %(parent)s AND name IN ({0})
-												""".format(ids), {'parent': item.item}, as_dict = 1)
+						ProductAttributeOption = DocType('Product Attribute Option')
+						query = (
+							frappe.qb.from_(ProductAttributeOption)
+							.select('*')
+							.where(ProductAttributeOption.parent == item.item)
+							.where(ProductAttributeOption.name.isin(ids))
+						)
+						options = query.run(as_dict=True)
 						title = ''
 						for op in options:
 							if op.image_list:
@@ -457,12 +474,16 @@ class Order(Document):
 								title = op.product_title
 						if title != '' and item.item_name != title:
 							item.item_name = title
-					result = frappe.db.sql( """ SELECT cart_thumbnail, list_image
-												FROM `tabProduct Image`
-												WHERE parent = %(product)s
-												ORDER BY is_primary DESC
-												LIMIT 1
-											""", {'product': item.item}, as_dict=1)
+					
+					ProductImage = DocType('Product Image')
+					query = (
+						frappe.qb.from_(ProductImage)
+						.select(ProductImage.cart_thumbnail, ProductImage.list_image)
+						.where(ProductImage.parent == item.item)
+						.orderby(ProductImage.is_primary)
+						.limit(1)
+					)
+					result = query.run(as_dict=True)
 					if attr_image:
 						if self.docstatus == 0:
 							item.item_image = attr_image
@@ -564,23 +585,30 @@ class Order(Document):
 				update_giftcard_status(self)
 		if self.docstatus == 0:
 			if self.outstanding_amount == 0:
-				frappe.db.sql(	""" UPDATE `tabOrder`
-									SET docstatus = 1
-									WHERE name = %(orderid)s
-								""", {'orderid': self.name})
+				Order = DocType('Order')
+				query = (
+					frappe.qb.update(Order)
+					.set(Order.docstatus, 1)
+					.where(Order.name == self.name)
+				)
+				query.run()
 				frappe.db.commit()
 		self.check_outstanding_balance(self.total_amount,new_disount)
 		workflow = frappe.db.get_all('Workflow', filters={'is_active': 1, 'document_type': 'Order'})
 		if workflow:
 			if self.workflow_state == 'Order Delivered':
 				if self.driver:
-					check_orders= frappe.db.sql(""" SELECT name
-													FROM `tabOrder`
-													WHERE name <> %(name)s
-														AND driver = %(driver)s
-														AND driver_status <> "Delivered"
-														AND status NOT IN ("Completed", "Cancelled")
-												""", {'name': self.name, 'driver': self.driver})
+					Order = DocType('Order')
+					query = (
+						frappe.qb.from_(Order)
+						.select(Order.name)
+						.where(Order.name != self.name)
+						.where(Order.driver == self.driver)
+						.where(Order.driver_status != 'Delivered')
+						.where(Order.status.notin(['Completed', 'Cancelled']))
+					)
+					check_orders = query.run()
+
 					if not check_orders:
 						frappe.db.set_value('Drivers', self.driver, 'working_status', 'Available')
 						frappe.db.commit()
@@ -654,9 +682,13 @@ class Order(Document):
 				frappe.db.set_value(self.doctype, self.name, 'discount', self.discount)
 		discount_history = frappe.db.get_all("Discount Usage History",filters={'order_id':self.name})
 		for x in discount_history:
-			frappe.db.sql(	"""DELETE FROM `tabDiscount Usage History`
-								WHERE name = %(usage_name)s
-							""", {'usage_name': x.name})
+			DiscountUsageHistory = DocType('Discount Usage History')
+			query = (
+				frappe.qb.from_(DiscountUsageHistory)
+				.where(DiscountUsageHistory.name == x.name)
+				.delete()
+			)
+			query.run()
 		if discount_response and discount_response.get('discount_amount'):
 			from go1_commerce.go1_commerce.v2.orders \
 				import insert_discount_usage_history
@@ -775,27 +807,38 @@ class Order(Document):
 		paid_amount = 0
 		si = frappe.db.get_all("Sales Invoice",filters={"reference":self.name})
 		if si:
-			payment_reference = frappe.db.sql("""SELECT PR.allocated_amount
-												FROM `tabPayment Reference` PR
-												INNER JOIN `tabPayment Entry` PE ON PE.name = PR.parent
-												WHERE PR.reference_doctype = 'Order'
-													AND PR.reference_name = %(reference_id)s
-													AND PE.docstatus = 1 
-													AND PE.payment_type = 'Receive'
-											""",{"reference_id":self.name},as_dict=1)
+			PaymentReference = DocType('Payment Reference')
+			PaymentEntry = DocType('Payment Entry')
+			query = (
+				frappe.qb.from_(PaymentReference)
+				.inner_join(PaymentEntry).on(PaymentEntry.name == PaymentReference.parent)
+				.select(PaymentReference.allocated_amount)
+				.where(
+					PaymentReference.reference_doctype == 'Order',
+					PaymentReference.reference_name == self.name,
+					PaymentEntry.docstatus == 1,
+					PaymentEntry.payment_type == 'Receive'
+				)
+			)
+			payment_reference = query.run(as_dict=True)
 			paid_amount += sum(round(flt(x.allocated_amount), 2) for x in payment_reference if x.allocated_amount > 0)
 			if not payment_reference:
 				if si:
 					for sinv in si:
-						payment_reference = frappe.db.sql(""" SELECT PR.allocated_amount
-																FROM `tabPayment Reference` PR
-																INNER JOIN `tabPayment Entry` PE
-																ON PE.name = PR.parent
-																WHERE PR.reference_doctype = 'Sales Invoice'
-																	AND PR.reference_name = %(reference_id)s
-																	AND PE.docstatus = 1 
-																	AND PE.payment_type = 'Receive'
-															""",{"reference_id":sinv.name},as_dict = 1)
+						PaymentReference = DocType('Payment Reference')
+						PaymentEntry = DocType('Payment Entry')
+						query = (
+							frappe.qb.from_(PaymentReference)
+							.inner_join(PaymentEntry).on(PaymentEntry.name == PaymentReference.parent)
+							.select(PaymentReference.allocated_amount)
+							.where(
+								PaymentReference.reference_doctype == 'Sales Invoice',
+								PaymentReference.reference_name == sinv.name,
+								PaymentEntry.docstatus == 1,
+								PaymentEntry.payment_type == 'Receive'
+							)
+						)
+						payment_reference = query.run(as_dict=True)
 						paid_amount += sum(round(flt(x.allocated_amount), 2) for x in payment_reference if x.allocated_amount > 0)
 					
 					
@@ -984,12 +1027,16 @@ class Order(Document):
 	def update_items_stock(self):
 		try:
 			if self.name:
-				items=frappe.db.sql(""" SELECT O.*, P.inventory_method, P.stock
-										FROM `tabOrder Item` AS O
-										INNER JOIN `tabProduct` AS P ON O.item = P.name
-										WHERE O.parent = %(parent)s
-										ORDER BY O.idx
-									""", {'parent': self.name}, as_dict = 1)
+				OrderItem = DocType('Order Item')
+				Product = DocType('Product')
+				query = (
+					frappe.qb.from_(OrderItem)
+					.inner_join(Product).on(OrderItem.item == Product.name)
+					.select(OrderItem.star(), Product.inventory_method, Product.stock)
+					.where(OrderItem.parent == self.name)
+					.orderby(OrderItem.idx)
+				)
+				items = query.run(as_dict=True)
 				if items:
 					for item in items:
 						has_variant = frappe.db.get_value("Product",item.item,"has_variants")
@@ -1056,12 +1103,15 @@ class Order(Document):
 
 
 	def get_item_image(self, item_code):
-		result = frappe.db.sql("""SELECT cart_thumbnail, list_image
-									FROM `tabProduct Image`
-									WHERE parent = %(product)s
-									ORDER BY is_primary DESC
-									LIMIT 1
-								""", {'product': item_code}, as_dict=1)
+		ProductImage = DocType('Product Image')
+		query = (
+			frappe.qb.from_(ProductImage)
+			.select(ProductImage.cart_thumbnail, ProductImage.list_image)
+			.where(ProductImage.parent == item_code)
+			.orderby(ProductImage.is_primary, order=Order.desc)
+			.limit(1)
+		)
+		result = query.run(as_dict=True)
 		if result and result[0].cart_thumbnail:
 			return result[0].cart_thumbnail
 		elif result and result[0].list_image:
@@ -1291,10 +1341,16 @@ def calculate_shipping_charges(doc):
 					}
 	items = doc.order_item
 	catalog_settings = frappe.get_single('Catalog Settings')
-	shipping_rate_method = frappe.db.sql("""SELECT name AS id, shipping_rate_method AS name
-											FROM `tabShipping Rate Method`
-											WHERE is_active = 1
-										""", as_dict=1)
+	ShippingRateMethod = DocType('Shipping Rate Method')
+	query = (
+		frappe.qb.from_(ShippingRateMethod)
+		.select(
+			ShippingRateMethod.name.as_('id'),
+			ShippingRateMethod.shipping_rate_method.as_('name')
+		)
+		.where(ShippingRateMethod.is_active == 1)
+	)
+	shipping_rate_method = query.run(as_dict=True)
 	return calculate_shipping_charges_method(
 												items,
 												catalog_settings,
@@ -1383,15 +1439,25 @@ def calculate_shipping_charges_by_total(shipping_method, shipping_rate_method, i
 			total_order_amount += item_amount
 
 	if shipping_rate_method:
-		shipping_charges_list = frappe.db.sql("""SELECT ST.shipping_method, ST.use_percentage, 
-													ST.charge_percentage, ST.charge_amount, 
-													ST.order_total_from, ST.order_total_to, SR.name
-												FROM `tabShipping By Total Charges` ST
-												INNER JOIN `tabShipping Rate Method` SR 
-													ON SR.name = ST.parent
-												WHERE ST.shipping_method = %(shipping_method)s
-												ORDER BY ST.idx DESC
-								""", {"shipping_method": shipping_method}, as_dict=True)
+		ShippingByTotalCharges = DocType('Shipping By Total Charges')
+		ShippingRateMethod = DocType('Shipping Rate Method')
+		query = (
+			frappe.qb.from_(ShippingByTotalCharges)
+			.inner_join(ShippingRateMethod)
+			.on(ShippingRateMethod.name == ShippingByTotalCharges.parent)
+			.select(
+				ShippingByTotalCharges.shipping_method,
+				ShippingByTotalCharges.use_percentage,
+				ShippingByTotalCharges.charge_percentage,
+				ShippingByTotalCharges.charge_amount,
+				ShippingByTotalCharges.order_total_from,
+				ShippingByTotalCharges.order_total_to,
+				ShippingRateMethod.name
+			)
+			.where(ShippingByTotalCharges.shipping_method == frappe.qb.Param('shipping_method'))
+			.orderby(ShippingByTotalCharges.idx,order=Order.desc)
+		)
+		shipping_charges_list = query.run(as_dict=True, params={"shipping_method": shipping_method})
 		for charge in shipping_charges_list:
 			if charge.get('order_total_from') <= total_order_amount < charge.get('order_total_to'):
 				if charge.get('use_percentage') == 1:
@@ -1414,15 +1480,25 @@ def calculate_shipping_charges_by_weight(shipping_method, shipping_rate_method, 
 			weight_order_amount += item_weight
 
 	if shipping_rate_method:
-		shipping_charges_list = frappe.db.sql("""SELECT ST.shipping_method, ST.charge_amount, 
-													ST.use_percentage, ST.charge_percentage, 
-													ST.order_weight_from, ST.order_weight_to, SR.name
-												FROM `tabShipping By Weight Charges` ST
-												INNER JOIN `tabShipping Rate Method` SR 
-													ON SR.name = ST.parent
-												WHERE ST.shipping_method = %(shipping_method)s
-												ORDER BY ST.idx DESC
-											""", {"shipping_method": shipping_method}, as_dict=True)
+		ShippingByWeightCharges = DocType('Shipping By Weight Charges')
+		ShippingRateMethod = DocType('Shipping Rate Method')
+		query = (
+			frappe.qb.from_(ShippingByWeightCharges)
+			.inner_join(ShippingRateMethod)
+			.on(ShippingRateMethod.name == ShippingByWeightCharges.parent)
+			.select(
+				ShippingByWeightCharges.shipping_method,
+				ShippingByWeightCharges.charge_amount,
+				ShippingByWeightCharges.use_percentage,
+				ShippingByWeightCharges.charge_percentage,
+				ShippingByWeightCharges.order_weight_from,
+				ShippingByWeightCharges.order_weight_to,
+				ShippingRateMethod.name
+			)
+			.where(ShippingByWeightCharges.shipping_method == frappe.qb.Param('shipping_method'))
+			.orderby(ShippingByWeightCharges.idx, order=Order.desc)
+		)
+		shipping_charges_list = query.run(as_dict=True, params={"shipping_method": shipping_method})
 		for charge in shipping_charges_list:
 			if charge.get('order_weight_from') <= weight_order_amount < charge.get('order_weight_to'):
 				if charge.use_percentage == 1:
@@ -1481,14 +1557,23 @@ def calculate_shipping_charges_by_distance(shipping_method, shipping_addr, shipp
 		distance = round(distance, 2)
 		hts += " distance: "+str(distance)+"\n"
 		hts += " shipping_method: "+str(	shipping_method)+"\n"
-		shipping_charges_list = frappe.db.sql('''SELECT SC.charge_amount,SC.use_percentage, 
-													SC.charge_percentage, SC.from_distance,SC.to_distance
-												FROM `tabShipping Charges By Distance` SC
-												WHERE shipping_method = %(shipping_method)s 
-												AND from_distance <= %(distance)s 
-												AND to_distance >= %(distance)s
-											''',{'distance': distance,'shipping_method': shipping_method}, 
-												as_dict=True)
+		ShippingChargesByDistance = DocType('Shipping Charges By Distance')
+		query = (
+			frappe.qb.from_(ShippingChargesByDistance)
+			.select(
+				ShippingChargesByDistance.charge_amount,
+				ShippingChargesByDistance.use_percentage,
+				ShippingChargesByDistance.charge_percentage,
+				ShippingChargesByDistance.from_distance,
+				ShippingChargesByDistance.to_distance
+			)
+			.where(
+				ShippingChargesByDistance.shipping_method == frappe.qb.Param('shipping_method'),
+				ShippingChargesByDistance.from_distance <= frappe.qb.Param('distance'),
+				ShippingChargesByDistance.to_distance >= frappe.qb.Param('distance')
+			)
+		)
+		shipping_charges_list = query.run(as_dict=True, params={'distance': distance, 'shipping_method': shipping_method})
 		if shipping_charges_list:
 			if shipping_charges_list[0].use_percentage == 1:
 				if items:
@@ -1544,16 +1629,31 @@ def calculate_shipping_charges_by_distance_and_total(shipping_method, shipping_a
 				else:
 					distance = result['rows'][0]['elements'][0]['distance']['value'] * 0.001
 		distance = round(distance, 2)
-		charges_query = f'''SELECT SC.charge_amount,SC.use_percentage, SC.charge_percentage,
-								SC.from_distance,SC.to_distance,SC.order_total_from,SC.order_total_to
-							FROM `tabShipping Charges By Distance and Total` SC
-							WHERE shipping_method = '{shipping_method}' 
-								AND {distance} >= from_distance 
-								AND {distance} <= to_distance 
-								AND {subtotal} >= order_total_from 
-								AND {subtotal} <= order_total_to
-						'''
-		shipping_charges_list = frappe.db.sql(charges_query,as_dict=1)
+		ShippingCharges = DocType('Shipping Charges By Distance and Total')
+		query = (
+			frappe.qb.from_(ShippingCharges)
+			.select(
+				ShippingCharges.charge_amount,
+				ShippingCharges.use_percentage,
+				ShippingCharges.charge_percentage,
+				ShippingCharges.from_distance,
+				ShippingCharges.to_distance,
+				ShippingCharges.order_total_from,
+				ShippingCharges.order_total_to
+			)
+			.where(
+				ShippingCharges.shipping_method == frappe.qb.Param('shipping_method'),
+				ShippingCharges.from_distance <= frappe.qb.Param('distance'),
+				ShippingCharges.to_distance >= frappe.qb.Param('distance'),
+				ShippingCharges.order_total_from <= frappe.qb.Param('subtotal'),
+				ShippingCharges.order_total_to >= frappe.qb.Param('subtotal')
+			)
+		)
+		shipping_charges_list = query.run(as_dict=True, params={
+			'shipping_method': shipping_method,
+			'distance': distance,
+			'subtotal': subtotal
+		})
 		if shipping_charges_list:
 			shipping_charges = shipping_charges+shipping_charges_list[0].charge_amount
 	return  shipping_charges
@@ -1563,9 +1663,12 @@ def calculate_multi_vendor_shipping_charges(shipping_method, shipping_addr, subt
 	from go1_commerce.go1_commerce.v2.orders \
 		import get_attributes_json
 	shipping_charges_list = []
-	shipping_rate_methods = frappe.db.sql('''SELECT * FROM `tabShipping Rate Method`''', as_dict=1)
-	if not shipping_rate_methods:
-		shipping_rate_methods = frappe.db.sql('''SELECT * FROM `tabShipping Rate Method`''', as_dict=1)
+	ShippingRateMethod = DocType('Shipping Rate Method')
+	query = (
+		frappe.qb.from_(ShippingRateMethod)
+		.select('*')
+	)
+	shipping_rate_methods = query.run(as_dict=True)
 	shipping_mapped_rate_method_check = shipping_rate_methods[0]
 	order_total = 0
 	weight = 0
@@ -1583,14 +1686,14 @@ def calculate_multi_vendor_shipping_charges(shipping_method, shipping_addr, subt
 			citem = item
 			if citem.get('attribute_ids') and has_variants == 1:
 				attribute_id = get_attributes_json(citem.get('attribute_ids'))
-				combination_weight = frappe.db.sql(""" SELECT weight
-														FROM `tabProduct Variant Combination`
-														WHERE parent = %(name)s
-														AND attributes_json = %(attribute_id)s
-													""", {'name': citem.get('item'),
-															'attribute_id': attribute_id}, as_dict=1)
-
-
+				ProductVariantCombination = DocType('Product Variant Combination')
+				query = (
+					frappe.qb.from_(ProductVariantCombination)
+					.select('weight')
+					.where(ProductVariantCombination.parent == citem.get('item'))
+					.where(ProductVariantCombination.attributes_json == attribute_id)
+				)
+				combination_weight = query.run(as_dict=True)
 				if combination_weight:
 					weight += combination_weight[0].weight * citem.get('quantity')
 					if additional_shipping_cost > 0:
@@ -1604,10 +1707,13 @@ def calculate_multi_vendor_shipping_charges(shipping_method, shipping_addr, subt
 				if citem.get('attribute_ids'):
 					attr_id = citem.get('attribute_ids').splitlines()
 					for item in attr_id:
-						query = '''SELECT * FROM `tabProduct Attribute Option`
-									WHERE name = "{name}"
-								'''.format(name = item)
-						attribute_weight = frappe.db.sql(query, as_dict=1)
+						ProductAttributeOption = DocType('Product Attribute Option')
+						query = (
+							frappe.qb.from_(ProductAttributeOption)
+							.select('*')
+							.where(ProductAttributeOption.name == item)
+						)
+						attribute_weight = query.run(as_dict=True)
 						if attribute_weight and attribute_weight[0].weight_adjustment:
 							weight += flt(attribute_weight[0].weight_adjustment) * citem.get('quantity')
 	check_shipping_rate_method(
@@ -1623,37 +1729,42 @@ def calculate_multi_vendor_shipping_charges(shipping_method, shipping_addr, subt
 def check_shipping_rate_method(shipping_mapped_rate_method_check,shipping_charges_list,
 								shipping_method,order_total,weight,shipping_charges,shipping_addr,subtotal):
 	if shipping_mapped_rate_method_check.shipping_rate_method == "Shipping By Total":
-		shipping_charges_list = frappe.db.sql(""" SELECT *
-													FROM `tabShipping By Total Charges`
-													WHERE shipping_method = %(shipping_method)s 
-														AND %(order_total)s >= order_total_from 
-														AND %(order_total)s <= order_total_to 
-														AND  parent = %(rate_method)s
-												""", {'order_total': order_total,
-													'rate_method': shipping_mapped_rate_method_check.name,
-													'shipping_method': shipping_method}, as_dict=True)
-
-
+		ShippingByTotalCharges = DocType('Shipping By Total Charges')
+		query = (
+			frappe.qb.from_(ShippingByTotalCharges)
+			.select('*')
+			.where(
+				(ShippingByTotalCharges.shipping_method == shipping_method) &
+				(ShippingByTotalCharges.order_total_from <= order_total) &
+				(ShippingByTotalCharges.order_total_to >= order_total) &
+				(ShippingByTotalCharges.parent == shipping_mapped_rate_method_check.name)
+			)
+		)
+		shipping_charges_list = query.run(as_dict=True)
+	ShippingByWeightCharges = DocType('Shipping By Weight Charges')
 	if shipping_mapped_rate_method_check.shipping_rate_method == "Shipping By Weight":
-		shipping_charges_list = frappe.db.sql("""SELECT *
-												FROM `tabShipping By Weight Charges`
-												WHERE shipping_method = %(shipping_method)s 
-													AND %(weight)s >= order_weight_from 
-													AND %(weight)s <= order_weight_to 
-													AND parent = %(rate_method)s
-											""",{'weight': weight, 'shipping_method': shipping_method,
-												'rate_method': shipping_mapped_rate_method_check.name},
-												as_dict=True)
-
-
+		query = (
+			frappe.qb.from_(ShippingByWeightCharges)
+			.select('*')
+			.where(
+				(ShippingByWeightCharges.shipping_method == shipping_method) &
+				(ShippingByWeightCharges.order_weight_from <= weight) &
+				(ShippingByWeightCharges.order_weight_to >= weight) &
+				(ShippingByWeightCharges.parent == shipping_mapped_rate_method_check.name)
+			)
+		)
+		shipping_charges_list = query.run(as_dict=True)
+	ShippingByFixedRateCharges = DocType('Shipping By Fixed Rate Charges')
 	if shipping_mapped_rate_method_check.shipping_rate_method == "Fixed Rate Shipping":
-		shipping_charges_list = frappe.db.sql(""" SELECT *
-												FROM `tabShipping By Fixed Rate Charges`
-												WHERE shipping_method = %(shipping_method)s AND
-												parent = %(rate_method)s
-											""", {'shipping_method': shipping_method,
-												'rate_method': shipping_mapped_rate_method_check.name},
-												as_dict = True)
+		query = (
+			frappe.qb.from_(ShippingByFixedRateCharges)
+			.select('*')
+			.where(
+				(ShippingByFixedRateCharges.shipping_method == shipping_method) &
+				(ShippingByFixedRateCharges.parent == shipping_mapped_rate_method_check.name)
+			)
+		)
+		shipping_charges_list = query.run(as_dict=True)
 	charges = 0
 	if shipping_mapped_rate_method_check.shipping_rate_method != "Shipping By Distance":
 		charges = calculate_shipping_charges_lists(
@@ -1847,23 +1958,29 @@ def order_detail_template_items(items):
 			for i in attr_ids:
 				if i: id_list.append(i)
 			ids = ",".join(['"' + x + '"' for x in id_list])
-			options = frappe.db.sql("""SELECT *
-										FROM `tabProduct Attribute Option`
-										WHERE parent = %(parent)s 
-											AND name IN ({0})
-									""".format(ids), {'parent': item.item}, as_dict=1)
+			ProductAttributeOption = DocType('Product Attribute Option')
+			options_query = (
+				frappe.qb.from_(ProductAttributeOption)
+				.select('*')
+				.where((ProductAttributeOption.parent == item.item) &
+					(ProductAttributeOption.name.isin(ids)))
+			)
+			options = options_query.run(as_dict=True)
 			for op in options:
 				if op.image_list:
 					images = json.loads(op.image_list)
 					if len(images) > 0:
 						images = sorted(images, key=lambda x: x.get('is_primary'), reverse=True)
 						attr_image = images[0].get('thumbnail')
-		result = frappe.db.sql(""" SELECT cart_thumbnail, list_image
-									FROM `tabProduct Image`
-									WHERE parent = %(product)s
-									ORDER BY is_primary DESC
-									LIMIT 1
-								""", {'product': item.item}, as_dict=1)
+		ProductImage = DocType('Product Image')
+		result_query = (
+			frappe.qb.from_(ProductImage)
+			.select(ProductImage.cart_thumbnail, ProductImage.list_image)
+			.where(ProductImage.parent == item.item)
+			.orderby(ProductImage.is_primary, order=Order.asc)
+			.limit(1)
+		)
+		result = result_query.run(as_dict=True)
 		if attr_image:
 			item.item_image = attr_image
 		elif result and result[0].cart_thumbnail:
@@ -1936,7 +2053,12 @@ def order_shipment_status(order_info,order_details,):
 
 def get_drivers(doctype, txt, searchfield, start, page_len, filters):
 	try:
-		user = frappe.db.sql('''select name from `tabDrivers`''')
+		Drivers = DocType('Drivers')
+		user_query = (
+			frappe.qb.from_(Drivers)
+			.select(Drivers.name)
+		)
+		user = user_query.run()
 		return user
 	except Exception:
 		frappe.log_error("Error in doctype.order.get_drivers", frappe.get_traceback())
@@ -1945,14 +2067,21 @@ def get_drivers(doctype, txt, searchfield, start, page_len, filters):
 
 def get_customers(doctype,txt,searchfield,start,page_len,filters):
 	try:
-		condition = ""
+		Customers = DocType('Customers')
+		query = (
+			frappe.qb.from_(Customers)
+			.select(Customers.name, Customers.full_name, Customers.phone)
+			.where(Customers.customer_status == 'Approved')
+			.where(Customers.disable == 0)
+			.where(Customers.naming_series != 'GC-')
+		)
 		if txt:
-			condition += '(name LIKE "%' + txt + '%" OR full_name LIKE "%' + txt + '%" OR phone LIKE "%' + txt + '%")'
-		user = frappe.db.sql("""SELECT name, full_name, phone
-								FROM `tabCustomers`
-								WHERE customer_status = 'Approved'
-								AND disable = 0 AND naming_series <> 'GC-' {condition}
-							""".format(condition=condition))
+			query = query.where(
+				(Customers.name.like(f"%{txt}%")) |
+				(Customers.full_name.like(f"%{txt}%")) |
+				(Customers.phone.like(f"%{txt}%"))
+			)
+		user = query.run(as_dict=True)
 		return user
 	except Exception:
 		frappe.log_error("Error in doctype.order.get_customers", frappe.get_traceback())
@@ -1961,15 +2090,16 @@ def get_customers(doctype,txt,searchfield,start,page_len,filters):
 
 def get_order_status(doctype,txt,searchfield,start,page_len,filters):
 	try:
-		condition = ''
+		OrderStatus = DocType('Order Status')
+		query = (
+			frappe.qb.from_(OrderStatus)
+			.select(OrderStatus.name)
+			.where(OrderStatus.shipping_status.is_not_null())
+		)
 		if txt:
-			condition += ' AND name LIKE "%{txt}%"'.format(txt = txt)
-		query = '''SELECT name
-					FROM `tabOrder Status`
-					WHERE shipping_status IS NOT NULL AND {condition}
-					ORDER BY display_order
-				'''.format(condition = condition)
-		results = frappe.db.sql('''{query}'''.format(query = query))
+			query = query.where(OrderStatus.name.like(f"%{txt}%"))
+		query = query.orderby(OrderStatus.display_order)
+		results = query.run(as_dict=True)
 		return results
 	except Exception:
 		frappe.log_error("Error in doctype.order.order.get_order_status",frappe.get_traceback())
@@ -2053,7 +2183,7 @@ def randomStringDigits(stringLength=6):
 	return ''.join(random.choice(lettersAndDigits) for i in range(stringLength))
 
 
-
+@frappe.whitelist()
 def get_order_settings(order_id,doctype):
 	if not frappe.db.get_value(doctype, order_id):
 		return
@@ -2079,7 +2209,7 @@ def get_order_settings(order_id,doctype):
 			"allow_shipment":allow_shipment}
 
 
-
+@frappe.whitelist()
 def check_order_settings():
 	is_restaurant_driver = 0
 	return {
@@ -2100,7 +2230,7 @@ def make_refund(refund_amount, order):
 	return "failed"
 
 
-
+@frappe.whitelist()
 def mark_as_ready(order):
 	order_info = frappe.get_doc("Order",order)
 	order_info.status = "Ready"
@@ -2109,15 +2239,25 @@ def mark_as_ready(order):
 
 
 def get_customer_payments(order):
-	payments = frappe.db.sql('''SELECT P.name, P.posting_date, P.paid_amount, R.outstanding_amount
-								FROM `tabPayment Entry` P, `tabPayment Reference` R
-								WHERE R.parent = P.name 
-									AND R.reference_doctype = "Order" 
-									AND R.reference_name = %(order)s
-							''',{'order': order}, as_dict = True)
+	PaymentEntry = DocType('Payment Entry')
+	PaymentReference = DocType('Payment Reference')
+	payments = (
+		frappe.qb.from_(PaymentEntry)
+		.inner_join(PaymentReference)
+		.on(PaymentReference.parent == PaymentEntry.name)
+		.select(
+			PaymentEntry.name,
+			PaymentEntry.posting_date,
+			PaymentEntry.paid_amount,
+			PaymentReference.outstanding_amount
+		)
+		.where(
+			PaymentReference.reference_doctype == "Order",
+			PaymentReference.reference_name == frappe.utils.escape(order)
+		)
+		.run(as_dict=True)
+	)
 	return payments
-
-
 
 def cancel_order(order):
 	if not frappe.db.get_value('Order', order):
@@ -2135,7 +2275,7 @@ def cancel_order(order):
 	return {'status': 'Success'}
 
 
-
+@frappe.whitelist()
 def get_linked_invoice(order):
 	return frappe.db.get_value("Sales Invoice",{"reference":order})
 
@@ -2198,10 +2338,13 @@ def clear_guest_user_details(order_id):
 def update_order_shipment_payment(order):
 	shipments = frappe.db.get_all("Shipment",filters = {"document_name":order},fields = ['*'])
 	if shipments:
-		frappe.db.sql(''' UPDATE `tabShipment`
-						SET payment_status = 'Paid'
-						WHERE name = %(shipment_id)s
-					''', {'shipment_id': shipments[0].name})
+		Shipment = DocType('Shipment')
+		qr=(
+			frappe.qb.update(Shipment)
+			.set(Shipment.payment_status, 'Paid')
+			.where(Shipment.name == shipments[0].name)
+			.run()
+		)
 
 
 
@@ -2324,10 +2467,13 @@ def check_linked_docs(dt, dn):
 	for _dt, link_docs in linked_docs.items():
 		for rec in link_docs:
 			if _dt == 'Discounts' and dt == 'Order':
-				frappe.db.sql('''DELETE FROM `tabDiscount Usage History`
-								WHERE parent = %(rec)s 
-									AND order_id = %(name)s
-							''',{'rec': rec.name,'name': dn})
+				DiscountUsageHistory = DocType('Discount Usage History')
+				dis = (
+					frappe.qb.delete(DiscountUsageHistory)
+					.where(DiscountUsageHistory.parent == rec.name)
+					.where(DiscountUsageHistory.order_id == dn)
+					.run()
+				)
 			else:
 				check_linked_docs(_dt, rec.name)
 
@@ -2381,17 +2527,22 @@ def get_coupon_discount(order_id,order_subtotal,coupon_code):
 			if coupon_data.max_discount_amount>0:
 				if discount_amount>coupon_data.max_discount_amount:
 					discount_amount = coupon_data.max_discount_amount
-			free_order_items = frappe.db.sql("""SELECT name
-												FROM `tabOrder Item`
-												WHERE parent = %(order_id)s
-													AND is_free_item = 1 
-													AND discount_coupon<>''
-											""",{'order_id': order_id}, as_dict=True)
-			for x in free_order_items:
-				frappe.db.sql("""DELETE FROM `tabOrder Item`
-								WHERE name = %(order_item_id)s
-							""",{'order_item_id': x.name})
-				frappe.db.commit()
+			OrderItem = DocType('Order Item')
+			free_order_items = (
+				frappe.qb.select(OrderItem.name)
+				.from_(OrderItem)
+				.where(OrderItem.parent == order_id)
+				.where(OrderItem.is_free_item == 1)
+				.where(OrderItem.discount_coupon != '')
+				.run(as_dict=True)
+			)
+			for item in free_order_items:
+				delete_result  = (
+					frappe.qb.delete(OrderItem)
+					.where(OrderItem.name == item['name'])
+					.run()
+				)
+			frappe.db.commit()
 			return {
 					"discount_amount":discount_amount,
 					"discount_rule":coupon_data.name,
@@ -2403,17 +2554,23 @@ def get_coupon_discount(order_id,order_subtotal,coupon_code):
 
 def get_order_item(order_id, coupon_code,coupon_data,msg,status):
 	new_order_item = ""
-	free_order_items = frappe.db.sql("""SELECT name
-										FROM `tabOrder Item`
-										WHERE parent = %(order_id)s
-											AND is_free_item = 1 
-											AND discount_coupon<>''
-									""",{'order_id': order_id}, as_dict=True)
-	for x in free_order_items:
-		frappe.db.sql("""DELETE FROM `tabOrder Item`
-						WHERE name = %(order_item_id)s
-					""",{'order_item_id': x.name})
-		frappe.db.commit()
+	OrderItem = DocType('Order Item')
+	free_order_items = (
+		frappe.qb.select(OrderItem.name)
+		.from_(OrderItem)
+		.where(OrderItem.parent == order_id)
+		.where(OrderItem.is_free_item == 1)
+		.where(OrderItem.discount_coupon != '')
+		.run(as_dict=True)
+	)
+	for item in free_order_items:
+		delete_result  =(
+			frappe.qb
+			.delete(OrderItem)
+			.where(OrderItem.name == item['name'])
+			.run()
+		)
+	frappe.db.commit()
 	if coupon_data.free_product:
 		product = frappe.get_doc("Product",coupon_data.free_product)
 		new_order_item = frappe.new_doc("Order Item")
@@ -2524,7 +2681,7 @@ def create_order_shipment(dt, dn, products, tracking_number = None, tracking_lin
 			frappe.log_error("Error in doctype.order.create_order_shipment", frappe.get_traceback())
 
 
-
+@frappe.whitelist()
 def get_order_items(OrderId,fntype):
 	try:
 		if fntype == 'packed' or fntype == 'Packed':
@@ -2577,11 +2734,17 @@ def get_order_items(OrderId,fntype):
 					
 			status_update.save(ignore_permissions=True)
 			frappe.db.set_value("Order",OrderId,'pre_status',"Delivered")
-			frappe.db.sql('''UPDATE `tabOrder Item` 
-							SET shipping_status='Delivered', 
-								delivery_date = %(delivery_date)s 
-							WHERE parent=%(OrderId)s
-						''',{"delivery_date":getdate(nowdate()),"OrderId":OrderId})
+			OrderItem = DocType('Order Item')
+			up = (
+				frappe.qb
+				.update(OrderItem)
+				.set({
+					OrderItem.shipping_status: 'Delivered',
+					OrderItem.delivery_date: getdate(nowdate())
+				})
+				.where(OrderItem.parent == OrderId)
+				.run()
+			)
 			return "Success"
 	except Exception:
 		frappe.log_error("Error in doctype.order.get_order_items", frappe.get_traceback())
@@ -2590,16 +2753,30 @@ def get_order_items(OrderId,fntype):
 
 def _get_order_items_(OrderId, fntype):
 	try:
-		lists = []
-		condition = ''
+		OrderItem = DocType('Order Item')
+		query = (
+			frappe.qb.from_(OrderItem)
+			.select(
+				OrderItem.item,
+				OrderItem.item_name,
+				OrderItem.quantity,
+				OrderItem.price,
+				OrderItem.amount,
+				OrderItem.name
+			)
+			.where(OrderItem.parent == OrderId)
+		)
 		if fntype == 'packed':
-			condition = ' AND (shipping_status="Pending" OR shipping_status is null)'
+			query = query.where(
+				(OrderItem.shipping_status == 'Pending') | (OrderItem.shipping_status.is_null())
+			)
 		elif fntype == 'shipped':
-			condition = ' AND (shipping_status="Packed" OR shipping_status="Ready to Ship" OR shipping_status="In Process")'
-		lists= frappe.db.sql('''SELECT item, item_name, quantity, price, amount, name 
-								FROM `tabOrder Item` 
-								WHERE parent = %(orderId)s {condition}
-							'''.format(condition = condition), {"orderId":OrderId}, as_dict = 1)
+			query = query.where(
+				(OrderItem.shipping_status == 'Packed') |
+				(OrderItem.shipping_status == 'Ready to Ship') |
+				(OrderItem.shipping_status == 'In Process')
+			)
+		lists = query.run(as_dict=True)
 		get_order_items(OrderId, fntype)
 		return lists
 	except Exception:
@@ -2608,11 +2785,15 @@ def _get_order_items_(OrderId, fntype):
 
 
 def get_shipment_bag_id(order_id):
-	items=frappe.db.sql(''' SELECT parent
-							FROM `tabShipment Bag Item`
-							WHERE order_id=%(order_id)s
-							ORDER BY idx
-						''',{'order_id': order_id}, as_dict=True)
+	ShipmentBagItem = DocType('Shipment Bag Item')
+	query = (
+		frappe.qb
+		.from_(ShipmentBagItem)
+		.select(ShipmentBagItem.parent)
+		.where(ShipmentBagItem.order_id == order_id)
+		.orderby(ShipmentBagItem.idx)
+	)
+	items = query.run(as_dict=True)
 	if items:
 		return {
 				"status":"success",
@@ -2625,7 +2806,7 @@ def get_shipment_bag_id(order_id):
 			}
 
 
-
+@frappe.whitelist()
 def get_attributes_combination(product):
 	combination = frappe.db.get_all('Product Variant Combination',
 									filters = {'parent':product, 'disabled':0},
@@ -2720,7 +2901,7 @@ def variant_stock_update(item):
 						)
 
 
-
+@frappe.whitelist()
 def get_doc_single_value(doctype, fieldname, filters=None, as_dict=True, debug=False, parent=None):
 	"""Returns a value form a document
 	:param doctype: DocType to be queried
@@ -2749,7 +2930,7 @@ def get_doc_single_value(doctype, fieldname, filters=None, as_dict=True, debug=F
 	return value[0] if len(fields) > 1 else value[0][0]
 
 
-
+@frappe.whitelist()
 def get_customer_details(doctype,fields,filters):
 	details = frappe.db.get_all(doctype,fields = fields,filters = filters,page_length = 1)
 	return details[0] if details else {}
@@ -2791,33 +2972,35 @@ def get_list( doctype, fields = None, filters = None, order_by = None, limit_sta
 def calculate_vendor_order_shipping_charges(order_item, order_doc):
 	shipping_charges = 0
 	shipping_rate_methods = []
-	shipping_rate_methods = frappe.db.sql("""SELECT name,shipping_rate_method
-											FROM `tabShipping Rate Method`
-										""",as_dict=1)
-	if not shipping_rate_methods:
-		shipping_rate_methods = frappe.db.sql("""SELECT name, shipping_rate_method
-												FROM `tabShipping Rate Method`
-											""", as_dict=True)
-
+	ShippingRateMethod = DocType('Shipping Rate Method')
+	query = (
+		frappe.qb.from_(ShippingRateMethod)
+		.select(ShippingRateMethod.name, ShippingRateMethod.shipping_rate_method)
+	)
+	shipping_rate_methods = query.run(as_dict=True)
 	if shipping_rate_methods:
 		vo_shipping_charges = 0
 		shipping_rate_method = shipping_rate_methods[0]
 		if shipping_rate_method.shipping_rate_method == "Fixed Rate Shipping":
-			business_list = frappe.db.sql("""SELECT business
-											FROM `tabOrder Item`
-											WHERE parent=%(order_id)s
-											GROUP BY business
-										""",
-										{'order_id': order_doc.name}, as_dict=True)
-
+			OrderItem = DocType('Order Item')
+			business_list_query = (
+				frappe.qb
+				.from_(OrderItem)
+				.select(OrderItem.business)
+				.where(OrderItem.parent == order_doc.name)
+				.groupby(OrderItem.business)
+			)
+			business_list = business_list_query.run(as_dict=True)
+			ShippingByFixedRateCharges = DocType('Shipping By Fixed Rate Charges')
 			if business_list:
-				shipping_charges_list = frappe.db.sql('''SELECT *
-														FROM `tabShipping By Fixed Rate Charges`
-														WHERE shipping_method = %(shipping_method)s
-															AND parent = %(shipping_rate_method)s
-													''',{'shipping_rate_method':shipping_rate_method.name
-														,'shipping_method': order_doc.shipping_method},
-														as_dict=True)
+				shipping_charges_list_query = (
+					frappe.qb.from_(ShippingByFixedRateCharges)
+					.select('*')
+					.where(
+						(ShippingByFixedRateCharges.shipping_method == order_doc.shipping_method) &
+						(ShippingByFixedRateCharges.parent == shipping_rate_method.name)
+					))
+				shipping_charges_list = shipping_charges_list_query.run(as_dict=True)
 				if shipping_charges_list:
 					vo_shipping_charges = round(shipping_charges_list[0].charge_amount / len(business_list),2)
 					shipping_by_total(
@@ -2851,16 +3034,18 @@ def shipping_by_total(catalog_settings, order_item, order_doc, shipping_rate_met
 		order_total = sum(round(flt(x.amount+x.tax), 2) for x in order_item)
 		if catalog_settings.included_tax:
 			order_total = sum(round(flt(x.amount), 2) for x in order_item)
-		shipping_charges_list = frappe.db.sql('''SELECT * 
-												FROM `tabShipping By Total Charges`
-												WHERE shipping_method = %(shipping_method)s
-													AND %(order_total)s >= order_total_from
-													AND %(order_total)s <= order_total_to
-													AND parent = %(shipping_rate_method)s
-											''', {'order_total': order_total,
-													'shipping_rate_method':shipping_rate_method.name,
-													'shipping_method': order_doc.shipping_method},
-											as_dict = True)
+		ShippingByTotalCharges = DocType('Shipping By Total Charges')
+		shipping_charges_list_query = (
+			frappe.qb.from_(ShippingByTotalCharges)
+			.select('*')
+			.where(
+				(ShippingByTotalCharges.shipping_method == order_doc.shipping_method) &
+				(order_total >= ShippingByTotalCharges.order_total_from) &
+				(order_total <= ShippingByTotalCharges.order_total_to) &
+				(ShippingByTotalCharges.parent == shipping_rate_method.name)
+			)
+		)
+		shipping_charges_list = shipping_charges_list_query.run(as_dict=True)
 		if shipping_charges_list:
 			if shipping_charges_list[0].use_percentage == 1:
 				vo_shipping_charges += float(sum(round(flt(x.amount), 2) for x in order_item)) * shipping_charges_list[0].\
@@ -2875,16 +3060,18 @@ def shipping_by_weight(order_item, order_doc, shipping_rate_method):
 		for x in order_item:
 			weight = frappe.db.get_value('Product',x.get('item'),['weight'])
 			order_weight += weight
-		shipping_charges_list = frappe.db.sql('''SELECT *
-												FROM `tabShipping By Weight Charges`
-												WHERE shipping_method = %(shipping_method)s
-													AND %(weight)s >= order_weight_from
-													AND %(weight)s <= order_weight_to
-													AND parent = %(shipping_rate_method)s
-											''',{'weight': order_weight,
-													'shipping_rate_method':shipping_rate_method.name,
-													'shipping_method': order_doc.shipping_method},
-											as_dict = True)
+		ShippingByWeightCharges = DocType('Shipping By Weight Charges')
+		shipping_charges_list_query = (
+			frappe.qb.from_(ShippingByWeightCharges)
+			.select('*')
+			.where(
+				(ShippingByWeightCharges.shipping_method == order_doc.shipping_method) &
+				(order_weight >= ShippingByWeightCharges.order_weight_from) &
+				(order_weight <= ShippingByWeightCharges.order_weight_to) &
+				(ShippingByWeightCharges.parent == shipping_rate_method.name)
+			)
+		)
+		shipping_charges_list = shipping_charges_list_query.run(as_dict=True)
 		if shipping_charges_list:
 			if shipping_charges_list[0].use_percentage == 1:
 				vo_shipping_charges += float(sum(round(flt(x.amount), 2) for x in order_item)) * \
@@ -2927,16 +3114,21 @@ def get_product_price(product, customer, attribute = None):
 
 
 def get_discount_list():
-	discount_list = frappe.db.sql("""SELECT name
-									FROM `tabDiscounts`
-									WHERE (discount_type = 'Assigned to Products'
-										OR discount_type = 'Assigned to Categories'
-										)
-										AND (CASE WHEN start_date IS NOT NULL
-											THEN start_date <= "{today}" ELSE 1 = 1 end)
-										AND (CASE WHEN end_date IS NOT NULL
-											THEN end_date >= "{today}" ELSE 1 = 1 END)
-								""".format(today = get_today_date()),as_dict = 1)
+	Discounts = DocType('Discounts')
+	today = get_today_date()
+	discount_list_query = (
+		frappe.qb
+		.from_(Discounts)
+		.select(Discounts.name)
+		.where(
+			(Discounts.discount_type.isin(['Assigned to Products', 'Assigned to Categories'])) &
+			( (Discounts.start_date.isnull()) |
+				(Discounts.start_date <= today)) &
+			((Discounts.end_date.isnull()) |
+				(Discounts.end_date >= today))
+		)
+	)
+	discount_list = discount_list_query.run(as_dict=True)
 	return discount_list
 
 

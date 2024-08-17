@@ -8,6 +8,7 @@ from frappe import _
 from frappe.model.document import Document
 from frappe.utils import add_days, getdate, today,nowdate
 from frappe.core.doctype.communication.email import make
+from frappe.query_builder import DocType
 
 class EmailCampaign(Document):
 	def validate(self):
@@ -70,9 +71,9 @@ def send_email_to_campaigns():
 			if email_campaign.campaign:
 				campaign = frappe.db.get_value("Campaign Email Schedule", {"parent":email_campaign.campaign},"email_template")
 				campaign_email = frappe.get_doc({
-		            'doctype': 'Campaign Email Schedule', 
-		            'parent': email_campaign.campaign
-		            })
+					'doctype': 'Campaign Email Schedule', 
+					'parent': email_campaign.campaign
+					})
 				email_campaign.email_template=campaign
 			send_mail(email_campaign)
 	except Exception:
@@ -82,8 +83,15 @@ def send_mail(email_campaign):
 	email_template = frappe.get_doc("Email Template", email_campaign.get("email_template"))
 	sender = frappe.db.get_value("User", email_campaign.get("sender"), 'email')
 	doc = None
-	if email_campaign.email_campaign_for == 'Email Group':
-		recipient = frappe.db.sql_list('''select email from `tabEmail Group Member` where email_group = %(group)s and unsubscribed=0''',{'group':email_campaign.recipient})
+	if email_campaign.email_campaign_for == 'Email Group':	
+		EmailGroupMember = DocType('Email Group Member')
+		query = (
+			frappe.qb.from_(EmailGroupMember)
+			.select(EmailGroupMember.email)
+			.where((EmailGroupMember.email_group == email_campaign.recipient) &
+				(EmailGroupMember.unsubscribed == 0))
+		)
+		recipient = query.run(pluck=True)
 	elif email_campaign.email_campaign_for == 'Shopping Cart':
 		customer = frappe.db.get_value('Shopping Cart', email_campaign.recipient, 'customer')
 		recipient = [frappe.db.get_value('Customers', customer, 'email')]

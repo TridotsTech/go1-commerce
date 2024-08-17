@@ -3,7 +3,7 @@
 
 import frappe
 from frappe import _
-
+from frappe.query_builder import DocType, Field
 
 def execute(filters=None):
 	columns, data = get_columns(),get_data(filters)
@@ -22,20 +22,40 @@ def get_columns():
 	return col__
 
 def get_data(filters):
-	condition = ''
+	Customer = DocType('Customer')
+	Order = DocType('Order')
+	query = (
+		frappe.qb.from_(Customer)
+		.select(
+			Customer.name,
+			Customer.full_name,
+			Customer.email,
+			Customer.phone,
+			frappe.qb.from_(Order)
+			.select(frappe.qb.fn.Count(Order.name))
+			.where(Order.customer == Customer.name)
+			.where(Order.docstatus == 1)
+			.as_("total_order_count"),
+			frappe.qb.from_(Order)
+			.select(frappe.qb.fn.Sum(Order.total_amount))
+			.where(Order.customer == Customer.name)
+			.where(Order.docstatus == 1)
+			.as_("total_amount")
+		)
+		.where(Customer.customer_status == 'Approved')
+	)
 	if filters.get('from_date'):
-		condition += f" AND ORD.order_date >= '{filters.get('from_date')}' "
+		query = query.where(frappe.qb.from_(Order).select(frappe.qb.fn.Min(Order.order_date)) >= filters.get('from_date'))
+
 	if filters.get('to_date'):
-		condition += f" AND ORD.order_date <= '{filters.get('to_date')}' "
+		query = query.where(frappe.qb.from_(Order).select(frappe.qb.fn.Max(Order.order_date)) <= filters.get('to_date'))
 
-	query = frappe.db.sql("""
-							SELECT C.name,C.full_name ,
-							C.email, C.phone,
-							(SELECT COUNT(ORD.name) FROM `tabOrder` ORD WHERE ORD.customer = C.name AND ORD.docstatus = 1)AS total_order_count,
-							(SELECT SUM(ORD.total_amount) FROM `tabOrder` ORD WHERE ORD.customer = C.name AND ORD.docstatus = 1)AS total_amount
+	query = query.groupby(
+		Customer.name,
+		Customer.full_name,
+		Customer.email,
+		Customer.phone
+	)
 
-							FROM `tabCustomers` C
-							WHERE C.customer_status = 'Approved' {conditions}
-							GROUP BY C.name,C.full_name,C.email, C.phone
-						""".format(conditions=condition), as_list=1)
-	return query
+	result = query.run(as_list=True)
+	return result

@@ -4,6 +4,7 @@
 import frappe
 from frappe import _
 from go1_commerce.go1_commerce.v2.product import get_attributes_combination
+from frappe.query_builder import DocType, Order
 
 def execute(filters=None):
 	columns, data = get_columns(), get_datas(filters)
@@ -18,21 +19,31 @@ def get_columns():
 	col.append(_("SKU")+":Data:100")
 	return col
 def get_datas(filters):
-	condition = ''
-	combination_txt = ''
+	Product = DocType('Product')
+	VariantCombination = DocType('Product Variant Combination')
+	query = (
+		frappe.qb.from_(Product)
+		.inner_join(VariantCombination)
+		.on(Product.name == VariantCombination.parent)
+		.select(
+			Product.name.as_("product_id"),
+			Product.item.as_("product_name"),
+			VariantCombination.attribute_id.as_("variant_id"),
+			frappe.qb.from_(f"''").as_("variant"),
+			VariantCombination.sku
+		)
+		.where(Product.has_variants == 1)
+		.where(VariantCombination.attribute_id.isnotnull())
+		.where(VariantCombination.disabled == 0)
+		.where(VariantCombination.show_in_market_place == 1)
+	)
+	
 	if filters and filters.get('product_id'):
-		condition += f"AND P.name = '{filters.get('product_id')}'"
-
-
-	query = f''' SELECT P.name product_id,P.item product_name,PVC.attribute_id AS variant_id,
-				 "" AS variant,
-				 PVC.sku
-				 FROM `tabProduct` P
-				 INNER JOIN `tabProduct Variant Combination` PVC ON PVC.parent = P.name 
-				 WHERE P.has_variants = 1 AND PVC.attribute_id IS NOT NULL AND PVC.disabled=0 
-				 AND PVC.show_in_market_place=1 {condition} ORDER BY P.creation DESC
-			'''
-	response = frappe.db.sql(query,as_dict=1)
+		query = query.where(Product.name == filters.get('product_id'))
+	
+	query = query.orderby(Product.creation, order=Order.desc)
+	
+	response = query.run(as_dict=True)
 	for res in response:
 		combination_txt_resp = get_attributes_combination(res.variant_id)
 		if combination_txt_resp:

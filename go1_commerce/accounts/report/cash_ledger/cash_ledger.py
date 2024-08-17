@@ -4,12 +4,12 @@
 # import frappe
 
 import frappe
+from frappe.query_builder import DocType, Field
 
 def execute(filters=None):
 	columns, data = [], []
 	columns = get_columns()
 	data = get_data(filters)
-	# frappe.log_error("222222222222",data)
 	return columns, data
 
 def get_columns():
@@ -27,40 +27,37 @@ def get_columns():
 		]
 
 def get_data(filters):
-	condition = ""
-	# if filters.get("se_id"):
-	# 	condition = " AND tx.name='"+filters.get("se_id")+"'"
-	# if filters.get("customer"):
-	# 	condition = " AND tm.party='"+filters.get("customer")+"'"
-	# if filters.get("reference_doctype"):
-	# 	condition = " AND tt.reference_doctype='"+filters.get("reference_doctype")+"'"
-	if filters.get('from_date'):
-		condition+=' and tm.modified>="%s"' % filters.get('from_date')
-	if filters.get('to_date'):
-		condition+=' and tm.modified<="%s"' % filters.get('to_date')
+	PaymentEntry = DocType('Payment Entry')
+	PaymentReference = DocType('Payment Reference')
+	Customers = DocType('Customers')
+	query = (
+		frappe.qb.from_(PaymentEntry).as_('tm')
+		.inner_join(PaymentReference).as_('tt').on('tm.name = tt.parent')
+		.inner_join(Customers).as_('cs').on('cs.name = tm.party')
+		.select(
+			Field('""').as_('cash_collection_date'),
+			PaymentEntry.modified.as_('cash_approval_date'),
+			PaymentEntry.party.as_('customer'),
+			Customers.first_name.as_('customer_name'),
+			PaymentReference.reference_doctype.as_('against'),
+			PaymentReference.reference_name.as_('against_reference'),
+			PaymentReference.reference_name.as_('order_id'),
+			PaymentEntry.paid_amount.as_('amount')
+		)
+		.where(PaymentEntry.mode_of_payment == 'Cash')
+		.where(PaymentReference.reference_doctype != 'Wallet Transaction')
+		.where(PaymentEntry.docstatus == 1)
+		.where(PaymentEntry.payment_type == 'Receive')
+	)
 
-	# return frappe.db.sql(""" 
-	# 						SELECT tx.name as sales_executive_id,tx.first_name as sales_executive_name,
-	# 	      				tm.creation as date,tm.party as customer,
-	# 	      				cs.first_name as customer_name,tt.reference_doctype as against,tt.reference_name as against_reference,tm.paid_amount as amount
-	# 	      				FROM `tabPayment Entry` tm inner join `tabPayment Reference` tt on tm.name=tt.parent  
-	# 						left join `tabEmployee` tx on tm.owner=tx.username  
-	# 						left join `tabCustomers` cs on cs.name=tm.party 
-	# 						WHERE tm.mode_of_payment='Cash' and tt.reference_doctype<>'Wallet Transaction' AND
-	# 	      				tx.name is not Null and tm.docstatus = 1 {condition} ORDER BY tm.creation DESC
-	# 					""".format(condition=condition),as_dict = 1)
-	ret_data = frappe.db.sql("""
-							SELECT "" as cash_collection_date, 
-							tm.modified as cash_approval_date,tm.party as customer,
-	 	      				cs.first_name as customer_name,tt.reference_doctype as against,tt.reference_name as against_reference,
-	 	      				tt.reference_name as order_id,
-	 	      				tm.paid_amount as amount
-	 	      				FROM `tabPayment Entry` tm inner join `tabPayment Reference` tt on tm.name=tt.parent 
-	 	      				inner join `tabCustomers` cs on cs.name=tm.party
-	 	      				WHERE tm.mode_of_payment='Cash' and tt.reference_doctype<>'Wallet Transaction' AND
-	 	      				tm.docstatus = 1 AND tm.payment_type='Receive' {condition} ORDER BY tm.creation DESC
-						""".format(condition=condition),as_dict = 1)
-	
+	if filters.get('from_date'):
+		query = query.where(PaymentEntry.modified >= filters.get('from_date'))
+	if filters.get('to_date'):
+		query = query.where(PaymentEntry.modified <= filters.get('to_date'))
+
+	query = query.orderby(PaymentEntry.creation, order=Order.desc)
+
+	ret_data = query.run(as_dict=True)
 	for x in ret_data:
 		if x.against=="Sales Invoice":
 			x.order_id = frappe.db.get_value("Sales Invoice",x.against_reference,"reference")

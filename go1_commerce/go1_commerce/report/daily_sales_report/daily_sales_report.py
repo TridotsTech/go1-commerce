@@ -4,7 +4,7 @@
 from __future__ import unicode_literals
 import frappe
 from frappe import _
-
+from frappe.query_builder import DocType
 
 def execute(filters=None):
 	columns, data = [], []
@@ -26,31 +26,63 @@ def get_columns(filters):
 	return columns
 
 def get_data(filters):
-	conditions = ' and o.order_date = "{0}"'.format(filters.get('date'))
-	
-	
-	query = 'select o.name, o.order_date,o.status,o.payment_status, o.payment_method_name,o.customer_name,o.customer_email,o.phone,'
-	query += 'o.total_amount from `tabOrder` o where o.docstatus = 1 {condition}'
-	data = frappe.db.sql(query.format(condition=conditions), as_list=1)
+	Order = DocType("Order")
+	date_condition = Order.order_date == filters.get('date')
+	query = (
+		frappe.qb.from_(Order)
+		.select(
+			Order.name,
+			Order.order_date,
+			Order.status,
+			Order.payment_status,
+			Order.payment_method_name,
+			Order.customer_name,
+			Order.customer_email,
+			Order.phone,
+			Order.total_amount
+		)
+		.where(
+			(Order.docstatus == 1) &
+			date_condition
+		)
+	)
+	data = query.run(as_list=True)
 	return data
 
 def get_orders(filters):
-	conditions = ' and o.order_date = "{0}"'.format(filters.get('date'))
-	query = 'select o.name from `tabOrder` o where o.docstatus = 1 {condition}'
-	data = frappe.db.sql(query.format(condition=conditions), as_list=1)
+	Order = DocType("Order")
+	date_condition = Order.order_date == filters.get('date')
+	query = (
+		frappe.qb.from_(Order)
+		.select(Order.name)
+		.where(
+			(Order.docstatus == 1) &
+			date_condition
+		)
+	)
+	data = query.run(as_list=True)
 	return data
 
 def get_chart_data(orders,data, filters):
 	if not orders:
 		orders = []
 	datasets = []
+	Order = DocType("Order")
 	for item in orders:
 		if item:
-			conditions = ' and o.order_date = "{0}"'.format(filters.get('date'))
-			
-			query = 'select o.total_amount from `tabOrder` o where o.docstatus = 1 and o.name=%s {condition}'
-			data = frappe.db.sql(query.format(condition=conditions), (item[0]), as_list=1)
-			datasets.append(data[0][0])
+			date_condition = Order.order_date == filters.get('date')
+			query = (
+				frappe.qb.from_(Order)
+				.select(Order.total_amount)
+				.where(
+					(Order.docstatus == 1) &
+					(Order.name == item[0]) &
+					date_condition
+				)
+			)
+			data = query.run(as_list=True)
+			if data:
+				datasets.append(data[0][0])
 	chart = {
 		"data": {
 			'labels': orders,

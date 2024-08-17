@@ -4,6 +4,7 @@
 from __future__ import unicode_literals
 import frappe
 from frappe import _
+from frappe.query_builder import DocType, Field, functions
 
 def execute(filters=None):
 	columns, data = [], []
@@ -29,17 +30,33 @@ def get_columns():
 	return columns
 
 def get_data(filters):
-	conditions = ''
-	if filters.get('from_date'):
-		conditions+=' and CAST(c.creation AS DATE)>="%s"' % filters.get('from_date')
-	if filters.get('to_date'):
-		conditions+=' and CAST(c.creation AS DATE)<="%s"' % filters.get('to_date')
-	loyalty_join_query = ''
-	loyalty_columns_query = ''
-	if "loyalty" in frappe.get_installed_apps():
-		loyalty_columns_query = ',ifnull(sum(LP.loyalty_points),0) as total_points'
-		loyalty_join_query = ' left join `tabLoyalty Point Entry` LP on LP.customer=c.name and LP.party_type="Customers"'
-	data = frappe.db.sql('''select c.name, c.full_name, c.email, c.phone {loyalty_columns_query}, CAST(c.creation AS DATE), group_concat(s.provider) from 
-		`tabCustomers` c left join `tabUser Social Login` s on s.parent = c.user_id and s.provider != 'frappe' {loyalty_join_query} 
-		where c.name != '' and c.naming_series != 'GC-' {condition} group by c.name order by c.creation desc'''.format(condition=conditions,loyalty_columns_query=loyalty_columns_query,loyalty_join_query=loyalty_join_query), as_list=1)
-	return data
+	Customer = DocType('Customers')
+    UserSocialLogin = DocType('User Social Login')
+    LoyaltyPointEntry = DocType('Loyalty Point Entry')
+    query = frappe.qb.from_(Customer).select(
+        Customer.name,
+        Customer.full_name,
+        Customer.email,
+        Customer.phone,
+        functions.Cast(Customer.creation, 'DATE').as_('creation_date'),
+        functions.GroupConcat(UserSocialLogin.provider).as_('social_logins')
+    )
+    if "loyalty" in frappe.get_installed_apps():
+        query = query.left_join(LoyaltyPointEntry).on(
+            (LoyaltyPointEntry.customer == Customer.name) &
+            (LoyaltyPointEntry.party_type == 'Customers')
+        ).select(
+            functions.IfNull(functions.Sum(LoyaltyPointEntry.loyalty_points), 0).as_('total_points')
+        )
+    query = query.left_join(UserSocialLogin).on(
+        (UserSocialLogin.parent == Customer.user_id) &
+        (UserSocialLogin.provider != 'frappe')
+    )
+    if filters.get('from_date'):
+        query = query.where(functions.Cast(Customer.creation, 'DATE') >= filters.get('from_date'))
+    if filters.get('to_date'):
+        query = query.where(functions.Cast(Customer.creation, 'DATE') <= filters.get('to_date'))
+    query = query.where(Customer.name != '').where(Customer.naming_series != 'GC-')
+    query = query.groupby(Customer.name)
+    query = query.orderby(Customer.creation.desc())
+    return query.run(as_list=True)

@@ -229,16 +229,21 @@ def get_sales_executive_customer_list():
 		users = frappe.db.get_all("User",filters={"api_key":token[0]})
 		if users:
 			se_email = frappe.db.get_all("Employee",filters={"email_id":users[0].name})
-
+			Customers = DocType("Customers")
+			Route = DocType("Route")
 			condition = ""
-			if se_email[0].name:
-				condition = " AND se.se ='"+se_email[0].name+"'"
-			query = """ SELECT cs.name,cs.center,cs.route,se.se,se.se_name 
-						FROM `tabCustomers` cs 
-						LEFT JOIN `tabRoute SE` se on cs.route=se.parent 
-						WHERE cs.route is not null
-						{condition} """.format(condition=condition)
-			return frappe.db.sql(query,as_dict=1)
+			if se_email and se_email[0].name:
+			    condition = Customers.route == Route.parent
+			query = (
+			    frappe.qb.from_(Customers)
+			    .left_join(Route)
+			    .on(Customers.route == Route.parent)
+			    .select(Customers.name, Customers.center, Customers.route, Route.se, Route.se_name)
+			    .where(Customers.route.is_not_null())
+			)
+			if condition:
+			    query = query.where(condition)
+			result = query.run(as_dict=True)
 
 	return None
 

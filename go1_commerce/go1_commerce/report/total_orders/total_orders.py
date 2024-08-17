@@ -8,6 +8,7 @@ from frappe.utils import flt
 from frappe.permissions import has_permission
 from frappe.utils import getdate,nowdate
 from datetime import datetime, timedelta
+from frappe.query_builder import DocType, Field, Order
 
 def execute(filters=None):
 	columns, data = [], []
@@ -28,31 +29,40 @@ def get_columns():
 		"Shipping Charge" + ":Currency:120",
 		"Tax Amount" + ":Currency:120",
 		"Total Amount" + ":Currency:120",
-		"Commission Amount" + ":Currency:140",
-		"Total Amount For Vendor" + ":Currency:170",
+		
 		
 	]
 
 def get_values(filters):
-	conditions = get_conditions(filters)
-	customer_order = frappe.db.sql('''select o.name, o.order_date, o.status, o.payment_status, ifnull((concat(o.first_name,' ' ,o.last_name)),o.first_name) as full_name, 
-		 o.order_subtotal,o.shipping_charges,o.total_tax_amount,o.total_amount, o.commission_amt, o.total_amount_for_vendor from 
-		`tabOrder` o where o.naming_series !="SUB-ORD-" and o.docstatus=1 {condition} '''.format(condition=conditions),as_list=1)
-	return customer_order
-
-def get_conditions(filters):
-	conditions=''
+	Order = DocType('Order')
+	query = (
+		frappe.qb.from_(Order)
+		.select(
+			Order.name,
+			Order.order_date,
+			Order.status,
+			Order.payment_status,
+			frappe.qb.functions.Concat(Order.first_name, ' ', Order.last_name).ifnull(Order.first_name).as_("full_name"),
+			Order.order_subtotal,
+			Order.shipping_charges,
+			Order.total_tax_amount,
+			Order.total_amount
+		)
+		.where(Order.naming_series != "SUB-ORD-")
+		.where(Order.docstatus == 1)
+	)
 	if filters.get('from_date'):
-		conditions+=' and o.order_date>="%s"' % filters.get('from_date')
+		query = query.where(Order.order_date >= filters.get('from_date'))
 	if filters.get('to_date'):
-		conditions+=' and o.order_date<="%s"' % filters.get('to_date')
+		query = query.where(Order.order_date <= filters.get('to_date'))
 	if filters.get('restaurant'):
-		conditions+=' and o.business="%s"' % filters.get('restaurant')
+		query = query.where(Order.business == filters.get('restaurant'))
 	if filters.get('status'):
-		conditions+=' and o.status="%s"' % filters.get('status')
+		query = query.where(Order.status == filters.get('status'))
 	if filters.get('payment_status'):
-		conditions+=' and o.payment_status="%s"' % filters.get('payment_status') 
-	return conditions
+		query = query.where(Order.payment_status == filters.get('payment_status'))
+	customer_order = query.run(as_list=True)
+	return customer_order
 
 def get_chart_data(filters):
 	status=filters.get('status') if filters.get('status') else None
@@ -97,15 +107,18 @@ def get_chart_data(filters):
 
 def get_order_list(status,year,month,month_list,day_list):
 	values=[]
-	condition=''
+	Order = DocType('Order')
+	conditions = []
 	if year:
 		year=int(year)
 	else:
 		year=int(getdate().year)
+	status = filters.get('status')
+	parent = filters.get('parent')
 	if status:
-		condition+=' and status="'+status+'"'
+		conditions.append(Order.status == status)
 	else:
-		condition+=' and status="Completed"'		
+		conditions.append(Order.status == "Completed")		
 	if month:
 		st_date=datetime(year=year,day=int(day_list[0]),month=datetime.strptime(month, '%B').month)
 		for item in day_list:
@@ -113,8 +126,18 @@ def get_order_list(status,year,month,month_list,day_list):
 			result=frappe.get_list('Order',filters={'order_date':st_date},limit_page_length=500,ignore_permissions=False)
 			if result:
 				parent=",".join('"'+str(x.name)+'"' for x in result)
-				data=frappe.db.sql('''select count(*) as count from `tabOrder` where naming_series !="SUB-ORD-" and name in ({parent}) {condition}'''.format(condition=condition,parent=parent),as_list=1)[0]
-				values.append(data[0])
+				if parent:
+					conditions.append(Order.name.isin(parent))
+				query = (
+					frappe.qb.from_(Order)
+					.select(frappe.qb.functions.Count("*").as_("count"))
+					.where(Order.naming_series != "SUB-ORD-")
+				)
+				for condition in conditions:
+					query = query.where(condition)
+				data = query.run(as_list=True)
+				values.append(data[0][0]) if data else 0
+				
 			else:
 				values.append(0)
 			st_date=st_date+timedelta(days=1)
@@ -133,15 +156,32 @@ def get_order_list(status,year,month,month_list,day_list):
 			result=frappe.get_list('Order',filters=filters,limit_page_length=5000,ignore_permissions=False)
 			if result:
 				parent=",".join('"'+str(x.name)+'"' for x in result)
-				data=frappe.db.sql('''select count(*) as count from `tabOrder` where naming_series !="SUB-ORD-" and name in ({parent}) {condition}'''.format(condition=condition,parent=parent),as_list=1)[0]
-				values.append(data[0])
+				if parent:
+					conditions.append(Order.name.isin(parent))
+				query = (
+					frappe.qb.from_(Order)
+					.select(frappe.qb.functions.Count("*").as_("count"))
+					.where(Order.naming_series != "SUB-ORD-")
+				)
+				for condition in conditions:
+					query = query.where(condition)
+				data = query.run(as_list=True)
+				values.append(data[0][0]) if data else 0
+				
 			else:
 				values.append(0)	
 	return values		
 
 @frappe.whitelist()
 def get_years():
-	year_list = frappe.db.sql_list('''select distinct year(order_date) as years from `tabOrder` where naming_series !="SUB-ORD-"''')
+	Order = DocType('Order')
+	query = (
+		frappe.qb.from_(Order)
+		.select(frappe.qb.functions.Year(Order.order_date).as_("years"))
+		.distinct()
+		.where(Order.naming_series != "SUB-ORD-")
+	)
+	year_list = query.run(as_list=True)
 	if not year_list:
 		year_list = [getdate().year]
 	return "\n".join(str(year) for year in year_list)

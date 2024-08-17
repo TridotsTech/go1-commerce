@@ -3,6 +3,8 @@
 
 from __future__ import unicode_literals
 import frappe
+from frappe.query_builder import DocType,  Order
+from frappe.query_builder.functions import  Sum
 
 def execute(filters=None):
 	columns, data = [], []
@@ -20,18 +22,43 @@ def get_columns():
 		]
 
 def best_selling(filters):	
-	condition=''
+	Product = DocType("Product")
+	OrderItem = DocType("Order Item")
+	Orders = DocType("Order")
+	query = (
+		frappe.qb.from_(Product)
+		.left_join(OrderItem).on(OrderItem.item == Product.name)
+		.left_join(Orders).on(Orders.name == OrderItem.parent)
+		.select(
+			Product.name,
+			Product.item,
+			Product.sku,
+			Sum(OrderItem.quantity).as_('qty')
+		)
+		.where(Orders.payment_status == "Paid")
+	)
+	
 	if filters.get('from_date'):
-		condition+=' and O.order_date>="%s"' % filters.get('from_date')
+		query = query.where(Orders.order_date >= filters.get('from_date'))
 	if filters.get('to_date'):
-		condition+=' and O.order_date<="%s"' % filters.get('to_date')
-	
-	return frappe.db.sql('''select p.name,p.item,p.sku,sum(o.quantity) as qty from `tabProduct` p left join `tabOrder Item` o on o.item=p.name and o.parenttype="Order" left join `tabOrder` O on o.parent=O.name where O.payment_status = 'Paid' {condition}  group by p.name having sum(o.quantity)>0 order by qty desc'''.format(condition=condition))
+		query = query.where(Orders.order_date <= filters.get('to_date'))
+	query = query.groupby(Product.name)
+	query = query.having(Sum(OrderItem.quantity) > 0)
+	query = query.orderby(Sum(OrderItem.quantity), order=Order.desc)
+	return query.run(as_dict=True)
 
-def get_items():	
-	
-	return frappe.db.sql('''select p.name from `tabProduct` p left join `tabOrder Item` o on o.item=p.name and o.parenttype="Order"  group by p.name having sum(o.quantity)>0 ''')
-
+def get_items():
+	Product = DocType("Product")
+	OrderItem = DocType("Order Item")	
+	query = (
+		frappe.qb.from_(Product)
+		.left_join(OrderItem).on((OrderItem.item == Product.name )&(OrderItem.parenttype == "Order"))
+		.select(Product.name)
+		.groupby(Product.name)
+		.having(Sum(OrderItem.quantity) > 0)
+	)
+	result = query.run(as_dict=True)
+	return result
 
 def get_chart_data(items,data):
 	
@@ -40,10 +67,18 @@ def get_chart_data(items,data):
 	datasets = []
 	for item in items:
 		if item:
-			
-			total_order= frappe.db.sql('''select sum(o.quantity) as qty from `tabProduct` p left join `tabOrder Item` o on o.item=p.name and o.parenttype="Order"  where p.name=%s group by p.name having sum(o.quantity)>0 order by qty desc''',(item[0]))
-
-				
+			Product = DocType("Product")
+			OrderItem = DocType("Order Item")
+			query = (
+				frappe.qb.from_(Product)
+				.left_join(OrderItem).on((OrderItem.item == Product.name )&(OrderItem.parenttype == "Order"))
+				.select(Sum('tabOrder Item.quantity').as_('qty'))
+				.where(Product.name == item[0])
+				.groupby(Product.name)
+				.having(Sum(OrderItem.quantity) > 0)
+				.orderby(Sum(OrderItem.quantity), order=Order.desc)
+			)
+			total_order = query.run(as_dict=True)
 			if total_order:
 				data = total_order[0][0]
 			else:

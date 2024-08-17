@@ -6,6 +6,7 @@ import frappe
 from frappe import _
 from frappe.utils import getdate,nowdate,date_diff,add_to_date
 from datetime import datetime, timedelta
+from frappe.query_builder import DocType, Order
 
 def execute(filters=None):
 	columns, data = [], []
@@ -24,11 +25,25 @@ def get_columns():
 	return columns
 
 def get_data(filters):
-	conditions = ''
-	if filters.get('from_date'):
-		conditions+=' and O.order_date>="{0}"'.format(filters.get('from_date'))
-	if filters.get('to_date'):
-		conditions+=' and O.order_date<="{0}"'.format(filters.get('to_date'))
+    Order = DocType('Order')
+    Business = DocType('Business')
 
-	data = frappe.db.sql(''' select O.name,O.order_date,O.customer_name,O.total_driver_charges from `tabOrder` O inner join `tabBusiness` B on B.name=O.business where O.driver = %(driver)s and O.docstatus = 1 and O.order_date>=%(from_date)s and O.order_date<=%(to_date)s order by O.creation desc''',{'driver':frappe.session.user,'conditions':conditions,"from_date":filters.get('from_date'),"to_date":filters.get('to_date')},as_list=1)
-	return data
+    query = frappe.qb.from_(Order)
+    query = query.left_join(Business).on(Order.business == Business.name)
+    conditions = []
+    if filters.get('from_date'):
+        conditions.append(Order.order_date >= filters.get('from_date'))
+    if filters.get('to_date'):
+        conditions.append(Order.order_date <= filters.get('to_date'))
+    query = query.select(
+        Order.name,
+        Order.order_date,
+        Order.customer_name,
+        Order.total_driver_charges
+    ).where(
+        (Order.driver == frappe.session.user) &
+        (Order.docstatus == 1) &
+        *conditions
+    ).orderby(Order.creation, order=Order.desc)
+    data = query.run(as_list=True)
+    return data

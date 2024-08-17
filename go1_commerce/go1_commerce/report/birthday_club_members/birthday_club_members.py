@@ -12,6 +12,7 @@ from urllib.parse import unquote
 from six import string_types
 from frappe.model.document import Document
 from go1_commerce.utils.setup import get_settings_from_domain
+from frappe.query_builder import DocType, Field, Subquery, Function
 
 def execute(filters=None):
 	columns, data = [], []
@@ -22,12 +23,32 @@ def execute(filters=None):
 def get_data(filters):
 	birthday_club_settings = get_settings_from_domain('BirthDay Club Setting')
 	if birthday_club_settings.beneficiary_method == "Discount":
-	    return frappe.db.sql("""SELECT M.email,M.day,M.month,substring_index(M.creation, ' ',1),
-	    						(SELECT order_id FROM `tabDiscount Usage History` DU WHERE 
-	    						parent = %(discount_id)s AND DU.customer = C.name ORDER BY DU.creation DESC limit 1) as `Order ID`
-	    						FROM `tabBirthDay Club Member` M INNER JOIN `tabCustomers` C
-	    						ON M.email = C.email 
-	    						ORDER BY M.creation DESC """,{"discount_id":birthday_club_settings.discount_id})
+		birthday_club_member = DocType("BirthDay Club Member")
+		customers = DocType("Customers")
+		discount_usage_history = DocType("Discount Usage History")
+		subquery = (
+			frappe.qb.from_(discount_usage_history, alias='DU')
+			.select(discount_usage_history.order_id)
+			.where(discount_usage_history.parent == birthday_club_settings.discount_id)
+			.where(discount_usage_history.customer == Field("C.name"))
+			.orderby(discount_usage_history.creation.desc())
+			.limit(1)
+		)
+		
+		query = (
+			frappe.qb.from_(birthday_club_member, alias='M')
+			.inner_join(customers, alias='C', on=birthday_club_member.email == customers.email)
+			.select(
+				birthday_club_member.email,
+				birthday_club_member.day,
+				birthday_club_member.month,
+				Function("SUBSTRING_INDEX", birthday_club_member.creation, ' ', 1).as_("creation_date"),
+				subquery.as_("Order ID")
+			)
+			.orderby(birthday_club_member.creation.desc())
+		)
+		result = query.run(as_dict=True)
+		return result
 
 def get_columns():
 	birthday_club_settings = get_settings_from_domain('BirthDay Club Setting')

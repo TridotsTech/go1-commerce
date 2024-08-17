@@ -9,6 +9,7 @@ from frappe import _
 from frappe.utils import flt, nowdate
 from frappe.utils import now_datetime
 from go1_commerce.utils.setup import get_settings
+from frappe.query_builder import DocType, Field
 
 current_date=timestamp = now_datetime().strftime(" %Y-%m-%d %H:%M:%S")
 
@@ -77,25 +78,31 @@ class WalletTransaction(Document):
 			
 	def debit_wallet(self):
 		try:
-			wallet_trans = frappe.db.sql('''(SELECT balance_amount, party, end_date, name 
-											FROM `tabWallet Transaction` 
-											WHERE is_settlement_paid = 0 
-												AND balance_amount > 0 
-												AND transaction_type = "Pay" 
-												AND party = %(party)s 
-												AND status = %(status)s 
-												AND end_date IS NOT NULL 
-											ORDER BY end_date ASC) 
-											UNION 
-											(SELECT balance_amount, party, end_date, name 
-											FROM `tabWallet Transaction` 
-											WHERE is_settlement_paid = 0 
-												AND balance_amount > 0 
-												AND transaction_type = "Pay" 
-												AND party = %(party)s 
-												AND status = %(status)s 
-												AND end_date IS NULL)
-										''', {'party': self.party, 'status': self.status}, as_dict=True)
+			wallet_transaction = DocType('Wallet Transaction')
+			query_1 = (
+				frappe.qb.from_(wallet_transaction)
+				.select(wallet_transaction.balance_amount, wallet_transaction.party, wallet_transaction.end_date, wallet_transaction.name)
+				.where(wallet_transaction.is_settlement_paid == 0)
+				.where(wallet_transaction.balance_amount > 0)
+				.where(wallet_transaction.transaction_type == "Pay")
+				.where(wallet_transaction.party == self.party)
+				.where(wallet_transaction.status == self.status)
+				.where(wallet_transaction.end_date.is_not_null())
+				.orderby(wallet_transaction.end_date.asc())
+			)
+			query_2 = (
+				frappe.qb.from_(wallet_transaction)
+				.select(wallet_transaction.balance_amount, wallet_transaction.party, wallet_transaction.end_date, wallet_transaction.name)
+				.where(wallet_transaction.is_settlement_paid == 0)
+				.where(wallet_transaction.balance_amount > 0)
+				.where(wallet_transaction.transaction_type == "Pay")
+				.where(wallet_transaction.party == self.party)
+				.where(wallet_transaction.status == self.status)
+				.where(wallet_transaction.end_date.is_null())
+			)
+			results_1 = query_1.run(as_dict=True)
+			results_2 = query_2.run(as_dict=True)
+			wallet_trans = results_1 + results_2
 			if len(wallet_trans)>0:
 				amt = self.amount
 				for trans in wallet_trans:
@@ -121,19 +128,24 @@ class WalletTransaction(Document):
 								"Error in accounts.doctype.wallet_entry.wallet_entry.debit_wallet") 
 
 	def update_wallet_detail(self, amt):
-		wallet = frappe.db.sql('''	SELECT total_wallet_amount, current_wallet_amount, name 
-									FROM `tabWallet` 
-									WHERE user = %s
-								''', self.party, as_dict=True)
+		walletDoc = DocType('Wallet')
+		query = (
+			frappe.qb.from_(walletDoc)
+			.select(walletDoc.total_wallet_amount, walletDoc.current_wallet_amount, walletDoc.name)
+			.where(walletDoc.user == self.party)
+		)
+		wallet = query.run(as_dict=True)
 
 		if len(wallet) > 0:
 			total = flt(wallet[0].total_wallet_amount) - flt(amt)
 			cur_amt = flt(wallet[0].current_wallet_amount) - flt(amt)
-			frappe.db.sql('''UPDATE `tabWallet` 
-							SET total_wallet_amount = %s, 
-								current_wallet_amount = %s 
-							WHERE user = %s
-						''', (total, cur_amt, self.party))
+			query = (
+				frappe.qb.from_(walletDoc)
+				.set(walletDoc.total_wallet_amount, total)
+				.set(walletDoc.current_wallet_amount, cur_amt)
+				.where(walletDoc.user == self.party)
+			).run()
+			
 
 	def before_cancel(self):
 		cancel_payment_entry(self)
@@ -338,14 +350,19 @@ def update_walletcancel(self):
 
 def cancel_payment_entry(self):
 	try:
-		slt = frappe.db.sql(""" SELECT DISTINCT R.parent 
-								FROM `tabPayment Entry` P, `tabPayment Reference` R
-								WHERE R.parent = p.name 
-									AND R.reference_doctype = 'Wallet Transaction' 
-									AND R.reference_name = %s 
-									AND P.payment_type = %s 
-									AND P.docstatus = 1
-							""", (self.name, self.transaction_type), as_dict=True)
+		payment_entry = DocType('Payment Entry')
+		payment_reference = DocType('Payment Reference')
+		slt = (
+			frappe.qb.from_(payment_reference)
+			.inner_join(payment_entry)
+			.on(payment_reference.parent == payment_entry.name)
+			.select(payment_reference.parent.distinct())
+			.where(payment_reference.reference_doctype == 'Wallet Transaction')
+			.where(payment_reference.reference_name == self.name)
+			.where(payment_entry.payment_type == self.transaction_type)
+			.where(payment_entry.docstatus == 1)
+			.run(as_dict=True)
+		)
 		if len(slt)>0:
 			for n in slt:
 				payment = frappe.get_doc("Payment Entry", n.parent)
@@ -445,17 +462,20 @@ def update_walletcancels(self):
 
 def update_transaction_status(id,doctype,status):
 	trans=frappe.get_doc('Wallet Transaction',id)
-	providers = frappe.db.sql('''SELECT name 
-								FROM `tabWallet Transaction` 
-								WHERE reference = "Order" 
-									AND order_type = "Order" 
-									AND is_settlement_paid = 0 
-									AND is_fund_added = 0 
-									AND transaction_type = "Receive" 
-									AND status = "Pending" 
-									AND type = %s 
-									AND order_id = %s
-							''', ("Service Provider", trans.order_id), as_dict=True)
+	wallet_transaction = DocType('Wallet Transaction')
+	providers = (
+		frappe.qb.from_(wallet_transaction)
+		.select(wallet_transaction.name)
+		.where(wallet_transaction.reference == "Order")
+		.where(wallet_transaction.order_type == "Order")
+		.where(wallet_transaction.is_settlement_paid == 0)
+		.where(wallet_transaction.is_fund_added == 0)
+		.where(wallet_transaction.transaction_type == "Receive")
+		.where(wallet_transaction.status == "Pending")
+		.where(wallet_transaction.type == "Service Provider")
+		.where(wallet_transaction.order_id == trans.order_id)
+		.run(as_dict=True)
+	)
 	if providers:
 		wallet_update = frappe.get_doc('Wallet Transaction',providers[0].name)
 		wallet_update.status = "Credited"
@@ -464,11 +484,13 @@ def update_transaction_status(id,doctype,status):
 		wallet_update.flags.ignore_permissions = True
 		wallet_update.db_update()
 	make_recived_payment(id,"Receive")
-	frappe.db.sql(	'''	UPDATE `tabWallet Transaction` 
-						SET status = 'Approved', 
-							is_settlement_paid = 1 
-						WHERE name = %(id)s
-					''', {"id": id})
+	trans = (
+		frappe.qb.update(wallet_transaction)
+		.set(wallet_transaction.status,'Approved')
+		.set(wallet_transaction.is_settlement_paid,1)
+		.where(wallet_transaction.name,trans.order_id)
+		).run()
+	
 
 	return "Success"
 
@@ -496,13 +518,18 @@ def make_recived_payment(source_name,payment_type,reference=None):
 		if w_sources:
 			source=w_sources[0]
 			if source.type != "Service Provider":
-				slt = frappe.db.sql(""" SELECT R.parent 
-										FROM `tabPayment Entry` P 
-										JOIN `tabPayment Reference` R ON R.parent = P.name 
-										WHERE R.reference_doctype = 'Wallet Transaction' 
-											AND R.reference_name = %s 
-											AND P.payment_type = %s
-									""", (source.name, payment_type), as_dict=True)
+				PaymentEntry = DocType('Payment Entry')
+				PaymentReference = DocType('Payment Reference')
+				query = (
+					frappe.qb.from_(PaymentReference)
+					.inner_join(PaymentEntry)
+					.on(PaymentReference.parent == PaymentEntry.name)
+					.select(PaymentReference.parent)
+					.where(PaymentReference.reference_doctype == 'Wallet Transaction')
+					.where(PaymentReference.reference_name == source_name)
+					.where(PaymentEntry.payment_type == payment_type)
+				)
+				slt = query.run(as_dict=True)
 				if len(slt) == 0:
 					total=(flt(source.amount))
 					pe = frappe.new_doc("Payment Entry")
@@ -535,13 +562,18 @@ def make_recived_payment(source_name,payment_type,reference=None):
 					pe.submit()
 					return pe.name
 			else:
-				slt = frappe.db.sql(""" SELECT p.name 
-										FROM `tabPayment Entry` p 
-										JOIN `tabPayment Reference` r ON r.parent = p.name 
-										WHERE r.reference_doctype = 'Wallet Transaction' 
-											AND r.reference_name = %s 
-											AND p.payment_type = 'Pay'
-									""", (source.name,), as_dict=True)
+				PaymentEntry = DocType('Payment Entry')
+				PaymentReference = DocType('Payment Reference')
+				query = (
+					frappe.qb.from_(PaymentEntry)
+					.inner_join(PaymentReference)
+					.on(PaymentReference.parent == PaymentEntry.name)
+					.select(PaymentEntry.name)
+					.where(PaymentReference.reference_doctype == 'Wallet Transaction')
+					.where(PaymentReference.reference_name == reference_name)
+					.where(PaymentEntry.payment_type == 'Pay')
+				)
+				slt = query.run(as_dict=True)
 				if len(slt) == 0:
 					total=(flt(source.amount))
 					pe = frappe.new_doc("Payment Entry")

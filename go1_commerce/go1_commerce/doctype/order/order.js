@@ -550,8 +550,14 @@ frappe.ui.form.on('Order', {
             let lists = [];
             let allow_form = true;
             let data = {};
+
             $('#returnTable').find('tbody tr').each(function() {
+                console.log("-----------FIRST-------")
+                console.log($(this).find('.grid-row-check').val())
+                console.log($(this).find('td:eq(1)').text())
+                console.log($(this).find('.grid-row-check').text())
                 if ($(this).find('.grid-row-check:checked').val()) {
+                    console.log("---------IN---------")
                     data.item = $(this).find('.productId').val();
                     data.item_name = $(this).find('td:eq(1)').text()
                     data.quantity = $(this).find('input[data-fieldname="quantity"]').val();
@@ -566,7 +572,7 @@ frappe.ui.form.on('Order', {
                                 data.price = parseFloat(check_data.price)
                                 data.amount = parseFloat(check_data.price)*parseInt(data.quantity)
                                 data.shipping_charge = parseFloat(check_data.shipping_charges)
-                                console.log("data",data);
+                                
                                 lists.push(data)
                             }
                             else {
@@ -575,16 +581,18 @@ frappe.ui.form.on('Order', {
                             }
                         }
                     }
-                } else {
-                    frappe.throw("Please select the Items !")
                 }
+                //  else {
+                //     frappe.throw("Please select the Items !")
+                // }
             })
+            
             data.order_id = frm.doc.name
             formData.order_id = frm.doc.name
             formData.return_reason = values.return_reason
             formData.return_action = values.return_action
             formData.remarks = values.comments
-            console.log(values);
+       
             formData.images = values.images
             formData.order_shipping_charge = parseFloat(frm.doc.shipping_charges)
             formData.items = lists

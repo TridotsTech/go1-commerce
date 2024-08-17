@@ -10,6 +10,7 @@ from frappe.query_builder import DocType
 class DeliverySetting(Document):
 	pass
 
+@frappe.whitelist()
 def check_category_exist_or_not():
 	category = []
 	DeliverySlotCategory = DocType('Delivery Slot Category')

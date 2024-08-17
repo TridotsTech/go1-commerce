@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import frappe, json
 from frappe import _
 from go1_commerce.utils.setup import get_settings_from_domain, get_theme_settings
+from frappe.query_builder import DocType
 
 @frappe.whitelist()
 def get_all_products_with_attributes(category=None, brand=None, item_name=None, active=None, featured=None, page_start=0, page_end=20):
@@ -27,78 +28,88 @@ def get_all_products_with_attributes(category=None, brand=None, item_name=None, 
 @frappe.whitelist()
 def get_product_attributes(name):	
 	try:
-		query = '''select AO.name as docname,concat_ws(' - ', PA.attribute, AO.parent_option) as name,AO.option_value as item, AO.parent_option,AO.price_adjustment as price,AO.attribute from `tabProduct Attribute Option` AO inner join `tabProduct Attribute Mapping` PA on AO.attribute_id=PA.name where PA.parent="{parent}" order by PA.display_order, name'''.format(parent=name)
-		s= frappe.db.sql(query,as_dict=1)
-		return s
+		ProductAttributeOption = DocType('Product Attribute Option')
+		ProductAttributeMapping = DocType('Product Attribute Mapping')
+		query = (
+			frappe.qb.from_(ProductAttributeOption)
+			.inner_join(ProductAttributeMapping).on(ProductAttributeOption.attribute_id == ProductAttributeMapping.name)
+			.select(
+				ProductAttributeOption.name.as_("docname"),
+				frappe.qb.concat_ws(' - ', ProductAttributeMapping.attribute, ProductAttributeOption.parent_option).as_("name"),
+				ProductAttributeOption.option_value.as_("item"),
+				ProductAttributeOption.parent_option,
+				ProductAttributeOption.price_adjustment.as_("price"),
+				ProductAttributeOption.attribute
+			)
+			.where(ProductAttributeMapping.parent == name)
+			.orderby(ProductAttributeMapping.display_order, "name")
+		)
+		return query.run(as_dict=True)
 	except Exception:
 		frappe.log_error(frappe.get_traceback(), "go1_commerce.go1_commerce.page.products_bulk_update.get_product_attributes") 
 
 @frappe.whitelist()
-def get_products(category=None,brand=None,cat_doctype=None,brand_doctype=None,item_name=None,active=None,featured=None, page_start=0, page_end=20):
-	if category or brand:
-		filters = ''
-		joins = ''
+def get_products(category=None, brand=None, cat_doctype=None, brand_doctype=None, item_name=None, active=None, featured=None, page_start=0, page_end=20):
+	try:
+		Product = DocType('Product')
+		ProductCategoryMapping = DocType('Product Category Mapping')
+		ProductBrandMapping = DocType('Product Brand Mapping')
+		ProductImage = DocType('Product Image')
+		query = frappe.qb.from_(Product).select(
+			Product.name,
+			Product.item,
+			Product.price,
+			Product.sku,
+			Product.old_price,
+			Product.stock,
+			Product.inventory_method,
+			Product.name.as_("docname"),
+			frappe.qb.case().when(Product.is_active > 0, 'Yes').else_('No').as_("is_active"),
+			frappe.qb.case().when(Product.display_home_page > 0, 'Yes').else_('No').as_("display_home_page"),
+			Product.name.as_("id"),
+			Product.name.as_("name1")
+		)
+		
 		if category:
-			joins += ' inner join `tabProduct Category Mapping` PCM on PCM.parent=P.name'
-			filters += " and PCM.category='{category}'".format(category=category)
+			query = query.inner_join(ProductCategoryMapping).on(ProductCategoryMapping.parent == Product.name)
+			query = query.where(ProductCategoryMapping.category == category)
+		
 		if brand:
-			joins += ' inner join `tabProduct Brand Mapping` PBM on PBM.parent=P.name'
-			filters += ' and PBM.brand="{brand}"'.format(brand=brand)
+			query = query.inner_join(ProductBrandMapping).on(ProductBrandMapping.parent == Product.name)
+			query = query.where(ProductBrandMapping.brand == brand)
 		if item_name:
-			item_name = '"%' + item_name + '%"'
-			filters += ' and P.item like %s' % (item_name)
-		if active:
-			if active=="Yes":
-				active=1
-			else:
-				active=0
-			filters += ' and P.is_active=%s' % (active)
-		if featured:
-			if featured=="Yes":
-				featured=1
-			else:
-				featured=0
-			filters += ' and P.display_home_page=%s' % (featured)
+			query = query.where(Product.item.like(f"%{item_name}%"))
 		
-		query = '''select P.name,P.item,P.price,P.sku,P.old_price,P.stock,P.inventory_method,P.name as docname,CASE WHEN P.is_active>0 THEN 'Yes' ELSE 'No' END as is_active,CASE WHEN P.display_home_page>0 THEN 'Yes' ELSE 'No' END as display_home_page,P.name as id,P.name as name1 from `tabProduct` P {joins} where P.name!='' {condition} limit {start}, {limit}'''.format(start=page_start, limit=page_end, condition=filters, joins=joins)
-		p = frappe.db.sql(query,as_dict=1)
-		for items in p:
-			images = frappe.db.sql('''select detail_thumbnail,detail_image from `tabProduct Image` where parent=%(name)s order by is_primary desc''',{'name':items.name},as_dict=1)
-			image = '<div class="row">'
-			for img in images:
-				if img.detail_thumbnail:
-					image += '<div class="col-md-4 popup" data-poster="'+img.detail_image+'" data-src='+img.detail_image+' style="margin-bottom:10px;padding-left:0px;padding-right:0px;"><a href="'+img.detail_image+'"><img class="img-responsive" id="myImg" src="'+ img.detail_thumbnail +'" onclick=showPopup("'+img.detail_image+'")></a></div>'
-			image+='</div>'
-			items.image = image
-	else:
-		filters = ''
-		if item_name:
-			item_name = '"%' + item_name + '%"'
-			filters += ' and P.item like %s' % (item_name)
 		if active:
-			if active=="Yes":
-				active=1
-			else:
-				active=0
-			filters += ' and P.is_active=%s' % (active)
-		if featured:
-			if featured=="Yes":
-				featured=1
-			else:
-				featured=0
-			filters += ' and P.display_home_page=%s' % (featured)
+			active = 1 if active == "Yes" else 0
+			query = query.where(Product.is_active == active)
 		
-		query = '''select P.name,P.item,P.price,P.sku,P.old_price,P.stock,P.inventory_method,P.name as docname,CASE WHEN P.is_active>0 THEN 'Yes' ELSE 'No' END as is_active,CASE WHEN P.display_home_page>0 THEN 'Yes' ELSE 'No' END as display_home_page,P.name as id,P.name as name1 from `tabProduct` P where P.name!= '' {condition} limit {start}, {limit}'''.format(start=page_start, limit=page_end, condition=filters)
-		p = frappe.db.sql(query,as_dict=1)
-		for items in p:
-			images = frappe.db.sql('''select detail_thumbnail,detail_image from `tabProduct Image` where parent=%(name)s order by is_primary desc''',{'name':items.name},as_dict=1)
-			image = '<div class="row">'
+		if featured:
+			featured = 1 if featured == "Yes" else 0
+			query = query.where(Product.display_home_page == featured)
+		query = query.limit(page_start, page_end)
+		products = query.run(as_dict=True)
+		for item in products:
+			images = (frappe.qb.from_(ProductImage).select(
+				ProductImage.detail_thumbnail,
+				ProductImage.detail_image
+			).where(ProductImage.parent == item['name']).orderby(ProductImage.is_primary, order=Order.desc).run(as_dict=True))
+			
+			image_html = '<div class="row">'
 			for img in images:
-				if img.detail_thumbnail:
-					image += '<div class="col-md-4 popup" data-poster="'+img.detail_image+'" data-src='+img.detail_image+' style="margin-bottom:10px;padding-left:0px;padding-right:0px;"><a href="'+img.detail_image+'"><img class="img-responsive" id="myImg" src="'+ img.detail_thumbnail +'" onclick=showPopup("'+img.detail_image+'")></a></div>'
-			image+='</div>'
-			items.image = image
-	return p
+				if img['detail_thumbnail']:
+					image_html += f'''
+						<div class="col-md-4 popup" data-poster="{img['detail_image']}" data-src="{img['detail_image']}" style="margin-bottom:10px;padding-left:0px;padding-right:0px;">
+							<a href="{img['detail_image']}">
+								<img class="img-responsive" id="myImg" src="{img['detail_thumbnail']}" onclick="showPopup('{img['detail_image']}')">
+							</a>
+						</div>'''
+			image_html += '</div>'
+			item['image'] = image_html
+
+		return products
+
+
 
 @frappe.whitelist()
 def update_bulk_data(doctype,docname,fieldname,value):

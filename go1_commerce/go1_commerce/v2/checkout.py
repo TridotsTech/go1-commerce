@@ -6,6 +6,7 @@ from datetime import datetime
 from six import string_types
 from go1_commerce.utils.utils import get_today_date
 from go1_commerce.utils.utils import role_auth,get_customer_from_token,other_exception
+from frappe.query_builder import DocType, Field, Order
 
 @frappe.whitelist(allow_guest=True)
 def check_cartitems_stock_mob(customer_id=None):
@@ -22,17 +23,32 @@ def check_cartitems_stock_mob(customer_id=None):
 			filters={'customer': customers[0].name, 'cart_type': 'Shopping Cart'}, 
 			fields=['name', 'tax', 'tax_breakup'])
 		if cart:
-			items = frappe.db.sql('''SELECT 
-										C.name, C.product, C.quantity, C.attribute_description,
-										C.attribute_ids, C.price, C.total, C.product_name, I.price, I.stock,
-										I.short_description, I.route,I.image AS image 
-									FROM 
-										`tabCart Items` C
-									INNER JOIN 
-										`tabProduct` I 
-										ON I.name = C.product
-									WHERE C.parent = %(parent)s
-									ORDER BY C.idx''',{'parent': cart[0].name},as_dict=True)
+			CartItems = DocType("Cart Items")
+			Product = DocType("Product")
+			query = (
+				frappe.qb
+				.from_(CartItems)
+				.join(Product)
+				.on(Product.name == CartItems.product)
+				.select(
+					CartItems.name,
+					CartItems.product,
+					CartItems.quantity,
+					CartItems.attribute_description,
+					CartItems.attribute_ids,
+					CartItems.price.as_("cart_price"),
+					CartItems.total,
+					CartItems.product_name,
+					Product.price.as_("product_price"),
+					Product.stock,
+					Product.short_description,
+					Product.route,
+					Product.image
+				)
+				.where(CartItems.parent == cart[0].name)
+				.orderby(CartItems.idx)
+			)
+			items= query.run(as_dict=True)
 			stock = False
 			for cart_item in items:
 				ProductId = cart_item.product
@@ -55,13 +71,23 @@ def check_cartitems_stock_mob(customer_id=None):
 @frappe.whitelist(allow_guest=True)
 def get_payment_methods():
 	try:
-		payment_method = frappe.db.sql('''  SELECT name, display_name AS payment_method, description,
-												redirect_controller, payment_type, additional_charge,
-												use_additional_fee_percentage, additional_fee_percentage
-											FROM 
-												`tabPayment Method`
-											WHERE enable = 1
-											ORDER BY display_order''',as_dict=True)
+		PaymentMethod = DocType("Payment Method")
+		query = (
+			frappe.qb.from_(PaymentMethod)
+			.select(
+				PaymentMethod.name,
+				PaymentMethod.display_name.as_("payment_method"),
+				PaymentMethod.description,
+				PaymentMethod.redirect_controller,
+				PaymentMethod.payment_type,
+				PaymentMethod.additional_charge,
+				PaymentMethod.use_additional_fee_percentage,
+				PaymentMethod.additional_fee_percentage
+			)
+			.where(PaymentMethod.enable == 1)
+			.orderby(PaymentMethod.display_order)
+		)
+		payment_method= query.run(as_dict=True)
 		return payment_method
 	except Exception:
 		other_exception('Error in v2.checkout.get_payment_method')
@@ -70,12 +96,20 @@ def get_payment_methods():
 def get_shipping_methods():
 	try:
 		order_settings = frappe.get_single('Order Settings')
-		data = frappe.db.sql('''SELECT 
-									name, shipping_method_name, description, is_deliverable 
-								FROM 
-									`tabShipping Method`
-								WHERE show_in_website = 1
-								ORDER BY display_order''',as_dict=True)
+		ShippingMethod = DocType("Shipping Method")
+		query = (
+			frappe.qb
+			.from_(ShippingMethod)
+			.select(
+				ShippingMethod.name,
+				ShippingMethod.shipping_method_name,
+				ShippingMethod.description,
+				ShippingMethod.is_deliverable
+			)
+			.where(ShippingMethod.show_in_website == 1)
+			.orderby(ShippingMethod.display_order)
+		)
+		data= query.run(as_dict=True)
 		for d in data:
 			if order_settings.shipping_calculated_by=="Shipping Provider":
 				if d.is_deliverable==1 and order_settings.shipping_provider: 
@@ -92,12 +126,17 @@ def get_shipping_methods():
 def calculate_shipping_charges(shipping_method,shipping_addr,cart_id):
 	try:
 		from go1_commerce.utils.setup import get_settings
-		active_shipping_rate_method_info = frappe.db.sql(''' SELECT 
-													name AS id,shipping_rate_method AS shipping_category 
-							   					FROM 
-													`tabShipping Rate Method` 
-												WHERE 
-									   				is_active = 1 ''', as_dict = 1)
+		ShippingRateMethod = DocType("Shipping Rate Method")
+		query = (
+			frappe.qb
+			.from_(ShippingRateMethod)
+			.select(
+				ShippingRateMethod.name.as_("id"),
+				ShippingRateMethod.shipping_rate_method.as_("shipping_category")
+			)
+			.where(ShippingRateMethod.is_active == 1)
+		)
+		active_shipping_rate_method_info= query.run(as_dict=True)
 		if active_shipping_rate_method_info:
 			active_shipping_rate_method_info = active_shipping_rate_method_info[0]
 			catalog_settings = get_settings('Catalog Settings')
@@ -149,7 +188,7 @@ def get_sh_charges_by_sh_method(SRM_info,shipping_method,shipping_addr,shopping_
 		
 	elif SRM_info.shipping_category == 'Shipping By Group By Distance and Weight':
 		sh_charges_resp = calculate_shipping_charges_distance_and_weight_group(SRM_info.get("id"),shipping_addr,
-																		 	   shopping_cart)
+																			   shopping_cart)
 	return sh_charges_resp
 
 def calculate_tax_for_sh_chrgs(shipping_charges,shopping_cart,catalog_settings):
@@ -179,12 +218,12 @@ def get_order_discount(subtotal,total_weight=0,shipping_method=None,payment_meth
 		from go1_commerce.go1_commerce.v2.orders\
 		import calculate_tax_after_discount , calculate_tax_without_discount
 		customer_cart = frappe.db.get_all('Shopping Cart', 
-			     		filters={'cart_type': 'Shopping Cart', 
-	    						 'customer': customer_id}, 
+						filters={'cart_type': 'Shopping Cart', 
+								 'customer': customer_id}, 
 						fields=['*'])
 		if customer_cart:
 			cart_items = frappe.db.get_all('Cart Items', 
-			   			 filters={'parent': customer_cart[0].name, 'is_free_item': 0}, 
+						 filters={'parent': customer_cart[0].name, 'is_free_item': 0}, 
 						 fields=['product', 'quantity', 'parent', 'price', 
 								 'attribute_ids', 'attribute_description',
 								 'is_free_item', 'total', 'discount_rule'])
@@ -192,9 +231,9 @@ def get_order_discount(subtotal,total_weight=0,shipping_method=None,payment_meth
 			response = get_order_subtotal_discount(subtotal, customer_id, cart_items, 
 					   total_weight,shipping_method, payment_method,shipping_charges)
 			if response and (response.get('discount_rule') or \
-		    	response.get('product_discount')) or response.get('shipping_discount'):
+				response.get('product_discount')) or response.get('shipping_discount'):
 				(tax, tax_splitup) = calculate_tax_after_discount(customer_id, 
-						      		 response.get('discount_amount'),
+									 response.get('discount_amount'),
 									 response.get('discount_rule'), 
 									 subtotal, cart_items, response=response)
 				return {'status': 'Success',
@@ -241,11 +280,11 @@ def validate_coupon(coupon_code, customer_id, subtotal, total_weight=0, discount
 									'discount_rule': item_info.get('discount_rule')})
 		else:
 			customer_cart = frappe.db.get_all('Shopping Cart', 
-				     		filters={'cart_type':'Shopping Cart','customer': customer_id},
+							filters={'cart_type':'Shopping Cart','customer': customer_id},
 							 fields=['*'])
 			if customer_cart:
 				cart_items = frappe.db.get_all('Cart Items',
-				    		 filters={'parent': customer_cart[0].name, 'is_free_item': 0}, 
+							 filters={'parent': customer_cart[0].name, 'is_free_item': 0}, 
 							 fields=['product', 'quantity', 'parent', 'price', 
 									 'attribute_ids', 'attribute_description',
 									 'is_free_item', 'total', 'discount_rule'])
@@ -261,7 +300,7 @@ def get_validate_coupons_cart_items(coupon_code, subtotal, customer_id, cart_ite
 	import get_coupon_code
 	if cart_items:
 		response = get_coupon_code(coupon_code, subtotal, customer_id, cart_items,
-			       discount_type = discount_type, shipping_method=shipping_method, 
+				   discount_type = discount_type, shipping_method=shipping_method, 
 				   payment_method=payment_method, shipping_charges=shipping_charges, 
 					total_weight =total_weight)
 		if response and response.get('discount_rule'):
@@ -327,20 +366,24 @@ def get_cart_delivery_slots(shipping_method=None):
 																			order_by="name")
 			if shipping_methods:
 				shipping_method = shipping_methods[0].name
-		ship_condition = ''
-		ship_condition = ' and SH.shipping_method = "{0}"'.format(shipping_method)
-		return get_cart_delivery_categories(ship_condition)
+		return get_cart_delivery_categories(shipping_method)
 	except Exception:
 		other_exception("Error in v2.checkout.get_shipping_method_with_delivery_slots_for_mobile")
 
-def get_cart_delivery_categories(ship_condition):
+def get_cart_delivery_categories(shipping_method):
 	default_delivery_slots = []
-	delivery_list = frappe.db.sql( '''  SELECT SH.parent 
-										FROM 
-											`tabDelivery Slot Shipping Method` SH
-										INNER JOIN `tabDelivery Setting` DS 
-										ON DS.name = SH.parent
-										WHERE enable = 1 {0}'''.format(ship_condition), as_dict=1)
+	DeliverySlotShippingMethod = DocType("Delivery Slot Shipping Method")
+	DeliverySetting = DocType("Delivery Setting")
+	query = (
+		frappe.qb.from_(DeliverySlotShippingMethod)
+		.join(DeliverySetting)
+		.on(DeliverySetting.name == DeliverySlotShippingMethod.parent)
+		.select(DeliverySlotShippingMethod.parent)
+		.where(DeliverySetting.enable == 1)
+	)
+	if shipping_method:
+		query = query.where(DeliverySlotShippingMethod.shipping_method == shipping_method)
+	delivery_list= query.run(as_dict=True)
 	for x in delivery_list:
 		if not frappe.db.get_all("Delivery Slot Category", filters={"parent":x.parent}):
 			(dates_lists, blocked_day_list) = get_delivery_slots_list(x.parent)
@@ -363,18 +406,18 @@ def get_delivery_slots_list(name):
 		if delivery.enable_start_date and delivery.no_of_dates_start_from>0:
 			today_date = frappe.utils.add_days(today_date, int(delivery.no_of_dates_start_from))
 			slots_list = get_slot_lists(delivery.delivery_slots, today_date, 
-			       						delivery.min_time, delivery.restrict_slot, 
+										delivery.min_time, delivery.restrict_slot, 
 										delivery.max_booking_slot)
 			if slots_list:
 				dates_list.append({'date': today_date, 'slots': slots_list, 
-		       					  'format_date': today_date.strftime('%b %d, %Y')})
+								  'format_date': today_date.strftime('%b %d, %Y')})
 		if delivery.slot_for_current_date:
 			slots_list = get_slot_lists(delivery.delivery_slots, today_date, 
-			       						delivery.min_time, delivery.restrict_slot, 
+										delivery.min_time, delivery.restrict_slot, 
 										delivery.max_booking_slot)
 			if slots_list:
 				dates_list.append({'date': today_date, 
-		       					   'slots': slots_list, 
+								   'slots': slots_list, 
 								   'format_date': today_date.strftime('%b %d, %Y')})
 		data = get_delivery_list(delivery,today_date,dates_list,blocked_day_list)
 		return data
@@ -448,16 +491,20 @@ def get_slot_lists(slots, date, min_time, restrict, max_booking_slot):
 				if allow:
 					doc = item.__dict__
 					doc['time_format'] = '{0} - {1}'.format(from_date.strftime('%I:%M %p'), 
-					     									to_date.strftime('%I:%M %p'))
+															to_date.strftime('%I:%M %p'))
 					slot_list.append(doc)
 	return slot_list
 	
 @frappe.whitelist(allow_guest=True)
 def get_country_states(country):
 	try:
-		return frappe.db.sql(
-			    '''SELECT name FROM `tabState` WHERE country=%(country)s''',
-				{'country': country}, as_dict=1)
+		State = DocType("State")
+		query = (
+			frappe.qb.from_(State)
+			.select(State.name)
+			.where(State.country == country)
+		)
+		return query.run(as_dict=True)
 	except Exception:
 		other_exception("Error in v2.cart.get_country_states")
 
@@ -465,11 +512,14 @@ def get_country_states(country):
 @frappe.whitelist(allow_guest=True)
 def validate_order_pincode_validate(cartitems,ship_addr):
 	try:
-		customer_shipping_address = frappe.db.sql ('''  SELECT * 
-														FROM 
-															`tabCustomer Address` 
-														WHERE name = %(addressId)s''', 
-															{'addressId': ship_addr}, as_dict=1)
+		CustomerAddress = DocType("Customer Address")
+		query = (
+			frappe.qb
+			.from_(CustomerAddress)
+			.select("*")
+			.where(CustomerAddress.name == ship_addr)
+		)
+		customer_shipping_address= query.run(as_dict=True)
 		if customer_shipping_address:
 			items = ''
 			i = 0
@@ -493,9 +543,13 @@ def validate_order_pincode_validate(cartitems,ship_addr):
 def check_pincode_availability(zipcode):
 	try:
 		pincode_available = False
-		pincodes = frappe.db.sql('''SELECT C.zipcode_range, C.name 
-									FROM 
-										`tabShipping City` C''', as_dict=1)
+		ShippingCity = DocType("Shipping City")
+		query = (
+			frappe.qb
+			.from_(ShippingCity)
+			.select(ShippingCity.zipcode_range, ShippingCity.name)  # Select specific fields
+		)
+		pincodes= query.run(as_dict=True)
 		shipping_city=""
 		if pincodes:
 			for item in pincodes:

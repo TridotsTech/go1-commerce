@@ -4,6 +4,7 @@
 from __future__ import unicode_literals
 import frappe
 from frappe.model.document import Document
+from frappe.query_builder import DocType
 
 class ShipmentBag(Document):
 	def on_update(self):
@@ -11,8 +12,9 @@ class ShipmentBag(Document):
 			import calculate_shipment_charges
 		total_amount = calculate_shipment_charges(self.name)
 		self.total_shipping_charges = total_amount
-		frappe.db.sql(f""" 	UPDATE 
-								`tabShipment Bag` 
-							set total_shipping_charges = '{total_amount}' 
-							WHERE name='{self.name}' """)
+		ShipmentBag = DocType('Shipment Bag')
+		query = frappe.qb.update(ShipmentBag).set(
+			ShipmentBag.total_shipping_charges, total_amount
+		).where(ShipmentBag.name == name)
+		query.run()
 		frappe.db.commit()

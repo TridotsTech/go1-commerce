@@ -6,7 +6,7 @@ from frappe.utils import flt, nowdate, now, cint
 from datetime import date, timedelta,datetime
 from frappe.utils import now_datetime
 from go1_commerce.utils.setup import get_settings
-from frappe.query_builder import DocType
+from frappe.query_builder import DocType,Order
 from frappe.query_builder import Field
 from frappe.query_builder.functions import IfNull,Sum
 
@@ -449,7 +449,7 @@ def app_pay_wallet_details(customer,page_no,page_len):
 				& (WalletTransaction.disabled == 0)
 				& (WalletTransaction.docstatus == 1)
 			)
-			.orderby(WalletTransaction.creation, order=frappe.qb.desc)
+			.orderby(WalletTransaction.creation, order=Order.desc)
 			.limit(cint(page_len))
 			.offset(cint(limit_start))
 		).run(as_dict=True)
@@ -520,7 +520,7 @@ def not_app_pay_wallet_details(customer, limit_start, page_len):
 				& (WalletTransaction.docstatus == 1)
 				& (WalletTransaction.disabled == 0)
 			)
-			.orderby(WalletTransaction.creation, order=frappe.qb.desc)
+			.orderby(WalletTransaction.creation, order=Order.desc)
 			.limit(cint(page_len))
 			.offset(cint(limit_start))
 		).run(as_dict=True)
@@ -594,7 +594,7 @@ def app_transaction_order_list(start, page_len, user):
 			WalletTransaction.transaction_type == "Pay",
 			WalletTransaction.party == user
 		)
-		.order_by(WalletTransaction.creation.desc())
+		.orderby(WalletTransaction.creation,order=Order.desc)
 		.limit(start, page_len)
 	).run(as_dict=True)
 
@@ -610,7 +610,7 @@ def app_transaction_total_count(user):
 			WalletTransaction.is_settlement_paid == 0,
 			WalletTransaction.party == user
 		)
-		.order_by(WalletTransaction.creation.desc())
+		.orderby(WalletTransaction.creation,order=Order.desc)
 	).run(as_dict=True)
 
 	return total_count
@@ -632,7 +632,7 @@ def get_app_transactions(user, page_no, page_len):
 				DocType("Wallet Transaction").transaction_type == "Pay",
 				DocType("Wallet Transaction").party == user
 			)
-			.order_by(DocType("Wallet Transaction").creation.desc())
+			.orderby(DocType("Wallet Transaction").creation, order=Order.desc)
 		).run(as_dict=True)
 
 		if transactions:
@@ -664,7 +664,7 @@ def counter_transaction_order_list(start, page_len, user):
 			WalletTransaction.status == "Pending",
 			WalletTransaction.party == user
 		)
-		.order_by(WalletTransaction.creation.desc())
+		.orderby(WalletTransaction.creation,order=Order.desc)
 		.limit(start, page_len)
 	).run(as_dict=True)
 
@@ -683,7 +683,7 @@ def counter_transaction_total_count(user):
 			WalletTransaction.status == "Pending",
 			WalletTransaction.party == user
 		)
-		.order_by(WalletTransaction.creation.desc())
+		.orderby(WalletTransaction.creation,order=Order.desc)
 	).run(as_dict=True)
 
 	return total_count
@@ -705,7 +705,7 @@ def get_counter_transactions(user, page_no, page_len):
 				DocType("Wallet Transaction").transaction_type == "Receive",
 				DocType("Wallet Transaction").party == user
 			)
-			.order_by(DocType("Wallet Transaction").creation.desc())
+			.orderby(DocType("Wallet Transaction").creation, order=Order.desc)
 		).run(as_dict=True)
 
 		if transactions:

@@ -14,46 +14,60 @@ from datetime import datetime
 from frappe.utils import now_datetime
 from go1_commerce.utils.setup import get_settings
 current_date = timestamp = now_datetime().strftime(" %Y-%m-%d %H:%M:%S")
+from frappe.query_builder import DocType, Order, functions as fn, Field
 
 class Wallet(Document):
 	pass
 
 def get_all_orders_transaction(**kwargs):
-	transaction = frappe.db.sql('''SELECT order_id
-								FROM `tabWallet Transaction`
-								WHERE docstatus = 1
-									AND type = "Business"
-									AND reference = "Order"
-									AND order_type = "Order"
-									AND is_settlement_paid = 0
-									AND transaction_type = "Pay"
-									AND party = %s 
-								ORDER BY creation desc
-							''',kwargs.get('user'),as_dict=1)
+	WalletTransaction = DocType('Wallet Transaction')
+	query = (
+		frappe.qb.from_(WalletTransaction)
+		.select(WalletTransaction.order_id)
+		.where(WalletTransaction.docstatus == 1)
+		.where(WalletTransaction.type == "Business")
+		.where(WalletTransaction.reference == "Order")
+		.where(WalletTransaction.order_type == "Order")
+		.where(WalletTransaction.is_settlement_paid == 0)
+		.where(WalletTransaction.transaction_type == "Pay")
+		.where(WalletTransaction.party == kwargs.get('user'))
+		.orderby(WalletTransaction.creation, order=Order.desc)
+	)
+	transaction = query.run(as_dict=True)
 	return transaction
 
 def get_all_orders_total_count(**kwargs):
-	total_count = frappe.db.sql('''SELECT ifnull(count(*),0) 
-								AS count 
-								FROM `tabWallet Transaction`
-								WHERE docstatus = 1
-									AND is_settlement_paid = 0 
-									AND party = %s 
-								ORDER BY creation desc
-							''',kwargs.get('user'),as_dict=1)
+	WalletTransaction = DocType('Wallet Transaction')
+	query = (
+		frappe.qb.from_(WalletTransaction)
+		.select(fn.IfNull(fn.Count('*'), 0).as_('count'))
+		.where(WalletTransaction.docstatus == 1)
+		.where(WalletTransaction.is_settlement_paid == 0)
+		.where(WalletTransaction.party == kwargs.get('user'))
+		.orderby(WalletTransaction.creation, order=Order.desc)
+	)
+	total_count = query.run(as_dict=True)
 	return total_count
 
 def get_all_orders_list(start,**kwargs):
-	order_list = frappe.db.sql('''SELECT 
-									ifnull(order_id,name) AS name,
-									ifnull(reference,'') AS reference ,total_value , amount 
-								FROM `tabWallet Transaction`
-								WHERE docstatus = 1
-									AND is_settlement_paid = 0 
-									AND transaction_type = "Pay"
-									AND party = %s 
-								ORDER BY creation desc limit {0},{1}
-							'''.format(start,int(kwargs.get('page_len'))),kwargs.get('user'),as_dict=1)
+	WalletTransaction = DocType('Wallet Transaction')
+	query = (
+		frappe.qb.from_(WalletTransaction)
+		.select(
+			fn.IfNull(WalletTransaction.order_id, WalletTransaction.name).as_('name'),
+			fn.IfNull(WalletTransaction.reference, '').as_('reference'),
+			WalletTransaction.total_value,
+			WalletTransaction.amount
+		)
+		.where(WalletTransaction.docstatus == 1)
+		.where(WalletTransaction.is_settlement_paid == 0)
+		.where(WalletTransaction.transaction_type == 'Pay')
+		.where(WalletTransaction.party == kwargs.get('user'))
+		.orderby(WalletTransaction.creation, order=Order.desc)
+		.limit(int(kwargs.get('page_len')))
+		.offset(start)
+	)
+	order_list = query.run(as_dict=True)
 	return order_list
 
 
@@ -72,33 +86,46 @@ def get_all_orders(**kwargs):
 		total_count = get_all_orders_total_count(**kwargs)
 		order_list = get_all_orders_list(start,**kwargs)
 		res = {	'orders':order_list,
-         		'count':total_count[0].count,
-           		"currency":currency}
+				'count':total_count[0].count,
+				"currency":currency}
 		return res
 	except Exception:
 		frappe.log_error(frappe.get_traceback(), "wallet.get_all_orders")
 
 def total_and_order_list(start, **kwargs):
-	total_count = frappe.db.sql('''SELECT ifnull(count(*),0) AS count 
-								FROM `tabWallet Transaction`
-								WHERE docstatus = 1
-									AND is_settlement_paid = 0 
-									AND transaction_type = "Receive"
-									AND status = "Pending"
-									AND party = %s 
-								ORDER BY creation desc
-							''',kwargs.get('user'),as_dict = 1)
-	order_list = frappe.db.sql('''SELECT 
-									ifnull(order_id,name) AS name,
-									ifnull(reference,'') AS reference ,total_value , amount 
-								FROM `tabWallet Transaction` 
-								WHERE docstatus = 1 
-									AND is_settlement_paid = 0 
-									AND transaction_type = "Receive"
-									AND status = "Pending"
-									AND party = %s 
-								ORDER BY creation desc limit {0},{1}
-							'''.format(start,int(kwargs.get('page_len'))),kwargs.get('user'),as_dict=1)
+	WalletTransaction = DocType('Wallet Transaction')
+	query = (
+		frappe.qb.from_(WalletTransaction)
+		.select(
+			fn.IfNull(fn.Count('*'), 0).as_('count')
+		)
+		.where(WalletTransaction.docstatus == 1)
+		.where(WalletTransaction.is_settlement_paid == 0)
+		.where(WalletTransaction.transaction_type == 'Receive')
+		.where(WalletTransaction.status == 'Pending')
+		.where(WalletTransaction.party == kwargs.get('user'))
+		.orderby(WalletTransaction.creation, order=Order.desc)
+	)
+	total_count = query.run(as_dict=True)
+	WalletTransaction = DocType('Wallet Transaction')
+	query = (
+		frappe.qb.from_(WalletTransaction)
+		.select(
+			fn.IfNull(WalletTransaction.order_id, WalletTransaction.name).as_('name'),
+			fn.IfNull(WalletTransaction.reference, '').as_('reference'),
+			WalletTransaction.total_value,
+			WalletTransaction.amount
+		)
+		.where(WalletTransaction.docstatus == 1)
+		.where(WalletTransaction.is_settlement_paid == 0)
+		.where(WalletTransaction.transaction_type == 'Receive')
+		.where(WalletTransaction.status == 'Pending')
+		.where(WalletTransaction.party == kwargs.get('user'))
+		.orderby(WalletTransaction.creation, order=Order.desc)
+		.limit(int(kwargs.get('page_len')))
+		.offset(start)
+	)
+	order_list = query.run(as_dict=True)
 	return [total_count, order_list]
 
 
@@ -111,17 +138,21 @@ def get_commission_list(**kwargs):
 		else:
 			currency = "₹"
 		start = (int(kwargs.get('page_no'))-1)*int(kwargs.get('page_len'))
-		transaction = frappe.db.sql('''SELECT order_id 
-									FROM `tabWallet Transaction`
-									WHERE docstatus = 1
-										AND reference = "Order"
-										AND order_type = "Order"
-										AND is_settlement_paid = 1 
-										AND is_fund_added = 0
-										AND transaction_type = "Receive"
-										AND party = %s 
-          							ORDER BY creation desc
-								''',kwargs.get('user'),as_dict=1)
+		
+		WalletTransaction = DocType('Wallet Transaction')
+		query = (
+			frappe.qb.from_(WalletTransaction)
+			.select(WalletTransaction.order_id)
+			.where(WalletTransaction.docstatus == 1)
+			.where(WalletTransaction.reference == "Order")
+			.where(WalletTransaction.order_type == "Order")
+			.where(WalletTransaction.is_settlement_paid == 1)
+			.where(WalletTransaction.is_fund_added == 0)
+			.where(WalletTransaction.transaction_type == "Receive")
+			.where(WalletTransaction.party == kwargs.get('user'))
+			.orderby(WalletTransaction.creation, order=Order.desc)
+		)
+		transaction = query.run(as_dict=True)
 		if transaction:
 			order_trans = ", ".join(['"' + i['order_id'] + '"' for i in transaction])
 		data = total_and_order_list(start, **kwargs)
@@ -129,99 +160,147 @@ def get_commission_list(**kwargs):
 		order_list = data[1]
 		return {'orders':order_list,
 				'count':total_count[0].count,
-    			"currency":currency}
+				"currency":currency}
 	except Exception:
 		frappe.log_error(frappe.get_traceback(), "wallet.get_commission_list")
 
 def counter_play(start_count, **kwargs):
-	counterpay_total_count = frappe.db.sql('''SELECT 
-													ifnull(count(*),0) AS count 
-												FROM `tabWallet Transaction`
-												WHERE docstatus = 1 AND party = %s
-													AND transaction_type = "Receive"
-													AND disabled = 0 
-												ORDER BY creation desc
-											''',kwargs.get('user'),as_dict=1)
-	counterpay_order_list = frappe.db.sql('''SELECT 
-												name, transaction_type as reference,transaction_date,total_value, 
-												amount, status,notes 
-											FROM`tabWallet Transaction` 
-											WHERE docstatus = 1
-												AND party = %s
-												AND transaction_type = "Receive" 
-												AND disabled = 0 
-											ORDER BY creation desc limit {0},{1}
-										'''.format(start_count,int(kwargs.get('counter_page_len'))),
-												kwargs.get('user'),as_dict=1)
+	WalletTransaction = DocType('Wallet Transaction')
+	counterpay_total_count_query = (
+		frappe.qb.from_(WalletTransaction)
+		.select(fn.IfNull(fn.Count('*'), 0).as_('count'))
+		.where(WalletTransaction.docstatus == 1)
+		.where(WalletTransaction.party == kwargs.get('user'))
+		.where(WalletTransaction.transaction_type == "Receive")
+		.where(WalletTransaction.disabled == 0)
+		.orderby(WalletTransaction.creation, order=Order.desc)
+	)
+	counterpay_total_count = counterpay_total_count_query.run(as_dict=True)
+	counterpay_order_list_query = (
+		frappe.qb.from_(WalletTransaction)
+		.select(
+			WalletTransaction.name, 
+			WalletTransaction.transaction_type.as_('reference'),
+			WalletTransaction.transaction_date,
+			WalletTransaction.total_value,
+			WalletTransaction.amount,
+			WalletTransaction.status,
+			WalletTransaction.notes
+		)
+		.where(WalletTransaction.docstatus == 1)
+		.where(WalletTransaction.party == kwargs.get('user'))
+		.where(WalletTransaction.transaction_type == "Receive")
+		.where(WalletTransaction.disabled == 0)
+		.orderby(WalletTransaction.creation, order=Order.desc)
+		.limit(int(kwargs.get('counter_page_len')))
+		.offset(start_count)
+	)
+	counterpay_order_list = counterpay_order_list_query.run(as_dict=True)
 	return [counterpay_total_count,counterpay_order_list]
 
 def get_transactions(start_count, start, **kwargs):
-	total_count = frappe.db.sql('''SELECT 
-										ifnull(count(*),0) as count 
-									FROM `tabWallet Transaction` 
-									WHERE docstatus = 1 
-										AND party = %s
-										AND disabled = 0 
-         							ORDER BY creation desc
-								''',kwargs.get('user'),as_dict=1)
-	order_list = frappe.db.sql('''SELECT 
-										name, transaction_type as reference,transaction_date ,total_value,
-										amount,status, notes 
-									FROM `tabWallet Transaction` 
-									WHERE docstatus = 1 
-										AND party = %s
-										AND transaction_type = "Pay"
-										AND disabled = 0 
-									ORDER BY creation desc 
-									LIMIT {0},{1}
-								'''.format(start,int(kwargs.get('page_len'))),kwargs.get('user'),as_dict=1)
+	WalletTransaction = DocType('Wallet Transaction')
+	total_count_query = (
+		frappe.qb.from_(WalletTransaction)
+		.select(fn.IfNull(fn.Count('*'), 0).as_('count'))
+		.where(WalletTransaction.docstatus == 1)
+		.where(WalletTransaction.party == kwargs.get('user'))
+		.where(WalletTransaction.disabled == 0)
+		.orderby(WalletTransaction.creation, order=Order.desc)
+	)
+	total_count = total_count_query.run(as_dict=True)
+	order_list_query = (
+		frappe.qb.from_(WalletTransaction)
+		.select(
+			WalletTransaction.name,
+			WalletTransaction.transaction_type.as_('reference'),
+			WalletTransaction.transaction_date,
+			WalletTransaction.total_value,
+			WalletTransaction.amount,
+			WalletTransaction.status,
+			WalletTransaction.notes
+		)
+		.where(WalletTransaction.docstatus == 1)
+		.where(WalletTransaction.party == kwargs.get('user'))
+		.where(WalletTransaction.transaction_type == "Pay")
+		.where(WalletTransaction.disabled == 0)
+		.orderby(WalletTransaction.creation, order=Order.desc)
+		.limit(int(kwargs.get('page_len')))
+		.offset(start)
+	)
+	order_list = order_list_query.run(as_dict=True)
 	data = counter_play(start_count, **kwargs)
 	counterpay_total_count = data[0]
 	counterpay_order_list = data[1]
 	return total_count,order_list,counterpay_total_count,counterpay_order_list
 
 def get_transactions_not_proiv(start_count, start, **kwargs):
-	total_count = frappe.db.sql(f'''SELECT IFNULL(COUNT(*), 0) AS count
-									FROM `tabWallet Transaction`
-									WHERE docstatus = 1
-									AND party = %s
-									AND transaction_type = "Pay"
-									AND disabled = 0
-									ORDER BY creation DESC
-									''',kwargs.get('user'),as_dict=1)
+	WalletTransaction = DocType('Wallet Transaction')
+	total_count_query = (
+		frappe.qb.from_(WalletTransaction)
+		.select(fn.IfNull(fn.Count('*'), 0).as_('count'))
+		.where(WalletTransaction.docstatus == 1)
+		.where(WalletTransaction.party == kwargs.get('user'))
+		.where(WalletTransaction.transaction_type == "Pay")
+		.where(WalletTransaction.disabled == 0)
+		.orderby(WalletTransaction.creation, order=Order.desc)
+	)
+	total_count = total_count_query.run(as_dict=True)
 
-	order_list = frappe.db.sql(f""" SELECT name, transaction_type AS reference, transaction_date, 
-										total_value, amount, status, notes 
-									FROM `tabWallet Transaction` 
-									WHERE docstatus = 1 
-										AND party = %(user)s 
-										AND transaction_type = "Pay" 
-										AND disabled = 0 
-									ORDER BY creation DESC 
-									LIMIT %(start)s, %(page_len)s
-								""", {'user': kwargs.get('user'), 'start': start, 'page_len': int(kwargs.get('page_len'))}, as_dict=True)
+	order_list_query = (
+		frappe.qb.from_(WalletTransaction)
+		.select(
+			WalletTransaction.name,
+			WalletTransaction.transaction_type.as_('reference'),
+			WalletTransaction.transaction_date,
+			WalletTransaction.total_value,
+			WalletTransaction.amount,
+			WalletTransaction.status,
+			WalletTransaction.notes
+		)
+		.where(WalletTransaction.docstatus == 1)
+		.where(WalletTransaction.party == kwargs.get('user'))
+		.where(WalletTransaction.transaction_type == "Pay")
+		.where(WalletTransaction.disabled == 0)
+		.orderby(WalletTransaction.creation, order=Order.desc)
+		.limit(int(kwargs.get('page_len')))
+		.offset(start)
+	)
 
-	counterpay_total_count = frappe.db.sql(f""" SELECT IFNULL(COUNT(*), 0) AS count
-												FROM `tabWallet Transaction`
-												WHERE docstatus = 1
-													AND party = %(user)s
-													AND transaction_type = "Pay"
-													AND disabled = 0
-												ORDER BY creation DESC
-											""", {'user': kwargs.get('user')}, as_dict=True)
+	order_list = order_list_query.run(as_dict=True)
 
-	counterpay_order_list = frappe.db.sql(f"""	SELECT name, transaction_type AS reference, 
-													transaction_date, total_value, amount, status, notes 
-												FROM `tabWallet Transaction` 
-												WHERE docstatus = 1 
-													AND party = %(user)s 
-													AND transaction_type = "Pay" 
-													AND disabled = 0 
-												ORDER BY creation DESC 
-												LIMIT %(start_count)s, %(counter_page_len)s
-											""",{'user': kwargs.get('user'), 'start_count': start_count,
-													'counter_page_len': int(kwargs.get('counter_page_len'))}, 
-													as_dict=True)
+	counterpay_total_count_query = (
+		frappe.qb.from_(WalletTransaction)
+		.select(fn.IfNull(fn.Count('*'), 0).as_('count'))
+		.where(WalletTransaction.docstatus == 1)
+		.where(WalletTransaction.party == kwargs.get('user'))
+		.where(WalletTransaction.transaction_type == "Pay")
+		.where(WalletTransaction.disabled == 0)
+		.orderby(WalletTransaction.creation, order=Order.desc)
+	)
+	counterpay_total_count = counterpay_total_count_query.run(as_dict=True)
+
+	counterpay_order_list_query = (
+		frappe.qb.from_(WalletTransaction)
+		.select(
+			WalletTransaction.name,
+			WalletTransaction.transaction_type.as_('reference'),
+			WalletTransaction.transaction_date,
+			WalletTransaction.total_value,
+			WalletTransaction.amount,
+			WalletTransaction.status,
+			WalletTransaction.notes
+		)
+		.where(WalletTransaction.docstatus == 1)
+		.where(WalletTransaction.party == kwargs.get('user'))
+		.where(WalletTransaction.transaction_type == "Pay")
+		.where(WalletTransaction.disabled == 0)
+		.orderby(WalletTransaction.creation, order=Order.desc)
+		.limit(int(kwargs.get('counter_page_len')))
+		.offset(start_count)
+	)
+
+	counterpay_order_list = counterpay_order_list_query.run(as_dict=True)
 
 	return [total_count,order_list,counterpay_total_count,counterpay_order_list]
 
@@ -237,31 +316,37 @@ def get_transaction_history(**kwargs):
 		start = (int(kwargs.get('page_no'))-1)*int(kwargs.get('page_len'))
 		start_count = (int(kwargs.get('counter_page_no'))-1)*int(kwargs.get('counter_page_len'))
 		if kwargs.get('user') != "Service Provider":
-			transaction = frappe.db.sql(''' SELECT order_id 
-											FROM `tabWallet Transaction`
-											WHERE docstatus = 1
-												AND type = "Business"
-												AND reference = "Order" 
-												AND order_type = "Order"
-												AND party = %s
-												AND transaction_type = "Pay"
-												AND disabled = 0 
-											ORDER BY creation desc
-							   			''',kwargs.get('user'),as_dict = 1)
+			WalletTransaction = DocType('Wallet Transaction')
+			transaction_query = (
+				frappe.qb.from_(WalletTransaction)
+				.select(WalletTransaction.order_id)
+				.where(WalletTransaction.docstatus == 1)
+				.where(WalletTransaction.type == "Business")
+				.where(WalletTransaction.reference == "Order")
+				.where(WalletTransaction.order_type == "Order")
+				.where(WalletTransaction.party == kwargs.get('user'))
+				.where(WalletTransaction.transaction_type == "Pay")
+				.where(WalletTransaction.disabled == 0)
+				.orderby(WalletTransaction.creation, order=Order.desc)
+			)
+			transaction = transaction_query.run(as_dict=True)
 			if transaction:
 				order_trans = ", ".join(['"' + i['order_id'] + '"' for i in transaction])
 			get_transactions(start_count,start, **kwargs)
 		else:
-			transaction = frappe.db.sql('''SELECT order_id 
-											FROM `tabWallet Transaction` 
-											WHERE docstatus = 1
-												AND reference = "Order"
-												AND order_type = "Order"
-												AND type = %s
-												AND transaction_type = "Pay"
-												AND disabled = 0 
-											ORDER BY creation desc
-							   			''',kwargs.get('user'),as_dict = 1)
+			WalletTransaction = DocType('Wallet Transaction')
+			transaction_query = (
+				frappe.qb.from_(WalletTransaction)
+				.select(WalletTransaction.order_id)
+				.where(WalletTransaction.docstatus == 1)
+				.where(WalletTransaction.reference == "Order")
+				.where(WalletTransaction.order_type == "Order")
+				.where(WalletTransaction.type == kwargs.get('user'))
+				.where(WalletTransaction.transaction_type == "Pay")
+				.where(WalletTransaction.disabled == 0)
+				.orderby(WalletTransaction.creation, order=Order.desc)
+			)
+			transaction = transaction_query.run(as_dict=True)
 			if transaction:
 				order_trans = ", ".join(['"' + i['order_id'] + '"' for i in transaction])
 		data = get_transactions_not_proiv(start_count, start, **kwargs)
@@ -313,14 +398,17 @@ def add_fund_to_wallet(source_name):
 	default_currency = get_settings("Catalog Settings")
 	if source_name:
 		source = frappe.get_all("Wallet",fields = ["*"],filters = {"name":source_name})[0]
-	transaction = frappe.db.sql(f'''SELECT order_id,amount,total_value,name 
-									FROM `tabWallet Transaction` 
-									WHERE is_settlement_paid=0
-										AND transaction_type="Receive"
-										AND status="Pending"
-										AND party=%s 
-									ORDER BY creation desc
-							 	''',source.user,as_dict=1)
+	WalletTransaction = DocType('Wallet Transaction')
+	transaction_query = (
+		frappe.qb.from_(WalletTransaction)
+		.select(WalletTransaction.order_id, WalletTransaction.amount, WalletTransaction.total_value, WalletTransaction.name)
+		.where(WalletTransaction.is_settlement_paid == 0)
+		.where(WalletTransaction.transaction_type == "Receive")
+		.where(WalletTransaction.status == "Pending")
+		.where(WalletTransaction.party == source.user)
+		.orderby(WalletTransaction.creation, order=Order.desc)
+	)
+	transaction = transaction_query.run(as_dict=True)
 	for trans in transaction:
 		wallet_entry = frappe.get_doc("Wallet Transaction",trans.name)
 		wallet_entry.status="Approved"
@@ -329,61 +417,86 @@ def add_fund_to_wallet(source_name):
 
 
 def get_if_not_provider(source, vendor):
-    for n in source:
-        n.to_be_received = frappe.db.sql('''SELECT  IFNULL(sum(amount),0) AS amount  
-                                            FROM `tabWallet Transaction` 
-                                            WHERE party = %s 
-												AND transaction_type = "Receive" 
-												AND status = "Pending"
-                                        ''', vendor, as_dict = 1)[0].amount
-        n.claimed_amount = frappe.db.sql('''SELECT IFNULL(sum(amount),0) AS amount 
-                                            FROM `tabWallet Transaction` 
-                                            WHERE party = %s 
-												AND transaction_type = "Receive" 
-												AND status = "Approved"
-                                        ''', vendor, as_dict = 1)[0].amount
-        n.total_amount = frappe.db.sql('''SELECT IFNULL(sum(amount),0) AS amount 
-                                            FROM `tabWallet Transaction` 
-                                            WHERE party = %s 
-                                            	AND transaction_type = "Receive"
-                                        ''', vendor, as_dict = 1)[0].amount
-    return source
+	for n in source:
+		WalletTransaction = DocType('Wallet Transaction')
+		to_be_received_query = (
+			frappe.qb.from_(WalletTransaction)
+			.select(Function('IFNULL', Function('SUM', WalletTransaction.amount), 0).as_('amount'))
+			.where(WalletTransaction.party == vendor)
+			.where(WalletTransaction.transaction_type == "Receive")
+			.where(WalletTransaction.status == "Pending")
+		)
+
+		n.to_be_received = to_be_received_query.run(as_dict=True)[0].amount
+		claimed_amount_query = (
+			frappe.qb.from_(WalletTransaction)
+			.select(Function('IFNULL', Function('SUM', WalletTransaction.amount), 0).as_('amount'))
+			.where(WalletTransaction.party == vendor)
+			.where(WalletTransaction.transaction_type == "Receive")
+			.where(WalletTransaction.status == "Approved")
+		)
+
+		n.claimed_amount = claimed_amount_query.run(as_dict=True)[0].amount
+		total_amount_query = (
+			frappe.qb.from_(WalletTransaction)
+			.select(Function('IFNULL', Function('SUM', WalletTransaction.amount), 0).as_('amount'))
+			.where(WalletTransaction.party == vendor)
+			.where(WalletTransaction.transaction_type == "Receive")
+		)
+
+		n.total_amount = total_amount_query.run(as_dict=True)[0].amount
+	return source
 
 
 def get_if_provider(source, vendor):
 	for n in source:
-		n.to_be_received = frappe.db.sql('''SELECT IFNULL(sum(amount),0) AS amount  
-											FROM `tabWallet Transaction` 
-											WHERE type = %s 
-											AND transaction_type = "Receive" 
-											AND status = "Pending"
-										''',vendor,as_dict = 1) [0].amount
-		n.climed_amount= frappe.db.sql('''SELECT IFNULL(sum(amount),0) AS amount 
-											FROM `tabWallet Transaction` 
-											WHERE type = %s 
-											AND transaction_type = "Receive" 
-											AND (status = "Approved" OR status = "Credited")
-										''',vendor,as_dict = 1)[0].amount
-		n.total_amount=frappe.db.sql('''SELECT IFNULL(sum(amount),0) AS amount 
-										FROM `tabWallet Transaction` 
-										WHERE type = %s 
-										AND transaction_type = "Receive"
-									''',vendor,as_dict = 1)[0].amount
+		WalletTransaction = DocType('Wallet Transaction')
+		to_be_received_query = (
+			frappe.qb.from_(WalletTransaction)
+			.select(Function('IFNULL', Function('SUM', WalletTransaction.amount), 0).as_('amount'))
+			.where(WalletTransaction.type == vendor)
+			.where(WalletTransaction.transaction_type == "Receive")
+			.where(WalletTransaction.status == "Pending")
+		)
+		n.to_be_received = to_be_received_query.run(as_dict=True)[0].amount
+
+		claimed_amount_query = (
+			frappe.qb.from_(WalletTransaction)
+			.select(Function('IFNULL', Function('SUM', WalletTransaction.amount), 0).as_('amount'))
+			.where(WalletTransaction.type == vendor)
+			.where(WalletTransaction.transaction_type == "Receive")
+			.where(WalletTransaction.status.isin(["Approved", "Credited"]))
+		)
+		n.claimed_amount = claimed_amount_query.run(as_dict=True)[0].amount
+
+		total_amount_query = (
+			frappe.qb.from_(WalletTransaction)
+			.select(Function('IFNULL', Function('SUM', WalletTransaction.amount), 0).as_('amount'))
+			.where(WalletTransaction.type == vendor)
+			.where(WalletTransaction.transaction_type == "Receive")
+		)
+		n.total_amount = total_amount_query.run(as_dict=True)[0].amount
 	return source
 
 
 def get_counter_apy_counters(vendor):
 	if vendor!="Service Provider":
-		source = frappe.db.sql(""" SELECT user_type, user, name1 AS user_name 
-									FROM`tabWallet`
-									WHERE user = %s
-								""", vendor, as_dict = 1)
+		Wallet = DocType('Wallet')
+		source_query = (
+			frappe.qb.from_(Wallet)
+			.select(Wallet.user_type, Wallet.user, Wallet.name1.as_('user_name'))
+			.where(Wallet.user == vendor)
+		)
+		source = source_query.run(as_dict=True)
 		return get_if_not_provider(source, vendor)
 	else:
-		source = frappe.db.sql(""" SELECT user_type, user, name1 AS user_name 
-									FROM `tabWallet` 
-									WHERE user = %s
-						 		""", vendor, as_dict = 1)
+		Wallet = DocType('Wallet')
+		source_query = (
+			frappe.qb.from_(Wallet)
+			.select(Wallet.user_type, Wallet.user, Wallet.name1.as_('user_name'))
+			.where(Wallet.user == vendor)
+		)
+		source = source_query.run(as_dict=True)
 		return get_if_provider(source, vendor)
 
 @frappe.whitelist()
@@ -394,38 +507,67 @@ def get_wallet_settings():
 def total_counter_graph_options(common_filters = [], ignore_permissions = True, count = 100):
 	dash = get_dash_value()
 	chart_options={}
-	label=frappe.db.sql_list("""SELECT A.dt
-								FROM (SELECT DATE_ADD('{from_date}', 
-						  			INTERVAL @rownum := @rownum + 1 DAY) AS dt 
-								FROM `tab{doctype}` 
-						  		JOIN (SELECT @rownum := -1) r) A
-								LEFT JOIN `tab{doctype}` O ON O.creation = A.dt 
-						  		WHERE A.dt <= '{to_date}' 
-						  		GROUP BY A.dt
-							""".format(doctype = dash['reference_doctype'],
-								  from_date=add_to_date(nowdate(),days = -7),to_date = nowdate()))
+	doctype = DocType(dash['reference_doctype'])
+	from_date = add_to_date(nowdate(), days=-7)
+	to_date = nowdate()
+	query = (
+		frappe.qb.from_(
+			frappe.qb.from_(
+				frappe.qb.select(
+					Function('DATE_ADD', from_date, Function('INTERVAL', frappe.qb.field('rownum') + 1, 'DAY')).as_('dt')
+				)
+				.from_(frappe.qb.from_('tab{doctype}'))
+				.join(frappe.qb.select(Function('@rownum := -1')).as_('r'))
+			).as_('A')
+			.left_join(doctype).on(doctype.creation == 'A.dt')
+			.select('A.dt')
+			.where('A.dt <= %(to_date)s')
+			.groupby('A.dt')
+		).format(doctype=doctype, from_date=from_date, to_date=to_date)
+	)
+	label = query.run(as_dict=True)
 	labels=[]
 	values=[]
 	if count>0 and len(label)>0:
-		check_data = frappe.db.sql('''SELECT name 
-									FROM `tab{doctype}` 
-									WHERE date(creation) between "{start_date}" 
-										AND "{end_date}"
-								'''.format(doctype = dash['reference_doctype'],
-											start_date = label[0],end_date = label[len(label)-1]))
+		doctype = DocType(dash['reference_doctype'])
+		start_date = label[0]
+		end_date = label[-1]
+		query = (
+			frappe.qb.from_(doctype)
+			.select('name')
+			.where(
+				Field('creation').date() >= start_date,
+				Field('creation').date() <= end_date
+			)
+		)
+		check_data = query.run(as_dict=True)
 		if not check_data:
-			lists = frappe.db.sql_list("""SELECT date(creation)
-										FROM `tab{doctype}` ORDER BY creation desc limit 1
-									""".format(doctype = dash['reference_doctype']))										
-			label = frappe.db.sql_list("""SELECT A.dt
-										FROM (SELECT DATE_ADD('{from_date}', 
-											INTERVAL @rownum := @rownum + 1 DAY) AS dt 
-										FROM `tab{doctype}` 
-										JOIN (SELECT @rownum := -1) r) A
-										LEFT JOIN `tab{doctype}` O ON O.creation = A.dt WHERE A.dt <= '{to_date}' 
-										GROUP BY A.dt
-									""".format(doctype = dash['reference_doctype'],
-												from_date = add_to_date(lists[0],days = -7),to_date = lists[0]))
+			doctype = DocType(dash['reference_doctype'])
+			latest_date_query = (
+				frappe.qb.from_(doctype)
+				.select(Field('creation').date())
+				.orderby(Field('creation').desc())
+				.limit(1)
+			)
+			lists = latest_date_query.run(as_dict=True)[0].get('creation')
+
+			from_date = add_to_date(latest_date, days=-7)
+			to_date = latest_date
+			date_range_query = (
+				frappe.qb.from_(
+					frappe.qb.from_(doctype)
+					.select(
+						Function('DATE_ADD', from_date, Function('INTERVAL', Function('@rownum := @rownum + 1 DAY'))).as_('dt')
+					)
+					.join(frappe.qb.from_(doctype).select().limit(1).as_('r'))
+				)
+				.left_join(doctype)
+				.on(Field('creation') == Field('dt'))
+				.select('dt')
+				.where(Field('dt') <= to_date)
+				.groupby('dt')
+			)
+			label = date_range_query.run(as_dict=True)
 	for item in label:
 		counter_filter = []
 		dt = getdate(item)

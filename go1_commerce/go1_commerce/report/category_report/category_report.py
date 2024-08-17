@@ -2,6 +2,7 @@
 # For license information, please see license.txt
 
 import frappe
+from frappe.query_builder import DocType, Field
 
 def execute(filters=None):
 	columns, data = get_columns(), get_data()
@@ -19,21 +20,48 @@ def get_columns():
 
 def get_data():
 	cat_data = []
-	categories = frappe.db.sql(""" SELECT name , category_name FROM `tabProduct Category` 
-								   WHERE is_active=1 AND 
-								 (parent_product_category IS NULL OR parent_product_category='')	
-							     ORDER BY category_name """,as_dict=1)
+	# categories = frappe.db.sql(""" SELECT name , category_name FROM `tabProduct Category` 
+	# 							   WHERE is_active=1 AND 
+	# 							 (parent_product_category IS NULL OR parent_product_category='')	
+	# 						     ORDER BY category_name """,as_dict=1)
+	# for x in categories:
+	# 	sub_categories = frappe.db.sql(""" SELECT name , category_name FROM `tabProduct Category` 
+	# 							   WHERE is_active=1 AND 
+	# 							 (parent_product_category =%(category_id)s)	 ORDER BY category_name 
+	# 						  """,{"category_id":x.name},as_dict=1)
+	ProductCategory = DocType('Product Category')
+	categories = (
+		frappe.qb.from_(ProductCategory)
+		.select(ProductCategory.name, ProductCategory.category_name)
+		.where(ProductCategory.is_active == 1)
+		.where((ProductCategory.parent_product_category.isnull() |
+				ProductCategory.parent_product_category == ''))
+		.orderby(ProductCategory.category_name)
+		.run(as_dict=True)
+	)
+
 	for x in categories:
-		sub_categories = frappe.db.sql(""" SELECT name , category_name FROM `tabProduct Category` 
-								   WHERE is_active=1 AND 
-								 (parent_product_category =%(category_id)s)	 ORDER BY category_name 
-							  """,{"category_id":x.name},as_dict=1)
+		# Fetch sub-categories
+		sub_categories = (
+			frappe.qb.from_(ProductCategory)
+			.select(ProductCategory.name, ProductCategory.category_name)
+			.where(ProductCategory.is_active == 1)
+			.where(ProductCategory.parent_product_category == x['name'])
+			.orderby(ProductCategory.category_name)
+			.run(as_dict=True)
+		)
 		if sub_categories:
 			for s in sub_categories:
-				sub_sub_categories = frappe.db.sql(""" SELECT name , category_name FROM `tabProduct Category` 
-								   WHERE is_active=1 AND 
-								 (parent_product_category =%(category_id)s)	 ORDER BY category_name 
-							  """,{"category_id":s.name},as_dict=1)
+				ProductCategory = DocType('Product Category')
+				sub_sub_categories = (
+					frappe.qb.from_(ProductCategory)
+					.select(ProductCategory.name, ProductCategory.category_name)
+					.where(ProductCategory.is_active == 1)
+					.where(ProductCategory.parent_product_category == s['name'])
+					.orderby(ProductCategory.category_name)
+					.run(as_dict=True)
+				)
+				
 				if sub_sub_categories:
 					for ss in sub_sub_categories:
 						cat_data.append({

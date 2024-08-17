@@ -4,6 +4,7 @@
 from __future__ import unicode_literals
 import frappe
 from frappe import _
+from frappe.query_builder import DocType, Field, functions as fn
 
 month_list = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 
@@ -44,10 +45,9 @@ def get_columns():
 
 def get_data(filters):
 	data = []
-	condition = ' and year(posting_date) = "%s"' % filters.get('year')
 	
-	income_entries = frappe.db.sql('''select monthname(posting_date) as month, sum(paid_amount) as amount from `tabPayment Entry` where docstatus = 1 and payment_type = "Receive" {} group by monthname(posting_date)'''.format(condition), as_dict=1)
-	expense_entries = frappe.db.sql('''select monthname(posting_date) as month, sum(paid_amount) as amount from `tabPayment Entry` where docstatus = 1 and payment_type = "Pay" {} group by monthname(posting_date)'''.format(condition), as_dict=1)
+	income_entries = get_payment_entries(filters, "Receive")
+	expense_entries = get_payment_entries(filters, "Pay")
 	for item in month_list:
 		income, expense, balance = 0, 0, 0
 		check_income = next((x for x in income_entries if x.month == item), None)
@@ -59,6 +59,27 @@ def get_data(filters):
 		balance = income - expense
 		data.append([item, income, expense, balance])
 	return data
+
+def get_payment_entries(filters, payment_type):
+	PaymentEntry = DocType('Payment Entry')
+	query = (
+		frappe.qb.from_(PaymentEntry)
+		.select(
+			fn.monthname(PaymentEntry.posting_date).as_('month'),
+			fn.sum(PaymentEntry.paid_amount).as_('amount')
+		)
+		.where(PaymentEntry.docstatus == 1)
+		.where(PaymentEntry.payment_type == payment_type)
+	)
+	if filters.get('year'):
+		query.where(
+			Function('YEAR', 'posting_date') == filters.get('year')
+		)
+	query = query.groupby(fn.monthname(PaymentEntry.posting_date))
+	result = query.run(as_dict=True)
+	return result
+
+
 
 def get_chart(data):
 	income_list = [x[1] for x in data]
@@ -86,5 +107,12 @@ def get_chart(data):
 
 @frappe.whitelist()
 def get_year_list():
-	year_list = frappe.db.sql_list('''select distinct year(posting_date) from `tabPayment Entry` order by posting_date desc''')
+	year_list_query = (
+	    frappe.qb.from_("tabPayment Entry")
+	    .select(Function('YEAR', 'posting_date'))
+	    .distinct()
+	    .orderby(Function('YEAR', 'posting_date').desc())
+	)
+	year_list = year_list_query.run(as_dict=True)
+	year_list = [row['YEAR(posting_date)'] for row in year_list]
 	return year_list

@@ -6,6 +6,7 @@ import frappe
 from frappe import _
 from frappe.utils import getdate,nowdate,date_diff,add_to_date
 from datetime import datetime, timedelta
+from frappe.query_builder import DocType, Count, Sum, Function
 
 def execute(filters=None):
 	columns, data = [], []
@@ -133,30 +134,52 @@ def get_columns():
 	return columns
 
 def get_values(filters):
-	conditions = get_conditions(filters)
-	fields_list = ''
-	if "Admin" in frappe.get_roles(frappe.session.user) or "Super Admin" in frappe.get_roles(frappe.session.user):
-		customer_order = frappe.db.sql('''select o.name, o.order_date, 
-		d.driver_name,o.payment_status, o.shipping_method_name, o.payment_method_name, c.full_name,s.provider, 
-			 o.order_subtotal, o.cash_collected_mode, o.origin_type, o.discount,o.shipping_charges,o.total_tax_amount,{field} o.payment_gateway_charges, (case when o.status = "Cancelled" then 0 else o.commission_amt end) as commission_amt, o.total_amount_for_vendor,o.total_amount from 
-			`tabOrder` o left join `tabDrivers` d on d.name = o.driver left join `tabCustomers` c on c.name = o.customer left join `tabUser Social Login` s on s.parent = c.user_id and s.provider != 'frappe' where o.naming_series !="SUB-ORD-" and o.docstatus=1 {condition} '''.format(condition=conditions, field=fields_list),as_dict=1)
-	else:
-		customer_order = frappe.db.sql('''select o.name, o.order_date, d.driver_name, o.status, o.payment_status, o.shipping_method_name, o.payment_method_name, c.full_name,  s.provider,
-			 o.order_subtotal, o.cash_collected_mode, o.origin_type, o.discount,o.shipping_charges,o.total_tax_amount,{field} o.payment_gateway_charges, (case when o.status = "Cancelled" then 0 else o.commission_amt end) as commission_amt, o.total_amount_for_vendor, o.total_amount from 
-			`tabOrder` o left join `tabDrivers` d on d.name = o.driver left join `tabCustomers` c on c.name = o.customer left join `tabUser Social Login` s on s.parent = c.user_id and s.provider != 'frappe' where o.naming_series !="SUB-ORD-" and o.docstatus=1 {condition} group by o.name'''.format(condition=conditions, field=fields_list),as_dict=1)
-	
-	return customer_order
-
-def get_conditions(filters):
-	conditions=''
-	from_date=filters.get('from_date') if filters.get('from_date') else None
-	to_date=filters.get('to_date') if filters.get('to_date') else None
-	if filters.get('status'):
-		conditions+=' and o.status="%s"' % filters.get('status')
-	if from_date and to_date:
-		conditions+='and o.order_date >= "%s"' % from_date
-		conditions+='and o.order_date <= "%s"' % to_date
-	return conditions
+    Order = DocType('Order')
+    Drivers = DocType('Drivers')
+    Customers = DocType('Customers')
+    UserSocialLogin = DocType('User Social Login')
+    
+    conditions = []
+    if filters.get('status'):
+        conditions.append(Order.status == filters.get('status'))
+    if filters.get('from_date') and filters.get('to_date'):
+        conditions.append(Order.order_date >= filters.get('from_date'))
+        conditions.append(Order.order_date <= filters.get('to_date'))
+    query = (
+        frappe.qb.from_(Order)
+        .left_join(Drivers).on(Drivers.name == Order.driver)
+        .left_join(Customers).on(Customers.name == Order.customer)
+        .left_join(UserSocialLogin).on((UserSocialLogin.parent == Customers.user_id) & (UserSocialLogin.provider != 'frappe'))
+        .select(
+            Order.name,
+            Order.order_date,
+            Drivers.driver_name,
+            Order.payment_status,
+            Order.shipping_method_name,
+            Order.payment_method_name,
+            Customers.full_name,
+            UserSocialLogin.provider,
+            Order.order_subtotal,
+            Order.cash_collected_mode,
+            Order.origin_type,
+            Order.discount,
+            Order.shipping_charges,
+            Order.total_tax_amount,
+            Order.payment_gateway_charges,
+            frappe.qb.from_(f'CASE WHEN o.status = "Cancelled" THEN 0 ELSE o.commission_amt END').as_('commission_amt'),
+            Order.total_amount_for_vendor,
+            Order.total_amount
+        )
+        .where(
+            (Order.naming_series != "SUB-ORD-") &
+            (Order.docstatus == 1) &
+            *conditions
+        )
+    )
+    if "Admin" not in frappe.get_roles(frappe.session.user) and "Super Admin" not in frappe.get_roles(frappe.session.user):
+        query = query.groupby(Order.name)
+    customer_order = query.run(as_dict=True)
+    return customer_order
 
 def get_chart_data(filters):
 	status=filters.get('status') if filters.get('status') else None

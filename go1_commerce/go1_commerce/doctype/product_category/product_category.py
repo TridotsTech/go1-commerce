@@ -11,7 +11,7 @@ from frappe.website.utils import clear_cache
 import os,re
 import json
 from frappe import _
-from frappe.query_builder import DocType,Field, Order
+from frappe.query_builder import DocType,Field, Order,Criterion
 
 nsm_parent_field = 'parent_product_category'
 
@@ -228,26 +228,30 @@ def get_parent_product_categories(item_group_name):
 
 def get_child_groups(product_category_name):
 	product_category = frappe.get_doc("Product Category", product_category_name)
-	return frappe.db.sql("""
-							SELECT name
-							FROM `tabProduct Category` 
-							WHERE lft >= %(lft)s 
-							AND rgt <= %(rgt)s
-							AND is_active = 1
-						""", {'lft': product_category.lft, 'rgt': product_category.rgt})
+	ProductCategory = DocType('Product Category')
 
+	category_query = (
+		frappe.qb.from_(ProductCategory)
+		.select(ProductCategory.name)
+		.where((ProductCategory.lft >= product_category.lft) &
+			   (ProductCategory.rgt <= product_category.rgt) &
+			   (ProductCategory.is_active == 1))
+	)
+	return category_query.run(as_dict=True)
 
 
 def get_parent_category(txt):
-	condition=''
+	ProductCategory = DocType('Product Category')
+	query = frappe.qb.from_(ProductCategory).select(
+		ProductCategory.name, ProductCategory.category_name
+	).where(ProductCategory.is_group == 1)
 	if txt:
-		condition += ' and (name like "%{txt}%" or category_name like "%{txt}%")'.format(txt=txt)
-
-	return frappe.db.sql("""
-							SELECT name, category_name 
-							FROM `tabProduct Category` 
-							WHERE is_group = 1 {condition}
-						""".format(condition=condition))
+		search_condition = Criterion.any(
+			ProductCategory.name.like(f"%{txt}%"),
+			ProductCategory.category_name.like(f"%{txt}%")
+		)
+		query = query.where(search_condition)
+	categories = query.run(as_dict=True)
 
 def save_cdn_to_local(org_image,title,size,column_name,id):
 	import base64

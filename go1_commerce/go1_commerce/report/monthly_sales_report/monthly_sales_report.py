@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 import frappe
 from frappe import _
 from datetime import date, timedelta, datetime
+from frappe.query_builder import DocType, Field
 
 def execute(filters=None):
 	columns, data = [], []
@@ -22,13 +23,26 @@ def get_columns():
 	]
 
 def get_data(filters):
-	conditions = ' and year(o.order_date) = "{0}" and monthname(o.order_date) = "{1}"'.format(filters.get('year'), filters.get('month'))
+	Order = DocType('tabOrder')
+	query = frappe.qb.from_(Order) 
+		.select(
+			Order.order_date,
+			frappe.qb.fn.Count(Order.name).as_('count'),
+			frappe.qb.fn.Sum(Order.total_amount).as_('total_amount'),
+			Order.payment_method_name
+		) 
+		.where(
+			(Order.docstatus == 1) &
+			(Order.payment_status == 'Paid') &
+			(frappe.qb.fn.Year(Order.order_date) == filters.get('year')) &
+			(frappe.qb.fn.MonthName(Order.order_date) == filters.get('month'))
+		)
 	if filters.get('from_date'):
-		conditions+=' and o.order_date>="%s"' % filters.get('from_date')
+		query = query.where(Order.order_date >= filters.get('from_date'))
 	if filters.get('to_date'):
-		conditions+=' and o.order_date<="%s"' % filters.get('to_date')
-	data = frappe.db.sql('''select o.order_date, count(o.name), sum(o.total_amount), o.payment_method_name from 
-	`tabOrder` o where o.docstatus = 1 and o.payment_status = 'Paid' {condition} group by o.order_date'''.format(condition=conditions), as_list=1)
+		query = query.where(Order.order_date <= filters.get('to_date'))
+	data = query.groupby(Order.order_date).run(as_dict=True)
+	
 	return data
 
 def days_cur_month(filters):
@@ -62,7 +76,18 @@ def get_chart_data(filters):
 	}
 
 def get_chart_data_source(filters):
-	conditions = ' and year(o.order_date) = "{0}" and monthname(o.order_date) = "{1}"'.format(filters.get('year'), filters.get('month'))
-	data = frappe.db.sql('''select o.order_date, sum(o.total_amount) from 
-		`tabOrder` o where o.docstatus = 1 {condition} group by o.order_date'''.format(condition=conditions), as_list=1)
-	return data
+    Order = DocType('tabOrder')
+    query = frappe.qb.from_(Order) 
+        .select(
+            Order.order_date,
+            frappe.qb.fn.Sum(Order.total_amount).as_('total_amount')
+        ) 
+        .where(
+            (Order.docstatus == 1) &
+            (frappe.qb.fn.Year(Order.order_date) == filters.get('year')) &
+            (frappe.qb.fn.MonthName(Order.order_date) == filters.get('month'))
+        )
+    
+    data = query.groupby(Order.order_date).run(as_dict=True)
+    
+    return data

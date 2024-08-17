@@ -15,14 +15,14 @@ class APILog(Document):
 
 def set_old_logs_as_seen():
 	ApiLog = DocType('API Log')
-	frappe.qb.update(ApiLog)
+	qry=(frappe.qb.update(ApiLog)
 		.set(ApiLog.seen, 1)
 		.where((ApiLog.seen == 0) & (ApiLog.creation < (now() - Interval(days=7))))
-		.run()
-	frappe.qb.from_(ApiLog)
+		.run())
+	qty=(frappe.qb.from_(ApiLog)
 		.delete()
 		.where(ApiLog.creation < (now() - Interval(days=30)))
-		.run()
+		.run())
 
 def clear_api_logs():
 	frappe.only_for('System Manager')

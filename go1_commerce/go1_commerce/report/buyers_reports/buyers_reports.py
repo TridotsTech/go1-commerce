@@ -3,6 +3,7 @@
 
 import frappe
 from frappe import _
+from frappe.query_builder import DocType, Field, Subquery, Function
 
 def execute(filters=None):
 	columns, data = get_columns(), get_datas(filters)
@@ -44,26 +45,57 @@ def get_columns():
 	return col__
 
 def get_datas(filters):
-	
-	query = """
-			SELECT C.name shopify_id,C.first_name first_name,C.last_name last_name,C.email email,
-			C.phone phone,C.creation created,C.modified updated,
-			C.store_front_image store_front_along,C.store_operator_image store_operator,
-			C.store_closeup_image store_closeup,C.business_latitude latitude,
-			C.business_longitude longitude,
-			C.city,C.state,C.country,C.zipcode,C.gst_in gst_number,
-			(CASE WHEN C.route IS NOT NULL THEN C.route ELSE 0 END)route,
-			C.center center_name,C.alternate_phone alternate_phone_number,
-			C.business_landmark land_mark,C.business_zip pincode,
-			C.address address,C.business_type customer_type,C.store_name store_name,
-			CONCAT(C.business_latitude,',',C.business_longitude)shop_location,
-			SA.area_name area,SA.sub_area sub_area,C.business_type center_type,
-			(SELECT COUNT(ORD.customer) FROM `tabOrder` ORD WHERE ORD.customer_email = C.email)orders_count,
-			(SELECT MAX(ORD.name) FROM `tabOrder` ORD WHERE ORD.customer_email = C.email)last_ordered_id
-			FROM `tabCustomers` C
-			INNER JOIN `tabRoute Sub Areas` RSA ON RSA.parent = C.route
-			INNER JOIN `tabSub Area` SA ON SA.sub_area_code = RSA.sub_area
-			GROUP BY C.email
-		"""
-	res = frappe.db.sql(query,as_dict=1)
-	return res
+	customers = DocType("Customers")
+	route_sub_areas = DocType("Route Sub Areas")
+	sub_area = DocType("Sub Area")
+	orders = DocType("Order")
+	orders_count_subquery = (
+		frappe.qb.from_(orders, alias='ORD')
+		.select(orders.customer.count())
+		.where(orders.customer_email == Field("C.email"))
+	)
+	last_ordered_id_subquery = (
+		frappe.qb.from_(orders, alias='ORD')
+		.select(orders.name.max())
+		.where(orders.customer_email == Field("C.email"))
+	)
+	query = (
+		frappe.qb.from_(customers, alias='C')
+		.inner_join(route_sub_areas, alias='RSA', on=route_sub_areas.parent == customers.route)
+		.inner_join(sub_area, alias='SA', on=sub_area.sub_area_code == route_sub_areas.sub_area)
+		.select(
+			customers.name.as_("shopify_id"),
+			customers.first_name.as_("first_name"),
+			customers.last_name.as_("last_name"),
+			customers.email.as_("email"),
+			customers.phone.as_("phone"),
+			customers.creation.as_("created"),
+			customers.modified.as_("updated"),
+			customers.store_front_image.as_("store_front_along"),
+			customers.store_operator_image.as_("store_operator"),
+			customers.store_closeup_image.as_("store_closeup"),
+			customers.business_latitude.as_("latitude"),
+			customers.business_longitude.as_("longitude"),
+			customers.city,
+			customers.state,
+			customers.country,
+			customers.zipcode,
+			customers.gst_in.as_("gst_number"),
+			Function("IFNULL", customers.route, 0).as_("route"),
+			customers.center.as_("center_name"),
+			customers.alternate_phone.as_("alternate_phone_number"),
+			customers.business_landmark.as_("land_mark"),
+			customers.business_zip.as_("pincode"),
+			customers.address,
+			customers.business_type.as_("customer_type"),
+			customers.store_name,
+			Function("CONCAT", customers.business_latitude, ',', customers.business_longitude).as_("shop_location"),
+			sub_area.area_name.as_("area"),
+			sub_area.sub_area.as_("sub_area"),
+			customers.business_type.as_("center_type"),
+			orders_count_subquery.as_("orders_count"),
+			last_ordered_id_subquery.as_("last_ordered_id")
+		)
+		.groupby(customers.email)
+	)
+	result = query.run(as_dict=True)
