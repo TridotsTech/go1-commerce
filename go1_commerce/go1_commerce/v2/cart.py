@@ -7,6 +7,7 @@ from frappe.utils import flt,today
 from datetime import datetime
 from go1_commerce.utils.utils import other_exception,get_customer_from_token
 from go1_commerce.utils.setup import get_settings
+from frappe.query_builder import DocType, Order
 
 class CustomerCart:
 	def insert_guest_customer(self):
@@ -513,7 +514,8 @@ def clear_cartitem():
 		cart = frappe.db.get_value('Shopping Cart',{'customer': customer,
 											'cart_type': 'Shopping Cart'},"name")
 		if cart:
-			frappe.db.sql(f''' DELETE FROM `tabCart Items` WHERE parent= '{cart}' ''')
+			CartItems = DocType("Cart Items")
+			delt = (frappe.qb.from_(CartItems).delete().where(CartItems.parent == cart).run())
 			frappe.db.commit()
 			parent_doc = frappe.get_doc('Shopping Cart', cart)
 			parent_doc.tax = 0
@@ -541,7 +543,7 @@ def get_cart_items(customer_id = None):
 			if frappe.db.get_single_value('Shopping Cart Settings','show_bestsellers_in_shopping_cart') == 1:
 				customer_bought = get_bought_together(customer)
 			return {"status":"success",
-		   			'cart': cart,
+					'cart': cart,
 					'wishlist': wishlist,
 					"you_may_like": customer_bought}
 		else:
@@ -551,23 +553,38 @@ def get_cart_items(customer_id = None):
 		return {"status":"failed","message":"something went wrong"}
 
 def get_items_if_customer_cart_exist(customer_cart):
-	items = frappe.db.sql(f'''
-		SELECT 
-			CI.name,CI.product,CI.product_name AS item,
-			CI.quantity,CI.price,CI.total,CI.product_name,
-			PR.brand AS product_brand,PR.brand_name,
-			CI.is_free_item,CI.is_fl_store_item,
-			CI.attribute_description,CI.attribute_ids,
-			CI.special_instruction,CI.tax_breakup,
-			CI.old_price,PR.route,PR.minimum_order_qty,
-			PR.image
-		FROM 
-			`tabCart Items` CI INNER JOIN `tabProduct` PR 
-				ON PR.name = CI.product
-		WHERE 
-			PR.name = CI.product AND CI.parent = '{customer_cart.name}' 
-		ORDER BY 
-			CI.creation DESC ''', as_dict = 1)
+	CartItems = DocType("Cart Items")
+	Product = DocType("Product")
+	items = (
+		frappe.qb.from_(CartItems)
+		.join(Product)
+		.on(Product.name == CartItems.product)
+		.select(
+			CartItems.name,
+			CartItems.product,
+			CartItems.product_name.as_("item"),
+			CartItems.quantity,
+			CartItems.price,
+			CartItems.total,
+			CartItems.product_name,
+			Product.brand.as_("product_brand"),
+			Product.brand_name,
+			CartItems.is_free_item,
+			CartItems.is_fl_store_item,
+			CartItems.attribute_description,
+			CartItems.attribute_ids,
+			CartItems.special_instruction,
+			CartItems.tax_breakup,
+			CartItems.old_price,
+			Product.route,
+			Product.minimum_order_qty,
+			Product.image,
+		)
+		.where(CartItems.parent == customer_cart.name)
+		.orderby(CartItems.creation, order=Order.desc)
+		.run(as_dict=True)
+	)
+
 	return items
 
 def check_attr_id_in_item(item):
@@ -578,9 +595,14 @@ def check_attr_id_in_item(item):
 			if attr:
 				attr_id_list.append(attr)
 		attr_ids = ','.join(['"' + x + '"' for x in attr_id_list])
-		options = frappe.db.sql(f''' SELECT image_list FROM `tabProduct Attribute Option` 
-										WHERE parent = '{item.product}' AND 
-										name IN ({attr_ids})''',as_dict = 1)
+		ProductAttributeOption = DocType("Product Attribute Option")
+		options = (
+			frappe.qb.from_(ProductAttributeOption)
+			.select(ProductAttributeOption.image_list)
+			.where(ProductAttributeOption.parent == item.product)
+			.where(ProductAttributeOption.name.isin(attr_ids))
+			.run(as_dict=True)
+		)
 		for op in options:
 			if op.image_list:
 				images = json.loads(op.image_list)
