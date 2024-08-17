@@ -3,7 +3,9 @@
 
 import frappe
 from frappe import _
-from frappe.query_builder import DocType, Field, Subquery, Function
+from frappe.query_builder import DocType, Field, Subquery
+from frappe.query_builder import Case
+from frappe.query_builder.functions import IfNull, Count, Concat
 
 def execute(filters=None):
 	columns, data = get_columns(), get_datas(filters)
@@ -50,19 +52,19 @@ def get_datas(filters):
 	sub_area = DocType("Sub Area")
 	orders = DocType("Order")
 	orders_count_subquery = (
-		frappe.qb.from_(orders, alias='ORD')
+		frappe.qb.from_(orders)
 		.select(orders.customer.count())
 		.where(orders.customer_email == Field("C.email"))
 	)
 	last_ordered_id_subquery = (
-		frappe.qb.from_(orders, alias='ORD')
+		frappe.qb.from_(orders)
 		.select(orders.name.max())
 		.where(orders.customer_email == Field("C.email"))
 	)
 	query = (
-		frappe.qb.from_(customers, alias='C')
-		.inner_join(route_sub_areas, alias='RSA', on=route_sub_areas.parent == customers.route)
-		.inner_join(sub_area, alias='SA', on=sub_area.sub_area_code == route_sub_areas.sub_area)
+		frappe.qb.from_(customers)
+		.inner_join(route_sub_areas).on(route_sub_areas.parent == customers.route)
+		.inner_join(sub_area).on(sub_area.sub_area_code == route_sub_areas.sub_area)
 		.select(
 			customers.name.as_("shopify_id"),
 			customers.first_name.as_("first_name"),
@@ -81,7 +83,7 @@ def get_datas(filters):
 			customers.country,
 			customers.zipcode,
 			customers.gst_in.as_("gst_number"),
-			Function("IFNULL", customers.route, 0).as_("route"),
+			IfNull(customers.route, 0).as_("route"),
 			customers.center.as_("center_name"),
 			customers.alternate_phone.as_("alternate_phone_number"),
 			customers.business_landmark.as_("land_mark"),
@@ -89,7 +91,7 @@ def get_datas(filters):
 			customers.address,
 			customers.business_type.as_("customer_type"),
 			customers.store_name,
-			Function("CONCAT", customers.business_latitude, ',', customers.business_longitude).as_("shop_location"),
+			Concat(customers.business_latitude, ',', customers.business_longitude).as_("shop_location"),
 			sub_area.area_name.as_("area"),
 			sub_area.sub_area.as_("sub_area"),
 			customers.business_type.as_("center_type"),

@@ -580,8 +580,8 @@ def validate_birthday_club(customer_id):
 			HasRole = DocType('Has Role')
 			query = (
 				frappe.qb.from_(BirthDayClubMember)
-				.join(Customers, on=Customers.email == BirthDayClubMember.email)
-				.join(HasRole, on=HasRole.parent == BirthDayClubMember.email)
+				.join(Customers).on(Customers.email == BirthDayClubMember.email)
+				.join(HasRole).on(HasRole.parent == BirthDayClubMember.email)
 				.select(
 					BirthDayClubMember.email,
 					BirthDayClubMember.day,
@@ -1002,8 +1002,8 @@ def get_product_discount_attr_items(disc,product,attribute_id,out):
 	Product = DocType('Product')
 	query = (
 		frappe.qb.from_(ProductAttributeOption)
-		.left_join(ProductAttributeMapping, on=ProductAttributeMapping.name == ProductAttributeOption.attribute_id)
-		.left_join(Product, on=Product.name == ProductAttributeMapping.parent)
+		.left_join(ProductAttributeMapping).on(ProductAttributeMapping.name == ProductAttributeOption.attribute_id)
+		.left_join(Product).on(Product.name == ProductAttributeMapping.parent)
 		.select(
 			(frappe.qb.field('IFNULL(O.price_adjustment, 0)') + frappe.qb.field('IFNULL(PDT.price, 0)')).as_('rate'),
 			ProductAttributeOption.option_value,
@@ -1025,7 +1025,7 @@ def get_product_discount_attr_items(disc,product,attribute_id,out):
 			ProductAttributeMapping = DocType('Product Attribute Mapping')
 			query = (
 				frappe.qb.from_(ProductAttributeOption)
-				.left_join(ProductAttributeMapping, on=ProductAttributeMapping.name == ProductAttributeOption.attribute_id)
+				.left_join(ProductAttributeMapping).on(ProductAttributeMapping.name == ProductAttributeOption.attribute_id)
 				.select(
 					ProductAttributeOption.price_adjustment,
 					ProductAttributeOption.option_value,
@@ -1074,7 +1074,7 @@ def check_attr_items(attr_items, item_info, dis_list,disc):
 		ProductAttributeMapping = DocType('Product Attribute Mapping')
 		query = (
 			frappe.qb.from_(ProductAttributeOption)
-			.left_join(ProductAttributeMapping, on=ProductAttributeMapping.name == ProductAttributeOption.attribute_id)
+			.left_join(ProductAttributeMapping).on(ProductAttributeMapping.name == ProductAttributeOption.attribute_id)
 			.select(
 				ProductAttributeOption.price_adjustment,
 				ProductAttributeOption.option_value,
@@ -1105,7 +1105,7 @@ def check_not_attr_items(all_attr, item_info, dis_list, disc):
 			ProductAttributeMapping = DocType('Product Attribute Mapping')
 			query = (
 				frappe.qb.from_(ProductAttributeOption)
-				.left_join(ProductAttributeMapping, on=ProductAttributeMapping.name == ProductAttributeOption.attribute_id)
+				.left_join(ProductAttributeMapping).on(ProductAttributeMapping.name == ProductAttributeOption.attribute_id)
 				.select(
 					ProductAttributeOption.price_adjustment,
 					ProductAttributeOption.option_value,
@@ -1139,8 +1139,8 @@ def get_product_discount_items(discount,dis_list,out):
 		Product = DocType('Product')
 		query = (
 			frappe.qb.from_(ProductAttributeOption)
-			.left_join(ProductAttributeMapping, on=ProductAttributeMapping.name == ProductAttributeOption.attribute_id)
-			.left_join(Product, on=Product.name == ProductAttributeMapping.parent)
+			.left_join(ProductAttributeMapping).on(ProductAttributeMapping.name == ProductAttributeOption.attribute_id)
+			.left_join(Product).on(Product.name == ProductAttributeMapping.parent)
 			.select(
 				(frappe.qb.field('IFNULL(O.price_adjustment, 0)') + frappe.qb.field('IFNULL(PDT.price, 0)')).as_('rate'),
 				ProductAttributeOption.option_value,
@@ -1181,7 +1181,7 @@ def get_product_discount_by_product(discount,product,attribute_id,out):
 			ProductAttributeMapping = DocType('Product Attribute Mapping')
 			query = (
 				frappe.qb.from_(ProductAttributeOption)
-				.left_join(ProductAttributeMapping, on=ProductAttributeMapping.name == ProductAttributeOption.attribute_id)
+				.left_join(ProductAttributeMapping).on(ProductAttributeMapping.name == ProductAttributeOption.attribute_id)
 				.select(
 					ProductAttributeOption.price_adjustment,
 					ProductAttributeOption.option_value,

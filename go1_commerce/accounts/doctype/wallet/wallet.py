@@ -15,6 +15,7 @@ from frappe.utils import now_datetime
 from go1_commerce.utils.setup import get_settings
 current_date = timestamp = now_datetime().strftime(" %Y-%m-%d %H:%M:%S")
 from frappe.query_builder import DocType, Order, functions as fn, Field
+from frappe.query_builder.functions import IfNull, Count, Sum, DateAdd
 
 class Wallet(Document):
 	pass
@@ -40,7 +41,7 @@ def get_all_orders_total_count(**kwargs):
 	WalletTransaction = DocType('Wallet Transaction')
 	query = (
 		frappe.qb.from_(WalletTransaction)
-		.select(fn.IfNull(fn.Count('*'), 0).as_('count'))
+		.select(IfNull(Count('*'), 0).as_('count'))
 		.where(WalletTransaction.docstatus == 1)
 		.where(WalletTransaction.is_settlement_paid == 0)
 		.where(WalletTransaction.party == kwargs.get('user'))
@@ -54,8 +55,8 @@ def get_all_orders_list(start,**kwargs):
 	query = (
 		frappe.qb.from_(WalletTransaction)
 		.select(
-			fn.IfNull(WalletTransaction.order_id, WalletTransaction.name).as_('name'),
-			fn.IfNull(WalletTransaction.reference, '').as_('reference'),
+			IfNull(WalletTransaction.order_id, WalletTransaction.name).as_('name'),
+			IfNull(WalletTransaction.reference, '').as_('reference'),
 			WalletTransaction.total_value,
 			WalletTransaction.amount
 		)
@@ -97,7 +98,7 @@ def total_and_order_list(start, **kwargs):
 	query = (
 		frappe.qb.from_(WalletTransaction)
 		.select(
-			fn.IfNull(fn.Count('*'), 0).as_('count')
+			IfNull(Count('*'), 0).as_('count')
 		)
 		.where(WalletTransaction.docstatus == 1)
 		.where(WalletTransaction.is_settlement_paid == 0)
@@ -111,8 +112,8 @@ def total_and_order_list(start, **kwargs):
 	query = (
 		frappe.qb.from_(WalletTransaction)
 		.select(
-			fn.IfNull(WalletTransaction.order_id, WalletTransaction.name).as_('name'),
-			fn.IfNull(WalletTransaction.reference, '').as_('reference'),
+			IfNull(WalletTransaction.order_id, WalletTransaction.name).as_('name'),
+			IfNull(WalletTransaction.reference, '').as_('reference'),
 			WalletTransaction.total_value,
 			WalletTransaction.amount
 		)
@@ -168,7 +169,7 @@ def counter_play(start_count, **kwargs):
 	WalletTransaction = DocType('Wallet Transaction')
 	counterpay_total_count_query = (
 		frappe.qb.from_(WalletTransaction)
-		.select(fn.IfNull(fn.Count('*'), 0).as_('count'))
+		.select(IfNull(Count('*'), 0).as_('count'))
 		.where(WalletTransaction.docstatus == 1)
 		.where(WalletTransaction.party == kwargs.get('user'))
 		.where(WalletTransaction.transaction_type == "Receive")
@@ -202,7 +203,7 @@ def get_transactions(start_count, start, **kwargs):
 	WalletTransaction = DocType('Wallet Transaction')
 	total_count_query = (
 		frappe.qb.from_(WalletTransaction)
-		.select(fn.IfNull(fn.Count('*'), 0).as_('count'))
+		.select(IfNull(Count('*'), 0).as_('count'))
 		.where(WalletTransaction.docstatus == 1)
 		.where(WalletTransaction.party == kwargs.get('user'))
 		.where(WalletTransaction.disabled == 0)
@@ -238,7 +239,7 @@ def get_transactions_not_proiv(start_count, start, **kwargs):
 	WalletTransaction = DocType('Wallet Transaction')
 	total_count_query = (
 		frappe.qb.from_(WalletTransaction)
-		.select(fn.IfNull(fn.Count('*'), 0).as_('count'))
+		.select(IfNull(Count('*'), 0).as_('count'))
 		.where(WalletTransaction.docstatus == 1)
 		.where(WalletTransaction.party == kwargs.get('user'))
 		.where(WalletTransaction.transaction_type == "Pay")
@@ -271,7 +272,7 @@ def get_transactions_not_proiv(start_count, start, **kwargs):
 
 	counterpay_total_count_query = (
 		frappe.qb.from_(WalletTransaction)
-		.select(fn.IfNull(fn.Count('*'), 0).as_('count'))
+		.select(IfNull(Count('*'), 0).as_('count'))
 		.where(WalletTransaction.docstatus == 1)
 		.where(WalletTransaction.party == kwargs.get('user'))
 		.where(WalletTransaction.transaction_type == "Pay")
@@ -421,7 +422,7 @@ def get_if_not_provider(source, vendor):
 		WalletTransaction = DocType('Wallet Transaction')
 		to_be_received_query = (
 			frappe.qb.from_(WalletTransaction)
-			.select(Function('IFNULL', Function('SUM', WalletTransaction.amount), 0).as_('amount'))
+			.select(IfNull(Sum(WalletTransaction.amount), 0).as_('amount'))
 			.where(WalletTransaction.party == vendor)
 			.where(WalletTransaction.transaction_type == "Receive")
 			.where(WalletTransaction.status == "Pending")
@@ -430,7 +431,7 @@ def get_if_not_provider(source, vendor):
 		n.to_be_received = to_be_received_query.run(as_dict=True)[0].amount
 		claimed_amount_query = (
 			frappe.qb.from_(WalletTransaction)
-			.select(Function('IFNULL', Function('SUM', WalletTransaction.amount), 0).as_('amount'))
+			.select(IfNull(Sum(WalletTransaction.amount), 0).as_('amount'))
 			.where(WalletTransaction.party == vendor)
 			.where(WalletTransaction.transaction_type == "Receive")
 			.where(WalletTransaction.status == "Approved")
@@ -439,7 +440,7 @@ def get_if_not_provider(source, vendor):
 		n.claimed_amount = claimed_amount_query.run(as_dict=True)[0].amount
 		total_amount_query = (
 			frappe.qb.from_(WalletTransaction)
-			.select(Function('IFNULL', Function('SUM', WalletTransaction.amount), 0).as_('amount'))
+			.select(IfNull(Sum(WalletTransaction.amount), 0).as_('amount'))
 			.where(WalletTransaction.party == vendor)
 			.where(WalletTransaction.transaction_type == "Receive")
 		)
@@ -453,7 +454,7 @@ def get_if_provider(source, vendor):
 		WalletTransaction = DocType('Wallet Transaction')
 		to_be_received_query = (
 			frappe.qb.from_(WalletTransaction)
-			.select(Function('IFNULL', Function('SUM', WalletTransaction.amount), 0).as_('amount'))
+			.select(IfNull(Sum(WalletTransaction.amount), 0).as_('amount'))
 			.where(WalletTransaction.type == vendor)
 			.where(WalletTransaction.transaction_type == "Receive")
 			.where(WalletTransaction.status == "Pending")
@@ -462,7 +463,7 @@ def get_if_provider(source, vendor):
 
 		claimed_amount_query = (
 			frappe.qb.from_(WalletTransaction)
-			.select(Function('IFNULL', Function('SUM', WalletTransaction.amount), 0).as_('amount'))
+			.select(IfNull(Sum(WalletTransaction.amount), 0).as_('amount'))
 			.where(WalletTransaction.type == vendor)
 			.where(WalletTransaction.transaction_type == "Receive")
 			.where(WalletTransaction.status.isin(["Approved", "Credited"]))
@@ -471,7 +472,7 @@ def get_if_provider(source, vendor):
 
 		total_amount_query = (
 			frappe.qb.from_(WalletTransaction)
-			.select(Function('IFNULL', Function('SUM', WalletTransaction.amount), 0).as_('amount'))
+			.select(IfNull(Sum(WalletTransaction.amount), 0).as_('amount'))
 			.where(WalletTransaction.type == vendor)
 			.where(WalletTransaction.transaction_type == "Receive")
 		)
@@ -514,7 +515,7 @@ def total_counter_graph_options(common_filters = [], ignore_permissions = True, 
 		frappe.qb.from_(
 			frappe.qb.from_(
 				frappe.qb.select(
-					Function('DATE_ADD', from_date, Function('INTERVAL', frappe.qb.field('rownum') + 1, 'DAY')).as_('dt')
+					DateAdd(from_date, frappe.qb.field('rownum') + 1, 'DAY').as_('dt')
 				)
 				.from_(frappe.qb.from_('tab{doctype}'))
 				.join(frappe.qb.select(Function('@rownum := -1')).as_('r'))
@@ -557,7 +558,7 @@ def total_counter_graph_options(common_filters = [], ignore_permissions = True, 
 				frappe.qb.from_(
 					frappe.qb.from_(doctype)
 					.select(
-						Function('DATE_ADD', from_date, Function('INTERVAL', Function('@rownum := @rownum + 1 DAY'))).as_('dt')
+						DateAdd(from_date, frappe.qb.field('rownum') + 1, 'DAY').as_('dt')
 					)
 					.join(frappe.qb.from_(doctype).select().limit(1).as_('r'))
 				)

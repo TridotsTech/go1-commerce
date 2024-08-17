@@ -12,7 +12,9 @@ from urllib.parse import unquote
 from six import string_types
 from frappe.model.document import Document
 from go1_commerce.utils.setup import get_settings_from_domain
-from frappe.query_builder import DocType, Field, Subquery, Function
+from frappe.query_builder import DocType, Field, Subquery
+from frappe.query_builder import Case
+from frappe.query_builder.functions import IfNull, Count
 
 def execute(filters=None):
 	columns, data = [], []
@@ -27,7 +29,7 @@ def get_data(filters):
 		customers = DocType("Customers")
 		discount_usage_history = DocType("Discount Usage History")
 		subquery = (
-			frappe.qb.from_(discount_usage_history, alias='DU')
+			frappe.qb.from_(discount_usage_history)
 			.select(discount_usage_history.order_id)
 			.where(discount_usage_history.parent == birthday_club_settings.discount_id)
 			.where(discount_usage_history.customer == Field("C.name"))
@@ -36,8 +38,8 @@ def get_data(filters):
 		)
 		
 		query = (
-			frappe.qb.from_(birthday_club_member, alias='M')
-			.inner_join(customers, alias='C', on=birthday_club_member.email == customers.email)
+			frappe.qb.from_(birthday_club_member)
+			.inner_join(customers).on(birthday_club_member.email == customers.email)
 			.select(
 				birthday_club_member.email,
 				birthday_club_member.day,
