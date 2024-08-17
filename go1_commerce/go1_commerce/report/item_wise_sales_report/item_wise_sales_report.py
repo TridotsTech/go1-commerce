@@ -29,35 +29,36 @@ def get_columns():
 	return columns
 
 def get_data(filters):
-    Orders = DocType('Order')
-    OrderItem = DocType('Order Item')
+	Orders = DocType('Order')
+	OrderItem = DocType('Order Item')
 
-    query = frappe.qb.from_(Orders)
-    query = query.inner_join(OrderItem).on(Orders.name == OrderItem.parent)
+	query = frappe.qb.from_(Orders)
+	query = query.inner_join(OrderItem).on(Orders.name == OrderItem.parent)
 
-    conditions = []
-    
-    if filters.get('from_date'):
-        conditions.append(Orders.order_date >= filters.get('from_date'))
-    if filters.get('to_date'):
-        conditions.append(Orders.order_date <= filters.get('to_date'))
+	conditions = []
+	
+	
 
-    query = query.select(
-        Orders.name,
-        Orders.order_date,
-        OrderItem.item,
-        OrderItem.item_name,
-        Orders.customer,
-        Orders.customer_name,
-        Orders.customer_email,
-        Orders.phone,
-        OrderItem.price,
-        OrderItem.quantity
-    ).where(
-        (Orders.docstatus == 1) &
-        (Orders.payment_status == 'Paid') &
-        *conditions
-    ).groupby(Orders.name).orderby(Orders.name, order=Order.desc)
-    data = query.run(as_list=True)
-    return data
+	query = query.select(
+		Orders.name,
+		Orders.order_date,
+		OrderItem.item,
+		OrderItem.item_name,
+		Orders.customer,
+		Orders.customer_name,
+		Orders.customer_email,
+		Orders.phone,
+		OrderItem.price,
+		OrderItem.quantity
+	).where(
+		(Orders.docstatus == 1) &
+		(Orders.payment_status == 'Paid')
+	)
+	if filters.get('from_date'):
+		query.where(Orders.order_date >= filters.get('from_date'))
+	if filters.get('to_date'):
+		query.where(Orders.order_date <= filters.get('to_date'))
+	query.groupby(Orders.name).orderby(Orders.name, order=Order.desc)
+	data = query.run(as_list=True)
+	return data
 

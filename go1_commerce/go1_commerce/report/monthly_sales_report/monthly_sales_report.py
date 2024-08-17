@@ -6,6 +6,8 @@ import frappe
 from frappe import _
 from datetime import date, timedelta, datetime
 from frappe.query_builder import DocType, Field
+from frappe.query_builder.functions import Function
+from frappe.query_builder.functions import IfNull, Count,Sum
 
 def execute(filters=None):
 	columns, data = [], []
@@ -23,20 +25,20 @@ def get_columns():
 	]
 
 def get_data(filters):
-	Order = DocType('tabOrder')
-	query = frappe.qb.from_(Order) 
+	Order = DocType('Order')
+	query = (frappe.qb.from_(Order) 
 		.select(
 			Order.order_date,
-			frappe.qb.fn.Count(Order.name).as_('count'),
-			frappe.qb.fn.Sum(Order.total_amount).as_('total_amount'),
+			Count(Order.name).as_('count'),
+			Sum(Order.total_amount).as_('total_amount'),
 			Order.payment_method_name
 		) 
 		.where(
 			(Order.docstatus == 1) &
 			(Order.payment_status == 'Paid') &
-			(frappe.qb.fn.Year(Order.order_date) == filters.get('year')) &
-			(frappe.qb.fn.MonthName(Order.order_date) == filters.get('month'))
-		)
+			(Function('YEAR',Order.order_date) == filters.get('year')) &
+			(Function('MONTHNAME',Order.order_date) == filters.get('month'))
+		))
 	if filters.get('from_date'):
 		query = query.where(Order.order_date >= filters.get('from_date'))
 	if filters.get('to_date'):
@@ -76,18 +78,18 @@ def get_chart_data(filters):
 	}
 
 def get_chart_data_source(filters):
-    Order = DocType('tabOrder')
-    query = frappe.qb.from_(Order) 
-        .select(
-            Order.order_date,
-            frappe.qb.fn.Sum(Order.total_amount).as_('total_amount')
-        ) 
-        .where(
-            (Order.docstatus == 1) &
-            (frappe.qb.fn.Year(Order.order_date) == filters.get('year')) &
-            (frappe.qb.fn.MonthName(Order.order_date) == filters.get('month'))
-        )
-    
-    data = query.groupby(Order.order_date).run(as_dict=True)
-    
-    return data
+	Order = DocType('Order')
+	query = (frappe.qb.from_(Order) 
+		.select(
+			Order.order_date,
+			Sum(Order.total_amount).as_('total_amount')
+		) 
+		.where(
+			(Order.docstatus == 1) &
+			(Function('YEAR',Order.order_date) == filters.get('year')) &
+			(Function('MONTHNAME',Order.order_date) == filters.get('month'))
+		))
+	
+	data = query.groupby(Order.order_date).run(as_dict=True)
+	
+	return data

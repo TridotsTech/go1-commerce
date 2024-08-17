@@ -4,8 +4,9 @@
 from __future__ import unicode_literals
 import frappe
 from frappe import _
-from frappe.query_builder import DocType
-from frappe.query_builder.functions import Count, Sum, MonthName, StrToDate
+from frappe.query_builder import DocType, Field
+from frappe.query_builder.functions import Count, Sum
+from frappe.query_builder.functions import Function
 
 def execute(filters=None):
 	columns, data = [], []
@@ -26,7 +27,7 @@ def get_data(filters):
 	Order = DocType('Order')
 	conditions = (Order.docstatus == 1) & (Order.payment_status == 'Paid')
 	if filters.get('year'):
-		conditions &= frappe.qb.functions.Year(Order.creation) == filters.get('year')
+		conditions &= Function('YEAR', Order.order_date).as_('years')
 	if filters.get('from_date'):
 		conditions &= Order.order_date >= filters.get('from_date')
 	if filters.get('to_date'):
@@ -34,13 +35,13 @@ def get_data(filters):
 	query = (
 		frappe.qb.from_(Order)
 		.select(
-			MonthName(Order.order_date),
+			Function('MONTHNAME', Order.order_date).as_('month'),
 			Count(Order.name),
 			Sum(Order.total_amount),
 			Order.payment_method_name
 		)
 		.where(conditions)
-		.groupby(MonthName(Order.order_date))
+		.groupby(Function('MONTHNAME',Order.order_date))
 		.orderby(Order.creation)
 	)
 	data = query.run(as_list=True)
@@ -66,23 +67,21 @@ def get_chart_data(filters):
 
 def get_chart_data_source(filters):
 	Order = DocType('Order')
-	months = frappe.qb.from_(
-		frappe.qb.union_all(
-			*(frappe.qb.select(frappe.qb.terms.Literal(i).as_('month')) for i in range(1, 13))
-		).as_('m')
-	)
+	months_query = ' UNION ALL '.join(f"SELECT {i} AS month" for i in range(1, 13))
+	months_table = f'({months_query}) AS months'
 	conditions = (Order.docstatus == 1)
 	if filters.get('year'):
-		conditions &= frappe.qb.functions.Year(Order.creation) == filters.get('year')
+		conditions &= Function('YEAR', Order.order_date) == filters.get('year')
 	query = (
-		months.left_join(Order)
-		.on(frappe.qb.functions.Month(Order.order_date) == months.month)
+		frappe.qb.from_(months_table)
+		.left_join(Order)
+		.on(Function('MONTH', Order.order_date) == Field('months.month'))
 		.select(
-			MonthName(StrToDate(months.month, '%m')),
-			Sum(Order.total_amount)
+			Function('MONTHNAME', Function('STR_TO_DATE', Field('months.month'), '%m')).as_('month_name'),
+			Sum(Order.total_amount).as_('total_amount')
 		)
 		.where(conditions)
-		.groupby(months.month)
+		.groupby(Field('months.month'))
 	)
 	data = query.run(as_list=True)
 	return data

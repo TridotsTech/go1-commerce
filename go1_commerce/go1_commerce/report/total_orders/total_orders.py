@@ -9,6 +9,7 @@ from frappe.permissions import has_permission
 from frappe.utils import getdate,nowdate
 from datetime import datetime, timedelta
 from frappe.query_builder import DocType, Field, Order
+from frappe.query_builder.functions import Function
 
 def execute(filters=None):
 	columns, data = [], []
@@ -177,7 +178,7 @@ def get_years():
 	Order = DocType('Order')
 	query = (
 		frappe.qb.from_(Order)
-		.select(frappe.qb.functions.Year(Order.order_date).as_("years"))
+		.select(Function('YEAR', Order.order_date).as_('years'))
 		.distinct()
 		.where(Order.naming_series != "SUB-ORD-")
 	)
