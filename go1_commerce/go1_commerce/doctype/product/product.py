@@ -1857,7 +1857,6 @@ def get_child_groups(item_group_name):
 	return data
 
 
-
 def get_child_categories1(category):
 	try:
 		lft, rgt = frappe.db.get_value('Product Category', category, ['lft', 'rgt'])
@@ -2855,6 +2854,7 @@ def update_whoose_search(self):
 	except Exception:
 		frappe.log_error(title="Error in update product search data",message = frappe.get_traceback())
 
+@frappe.whitelist()
 def delete_combination(dt, dn):
 	frappe.delete_doc(dt, dn)
 	frappe.db.commit()

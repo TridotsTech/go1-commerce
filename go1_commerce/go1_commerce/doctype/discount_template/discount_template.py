@@ -11,6 +11,7 @@ from frappe.query_builder import DocType
 class DiscountTemplate(Document):
 	pass
 
+@frappe.whitelist()
 def get_all_templates():
 	DiscountTemplate = DocType('Discount Template')
 	query = (
@@ -19,6 +20,7 @@ def get_all_templates():
 	)
 	result = query.run(as_dict=True)
 
+@frappe.whitelist()
 def create_discount(template):
 	from frappe.model.mapper import get_mapped_doc
 	doc = get_mapped_doc("Discount Template", template, {
@@ -33,5 +35,6 @@ def create_discount(template):
 	doc.save(ignore_permissions=True)
 	return doc
 
+@frappe.whitelist()
 def get_template_info(name):
 	return frappe.get_doc('Discount Template', name)

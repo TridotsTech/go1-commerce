@@ -648,7 +648,7 @@ def get_all_roles(include=None):
 	active_roles = [row.get("name") for row in roles]
 	return active_roles
 
-
+@frappe.whitelist()
 def make_customers_dashboard(name):
 	try:
 		data = get_order_count(name)
@@ -706,7 +706,7 @@ def get_order_count(name):
 	all_count = len(all_order_list)
 	return [today_orders_count,all_count,source]
 
-
+@frappe.whitelist()
 def get_customer_orders(customer_id):
 	condition = ''
 	dt = 'Order'
@@ -723,12 +723,14 @@ def get_customer_orders(customer_id):
 		)
 		.where(
 			(OrderDoc.customer == customer_id) &
-			(OrderDoc.naming_series != "SUB-ORD-") &
-			(frappe.qb.custom_condition(condition))
+			(OrderDoc.naming_series != "SUB-ORD-")
+			
 		)
 		.orderby(OrderDoc.creation)
 		.limit(10)
 	)
+	if condition:
+		query = query.where(condition)
 	order_detail = query.run(as_dict=True)
 	catalog_settings = get_settings('Catalog Settings')
 	currency=frappe.db.get_all('Currency',fields=["*"], 
@@ -742,7 +744,7 @@ def get_customer_orders(customer_id):
 			'currency':rupee
 			}
 
-
+@frappe.whitelist()
 def get_order_settings():
 	order_settings = get_settings('Order Settings')
 	return order_settings

@@ -766,7 +766,7 @@ def check_delivery_charge_discount(
 	return out
 
 
-
+@frappe.whitelist()
 def save_as_template(discount, title):
 	from frappe.model.mapper import get_mapped_doc
 	doc = get_mapped_doc("Discounts", discount, {
@@ -945,7 +945,7 @@ def update_wallet_transaction(order_info, discount, notes, cashback):
 	return res
 
 
-
+@frappe.whitelist()
 def get_shopping_cart_settings():
 	from go1_commerce.utils.setup import get_settings
 	return get_settings('Shopping Cart Settings')
@@ -953,8 +953,7 @@ def get_shopping_cart_settings():
 
 
 def get_product_attribute(product):
-	from go1_commerce.go1_commerce.doctype.\
-		product.product import get_product_attribute_options
+	from go1_commerce.go1_commerce.doctype.product.product import get_product_attribute_options
 	attributes=frappe.db.get_all('Product Attribute Mapping',
 									filters = {'parent':product},
 									fields = [
