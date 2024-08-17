@@ -1861,7 +1861,7 @@ def get_child_categories1(category):
 	except Exception:
 		frappe.log_error(frappe.get_traceback(), 'Error in api.get_child_categories')
 
-
+@frappe.whitelist()
 def get_category_list(reference_doc, reference_fields, filters=None, page_no=1, page_len=20, 
 													search_txt=None, search_field="name"):
 	reference_field = json.loads(reference_fields)
@@ -1946,7 +1946,7 @@ def get_category_attributes(reference_doc, reference_fields, filters=None,page_n
 							'''.format(condition=condition), as_dict=True)
 	return {"list_name":list_name, "list_len":len(list_len)}
 
-
+@frappe.whitelist()
 def get_returnpolicy_list(reference_doc, reference_fields, filters=None,page_no=1, 
 								page_len=20, search_txt=None, search_field="name"):
 	start = (int(page_no) - 1) * int(page_len)
@@ -1978,7 +1978,7 @@ def get_returnpolicy_list(reference_doc, reference_fields, filters=None,page_no=
 							'''.format(field=fields, dt=reference_doc, cond=condition), as_dict=1)
 	return {"list_name":list_name, "list_len":len(list_len)}
 
-
+@frappe.whitelist()
 def get_specification_list(reference_doc, reference_fields, filters=None,page_no=1, page_len=20, 
 															search_txt=None, search_field="name"):
 	start = (int(page_no) - 1) * int(page_len)
@@ -2010,7 +2010,7 @@ def get_specification_list(reference_doc, reference_fields, filters=None,page_no
 	
 	return {"list_name":list_name, "list_len":len(list_len)}
 
-
+@frappe.whitelist()
 def get_brand_list(reference_doc, reference_fields, filters=None, page_no=1, page_len=20, 
 													search_txt=None, search_field="name"):
 	start = (int(page_no) - 1) * int(page_len)
@@ -2039,7 +2039,7 @@ def get_brand_list(reference_doc, reference_fields, filters=None, page_no=1, pag
 							'''.format(field=fields, dt=reference_doc, cond=condition), as_dict=1)
 	return {"list_name":list_name, "list_len":len(list_len)}
 
-
+@frappe.whitelist()
 def get_recent_products():
 	try:
 		role = frappe.get_roles(frappe.session.user)

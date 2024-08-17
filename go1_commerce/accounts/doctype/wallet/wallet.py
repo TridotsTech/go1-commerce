@@ -304,7 +304,7 @@ def get_transactions_not_proiv(start_count, start, **kwargs):
 
 	return [total_count,order_list,counterpay_total_count,counterpay_order_list]
 
-
+@frappe.whitelist()
 def get_transaction_history(**kwargs):
 	try:
 		condition = 'total_amount <> 0'
@@ -478,7 +478,7 @@ def get_if_provider(source, vendor):
 		n.total_amount = total_amount_query.run(as_dict=True)[0].amount
 	return source
 
-
+@frappe.whitelist()
 def get_counter_apy_counters(vendor):
 	if vendor!="Service Provider":
 		Wallet = DocType('Wallet')
