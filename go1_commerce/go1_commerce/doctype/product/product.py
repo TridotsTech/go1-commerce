@@ -1716,7 +1716,7 @@ def delete_attribute_option_alert(option):
 	else:
 		return "Success"
 
-
+@frappe.whitelist()
 def show_attribute_deletion_err(item, row_id):
 	ProductVariantCombination = DocType('Product Variant Combination')
 	ProductAttributeOption = DocType('Product Attribute Option')
@@ -1744,13 +1744,14 @@ def show_attribute_deletion_err(item, row_id):
 		if attributes:
 			return 'Failed'
 
-
+@frappe.whitelist()
 def check_attr_combination_price(self):
 	if len(self.variant_combination) > 0:
 		for i in self.variant_combination:
 			if flt(i.price)<flt(self.price):
 				frappe.throw("Attribute combination price should be greater than or equal to base price")
 
+@frappe.whitelist()
 def delete_attribute_options(dt, dn):
 	try:
 		doc = frappe.get_doc(dt, dn)
@@ -1779,7 +1780,7 @@ def delete_attribute_options(dt, dn):
 		return {'status': 'Failed'}
 
 
-
+@frappe.whitelist()
 def insert_attribute_option_video(option_id,video_id,video_type):
 	attribute_option_video = frappe.new_doc("Product Attribute Option Video")
 	attribute_option_video.option_id = option_id
@@ -1792,18 +1793,20 @@ def insert_attribute_option_video(option_id,video_id,video_type):
 	if attributeoptions_video:
 		return attributeoptions_video
 	 
+@frappe.whitelist()
 def get_attribute_option_videos(option_id):
 	ProductAttributeOptionVideo = DocType('Product Attribute Option Video')
 	attributeoptions_video = frappe.qb.from_(ProductAttributeOptionVideo).select('*').where(ProductAttributeOptionVideo.option_id == option_id).run(as_dict=True)
 	if attributeoptions_video:
 		return attributeoptions_video
 
-
+@frappe.whitelist()
 def delete_product_attribute_option_video(name):
 	doc = frappe.get_doc('Product Attribute Option Video', name)
 	doc.delete()
 	return {'status': "Success"}
 
+@frappe.whitelist()
 def update_attribute_option_video(name,video_id,option_id,video_type):
 	frappe.db.set_value('Product Attribute Option Video',name,'youtube_video_id',video_id)
 	frappe.db.set_value('Product Attribute Option Video',name,'video_type',video_type)
@@ -1818,14 +1821,14 @@ def update_attribute_option_video(name,video_id,option_id,video_type):
 		return attributeoptions_video
 
 
-   
+@frappe.whitelist()  
 def get_all_category_lists(product_group=None):
 	item_group = frappe.db.get_all("Product Category", fields=["*"], filters={"is_active":1})
 	for n in item_group:
 		child_groups = ", ".join(['"' + frappe.db.escape(i[0]) + '"' for i in get_child_groups(n.name)])
 		parent_category = get_parent_item_groups(n.name)
 		
-
+@frappe.whitelist()
 def get_parent_item_groups(item_group_name):
 	item_group = frappe.get_doc("Product Category", item_group_name)
 	ProductCategory = DocType('Product Category')
@@ -1843,7 +1846,7 @@ def get_parent_item_groups(item_group_name):
 def get_child_groups(item_group_name):
 	item_group = frappe.get_doc("Product Category", item_group_name)
 	ProductCategory = DocType('Product Category')
-	return = (
+	data = (
 		frappe.qb.from_(ProductCategory)
 		.select(ProductCategory.name, ProductCategory.category_name)
 		.where(ProductCategory.lft >= item_group.lft)
@@ -1851,6 +1854,7 @@ def get_child_groups(item_group_name):
 		.where(ProductCategory.is_active == 1)
 		.run(as_dict=True)
 	)
+	return data
 
 
 
