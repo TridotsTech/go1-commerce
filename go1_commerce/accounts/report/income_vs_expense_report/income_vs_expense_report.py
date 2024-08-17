@@ -5,6 +5,8 @@ from __future__ import unicode_literals
 import frappe
 from frappe import _
 from frappe.query_builder import DocType, Field, functions as fn
+from frappe.query_builder.functions import Function
+from frappe.query_builder.functions import Count, Sum
 
 month_list = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 
@@ -65,8 +67,8 @@ def get_payment_entries(filters, payment_type):
 	query = (
 		frappe.qb.from_(PaymentEntry)
 		.select(
-			fn.monthname(PaymentEntry.posting_date).as_('month'),
-			fn.sum(PaymentEntry.paid_amount).as_('amount')
+			Function('MONTHNAME',PaymentEntry.posting_date).as_('month'),
+			Sum(PaymentEntry.paid_amount).as_('amount')
 		)
 		.where(PaymentEntry.docstatus == 1)
 		.where(PaymentEntry.payment_type == payment_type)
@@ -75,7 +77,7 @@ def get_payment_entries(filters, payment_type):
 		query.where(
 			Function('YEAR', 'posting_date') == filters.get('year')
 		)
-	query = query.groupby(fn.monthname(PaymentEntry.posting_date))
+	query = query.groupby(Function('MONTHNAME',PaymentEntry.posting_date))
 	result = query.run(as_dict=True)
 	return result
 

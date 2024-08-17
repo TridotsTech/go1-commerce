@@ -39,7 +39,7 @@ def customer_report(filters):
 			Order.order_date,
 			Order.status,
 			Order.payment_status,
-			(Order.first_name + ' ' + Order.last_name).as_field('customer_name'),
+			(Order.first_name + ' ' + Order.last_name).as_('customer_name'),
 			Order.customer_email,
 			Order.phone,
 			Order.total_amount,
