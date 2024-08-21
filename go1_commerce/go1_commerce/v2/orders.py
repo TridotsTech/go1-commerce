@@ -2664,7 +2664,7 @@ def validate_inventory_method(product,catalog_settings,qty,attributeId,customer)
 				'increment_quantity': 1
 			}
 	else:
-		res = validate_attributes_stock_mob(product.name,attributeId,'',1, add_qty=None,customer=customer)
+		res = validate_attributes_stock(product.name,attributeId,'',1, add_qty=None,customer=customer)
 		if res:
 			if res['status'] == 'Failed':
 				return {
@@ -2759,7 +2759,7 @@ def validate_product_cart_qty_conditions(cart,product,ProductId,attributeId,add_
 					'message': '','increment_quantity': 1
 				}
 		else:
-			res = validate_attributes_stock_mob(product.name, attributeId, '', 1, add_qty = None, 
+			res = validate_attributes_stock(product.name, attributeId, '', 1, add_qty = None, 
 													customer = customer)
 			if res:
 				if res['status'] == 'Failed':
@@ -2838,7 +2838,7 @@ def validate_product_cart_qty_conditions_inventory_method(product,cart_qty,cart_
 							+ ' is :' + str(product.maximum_order_qty)
 					}
 	else:
-		res = validate_attributes_stock_mob(product.name,
+		res = validate_attributes_stock(product.name,
 				cart_items[0].attribute_ids,
 				cart_items[0].attribute_description,
 				cart_qty, add_qty=None,customer=customer)
@@ -2917,7 +2917,7 @@ def validate_product_cart_qty_inventory_method(product,qty,attributeId,customer)
 				'increment_quantity': 1
 			}
 	else:
-		res = validate_attributes_stock_mob(product.name, attributeId, '',1, add_qty = None, 
+		res = validate_attributes_stock(product.name, attributeId, '',1, add_qty = None, 
 												customer = customer)
 		if res:
 			if res['status'] == 'Failed':
@@ -2934,7 +2934,7 @@ def validate_product_cart_qty_inventory_method(product,qty,attributeId,customer)
 
 
 @frappe.whitelist(allow_guest = True)
-def validate_attributes_stock_mob(product, attribute_id, variant_html, cart_qty, add_qty = None, customer = None):
+def validate_attributes_stock(product, attribute_id, variant_html, cart_qty, add_qty = None, customer = None):
 	try:
 		product_info = frappe.get_doc('Product', product)
 		product_price = product_info.price
@@ -2972,7 +2972,7 @@ def validate_attributes_stock_mob(product, attribute_id, variant_html, cart_qty,
 									str(product_info.item.encode('ascii', 'ignore'))
 					}
 	except Exception:
-		frappe.log_error('Error in v2.orders.validate_attributes_stock_mob', frappe.get_traceback())
+		frappe.log_error('Error in v2.orders.validate_attributes_stock', frappe.get_traceback())
 
 
 def _validate_inventory_product_info(qty,check_data,product_info,discount):

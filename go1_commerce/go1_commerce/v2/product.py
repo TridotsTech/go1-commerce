@@ -693,7 +693,7 @@ def product_attributes_data(x,customer,show_attributes):
 					attribute.options = attribute_options(attribute,x,op,count,attribute_ids,customer,
 															has_attr_stock=x.has_attr_stock)
 		if show_attributes==1:
-			from go1_commerce.go1_commerce.v2.cart \
+			from go1_commerce.go1_commerce.v2.orders \
 			import validate_attributes_stock
 			x.variant_price = validate_attributes_stock(x.name,attribute_ids,
 								attribute,x.minimum_order_qty,add_qty=None)
@@ -740,7 +740,7 @@ def attribute_options(attribute,x,op,count,attribute_ids,customer,has_attr_stock
 			op.attr_oldprice = float(op.price_adjustment) + float(x.old_price)
 	if x.inventory_method == 'Track Inventory By Product Attributes':
 		attribute_ids=op.name+'\n'
-		from go1_commerce.go1_commerce.v2.cart import validate_attributes_stock
+		from go1_commerce.go1_commerce.v2.orders import validate_attributes_stock
 		variant_comb = validate_attributes_stock(x.name,attribute_ids,attribute,x.minimum_order_qty,
 													add_qty=None).get('status') == 'True'
 		op.attr_itemprice = float(variant_comb['price'])
@@ -1096,7 +1096,7 @@ def get_product_details_(product, isMobile=0, customer=None, current_category=No
 										op.attr_oldprice = float(op.price_adjustment) + float(x.old_price)
 								if x.inventory_method == 'Track Inventory By Product Attributes':
 									attribute_ids=op.name+'\n'
-									from go1_commerce.go1_commerce.v2.cart \
+									from go1_commerce.go1_commerce.v2.orders \
 																import validate_attributes_stock
 									variant_comb = validate_attributes_stock(x.name,attribute_ids,attribute,x.minimum_order_qty,add_qty=None)
 									if variant_comb:
@@ -1122,7 +1122,7 @@ def get_product_details_(product, isMobile=0, customer=None, current_category=No
 							else:
 								op.images = []
 				if show_attributes==1:
-					from go1_commerce.go1_commerce.v2.cart \
+					from go1_commerce.go1_commerce.v2.orders \
 																import validate_attributes_stock
 					x.variant_price = validate_attributes_stock(x.name,attribute_ids,attribute,x.minimum_order_qty,add_qty=None)
 					x.attribute_price = attribute_price
@@ -1268,8 +1268,9 @@ def get_search_results(search_text, sort_by, page_no, page_size, brands, ratings
 
 		if catalog_settings.enable_full_text_search == 1:
 			from frappe.query_builder.functions import Match
+			search_text_mod = f'+{search_text.replace(" ", "* +")}*'
 			# search_text_mod = ' '.join([f"+{tx}*" for tx in search_text.split()])
-			match_against_condition = Match(Product.search_words).Against(search_text)
+			match_against_condition = Match(Product.search_words).Against(search_text_mod)
 			print(match_against_condition)
 			# match_against_condition = Raw(f"MATCH(P.search_words) AGAINST('{search_text_mod}' IN BOOLEAN MODE)")
 			
