@@ -45,7 +45,7 @@ class TestOrder(unittest.TestCase):
 		order_doc1 = frappe.get_doc("Order", order2).reload()
 
 def make_order( product, customer, shipping_charge, tax, attr, status, shipping_status, payment_status, subtotal_discount, delivery_discount):
-	from go1_commerce.go1_commerce.api import validate_attributes_stock
+	from go1_commerce.go1_commerce.v2.cart import validate_attributes_stock
 	from go1_commerce.go1_commerce.api import get_order_discount, calculate_vendor_based_shipping_charges
 	from go1_commerce.go1_commerce.doctype.discounts.discounts import get_product_discount
 	from go1_commerce.accounts.api import make_payment

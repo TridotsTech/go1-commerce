@@ -49,6 +49,7 @@
   "enable_recently_viewed_products",
   "enable_best_sellers",
   "enable_customers_who_bought",
+  "customers_who_bought",
   "search_settings",
   "enable_full_text_search",
   "column_break_101",
@@ -477,11 +478,17 @@
    "fieldname": "generate_barcode_for_product",
    "fieldtype": "Check",
    "label": "Generate Barcode for Product"
+  },
+  {
+   "default": "0",
+   "fieldname": "customers_who_bought",
+   "fieldtype": "Check",
+   "label": "Customers Who Bought"
   }
  ],
  "issingle": 1,
  "links": [],
- "modified": "2024-08-07 11:43:27.421534",
+ "modified": "2024-08-20 11:20:37.887981",
  "modified_by": "Administrator",
  "module": "Go1 Commerce",
  "name": "Catalog Settings",

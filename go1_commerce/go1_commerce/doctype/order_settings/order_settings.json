@@ -17,10 +17,11 @@
   "allow_cancel_order",
   "allow_customer_print_order",
   "auto_customer_approval",
-  "customer_print_format",
-  "cancel_order_days",
+  "allow_multiple_address",
   "column_break_6",
   "default_print_format",
+  "customer_print_format",
+  "cancel_order_days",
   "invoice_section",
   "enable_invoice",
   "column_break_14",
@@ -769,11 +770,17 @@
    "fieldtype": "Table",
    "label": "IP Address to be blocked",
    "options": "Block IP Address"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_multiple_address",
+   "fieldtype": "Check",
+   "label": "Allow Multiple Address"
   }
  ],
  "issingle": 1,
  "links": [],
- "modified": "2024-08-08 17:26:33.344374",
+ "modified": "2024-08-20 13:44:03.580311",
  "modified_by": "Administrator",
  "module": "Go1 Commerce",
  "name": "Order Settings",

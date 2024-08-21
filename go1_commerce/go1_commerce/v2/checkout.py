@@ -128,8 +128,7 @@ def calculate_shipping_charges(shipping_method,shipping_addr,cart_id):
 		from go1_commerce.utils.setup import get_settings
 		ShippingRateMethod = DocType("Shipping Rate Method")
 		query = (
-			frappe.qb
-			.from_(ShippingRateMethod)
+			frappe.qb.from_(ShippingRateMethod)
 			.select(
 				ShippingRateMethod.name.as_("id"),
 				ShippingRateMethod.shipping_rate_method.as_("shipping_category")
@@ -362,8 +361,7 @@ def get_cart_delivery_slots(shipping_method=None):
 	try:
 		if not shipping_method:
 			shipping_methods = frappe.db.get_all("Shipping Method",filters={"is_deliverable":1,
-																			"show_in_website":1},
-																			order_by="name")
+																			"show_in_website":1},order_by="name")
 			if shipping_methods:
 				shipping_method = shipping_methods[0].name
 		return get_cart_delivery_categories(shipping_method)
@@ -371,6 +369,7 @@ def get_cart_delivery_slots(shipping_method=None):
 		other_exception("Error in v2.checkout.get_shipping_method_with_delivery_slots_for_mobile")
 
 def get_cart_delivery_categories(shipping_method):
+
 	default_delivery_slots = []
 	DeliverySlotShippingMethod = DocType("Delivery Slot Shipping Method")
 	DeliverySetting = DocType("Delivery Setting")
@@ -381,11 +380,13 @@ def get_cart_delivery_categories(shipping_method):
 		.select(DeliverySlotShippingMethod.parent)
 		.where(DeliverySetting.enable == 1)
 	)
+	
 	if shipping_method:
 		query = query.where(DeliverySlotShippingMethod.shipping_method == shipping_method)
 	delivery_list= query.run(as_dict=True)
 	for x in delivery_list:
-		if not frappe.db.get_all("Delivery Slot Category", filters={"parent":x.parent}):
+		slot_cat = frappe.db.get_all("Delivery Slot Category", filters={"parent":x.parent})
+		if not slot_cat:
 			(dates_lists, blocked_day_list) = get_delivery_slots_list(x.parent)
 			x.dates_lists = dates_lists
 			x.blocked_day_list = blocked_day_list

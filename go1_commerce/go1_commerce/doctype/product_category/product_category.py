@@ -95,7 +95,7 @@ class ProductCategory(WebsiteGenerator, NestedSet):
 		self.route += self.scrub(self.category_name)
 	
 	
-
+@frappe.whitelist()
 def get_children(doctype, parent=None, is_root=False):
 	try:
 		if parent == None or parent == "All Categories":
@@ -209,9 +209,7 @@ def get_parent_product_categories(item_group_name):
 	if not item_group_name:
 		return base_parents
 	item_group = frappe.get_doc("Product Category", item_group_name)
-	print(item_group_name)
-	print(item_group.lft)
-	print(item_group.rgt)
+	
 	ProductCategory = DocType('Product Category')
 	res = (
 		frappe.qb.from_(ProductCategory)
@@ -239,19 +237,22 @@ def get_child_groups(product_category_name):
 	)
 	return category_query.run(as_dict=True)
 
-
-def get_parent_category(txt):
-	ProductCategory = DocType('Product Category')
+@frappe.whitelist()
+def get_parent_category(doctype, txt, searchfield, start, page_len, filters):
+	ProductCategory = DocType(doctype)
 	query = frappe.qb.from_(ProductCategory).select(
 		ProductCategory.name, ProductCategory.category_name
 	).where(ProductCategory.is_group == 1)
 	if txt:
-		search_condition = Criterion.any(
-			ProductCategory.name.like(f"%{txt}%"),
+		search_condition = (
+			ProductCategory.name.like(f"%{txt}%") | 
 			ProductCategory.category_name.like(f"%{txt}%")
-		)
+			)
+   
 		query = query.where(search_condition)
-	categories = query.run(as_dict=True)
+	categories = query.run()
+	
+	return categories
 
 def save_cdn_to_local(org_image,title,size,column_name,id):
 	import base64

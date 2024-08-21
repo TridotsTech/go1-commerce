@@ -9,12 +9,20 @@ import pytz
 from six import string_types
 from go1_commerce.utils.setup import get_settings_value,get_settings
 from go1_commerce.go1_commerce.v2.category \
-    import get_parent_categories,get_parent_categorie,get_child_categories
+	import get_parent_categories,get_parent_categorie,get_child_categories
 from go1_commerce.utils.utils import get_customer_from_token, other_exception
+from frappe.query_builder import DocType, Field, Order
+from frappe.query_builder.functions import Count, Sum, Concat
+from frappe.query_builder.functions import Function
 
 try:
 	catalog_settings = get_settings('Catalog Settings')
 	no_of_records_per_page = catalog_settings.no_of_records_per_page
+	Product = DocType('Product')
+	ProductAttributeOption = DocType('Product Attribute Option')
+	ProductCategoryMapping = DocType('Product Category Mapping')
+	ProductCategory = DocType('Product Category')
+	ProductSearchKeyword = DocType('Product Search Keyword')
 except Exception as e:
 	catalog_settings = None
 	no_of_records_per_page = 10
@@ -24,9 +32,7 @@ def get_category_products(category=None, sort_by=None, page_no=1,page_size=no_of
 							brands=None, rating=None,min_price=None, max_price=None,attributes=None,
 							productsid=None,customer=None,route=None):
 	if route:
-		categories = frappe.db.get_value("Product Category",{"route":route},"name")
-		if categories:
-			category = categories
+		category = frappe.db.get_value("Product Category",{"route":route},"name")
 	default_sort_order = get_settings_value('Catalog Settings','default_product_sort_order')
 	sort_order = get_sorted_columns(default_sort_order)
 	if sort_by:
@@ -36,14 +42,6 @@ def get_category_products(category=None, sort_by=None, page_no=1,page_size=no_of
 	if category_products:
 		category_products = get_list_product_details(category_products, customer=customer)
 	return category_products
-
-def get_product_list_columns():
-	return """ P.item, P.price, P.old_price, P.short_description,P.has_variants,
-			P.sku, P.name, P.route, P.inventory_method, P.is_gift_card, P.image AS product_image,
-			P.minimum_order_qty, P.maximum_order_qty, P.disable_add_to_cart_button,P.stock, 
-			P.weight, P.approved_total_reviews,(CONCAT("/pr/",P.route)) AS b_route,P.brand_name AS brand,
-			P.brand_unique_name AS brand_route,P.route,P.brand_name AS product_brand """
-
 
  
 @frappe.whitelist(allow_guest=True)
@@ -453,8 +451,8 @@ def check_user_location_delivery(zipcode,state=None, country=None):
 		param: state: state of customer address
 		param: country: country of customer address'''
 	default_shipping_method = frappe.db.get_all('Shipping Rate Method', 
-                                            	fields=["name", "shipping_rate_method"], 
-                                            	filters={'is_active': 1})
+												fields=["name", "shipping_rate_method"], 
+												filters={'is_active': 1})
 	doctype = None
 	if len(default_shipping_method)>0:
 		frappe.log_error("1",1)
@@ -496,7 +494,7 @@ def check_user_location_delivery(zipcode,state=None, country=None):
 						to_date = add_days(from_date, int(delivery_days))
 						delivery_date = '{0}'.format(to_date.strftime('%a, %b %d'))
 		return {'allow': response, 
-          		'delivery_days': delivery_days, 
+				'delivery_days': delivery_days, 
 				'delivery_date': delivery_date}
 
 def check_city_ziprange(city, zipcode):
@@ -536,7 +534,7 @@ def not_valid_customer():
 
 
 def get_discount_list(today_date):
-    discount_list = frappe.db.sql(f"""  SELECT name 
+	discount_list = frappe.db.sql(f"""  SELECT name 
 										FROM 
 											`tabDiscounts` 
 										WHERE 
@@ -549,7 +547,7 @@ def get_discount_list(today_date):
 											end_date IS NOT NULL 
 											THEN end_date >= "{today_date}"
 										ELSE 1 = 1 END)""",as_dict=1)
-    return discount_list
+	return discount_list
 
 def get_products_info(product, current_category=None):
 	customer = get_customer_from_token()
@@ -744,7 +742,7 @@ def attribute_options(attribute,x,op,count,attribute_ids,customer,has_attr_stock
 		attribute_ids=op.name+'\n'
 		from go1_commerce.go1_commerce.v2.cart import validate_attributes_stock
 		variant_comb = validate_attributes_stock(x.name,attribute_ids,attribute,x.minimum_order_qty,
-                                           			add_qty=None).get('status') == 'True'
+													add_qty=None).get('status') == 'True'
 		op.attr_itemprice = float(variant_comb['price'])
 		op.attr_oldprice = float(variant_comb['old_price'])
 		if variant_comb.get('discount'):
@@ -894,99 +892,52 @@ def product_review_and_video(x):
 	
 
 @frappe.whitelist(allow_guest=True)
-def get_conditions_sort(brands, ratings, sort_by, min_price, max_price,attributes):
-	try:
-		condition = ''
-		if brands:
-			brandarray = brands.split(',')
-			if len(brandarray) > 1:
-				condition += f"""AND P.brand_unique_name IN 
-									("""
-				for b in brandarray:
-					condition += "'"
-					condition += b
-					if not brandarray.index(b) == len(brandarray) - 1:
-						condition += "',"
-					else:
-						condition += "'"
-				condition += ')'
-			else:
-				condition += f""" AND P.brand_unique_name ='{ brandarray[0] }'"""
-		return get_sub_conditions_sort(ratings,sort_by,min_price,max_price,attributes,condition)
-	except Exception:
-		other_exception("Error in v2.product.get_conditions_sort")
-
-
-def get_sub_conditions_sort(ratings,sort_by,min_price,max_price, attributes,condition):
-	sort = ""
-	if ratings:
-		if int(ratings) > 0:
-			condition += ' AND P.approved_total_reviews>=' + str(ratings)
-	if min_price:
-		condition += ' AND PP.price>=' + min_price
-	if max_price:
-		condition += ' AND PP.price<=' + max_price
-	attr_condition = sub_conditions_sort_attributes(attributes)
-	condition += attr_condition
-	if sort_by:
-		if sort_by.lower() == 'modified DESC':
-			sort = 'ORDER BY P.display_order,stock DESC'
-		if sort_by.lower() == 'relevance':
-			sort = ' ORDER BY stock DESC,P.modified DESC'
-		if sort_by.lower() == 'name ASC' or sort_by.lower() == 'name_asc':
-			sort = ' ORDER BY TRIM(P.item) ASC'
-		if sort_by.lower() == 'name DESC' or sort_by.lower() == 'name_desc':
-			sort = ' ORDER BY TRIM(P.item) DESC'
-		if sort_by.lower() == 'price ASC' or sort_by.lower() == 'price_asc':
-			sort = ' ORDER BY price ASC'
-		if sort_by.lower() == 'price DESC' or sort_by.lower() == 'price_desc':
-			sort = ' ORDER BY price  DESC'
-	return (condition, sort)
-
-
-def sub_conditions_sort_attributes(attributes):
-	attr_condition = ""
-	if attributes:
-		if type(attributes) is dict:
-			attr_condition += ' AND P.name IN(SELECT parent \
-								FROM `tabProduct Attribute Option` \
-								WHERE unique_name IN('
-			counter = 0
-			if not counter == 0:
-				attr_condition += ','
-			option_values = attributes['value'].split(',')
-			for option in option_values:
-				attr_condition += "'"
-				attr_condition += option
-				if not option_values.index(option) == len(option_values) - 1:
-					attr_condition += "',"
-				else:
-					attr_condition += "'"
-			counter = counter + 1
-			attr_condition += '))'
+def get_conditions_sort(brands, ratings, sort_by, min_price, max_price, attributes, query):
+	if brands:
+		brand_array = brands.split(',')
+		if len(brand_array) > 1:
+			query = query.where(Product.brand_unique_name.isin(brand_array))
 		else:
-			if isinstance(attributes, string_types):
-				attributes = json.loads(attributes)
-			if len(attributes) > 0:
-				attr_condition += ' AND P.name IN(SELECT parent \
-									FROM `tabProduct Attribute Option` \
-									WHERE unique_name IN('
-				counter = 0
-				for x in attributes:
-					if not counter == 0:
-						attr_condition += ','
-					option_values = x['value'].split(',')
-					for option in option_values:
-						attr_condition += "'"
-						attr_condition += option
-						if not option_values.index(option) == len(option_values) - 1:
-							attr_condition += "',"
-						else:
-							attr_condition += "'"
-					counter = counter + 1
-				attr_condition += '))'
-	return attr_condition
+			query = query.where(Product.brand_unique_name == brand_array[0])
 
+	
+	return get_sub_conditions_sort(ratings,sort_by,min_price,max_price,attributes,query)
+	
+def get_sub_conditions_sort(ratings,sort_by,min_price,max_price, attributes,query):
+	if ratings and int(ratings) > 0:
+		query = query.where(Product.approved_total_reviews >= int(ratings))
+
+	if min_price:
+		query = query.where(Product.price >= float(min_price))
+	if max_price:
+		query = query.where(Product.price <= float(max_price))
+
+	
+	query = sub_conditions_sort_attributes(attributes, query)
+
+	if sort_by:
+		if sort_by.lower() == 'modified desc':
+			query = query.orderby(Product.stock, order=Order.desc)
+		elif sort_by.lower() == 'relevance':
+			query = query.orderby(Product.stock, order=Order.desc).orderby(Product.modified, order=Order.desc)
+		elif sort_by.lower() in ['name asc', 'name_asc']:
+			query = query.orderby(Product.item.trim(), order=Order.asc)
+		elif sort_by.lower() in ['name desc', 'name_desc']:
+			query = query.orderby(Product.item.trim(), order=Order.desc)
+		elif sort_by.lower() in ['price asc', 'price_asc']:
+			query = query.orderby(Product.price, order=Order.asc)
+		elif sort_by.lower() in ['price desc', 'price_desc']:
+			query = query.orderby(Product.price, order=Order.desc)
+	return query
+
+def sub_conditions_sort_attributes(attributes, query):
+	if attributes:
+		attr_query = frappe.qb.from_(ProductAttributeOption).select(ProductAttributeOption.parent).where(
+			ProductAttributeOption.unique_name.isin(attributes['value'].split(','))
+		)
+		query = query.where(Product.name.isin(attr_query))
+
+	return query
 
 def get_product_price(product, qty=1, rate=None,attribute_id=None, customer=None):
 	try:
@@ -1292,72 +1243,67 @@ def get_search_results(search_text, sort_by, page_no, page_size, brands, ratings
 	min_price,max_price,attributes,customer=None):
 	try:
 		from frappe.website.utils import cleanup_page_name
+		from urllib.parse import unquote
 		search_text = unquote(search_text)
 		queryText = cleanup_page_name(search_text).replace('_', '-')
 		catalog_settings = frappe.get_single('Catalog Settings')
-		(conditions, sort) = get_conditions_sort(brands, ratings, sort_by, min_price,max_price, attributes)
-		searchKey = '"%' + search_text + '%"'
-		search_query = ' AND ('
-		select_query = ''
-		count = 0
-		queryKey = '"%' + queryText + '%"'
+		
+		query = (
+				frappe.qb.from_(Product)
+				.left_join(ProductSearchKeyword).on(ProductSearchKeyword.parent == Product.name)
+				.select(*get_product_list_columns()) 
+			)
+		
+		conditions = (Product.is_active == 1) & (Product.status == 'Approved')
+		query = get_conditions_sort(brands, ratings, sort_by, min_price,max_price, attributes, query)
 		if catalog_settings.search_fields:
-			select_query = ', (CASE '
+			search_conditions = None
 			for item in catalog_settings.search_fields:
-				search_query += 'P.%s LIKE %s OR ' % (item.fieldname, searchKey)
-				select_query += ' WHEN P.%s LIKE %s THEN %s' % (item.fieldname, searchKey, count)
-				count = count + 1
-			search_query = search_query[:-3]
-			select_query += ' ELSE -1 END) AS sort_order'
-			sort += ' ORDER BY sort_order ASC'
+				if search_conditions is None:
+					search_conditions = Field(item.fieldname).like(f"%{search_text}%")
+				else:
+					search_conditions |= Field(item.fieldname).like(f"%{search_text}%")
+			if search_conditions:
+				conditions &= search_conditions
+
 		if catalog_settings.enable_full_text_search == 1:
-			search_text = search_text.replace(" ","-")
-			tex1 = []
-			text1 = search_text.split()
-			for tx in text1:
-				tex = '+' + tx + '*'
-				tex1.append(tex)
-			tex1 = tex1
-			l = [item for value in tex1 for item in value]
-			l = ''.join(l)
-			search_query += " OR S.search_route LIKE '{}' OR MATCH(P.search_words) AGAINST('{}' IN BOOLEAN MODE)".format(queryKey, l)
+			from frappe.query_builder.functions import Match
+			# search_text_mod = ' '.join([f"+{tx}*" for tx in search_text.split()])
+			match_against_condition = Match(Product.search_words).Against(search_text)
+			print(match_against_condition)
+			# match_against_condition = Raw(f"MATCH(P.search_words) AGAINST('{search_text_mod}' IN BOOLEAN MODE)")
+			
+			# from frappe.query_builder import Criterion
+			# match_against_condition = Criterion.all(f"MATCH(P.search_words) AGAINST('{search_text_mod}' IN BOOLEAN MODE)")
 		else:
-			if catalog_settings.search_fields:
-				search_query += '   OR S.search_route LIKE %s OR S.search_keywords LIKE %s' % (queryKey,queryKey)
-			else:
-				search_query += ' S.search_route LIKE %s OR S.search_keywords LIKE %s' % (queryKey,queryKey)
-		search_query += ' OR S.search_route LIKE %s' % searchKey
-		search_query += ')'
-		output = get_search_data(select_query,search_text,page_no,page_size,customer,brands,attributes,
-							 conditions,sort,search_query)
+			conditions &= (ProductSearchKeyword.search_route.like(f"%{search_text}%")
+						   | ProductSearchKeyword.search_keywords.like(f"%{search_text}%"))
+		output = get_search_data(search_text,page_no,page_size,customer,brands,attributes,
+							 conditions,query,match_against_condition)
 		return output
 	except Exception:
 		other_exception("Error in v2.product.get_search_results")
 
 
-def get_search_data(select_query,search_text,page_no,page_size,customer,brands,attributes,
-							 conditions,sort,search_query):
+def get_search_data(search_text,page_no,page_size,customer,brands,attributes,
+							 conditions,query,match_against_condition):
 		try:
-			start_with_condition = " and (P.item like '{}%%')".format(search_text)
-			list_columns = get_product_list_columns()
-			start_with_items  = f"""SELECT DISTINCT 
-										{list_columns}
-									FROM `tabProduct` P
-									LEFT JOIN `tabProduct Search Keyword` S ON S.parent = P.name 
-									WHERE P.is_active = 1 
-										AND P.status = 'Approved' {select_query}
-										{start_with_condition} {conditions} {sort}
-									LIMIT 
-										{(int(page_no) - 1) * int(page_size)}, {int(page_size)}"""
-			query = f"""SELECT DISTINCT 
-							{list_columns}
-						FROM `tabProduct` P
-						LEFT JOIN `tabProduct Search Keyword` s ON S.parent=P.name
-						WHERE P.is_active = 1 
-							AND P.status = 'Approved' 
-							AND (P.route LIKE '%{search_text}%') 
-						LIMIT {(int(page_no) - 1) * int(page_size)},{int(page_size)}"""
-			data = get_search_result(start_with_items,query,page_size)
+			
+			query = (
+				query.where(conditions)
+				.where(match_against_condition)
+				.limit(int(page_size))
+				.offset((int(page_no) - 1) * int(page_size))
+			)
+			secondary_query = (
+				query.where(
+					(Product.route.like(f"%{search_text}%"))
+					
+				)
+				.limit(int(page_size))
+				.offset((int(page_no) - 1) * int(page_size))
+			)
+			data = get_search_result(query,secondary_query,page_size)
 			return data
 		except Exception:
 			frappe.log_error(message=frappe.get_traceback(), 
@@ -1365,11 +1311,11 @@ def get_search_data(select_query,search_text,page_no,page_size,customer,brands,a
 
 
 def get_search_result(start_with_items,query,page_size):
-	result = frappe.db.sql(start_with_items, as_dict=1)
-
+	print(start_with_items)
+	print(query)
+	result = start_with_items.run(as_dict=1)
 	if len(result) < int(page_size) or not result:
-		other_items = frappe.db.sql(query, as_dict=1)
-		frappe.log_error("other_items",other_items)
+		other_items = query.run(as_dict=1)
 		for x in other_items:
 			if result:
 				allowed = 1
@@ -1381,7 +1327,6 @@ def get_search_result(start_with_items,query,page_size):
 			else:
 				if len(result) <= int(page_size):
 					result.append(x)
-		frappe.log_error("result",result)
 		return result
 
 
@@ -1459,14 +1404,8 @@ def get_brand_based_products(brand=None, sort_by=None, page_no=1,page_size=no_of
 def get_sorted_brand_products(brand, sort_by, page_no, page_size,route,
 								ratings, min_price,max_price, attributes,productsid=None):
 	try:
-		(conditions, sort) = get_conditions_sort(brand, ratings, sort_by, min_price,max_price, attributes)
-		brand_filter = ""
-		if brand:
-			brand_filter = "'" + brand + "'"
-		if productsid:
-			conditions += ' and P.name!="{name}"'.format(name=productsid)
 		return {"product" : get_sorted_brand_products_query(page_size,conditions,brand_filter,brand,route,
-										   		sort_by,page_no,ratings,min_price, max_price, attributes)}
+												sort_by,page_no,ratings,min_price, max_price, attributes)}
 	except Exception:
 		other_exception("Error in v2.product.get_sorted_brand_products")
 
@@ -1474,18 +1413,25 @@ def get_sorted_brand_products(brand, sort_by, page_no, page_size,route,
 def get_sorted_brand_products_query(page_size,conditions,brand_filter,sort_by,brand,route,
 									   page_no,ratings,min_price, max_price, attributes):
 	try:
-		(conditions, sort) = get_conditions_sort(brand_filter, ratings, sort_by, min_price, max_price, attributes)
+		
 		list_columns = get_product_list_columns()
-		# frappe.log_error("brand_filter",brand_filter)
-		query = f"""SELECT DISTINCT {list_columns}
-				FROM `tabProduct` P
-				LEFT JOIN `tabProduct Search Keyword` s ON s.parent = P.name
-				WHERE P.is_active = 1 
-					AND P.status = 'Approved' 
-					AND (P.brand = {brand_filter})
-				ORDER BY P.modified DESC
-				LIMIT {(int(page_no) - 1) * int(page_size)},{int(page_size)}"""
-		result = frappe.db.sql(query, as_dict=True)
+		ProductSearchKeyword = DocType("Product Search Keyword")
+		query = (
+		    frappe.qb.from_(Product)
+		    .left_join(ProductSearchKeyword)
+		    .on(ProductSearchKeyword.parent == Product.name)
+		    .select(*list_columns)  
+		    .where((Product.is_active == 1) & (Product.status == 'Approved') & (Product.brand.isin(brand_filter)))
+		    
+		)
+		if productsid:
+			query = query.where(Product.name != productsid)
+		query = get_conditions_sort(brand_filter, ratings, sort_by, min_price, max_price, attributes, query)
+		query = (query.orderby(Product.modified, order=Order.desc)
+		    .limit(int(page_size))
+		    .offset((int(page_no) - 1) * int(page_size))
+		    )
+		result = query.run(as_dict=True)
 		return result
 	except Exception:
 		frappe.log_error(frappe.get_traceback(), 'api.get_sorted_brand_products')
@@ -1496,36 +1442,40 @@ def get_sorted_category_products(category, sort_by, page_no, page_size, brands,
 	ratings, min_price,max_price, attributes,productsid=None):
 	try:
 		catalog_settings = frappe.get_single('Catalog Settings')
-		(conditions, sort) = get_conditions_sort(brands, ratings, sort_by, min_price, max_price, attributes)
-		# frappe.log_error("conditions",conditions)
-		category_filter = "'" + category + "'"
+		category_filter = [category]
 		if catalog_settings.include_products_from_subcategories == 1:
-			from go1_commerce.go1_commerce.v2.category \
-			import get_child_categories
+			from go1_commerce.go1_commerce.v2.category import get_child_categories
 			child_categories = get_child_categories(category)
 			if child_categories:
-				category_filter = ','.join(['"' + x.name + '"' for x in child_categories])
+				category_filter.extend([x.name for x in child_categories])
+
 		if productsid:
-			conditions += ' and P.name!="{name}"'.format(name=productsid)
+			conditions += Product.name != productsid
 		list_columns = get_product_list_columns()
-		# frappe.log_error("list_columns",list_columns)
-		query = f"""SELECT DISTINCT {list_columns}
-					FROM `tabProduct` P
-					INNER JOIN `tabProduct Category Mapping` CM ON CM.parent=P.name
-					INNER JOIN `tabProduct Category` pc ON CM.category=pc.name
-					WHERE P.is_active = 1 
-						AND P.status='Approved' 
-						AND CM.category IN ({category_filter}) {conditions}
-					GROUP BY P.name {sort}
-					LIMIT {(int(page_no) - 1)* int(page_size)},{int(page_size)}"""
-		result = frappe.db.sql(query, as_dict=True)
+		query = (
+			frappe.qb.from_(Product)
+			.inner_join(ProductCategoryMapping)
+			.on(ProductCategoryMapping.parent == Product.name)
+			.inner_join(ProductCategory)
+			.on(ProductCategoryMapping.category == ProductCategory.name)
+			.select(*list_columns)
+			.where((Product.is_active == 1) & (Product.status == 'Approved'))
+			.where(ProductCategoryMapping.category.isin(category_filter))	
+		)
+		if productsid:
+			query = query.where(Product.name != productsid)
+		query = get_conditions_sort(brands, ratings, sort_by, min_price, max_price, attributes, query)
+		query = (
+			query.groupby(Product.name)
+			.limit(int(page_size))
+			.offset((int(page_no) - 1) * int(page_size)))
+		result = query.run(as_dict=True)
 		return result
+
 	except Exception:
 		frappe.log_error(frappe.get_traceback(), 'Error in api.get_sorted_category_products')
 
  
-
-   
 @frappe.whitelist(allow_guest=True)
 def insert_stockavail_notification(data):
 	try:
@@ -1650,7 +1600,7 @@ def get_attributes_combination(attribute):
 							attribute_html +=", "
 						if frappe.db.get_all("Product Attribute Option",filters={"name":obj}):
 							option_value, attribute = frappe.db.get_value("Product Attribute Option", obj, 
-                                                    					["option_value","attribute"])
+																		["option_value","attribute"])
 							attribute_name = frappe.db.get_value("Product Attribute", attribute, "attribute_name")
 							attribute_html += attribute_name+" : "+option_value
 				item["combination_txt"] = attribute_html
@@ -2015,3 +1965,12 @@ def update_videoto_file(file_name, upload_doc, file_type, file_path, docname, na
 		return items.name
 	except Exception:
 		frappe.log_error('Error in v2.common.update_videoto_file', frappe.get_traceback())
+
+
+def get_product_list_columns():
+	return (Product.item, Product.price, Product.old_price, Product.short_description,Product.has_variants,
+			Product.sku, Product.name, Product.route, Product.inventory_method, Product.is_gift_card, Product.image.as_("product_image"),
+			Product.minimum_order_qty, Product.maximum_order_qty, Product.disable_add_to_cart_button,Product.stock, 
+			Product.weight, Product.approved_total_reviews,(Concat("/pr/",Product.route)).as_("b_route"),Product.brand_name.as_("brand"),
+			Product.brand_unique_name.as_("brand_route"),Product.route,Product.brand_name.as_("product_brand"))
+

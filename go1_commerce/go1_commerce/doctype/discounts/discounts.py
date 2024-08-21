@@ -816,6 +816,8 @@ def get_products(doctype, txt, searchfield, start, page_len, filters):
 		.select(Product.name, Product.item)
 		.where(Product.status == "Approved")
 	)
+	if txt:
+		query.where(Product.name == "Approved")
 	result = query.run(as_dict=True)
 
 

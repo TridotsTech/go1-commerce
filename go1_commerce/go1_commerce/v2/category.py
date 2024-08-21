@@ -106,13 +106,15 @@ def get_child_categories(parent_category_name, show_count=0, limit=500):
 			"route",
 		],
 		filters={"parent_product_category": parent_category_name, "is_active": 1},
-		order_by="mega_menu_column, display_order",
+		order_by="display_order",
 		limit=limit)
+
 	if show_count:
 		for category in child_categories:
 			category.products_count = len(get_category_products_count(category.name))
 	for category in child_categories:
 		category.child = get_child_categories(category.name, show_count, limit=limit)
+		
 	return child_categories
 
 def get_categories_sidemenu(category):
@@ -218,7 +220,9 @@ def get_category_filters(category=None, brands='', ratings='', min_price='', max
 	
 	try:
 		meta_info = get_category_meta_info(category, route)
+	
 		filter_data = get_filter_data_from_json_files(category, route)
+		
 		return {
 			'meta_info': meta_info,
 			'attribute_list': filter_data.get('attributes', []),
@@ -248,12 +252,14 @@ def get_category_meta_info(category=None, route=None):
 			meta_title = categories[0].meta_title 
 			meta_keywords = categories[0].meta_keywords
 			meta_description = categories[0].meta_description
+		
 	if not route and category:
 		meta_title,meta_keywords,meta_description = frappe.db.get_value("Product Category",category,
 															['meta_title','meta_keywords','meta_description'])
 	meta_info = {"meta_title":meta_title,
 				"meta_keywords":meta_keywords,
-				"meta_description":meta_description}
+				"meta_description":meta_description,
+				"category":category}
 	return meta_info
 
 def get_filter_data_from_json_files(category=None, route=None):
@@ -291,47 +297,66 @@ def get_category_option_query(products_filter, attributes):
 		product = DocType('Product')
 		attribute_mapping = DocType('Product Attribute Mapping')
 		attribute_option = DocType('Product Attribute Option')
-		attribute_id = x.product_attribute  # Replace with the actual attribute ID
+		attribute_id = x.product_attribute
 		query = (
-		    frappe.qb.from_(product)
-		    .join(attribute_mapping)
-		    .on(product.name == attribute_mapping.parent)
-		    .join(attribute_option)
-		    .on(
-		        (attribute_option.parent == product.name) & 
-		        (attribute_option.attribute == attribute_mapping.product_attribute)
-		    )
-		    .select(
-		        attribute_option.unique_name,
-		        attribute_option.option_value,
-		    )
-		    .where(attribute_option.parent.isin(products_filter))
-		    .where(attribute_option.attribute == attribute_id)
+			frappe.qb.from_(product)
+			.join(attribute_mapping)
+			.on(product.name == attribute_mapping.parent)
+			.join(attribute_option)
+			.on(
+				(attribute_option.parent == product.name) & 
+				(attribute_option.attribute == attribute_mapping.product_attribute)
+			)
+			.select(
+				attribute_option.unique_name,
+				attribute_option.option_value,
+			)
+			.where(attribute_option.parent.isin(products_filter))
+			.where(attribute_option.attribute == attribute_id)
 		)
 
 		results = query.run(as_dict=1)
 		x.options = results
+
 	return attributes
 
 
 def get_category_item_attribute_filter(product_ids):
-	products_filter = []
-	for x in product_ids:
-		products_filter.append(x.product)
-	product_attribute_mapping = DocType('Product Attribute Mapping')
-	product_attribute = DocType('Product Attribute')
-	query = (
-	    frappe.qb.from_(product_attribute_mapping)
-	    .join(product_attribute)
-	    .on(product_attribute.name == product_attribute_mapping.product_attribute)
-	    .select(
-	        product_attribute_mapping.attribute,
-	        product_attribute_mapping.product_attribute,
-	        product_attribute_mapping.attribute_unique_name.as_('attribute_unique_name')
-	    )
-	    .where(product_attribute_mapping.parent.isin(products_filter))
-	)
-	results = query.run(as_dict=1)
+	# products_filter = []
+	# for x in product_ids:
+	# 	products_filter.append(x.product)
+	# product_attribute_mapping = DocType('Product Attribute Mapping')
+	# product_attribute = DocType('Product Attribute')
+	# query = (
+	#     frappe.qb.from_(product_attribute_mapping)
+	#     .join(product_attribute)
+	#     .on(product_attribute.name == product_attribute_mapping.product_attribute)
+	#     .select(
+	#         product_attribute_mapping.attribute,
+	#         product_attribute_mapping.product_attribute,
+	#         product_attribute_mapping.attribute_unique_name.as_('attribute_unique_name')
+	#     )
+	#     .where(product_attribute_mapping.parent.isin(products_filter))
+	# )
+	# results = query.run(as_dict=1)
+	products_filter = [x.product for x in product_ids]
+	if products_filter:
+		product_attribute_mapping = DocType('Product Attribute Mapping')
+		product_attribute = DocType('Product Attribute')
+		query = (
+			frappe.qb.from_(product_attribute_mapping)
+			.join(product_attribute)
+			.on(product_attribute.name == product_attribute_mapping.product_attribute)
+			.select(
+				product_attribute_mapping.attribute,
+				product_attribute_mapping.product_attribute,
+				product_attribute_mapping.attribute_unique_name.as_('attribute_unique_name')
+			)
+			.where(product_attribute_mapping.parent.isin(products_filter))
+		)
+		results = query.run(as_dict=1)
+	else:
+		results = []
 	get_category_option_query(products_filter, results)
 	return results
 
@@ -345,15 +370,15 @@ def get_category_product_ids(category_filter):
 	category_mapping = DocType('Product Category Mapping')
 	category = DocType('Product Category')
 	query = (
-	    frappe.qb.from_(product)
-	    .join(category_mapping)
-	    .on(product.name == category_mapping.parent)
-	    .join(category)
-	    .on(category_mapping.category == category.name)
-	    .select(product.name.as_('product'))
-	    .where(product.is_active == 1)
-	    .where(product.status == 'Approved')
-	    .where(category.name.isin(category_filter_list))
+		frappe.qb.from_(product)
+		.join(category_mapping)
+		.on(product.name == category_mapping.parent)
+		.join(category)
+		.on(category_mapping.category == category.name)
+		.select(product.name.as_('product'))
+		.where(product.is_active == 1)
+		.where(product.status == 'Approved')
+		.where(category.name.isin(category_filter_list))
 	)
 	results = query.run(as_dict=1)
 	frappe.log_error("results_pids",results)
@@ -367,16 +392,16 @@ def get_category_brands_filter(product_ids):
 		product = DocType('Product')
 		product_brand = DocType('Product Brand')
 		query = (
-	    frappe.qb.from_(product)
-	    .join(product_brand)
-	    .on(product_brand.name == product.brand)
-	    .select(
-	        product_brand.name.as_('brand'),
-	        product_brand.brand_name,
-	        product_brand.unique_name,
-	    )
-	    .where(product.name.isin(products_filter))
-	    .groupby(product_brand.name,product_brand.unique_name,product_brand.brand_name)
+		frappe.qb.from_(product)
+		.join(product_brand)
+		.on(product_brand.name == product.brand)
+		.select(
+			product_brand.name.as_('brand'),
+			product_brand.brand_name,
+			product_brand.unique_name,
+		)
+		.where(product.name.isin(products_filter))
+		.groupby(product_brand.name,product_brand.unique_name,product_brand.brand_name)
 		)
 		results = query.run(as_dict=1)
 		return results

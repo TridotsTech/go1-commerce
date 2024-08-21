@@ -1900,9 +1900,11 @@ def get_category_list(reference_doc, reference_fields, filters=None, page_no=1, 
 
 	list_name = (
 		list_name.orderby(ReferenceDoc.lft)
-		.limit(start, int(page_len))
-		.run(as_dict=True)
-	)
+		.limit(int(page_len))
+		.offset(start) 
+		)
+	
+	list_name = list_name.run(as_dict=True)
 	if list_name:
 		for content in list_name:
 			if content.name:

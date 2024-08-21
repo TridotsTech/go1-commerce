@@ -11,7 +11,7 @@ from frappe.query_builder import DocType
 class ShippingCity(Document):
 	pass
 
-
+@frappe.whitelist()
 def get_area_list(reference_doc, reference_fields, city):
 	reference_field = json.loads(reference_fields)
 	fields = ','.join([x for x in reference_field])
@@ -21,7 +21,7 @@ def get_area_list(reference_doc, reference_fields, city):
 	return {"list_name":list_name}
 
 
-
+@frappe.whitelist()
 def get_areas_fromziprange(ziprange):
 	zipcoderanges = zip_code(ziprange)
 	if zipcoderanges:
