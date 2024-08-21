@@ -1247,7 +1247,7 @@ def get_search_results(search_text, sort_by, page_no, page_size, brands, ratings
 		search_text = unquote(search_text)
 		queryText = cleanup_page_name(search_text).replace('_', '-')
 		catalog_settings = frappe.get_single('Catalog Settings')
-		
+		queryKey = '"%' + queryText + '%"'
 		query = (
 				frappe.qb.from_(Product)
 				.left_join(ProductSearchKeyword).on(ProductSearchKeyword.parent == Product.name)
@@ -1256,62 +1256,70 @@ def get_search_results(search_text, sort_by, page_no, page_size, brands, ratings
 		
 		conditions = (Product.is_active == 1) & (Product.status == 'Approved')
 		query = get_conditions_sort(brands, ratings, sort_by, min_price,max_price, attributes, query)
+		search_conditions = None
 		if catalog_settings.search_fields:
-			search_conditions = None
+			
 			for item in catalog_settings.search_fields:
 				if search_conditions is None:
 					search_conditions = Field(item.fieldname).like(f"%{search_text}%")
 				else:
 					search_conditions |= Field(item.fieldname).like(f"%{search_text}%")
-			if search_conditions:
-				conditions &= search_conditions
-
-		if catalog_settings.enable_full_text_search == 1:
-			from frappe.query_builder.functions import Match
-			search_text_mod = f'+{search_text.replace(" ", "* +")}*'
-			# search_text_mod = ' '.join([f"+{tx}*" for tx in search_text.split()])
-			match_against_condition = Match(Product.search_words).Against(search_text_mod)
-			print(match_against_condition)
-			# match_against_condition = Raw(f"MATCH(P.search_words) AGAINST('{search_text_mod}' IN BOOLEAN MODE)")
 			
-			# from frappe.query_builder import Criterion
-			# match_against_condition = Criterion.all(f"MATCH(P.search_words) AGAINST('{search_text_mod}' IN BOOLEAN MODE)")
+		print(conditions)
+		if catalog_settings.enable_full_text_search == 1:
+			search_text = search_text.replace(" ","-")
+			tex1 = []
+			text1 = search_text.split()
+			for tx in text1:
+				tex = '+' + tx + '*'
+				tex1.append(tex)
+			tex1 = tex1
+			l = [item for value in tex1 for item in value]
+			l = ''.join(l)
+			from frappe.query_builder.functions import Match
+			search_conditions |= ProductSearchKeyword.search_route.like(f"%{l}%") |Match(Product.search_words).Against(search_text)
+			print(search_conditions)
+
 		else:
-			conditions &= (ProductSearchKeyword.search_route.like(f"%{search_text}%")
-						   | ProductSearchKeyword.search_keywords.like(f"%{search_text}%"))
+			search_conditions |= ProductSearchKeyword.search_route.like(f"%{queryKey}%") | ProductSearchKeyword.search_keywords.like(f"%{queryKey}%")
+		
+		if search_conditions:
+			conditions &= search_conditions
 		output = get_search_data(search_text,page_no,page_size,customer,brands,attributes,
-							 conditions,query,match_against_condition)
+							 conditions,query)
 		return output
 	except Exception:
 		other_exception("Error in v2.product.get_search_results")
 
 
 def get_search_data(search_text,page_no,page_size,customer,brands,attributes,
-							 conditions,query,match_against_condition):
+							 conditions,query):
 		try:
 			
-			query = (
+			secondary_query = (
 				query.where(conditions)
-				.where(match_against_condition)
 				.limit(int(page_size))
 				.offset((int(page_no) - 1) * int(page_size))
 			)
-			secondary_query = (
-				query.where(
+			querys = (
+				frappe.qb.from_(Product)
+				.left_join(ProductSearchKeyword).on(ProductSearchKeyword.parent == Product.name)
+				.select(*get_product_list_columns()) 
+				.where((Product.is_active == 1) & (Product.status == 'Approved') &
 					(Product.route.like(f"%{search_text}%"))
 					
 				)
 				.limit(int(page_size))
 				.offset((int(page_no) - 1) * int(page_size))
 			)
-			data = get_search_result(query,secondary_query,page_size)
+			data = get_search_result(querys,secondary_query,page_size)
 			return data
 		except Exception:
 			frappe.log_error(message=frappe.get_traceback(), 
 			title='v2.product.get_search_results')
 
 
-def get_search_result(start_with_items,query,page_size):
+def get_search_result(query, start_with_items,page_size):
 	print(start_with_items)
 	print(query)
 	result = start_with_items.run(as_dict=1)
@@ -1418,20 +1426,20 @@ def get_sorted_brand_products_query(page_size,conditions,brand_filter,sort_by,br
 		list_columns = get_product_list_columns()
 		ProductSearchKeyword = DocType("Product Search Keyword")
 		query = (
-		    frappe.qb.from_(Product)
-		    .left_join(ProductSearchKeyword)
-		    .on(ProductSearchKeyword.parent == Product.name)
-		    .select(*list_columns)  
-		    .where((Product.is_active == 1) & (Product.status == 'Approved') & (Product.brand.isin(brand_filter)))
-		    
+			frappe.qb.from_(Product)
+			.left_join(ProductSearchKeyword)
+			.on(ProductSearchKeyword.parent == Product.name)
+			.select(*list_columns)  
+			.where((Product.is_active == 1) & (Product.status == 'Approved') & (Product.brand.isin(brand_filter)))
+			
 		)
 		if productsid:
 			query = query.where(Product.name != productsid)
 		query = get_conditions_sort(brand_filter, ratings, sort_by, min_price, max_price, attributes, query)
 		query = (query.orderby(Product.modified, order=Order.desc)
-		    .limit(int(page_size))
-		    .offset((int(page_no) - 1) * int(page_size))
-		    )
+			.limit(int(page_size))
+			.offset((int(page_no) - 1) * int(page_size))
+			)
 		result = query.run(as_dict=True)
 		return result
 	except Exception:
