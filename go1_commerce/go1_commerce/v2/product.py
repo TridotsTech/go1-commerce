@@ -963,7 +963,7 @@ def sub_conditions_sort_attributes(attributes, query):
 				attr_condition = attr_conditions_list[0]
 				for sub_query in attr_conditions_list[1:]:
 					attr_condition |= sub_query
-	query = query.where(Product.name.isin(attr_condition))
+		query = query.where(Product.name.isin(attr_condition))
 	return query
 
 def get_product_price(product, qty=1, rate=None,attribute_id=None, customer=None):
