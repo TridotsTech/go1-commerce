@@ -1614,7 +1614,7 @@ def get_product_reviews_list(product, page_no=0, page_len=10):
 			ProductReview.review_title,
 			ProductReview.review_message,
 			ProductReview.rating,
-			Function('DATE_FORMAT', ProductReview.creation, date_format).as_('date'),
+			Function('DATE_FORMAT', ProductReview.creation, dateformat).as_('date'),
 			ProductReview.creation
 		)
 		.where(
