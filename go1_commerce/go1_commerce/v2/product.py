@@ -33,7 +33,6 @@ def get_category_products(params):
 							params.get('brands'), params.get('rating'),params.get('min_price'), params.get('max_price'),params.get('attributes'),
 							params.get('productsid'),params.get('customer'),params.get('route'))
 
-@frappe.whitelist(allow_guest=True)
 def get_categoryproducts(category, sort_by, page_no,page_size,
 							brands, rating,min_price, max_price,attributes,
 							productsid,customer,route):
@@ -50,7 +49,6 @@ def get_categoryproducts(category, sort_by, page_no,page_size,
 	return category_products
 
  
-@frappe.whitelist(allow_guest=True)
 def get_parent_categories():
 	try:
 		filters = {'parent_product_category': '', 'is_active': 1}
@@ -76,7 +74,6 @@ def get_parent_categories():
 
 
 
-@frappe.whitelist(allow_guest=True)
 def get_customer_recently_viewed_products(customer=None, isMobile=0):
 	products = []
 	if not customer:
