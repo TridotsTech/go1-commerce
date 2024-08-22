@@ -18,7 +18,7 @@ from six import string_types
 from go1_commerce.utils.setup import get_settings, get_settings_value
 from frappe.desk.reportview import get_match_cond, get_filters_cond
 from frappe.query_builder import DocType, Field, functions as fn, Order
-
+from frappe.query_builder.functions import Function
 
 class Product(WebsiteGenerator):
 	website = frappe._dict(
