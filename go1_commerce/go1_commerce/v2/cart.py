@@ -442,18 +442,14 @@ class CustomerCart:
 			frappe.db.commit()
 
 @frappe.whitelist(allow_guest = True)
-def insert_cart_items(item_code, qty, qty_type, rate = 0, cart_type = "Shopping Cart",
-						attribute = None, attribute_id = None,is_gift_card = None,sender_name = None,
-						sender_email = None,sender_message = None,recipient_email = None,
-						recipient_date_of_birth = None,recipient_name = None, device_type = None,
-						customer = None):
+def insert_cart_items(params):
 	try:
 		insert_cart = CustomerCart()
-		return insert_cart.insert_cart_items(item_code, qty, qty_type, rate, cart_type,
-						attribute, attribute_id,is_gift_card ,sender_name ,
-						sender_email ,sender_message ,recipient_email ,
-						recipient_date_of_birth ,recipient_name , device_type,
-						customer)
+		return insert_cart.insert_cart_items(params.get("item_code"), params.get("qty"), params.get("qty_type"), params.get("rate",0), params.get("cart_type", "Shopping Cart"),
+						params.get("attribute"), params.get("attribute_id"),params.get("is_gift_card",0) ,params.get("sender_name") ,
+						params.get("sender_email") ,params.get("sender_message") ,params.get("recipient_email") ,
+						params.get("recipient_date_of_birth") ,params.get("recipient_name") , params.get("device_type"),
+						params.get("customer"))
 	except Exception:
 		other_exception("Error in v2.cart.insert_cartItems")
 
@@ -508,9 +504,10 @@ def delete_cart_items(name,customer_id = None):
 		return {"status":"Failed","message":"something went wrong"}
 	
 @frappe.whitelist()
-def clear_cartitem():
+def clear_cartitem(customer=None):
 	try:
-		customer = get_customer_from_token()
+		if not customer:
+			customer = get_customer_from_token()
 		cart = frappe.db.get_value('Shopping Cart',{'customer': customer,
 											'cart_type': 'Shopping Cart'},"name")
 		if cart:

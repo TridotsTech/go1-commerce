@@ -49,7 +49,7 @@ def remove_deleted_data(r__m_array):
 	except Exception:
 		frappe.log_error(frappe.get_traceback(),"Error in delete whoosh search data")
 
-@frappe.whitelist(allow_guest = True)
+@frappe.whitelist()
 def search_product(search_txt,page_no = 1,page_length = 10):
 	try:
 		results = []
@@ -132,7 +132,7 @@ def update_order_item(doc,method):
 			import update_whoose_search
 			update_whoose_search(pr)
 
-@frappe.whitelist(allow_guest = True)
+@frappe.whitelist()
 def update_products(doc):
 	for x in doc.get('items'):
 		pr_doc = frappe.get_doc("Product",x.get("product"))

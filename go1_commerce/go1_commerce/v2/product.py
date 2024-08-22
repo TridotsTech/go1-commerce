@@ -28,9 +28,15 @@ except Exception as e:
 	no_of_records_per_page = 10
 
 @frappe.whitelist(allow_guest=True)
-def get_category_products(category=None, sort_by=None, page_no=1,page_size=no_of_records_per_page,
-							brands=None, rating=None,min_price=None, max_price=None,attributes=None,
-							productsid=None,customer=None,route=None):
+def get_category_products(params):
+	return get_categoryproducts(params.get('category'), params.get('sort_by'), params.get('page_no', 1),params.get('page_size', no_of_records_per_page),
+							params.get('brands'), params.get('rating'),params.get('min_price'), params.get('max_price'),params.get('attributes'),
+							params.get('productsid'),params.get('customer'),params.get('route'))
+
+@frappe.whitelist(allow_guest=True)
+def get_categoryproducts(category, sort_by, page_no,page_size,
+							brands, rating,min_price, max_price,attributes,
+							productsid,customer,route):
 	if route:
 		category = frappe.db.get_value("Product Category",{"route":route},"name")
 	default_sort_order = get_settings_value('Catalog Settings','default_product_sort_order')
@@ -176,7 +182,6 @@ def get_category_based_best_sellers(category, item, isMobile=0):
 		best_sellers = get_product_details(best_sellers, isMobile=isMobile)
 	return best_sellers
 
-@frappe.whitelist(allow_guest=True)
 def get_category_products_count(category):
 	category_filter="'"+category+"'"
 	if catalog_settings.include_products_from_subcategories==1:
@@ -931,12 +936,34 @@ def get_sub_conditions_sort(ratings,sort_by,min_price,max_price, attributes,quer
 	return query
 
 def sub_conditions_sort_attributes(attributes, query):
+	attr_condition = None
 	if attributes:
-		attr_query = frappe.qb.from_(ProductAttributeOption).select(ProductAttributeOption.parent).where(
-			ProductAttributeOption.unique_name.isin(attributes['value'].split(','))
-		)
-		query = query.where(Product.name.isin(attr_query))
+		if isinstance(attributes, dict):
+			option_values = attributes['value'].split(',')
+			attr_condition = (
+				frappe.qb.from_('tabProduct Attribute Option')
+				.select('parent')
+				.where(Field('unique_name').isin(option_values))
+			)
+		else:
+			if isinstance(attributes, str):
+				attributes = json.loads(attributes)
 
+			if len(attributes) > 0:
+				attr_conditions_list = []
+
+				for attribute in attributes:
+					option_values = attribute['value'].split(',')
+					sub_query = (
+						frappe.qb.from_('Product Attribute Option')
+						.select('parent')
+						.where(Field('unique_name').isin(option_values))
+					)
+					attr_conditions_list.append(sub_query)
+				attr_condition = attr_conditions_list[0]
+				for sub_query in attr_conditions_list[1:]:
+					attr_condition |= sub_query
+	query = query.where(Product.name.isin(attr_condition))
 	return query
 
 def get_product_price(product, qty=1, rate=None,attribute_id=None, customer=None):
@@ -1218,8 +1245,12 @@ def get_enquiry_product_detail(product_id):
 					return get_cat[0]['type_of_category']
 
 @frappe.whitelist(allow_guest=True)
-def get_search_products(customer= None,search_text=None, sort_by=None, page_no=1, page_size=12, brands=None,
-	rating=None,min_price=None,	max_price=None,	attributes=None, as_html=None, is_list = 0):
+def get_search_products(params):
+	return get_searchproducts(params.get('customer'),params.get('search_text'), params.get('sort_by'), params.get('page_no', 1), params.get('page_size', 12), params.get('brands'),
+	params.get('rating'),params.get('min_price'),params.get('max_price'),params.get('attributes'), params.get('as_html'), params.get('is_list', 0))
+
+def get_searchproducts(customer,search_text, sort_by, page_no, page_size, brands,
+	rating,min_price,	max_price,	attributes, as_html, is_list):
 	try:
 		catalog_settings = frappe.get_single('Catalog Settings')
 		if catalog_settings.enable_whoosh_search == 1:
@@ -1353,41 +1384,6 @@ def get_sorted_columns(sort_by):
 
 
 @frappe.whitelist(allow_guest=True)
-def get_category_page_data(	category = None, sort_by = None, page_no = 1, 
-							customer = None,route = None, page_size = no_of_records_per_page,
-							brands = None,rating = None, min_price = None,max_price = None,
-							attributes = None, as_html = None,productsid = None,view_by = None
-						):
-	products = get_category_products(category, sort_by, page_no, page_size,brands,rating, 
-									min_price, max_price, attributes,as_html,productsid, 
-									view_by,customer,route)
-	filters = get_category_page_filters(category, brands = brands, ratings= rating,
-										min_price = min_price, max_price = max_price)
-	return {"products":products,
-			"filters":filters}
-
-
-@frappe.whitelist(allow_guest=True)
-def get_category_page_filters(category, brands='', ratings='', min_price='', max_price=''):
-	'''
-		To get all available filters in category list page
-
-		param: category: category id
-		param: brands: list of brand ids in comma seperated. eg: "brand 1, brand2"
-		param: ratings: based on product rating. Ranges from 1 to 4
-		param: min_price: minimum price from which products should display
-		param: max_price: maximum price upto which products must display
-		param: domain: to get data based on the current doamin (for saas model)		 
-	'''
-	
-	from go1_commerce.go1_commerce.api import item_attribute_filters, get_brands_category_based, get_categories_sidemenu
-	attribute_filters = item_attribute_filters(category, brands, ratings, min_price, max_price)
-	brand_filters = get_brands_category_based(category, '', ratings, min_price, max_price, '')
-	category_list = get_categories_sidemenu(category)
-	return {'attribute_list': attribute_filters, 'brand_list': brand_filters, 'category_list': category_list}
-
-
-@frappe.whitelist(allow_guest=True)
 def get_brand_based_products(brand=None, sort_by=None, page_no=1,page_size=no_of_records_per_page,
 							brands=None, rating=None,min_price=None, max_price=None,attributes=None,
 							productsid=None, view_by=None, customer=None,route=None):
@@ -1473,6 +1469,7 @@ def get_sorted_category_products(category, sort_by, page_no, page_size, brands,
 		)
 		if productsid:
 			query = query.where(Product.name != productsid)
+		
 		query = get_conditions_sort(brands, ratings, sort_by, min_price, max_price, attributes, query)
 		query = (
 			query.groupby(Product.name)
@@ -1831,7 +1828,7 @@ def convert_deity_thumbnail_image(image_name,size,productid,updated_column=None,
 	except Exception:
 		frappe.log_error(frappe.get_traceback(), "Error in v2.common.convert_deity_thumbnail_image") 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def delete_current_attribute_img(docname, childname):
 	doc = frappe.get_doc('Product Attribute Option', docname)
 	if doc.image_list:
@@ -1863,49 +1860,12 @@ def update_attribute_option_images(dn, docs):
 		frappe.db.commit()
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def get_file_uploaded_imagelist(child_name, child_doctype):
 	attribute = frappe.get_doc(child_doctype, child_name)
 	if attribute.image_list:
 		return json.loads(attribute.image_list)
 	return []
-
-@frappe.whitelist(allow_guest=True)
-def get_file_uploaded_imagelist1(name, product, device_type,image_position, child_table=None):
-	try:
-		image_list = []
-		video_list = []
-		child_doc = 'Product Attribute Option'
-		if child_table:
-			child_doc = child_table
-		attribute = frappe.get_doc(child_doc, name)
-		attr_product_title = ''
-		if attribute.product_title:
-			attr_product_title = attribute.product_title
-		if attribute.image_list:
-			images = json.loads(attribute.image_list)
-			for im in images:
-				image_list.append({'original_image': im.get('image'),
-								  'detail_image': im.get('detail_thumbnail'),
-								  'detail_thumbnail': im.get('thumbnail')})
-		attribute_video = frappe.get_all('Product Attribute Option Video', filters={'option_id': name}, fields=['youtube_video_id','video_type'])
-		if attribute_video:
-			for video in attribute_video:
-				if video.youtube_video_id:
-					video_list.append({'video_link': video.youtube_video_id,'video_type':video.video_type})
-		
-		if device_type == 'Desktop':
-			if len(image_list) > 0 or len(video_list) > 0:
-				image_template = frappe.render_template('/templates/pages/DetailPage/productimages.html'
-						, {'attr_image': image_list, 'demo_video': video_list,'image_position':image_position})
-				return {'image_template':image_template, 'product_title':attr_product_title}
-			else:
-				return {'product_title':attr_product_title}
-		else:
-			return {'attr_image': image_list, 'demo_video': video_list, 'product_title':attr_product_title}
-	except Exception as e:
-		frappe.log_error(frappe.get_traceback(), 'Error in v2.product.get_file_uploaded_imagelist1')
-
 
 @frappe.whitelist()
 def update_attribute_images(name, dt, dn):

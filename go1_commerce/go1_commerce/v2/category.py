@@ -45,7 +45,7 @@ def get_category_products_count(category):
 	except Exception:
 		frappe.log_error(title=_("Error fetching category product counts"),message=frappe.get_traceback())
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def get_parent_categories(show_count=0):
 	""" Retrieves parent product categories and their children, 
 		optionally including product counts. """
@@ -119,7 +119,6 @@ def get_child_categories(parent_category_name, show_count=0, limit=500):
 
 def get_categories_sidemenu(category):
 	try:
-		frappe.log_error("get_categories_sidemenu",category)
 		if category:
 			category = category.replace('&amp;', '&')
 		current_category = get_current_category(category)
@@ -183,7 +182,7 @@ def get_parent_category_list(parent_category):
 						  fields=['name', 'category_name', 'route'],
 						  filters=filters, order_by='display_order', limit_page_length=50)
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def get_category_filters_json(category=None, brands='', ratings='', min_price='', max_price='',route=None):
 	try:
 		if route:
@@ -194,8 +193,6 @@ def get_category_filters_json(category=None, brands='', ratings='', min_price=''
 			catalog_settings = frappe.get_single('Catalog Settings')
 			category_filter = "'" + category + "'"
 			if catalog_settings.include_products_from_subcategories == 1:
-				from go1_commerce.go1_commerce.v2.category \
-				import get_child_categories
 				child_categories = get_child_categories(category)
 				if child_categories:
 					category_filter = ','.join(['"' + x.name + '"' for x in child_categories])
@@ -215,7 +212,7 @@ def get_category_filters_json(category=None, brands='', ratings='', min_price=''
 		other_exception("Error in v2.category.get_category_filters")
 		return {'meta_info':{},'attribute_list': [], 'brand_list': [], 'category_list': []}
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def get_category_filters(category=None, brands='', ratings='', min_price='', max_price='',route=None):
 	
 	try:
@@ -322,23 +319,6 @@ def get_category_option_query(products_filter, attributes):
 
 
 def get_category_item_attribute_filter(product_ids):
-	# products_filter = []
-	# for x in product_ids:
-	# 	products_filter.append(x.product)
-	# product_attribute_mapping = DocType('Product Attribute Mapping')
-	# product_attribute = DocType('Product Attribute')
-	# query = (
-	#     frappe.qb.from_(product_attribute_mapping)
-	#     .join(product_attribute)
-	#     .on(product_attribute.name == product_attribute_mapping.product_attribute)
-	#     .select(
-	#         product_attribute_mapping.attribute,
-	#         product_attribute_mapping.product_attribute,
-	#         product_attribute_mapping.attribute_unique_name.as_('attribute_unique_name')
-	#     )
-	#     .where(product_attribute_mapping.parent.isin(products_filter))
-	# )
-	# results = query.run(as_dict=1)
 	products_filter = [x.product for x in product_ids]
 	if products_filter:
 		product_attribute_mapping = DocType('Product Attribute Mapping')

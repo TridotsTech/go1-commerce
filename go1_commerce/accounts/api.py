@@ -11,10 +11,6 @@ from frappe.query_builder import Field
 from frappe.query_builder.functions import IfNull,Sum
 
 
-@frappe.whitelist(allow_guest = True)
-def check_wallet_setting():
-	return frappe.get_single("Wallet Settings")
-
 @frappe.whitelist()
 def release_lockedin_amount():
 	try:
@@ -337,7 +333,8 @@ def check_MOP_and_amount(pe,mode_of_payment, source, amount, total):
 		pe.received_amount = abs(total)
 		paid_amount = abs(total)
 		return paid_amount
-@frappe.whitelist(allow_guest = True)
+
+@frappe.whitelist()
 def make_payment(source_name = None, order = None, mode_of_payment = None, amount = None):
 	try:
 		frappe.log_error("source_name",source_name)
@@ -865,4 +862,3 @@ def update_meta_data(doctype,docname,fieldname,value):
 		return doc
 	except Exception:
 		frappe.log_error(frappe.get_traceback(), "Error in accounts.api.update_meta_data")
-

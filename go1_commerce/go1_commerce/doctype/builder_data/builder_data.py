@@ -56,25 +56,12 @@ class BuilderData(Document):
 	def get_category_filters(self,route):
 		from go1_commerce.go1_commerce.v2.category import get_category_filters as _get_category_filters
 		return _get_category_filters(route=route)
+		
 	def get_attributes_data(self,options):
 		options_data = options.split(",")
 		options_filter = ""
 		if options_data:
 			options_filter = ','.join(['"' + x + '"' for x in options_data if x])
-		# frappe.log_error("options_filter",options_filter)
-		# selected_options_data = frappe.db.sql(f""" 
-		# 							SELECT 
-		# 								CONCAT(A.attribute_name," : ") AS attribute_name ,
-		# 								PAO.option_value,
-		# 								PAO.unique_name
-		# 							FROM 
-		# 								`tabProduct Attribute Option` PAO
-		# 							INNER JOIN 
-		# 								`tabProduct Attribute` A
-		# 							ON 
-		# 								PAO.attribute = A.name
-		# 							WHERE PAO.unique_name IN ({options_filter})
-		# 						""",as_dict=1)
 		ProductAttributeOption = DocType('Product Attribute Option')
 		ProductAttribute = DocType('Product Attribute')
 

@@ -35,7 +35,7 @@ def generate_all_settings(doc,method):
 
 
 @frappe.whitelist(allow_guest=True)
-def get_all_website_settings(allow_guest = True):
+def get_all_website_settings():
 	try:
 		import os
 		path = get_files_path()
@@ -628,13 +628,21 @@ def check_route(route):
 	return [sub_header,header_content,footer_content]
 
 @frappe.whitelist(allow_guest=True)
-def get_page_content_with_pagination(route=None, user=None, customer=None,
-										application_type="mobile",seller_classify="All Stores",
-										page_no=1,page_size=4):
+def get_page_content_with_pagination(params):
+	try:
+		return get_content_with_pagination(params.get('route'), params.get('user'), params.get('customer'),
+										params.get('application_type','mobile'),params.get('seller_classify','All Stores'),
+										params.get('page_no',1),params.get('page_size',4))
+	except Exception as e:
+		frappe.log_error(message=frappe.get_traceback(), title='Error in page_content')			
+
+
+def get_content_with_pagination(route, user, customer,application_type,seller_classify,
+										page_no,page_size):
 	try:
 		page_content = page_type = list_content = list_style = None
 		side_menu = sub_header = None
-		if not user:
+		if not user and not customer:
 			customer = get_customer_from_token()
 		if user and not customer:
 			customer_info = frappe.db.get_all('Customers', filters={'user_id': user})
@@ -1145,6 +1153,8 @@ def get_page_footer_info(footer_id):
 
 @frappe.whitelist(allow_guest=True)
 def send_otp(mobile_no,doctype="Customer"):
+	if mobile_no and not frappe.db.exists("Customers",{"phone":mobile_no}):
+		return {"status":"Failed","message":"Customer not exist."}
 	from frappe.utils.data import add_to_date
 	from frappe.utils import now
 	platform_settings = frappe.get_single('Order Settings')
@@ -1691,7 +1701,7 @@ def validate_item_info(item, g_item, item_info):
 			).run()
 			
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def update_recently_viewed_products(guest_id, customer_id):
 	recently_viewed_products = frappe.get_all('Customer Viewed Product', 
 											fields=['product', 'viewed_date', 'name'],

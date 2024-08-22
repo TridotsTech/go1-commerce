@@ -43,87 +43,10 @@ def _make_sales_invoice(source_name, target_doc = None, submit = False, ignore_p
 	else:
 		return doclist
 
-@frappe.whitelist(allow_guest=True)
-def createOrderDelivery(order):
-	try:
-		orderDelivery = frappe.db.get_all('Order Delivery', filters={'order_id': order.name})
-		random = get_random_name()
-		if not orderDelivery:
-			order.delivery_created = 1
-			result = frappe.get_doc({
-										'doctype': 'Order Delivery', 
-										'order_id': order.name, 
-										'name': random, 
-										'check_reallocation': 1
-									}).insert(ignore_permissions = True)
-			return result
-	except Exception:
-		frappe.log_error('Error in api.createOrderDelivery', frappe.get_traceback())
 
 
-@frappe.whitelist(allow_guest=True)
-def get_random_name():
-	import random
-	import string
-	random = ''.join([random.choice(string.ascii_letters + string.digits) for n in range(10)])
-	return random
 
 
-@frappe.whitelist(allow_guest=True)
-def retrigger_notify_drivers(order):
-	try:
-		order_doc = frappe.get_doc("Order",order)
-		if order_doc.workflow_state == "Driver Not Assigned":
-			order_doc.driver = None
-			order_doc.driver_status = "Pending"
-			if order_doc.workflow_state == "Driver Accepted":
-				order_doc.workflow_state = "Driver Not Assigned"
-				orderDelivery = frappe.db.get_all('Order Delivery', 
-													filters = {'order_id': order}, 
-													fields = ['*'])
-				if orderDelivery:
-					assigned_drivers = frappe.db.get_all("Driver Assigned",
-											filters = {"parent":orderDelivery[0].name, "status":"Accepted"},
-											fields = ["driver","respond_within","name"])
-					if assigned_drivers:
-						for assigned_driver in assigned_drivers:
-							
-							Drivers = DocType('Drivers')
-							query = (
-								frappe.qb.update(Drivers)
-								.set({
-									'working_status': 'Available',
-									'driver_status': 'Online'
-								})
-								.where(Drivers.name == assigned_driver.driver)
-							)
-							query.run()
-							frappe.db.commit()
-							doc = frappe.get_doc('Drivers', assigned_driver.driver)
-							doc.save(ignore_permissions = True)
-							frappe.publish_realtime('check_active_drivers', {
-																	'name': assigned_driver.driver, 
-																	'driver_status': doc.driver_status, 
-																	'working_status': doc.working_status
-																})
-	except Exception as e:
-		frappe.log_error('Error in api.retrigger_notify_drivers', frappe.get_traceback())
-
-
-@frappe.whitelist(allow_guest=True)
-def update_order_delivery(delivery, driver, time, next_time):
-	try:
-		delivery_info = frappe.get_doc('Order Delivery', delivery.name)
-		delivery_info.append('driver_assigned', {
-												'driver': driver,
-												'notified_at': time,
-												'respond_within': next_time,
-												'order_id': delivery.order_id,
-												'status': 'Task Assigned',
-												})
-		delivery_info.save(ignore_permissions = True)
-	except Exception:
-		frappe.log_error('Error in api.update_order_delivery', frappe.get_traceback())
 
 
 def get_attributes_json(attribute_id):
@@ -796,7 +719,10 @@ def not_check_items(check_items):
 @frappe.whitelist()
 # @role_auth(role='Customer',method="POST")
 def insert_order(data):
-	customer_id = get_customer_from_token()
+	if not data.get("customer"):
+		customer_id = get_customer_from_token()
+	else:
+		customer_id = data.get("customer")
 	catalog_settings = frappe.get_single('Catalog Settings')
 	order_settings = frappe.get_single('Order Settings')
 	val_ip = validate_domain_and_ips()
@@ -2456,8 +2382,6 @@ def get_sh_chrgs_of_distance_and_weight_group(distance,shipping_rate_method,weig
 			"shipping_charges":total_shipping_charges
 		}
 
-
-
 @frappe.whitelist(allow_guest = True)
 def calculate_tax_after_discount(customer_id, discount_amount, discount, subtotal,
 									cart_items, prev_discount=None, discount_type=None, response=None):
@@ -3867,71 +3791,6 @@ def get_order_invoices(order_id):
 				"message":'Invalid Order ID. !'
 			}
 
-
-@frappe.whitelist(allow_guest=True)
-def get_invoices(token):
-
-	orders = frappe.db.get_all("Order",filters={"uuid":token})
-	if not orders:
-		return {
-				"status":"Failed",
-				"message":"No order found. !"
-			}
-	if orders:
-		order_id = orders[0].name
-	docnames = []
-	for x in orders:
-		docnames.append(x.name)
-	order_settings = frappe.get_single('Order Settings')
-	return download_multi_pdf(
-								order_id, doctype = "Orders", 
-								name = docnames[0],
-								format_ = order_settings.default_print_format,
-								no_letterhead = 1,
-								letterhead = 'No Letterhead'
-							)
-
-
-@frappe.whitelist(allow_guest=True)
-def download_multi_pdf(order_id, doctype, name, format_ = None, no_letterhead = False, letterhead = None, 
-						options = None):
-	import json
-	from PyPDF2 import PdfWriter
-	output = PdfWriter()
-	if isinstance(options, str):
-		options = json.loads(options)
-	if not isinstance(doctype, dict):
-		result = name
-		for i, ss in enumerate(result):
-			output = frappe.get_print(doctype, ss, format_, as_pdf = True, output = output,
-										no_letterhead = no_letterhead, letterhead = letterhead,
-										pdf_options = options )
-		frappe.response.filename = "{doctype}.pdf".format(doctype = order_id.replace(" ", "-").replace("/", "-"))
-	else:
-		for doctype_name in doctype:
-			for doc_name in doctype[doctype_name]:
-				try:
-					output = frappe.get_print(doctype_name, doc_name, format, as_pdf = True,
-											output = output, no_letterhead = no_letterhead,
-											letterhead = letterhead, pdf_options = options)
-				except Exception:
-					frappe.log_error(title = "Error in Multi PDF download",
-									message = f"Permission Error on doc {doc_name} of doctype {doctype_name}",
-									reference_doctype = doctype_name,
-									reference_name = doc_name,)
-		frappe.response.filename = f"{name}.pdf"
-	frappe.response.filecontent = read_multi_pdf(output)
-	frappe.response.type = "download"
-	frappe.response.display_content_as = "attachment"
-
-
-def read_multi_pdf(output):
-	fname = os.path.join("/tmp", f"frappe-pdf-{frappe.generate_hash()}.pdf")
-	output.write(open(fname, "wb"))
-	with open(fname, "rb") as fileobj:
-		filedata = fileobj.read()
-	return filedata
-
 @frappe.whitelist(allow_guest=True)
 def get_Products_Tax_Template(name):
 	tax = frappe.db.get_all('Product Tax Template', fields = ['name'],
@@ -3942,13 +3801,11 @@ def get_Products_Tax_Template(name):
 					filters={'parent': i.name})
 	return tax
 
-
 @frappe.whitelist()
 def get_city_based_role():
 	m_settings = frappe.get_single("Market Place Settings")
 	roles = ",".join(['"' + x.role + '"' for x in m_settings.city_based_role])
 	return roles
-
 
 @frappe.whitelist()
 def get_today_date(time_zone = None, replace = False):

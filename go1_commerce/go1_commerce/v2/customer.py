@@ -79,9 +79,10 @@ def get_list_period_wise(dt, condition, customer_id):
 	return [week_order_list, month_order_list, today_order_list, all_order_list]
 
 @frappe.whitelist()
-def get_customer_dashboard():
+def get_customer_dashboard(customer_id=None):
 	try:
-		customer_id = get_customer_from_token()
+		if not customer_id:
+			customer_id = get_customer_from_token()
 		if customer_id:
 			recent_orders = get_orders_list(page_no = 1,page_length = 5, no_subscription_order = 1)
 			condition = ''
@@ -128,12 +129,14 @@ def check_condition_in_order_list(customer,status,driver,date,shipping_method,
 		condition += ' and docstatus > 0'
 
 	return condition
+
 @frappe.whitelist()
 def get_orders_list(page_no=1,page_length=10,no_subscription_order=0,order_from=None,language=None,
 					status=None,shipping_method=None,date=None,driver=None,allow_draft=1,
-					exclude_order_from=None):
+					exclude_order_from=None, customer=None):
 	try:
-		customer = get_customer_from_token()
+		if not customer:
+			customer = get_customer_from_token()
 		
 		Orders = DocType("Order")
 		query = frappe.qb.from_(Orders).select('*').where(Orders.total_amount > 0)
@@ -276,9 +279,10 @@ def get_order_delivery_slots(item):
 	item.delivery_slot_list = delivery_slot_list
 		
 @frappe.whitelist()
-def get_customer_address():
+def get_customer_address(customer_id=None):
 	try:
-		customer_id = get_customer_from_token()
+		if not customer_id:
+			customer_id = get_customer_from_token()
 		if customer_id:
 			CustomerAddress = DocType('Customer Address')
 			query = (
@@ -298,10 +302,11 @@ def get_customer_address():
 		other_exception("Error in v2.customer.get_customer_address")
 
 @frappe.whitelist()
-def get_customer_order_list(page_no = None, page_length = None):
+def get_customer_order_list(page_no = None, page_length = None, customer_id=None):
 	try:
 		if type(page_no) == int and type(page_length) == int and page_no and page_length:
-			customer_id = get_customer_from_token()
+			if not customer_id:
+				customer_id = get_customer_from_token()
 			if customer_id:
 				limit_start = (int(page_no)-1) * int(page_length)
 				fields_list = ["name","creation","status","payment_status","total_amount"]
@@ -325,9 +330,10 @@ def get_customer_order_list(page_no = None, page_length = None):
 		other_exception("Error in v2.customer.get_customer_order_list")
 
 @frappe.whitelist()
-def get_customer_order_details(order_id):
+def get_customer_order_details(order_id, customer_id=None):
 	try:
-		customer_id = get_customer_from_token()
+		if not customer_id:
+			customer_id = get_customer_from_token()
 		if customer_id and frappe.db.get_all("Order",filters={"name":order_id,"customer":customer_id}):
 			order = frappe.get_doc('Order', order_id)
 			delivery_slot = []
@@ -411,12 +417,15 @@ def _get_user_for_update_password(key,new_password, old_password, user):
 def update_address(data):
 	try:
 		response = json.loads(data)
-		customers = get_customer_from_token()
-		if customers:
+		if not response.get('customer'):
+			customer = get_customer_from_token()
+		else:
+			customer = response.get('customer')
+		if customer:
 			if response.get('is_default') == 1:
-				set_default_address(customers)
+				set_default_address(customer)
 			if response.get('address_type'):
-				res = validate_address(response.get('address_type'), customers,response.get('name'))
+				res = validate_address(response.get('address_type'), customer,response.get('name'))
 				if res and res['status'] == 'failed':
 					return res
 			address = frappe.get_doc('Customer Address', response.get('name'))
@@ -466,10 +475,11 @@ def set_address_fields(response, address):
 	if response.get('house_type'):
 		address.house_type = response.get('house_type')
 
-@frappe.whitelist(allow_guest=True)
-def get_customer_info(user=None, email=None, doctype=None, guest_id=None, phone=None):
+@frappe.whitelist()
+def get_customer_info(user=None, email=None, doctype=None, guest_id=None, phone=None, customer=None):
 	try:
-		customer = get_customer_from_token()
+		if not customer:
+			customer = get_customer_from_token()
 		if customer:
 			if not doctype:
 				doctype = 'Customers'
@@ -559,7 +569,7 @@ def get_order_info(order_id):
 	return {"info":order,"messages":[],"delivery_slot":delivery_slot,'feedback':feedback[0] \
 				if feedback else None}
 
-@frappe.whitelist(allow_guest = True)
+@frappe.whitelist()
 def insert_update_customer(**info):
 	try:
 		if info.get('cmd'):
@@ -855,9 +865,10 @@ def update_registration_details(**kwargs):
 
 @frappe.whitelist()
 @role_auth(role='Customer',method="GET")
-def get_wallet_details():
+def get_wallet_details(customer=None):
 	try:
-		customer = get_customer_from_token()
+		if not customer:
+			customer = get_customer_from_token()
 		Wallet = DocType("Wallet")
 		wallet_amount = (
 			frappe.qb.from_(Wallet)
@@ -872,9 +883,10 @@ def get_wallet_details():
 
 @frappe.whitelist()
 @role_auth(role='Customer',method="PUT")
-def update_device_id(device_id):
+def update_device_id(device_id, customer=None):
 	try:
-		customer = get_customer_from_token()
+		if not customer:
+			customer = get_customer_from_token()
 		if customer:
 			from go1_commerce.go1_commerce.v2.common import update_device_id
 			update_device_id('Customers',customer,device_id,'Customer')

@@ -8,7 +8,7 @@ from go1_commerce.utils.utils import get_today_date
 from go1_commerce.utils.utils import role_auth,get_customer_from_token,other_exception
 from frappe.query_builder import DocType, Field, Order
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def check_cartitems_stock_mob(customer_id=None):
 	try:
 		if customer_id:
@@ -68,7 +68,7 @@ def check_cartitems_stock_mob(customer_id=None):
 	except Exception:
 		other_exception("Error in v2.checkout.check_cartitems_stock_mob")
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def get_payment_methods():
 	try:
 		PaymentMethod = DocType("Payment Method")
@@ -92,7 +92,7 @@ def get_payment_methods():
 	except Exception:
 		other_exception('Error in v2.checkout.get_payment_method')
 	
-@frappe.whitelist(allow_guest=True)	
+@frappe.whitelist()	
 def get_shipping_methods():
 	try:
 		order_settings = frappe.get_single('Order Settings')
@@ -206,7 +206,7 @@ def calculate_tax_for_sh_chrgs(shipping_charges,shopping_cart,catalog_settings):
 			'item_tax_rate': shopping_cart.tax if shopping_cart else 0}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 @role_auth(role='Customer',method="POST")	
 def get_order_discount(subtotal,total_weight=0,shipping_method=None,payment_method=None,shipping_charges=0):
 	try:
@@ -496,7 +496,7 @@ def get_slot_lists(slots, date, min_time, restrict, max_booking_slot):
 					slot_list.append(doc)
 	return slot_list
 	
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def get_country_states(country):
 	try:
 		State = DocType("State")
@@ -510,7 +510,7 @@ def get_country_states(country):
 		other_exception("Error in v2.cart.get_country_states")
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def validate_order_pincode_validate(cartitems,ship_addr):
 	try:
 		CustomerAddress = DocType("Customer Address")
@@ -568,8 +568,7 @@ def check_pincode_availability(zipcode):
 		frappe.log_error(message=frappe.get_traceback(),title='Error in v2.checkout.check_pincode_availability')
 		return {'is_available': 0}
 
-
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def shipping_zip_matches(zip, ziprange):
 	zipcoderanges = []
 	returnValue = False

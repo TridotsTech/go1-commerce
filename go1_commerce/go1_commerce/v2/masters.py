@@ -17,23 +17,6 @@ def failed_msg_400_resp(message):
 			"error_message":message}
 
 @frappe.whitelist()
-def get_countries():
-	try:
-		Country = DocType('Country')
-		data = (
-			frappe.qb.from_(Country)
-			.select(Country.name, Country.time_zones)
-			.where(Country.docstatus == 0)
-		).run(as_dict=True)
-		if data:
-			return format_output(label="name",value="name",data=data)
-		else:
-			return failed_msg_resp("The Contry list not found")
-	except Exception:
-		other_exception("country get_country_list")
-
-
-@frappe.whitelist()
 def get_states(country=None):
 	try:
 		
