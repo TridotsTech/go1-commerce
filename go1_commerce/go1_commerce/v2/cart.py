@@ -96,7 +96,7 @@ class CustomerCart:
 										sender_email,sender_message,recipient_email, 
 										recipient_date_of_birth,recipient_name,device_type)
 			if res.get('status'):
-				return get_cart_items(customer)
+				return get_customer_cart_items(customer)
 			else:
 				return res
 		
@@ -120,7 +120,7 @@ class CustomerCart:
 										sender_message,recipient_email,recipient_date_of_birth,
 										recipient_name,device_type)
 			if res.get('status'):
-				return get_customer_cart(cart_type,customer)
+				return get_customer_cart_items(customer)
 			else:
 				return res
 	
@@ -228,7 +228,7 @@ class CustomerCart:
 			if not resp.get('status'):
 				return resp
 		cartitem.save(ignore_permissions=True)
-		return get_customer_cart(cart_type,customer)
+		return get_customer_cart_items(customer)
 	
 	def update_cartitem(self,name, qty, qty_type = None):
 		if not frappe.db.get_value("Cart Items",{"name":name}):
@@ -320,7 +320,7 @@ class CustomerCart:
 			if not check_stock.get("status"):
 				return check_stock
 			frappe.db.commit()
-		return get_cart_items(customer)
+		return get_customer_cart_items(customer)
 	
 	def update_item_to_existing_cart(self,wishlist_item_doc,product_details,shopping_cart_item):
 		cartitem = frappe.get_doc('Cart Items', shopping_cart_item)
@@ -498,7 +498,7 @@ def delete_cart_items(name,customer_id = None):
 			frappe.db.commit()
 			parent_doc = frappe.get_doc('Shopping Cart', doc.parent)
 			parent_doc.save(ignore_permissions=True)
-		return get_cart_items(customer)
+		return get_customer_cart_items(customer)
 	except Exception:
 		other_exception("Error in v2.carts.delete_cart_items")
 		return {"status":"Failed","message":"something went wrong"}
@@ -526,7 +526,7 @@ def clear_cartitem(customer=None):
 		other_exception("Error in v2.cart.clear_cartitem")
 
 @frappe.whitelist(allow_guest = True)
-def get_cart_items(customer_id = None):
+def get_customer_cart_items(customer_id = None):
 	try:
 		if customer_id:
 			customer = customer_id

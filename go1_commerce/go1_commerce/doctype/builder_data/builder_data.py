@@ -14,26 +14,14 @@ except Exception as e:
 	no_of_records_per_page = 10
 	
 class BuilderData(Document):
-	def get_category_products(self,category=None, sort_by=None, page_no=1,
-							 page_size=no_of_records_per_page,
-							brands=None, rating=None,min_price=None, 
-							max_price=None,attributes=None,
-							productsid=None,customer=None,route=None):
-		if not customer and frappe.request.cookies.get('customer_id'):
+	def get_category_products(self,params):
+		customer = None
+		if not params.get("customer") and frappe.request.cookies.get('customer_id'):
 			customer = frappe.request.cookies.get('customer_id')
 		from go1_commerce.go1_commerce.v2.product import get_category_products as _get_category_products
-		product_list = _get_category_products(category=category, 
-							sort_by=sort_by, 
-							page_no=page_no,
-							page_size=page_size,
-							brands=brands, 
-							rating=rating,
-							min_price=min_price, 
-							max_price=max_price,
-							attributes=attributes,
-							customer=customer,
-							route=route)
+		product_list = _get_category_products(params)
 		customer_cart = None
+		frappe.log_error("get_customer_cart_items",customer)
 		if customer:
 			customer_cart = self.get_customer_cart_items(customer)
 		for x in product_list:
@@ -89,22 +77,25 @@ class BuilderData(Document):
 			frappe.log_error(title = "Error in builder_data.get_attributes_data", 
 								message = frappe.get_traceback())
 
-	def get_customer_cart_items(self,customer):
-		from go1_commerce.go1_commerce.v2.cart import get_cart_items
-		cart_obj = get_cart_items(customer)
-		currency = frappe.db.get_single_value("Catalog Settings","default_currency")
-		currency_symbol = frappe.db.get_value("Currency",currency,"symbol")
-		if cart_obj.get("status") == "success":
-			if cart_obj.get("cart"):
-				total_amount = 0
-				for c in cart_obj.get("cart").get("items"):
-					c.formatted_price = frappe.utils.fmt_money(c["price"],currency=currency_symbol)
-					total_amount = c["total"] + total_amount
-				cart_obj.get("cart")["formatted_total"] = frappe.utils.fmt_money(total_amount,currency=currency_symbol)
-			if cart_obj.get("wishlist"):
-				for c in cart_obj.get("wishlist").get("items"):
-					c.formatted_price = frappe.utils.fmt_money(c["price"],currency=currency_symbol)
-		 
+	def get_customer_cart_items(self,customer=None):
+		cart_obj={}
+		frappe.log_error("cart customer",customer)
+		if customer:
+			from go1_commerce.go1_commerce.v2.cart import get_customer_cart_items as _get_customer_cart
+			cart_obj = _get_customer_cart(customer)
+			currency = frappe.db.get_single_value("Catalog Settings","default_currency")
+			currency_symbol = frappe.db.get_value("Currency",currency,"symbol")
+			if cart_obj.get("status") == "success":
+				if cart_obj.get("cart"):
+					total_amount = 0
+					for c in cart_obj.get("cart").get("items"):
+						c.formatted_price = frappe.utils.fmt_money(c["price"],currency=currency_symbol)
+						total_amount = c["total"] + total_amount
+					cart_obj.get("cart")["formatted_total"] = frappe.utils.fmt_money(total_amount,currency=currency_symbol)
+				if cart_obj.get("wishlist"):
+					for c in cart_obj.get("wishlist").get("items"):
+						c.formatted_price = frappe.utils.fmt_money(c["price"],currency=currency_symbol)
+			 
 		return cart_obj
 
 	def get_all_settings(self):

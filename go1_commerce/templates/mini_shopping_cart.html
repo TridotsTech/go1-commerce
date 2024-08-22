@@ -1,0 +1,183 @@
+<div class="frappe-builder-3b8cab6b">
+{%for c_item in cart_items%}
+    <div class="frappe-builder-2555e525" data-cart-item="{{c_item.name}}"><img class="frappe-builder-0737d1a5" src="{{c_item.image}}">
+        <div class="frappe-builder-f6fb182d">
+            <div class="frappe-builder-922eadd3 __text_block__">{{c_item.item}}</div>
+            <div class="frappe-builder-c8039e60">
+                <div class="frappe-builder-9b9ea9cf __text_block__">{{c_item.formatted_price}}</div>
+                <div class="frappe-builder-1de0e39e" data-item-name="{{c_item.item}}"><a class="frappe-builder-c748a71b __text_block__" data-item-id="{{c_item.name}}" href="#" onclick="update_cart_item('sub',this)">-</a>
+                    <div class="frappe-builder-720f514a __text_block__ cart-qty">{{c_item.quantity}}</div><a class="frappe-builder-e92f8914 __text_block__" data-item-id="{{c_item.name}}" href="#" onclick="update_cart_item('add',this)">+</a><a class="frappe-builder-fbea0bf0 __text_block__" data-item-id="{{c_item.name}}" href="#" onclick="show_delete_cart_item_confirm(this)">
+                        <div class="frappe-builder-f2840283"><svg data-name="Layer 1" id="Layer_1" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <defs>
+                                    <style>
+                                    .cls-1 {
+                                        fill: #c70000;
+                                    }
+                                    </style>
+                                </defs>
+                                <title>delete-icon</title>
+                                <path class="cls-1" d="M20.66,4.72H15.8V3.91a2.43,2.43,0,0,0-2.43-2.43H10.14A2.43,2.43,0,0,0,7.71,3.91v.81H2.85a.81.81,0,0,0,0,1.62h.81V18.48a4.06,4.06,0,0,0,4.05,4.05H15.8a4.06,4.06,0,0,0,4.05-4.05V6.34h.81a.81.81,0,1,0,0-1.62ZM9.33,3.91a.81.81,0,0,1,.81-.81h3.23a.81.81,0,0,1,.81.81v.81H9.33Zm8.9,14.57a2.43,2.43,0,0,1-2.43,2.43H7.71a2.43,2.43,0,0,1-2.43-2.43V6.34h13ZM11,16.86V10.39a.81.81,0,1,1,1.61,0v6.47a.81.81,0,1,1-1.61,0Zm-3.24,0V10.39a.81.81,0,0,1,1.62,0v6.47a.81.81,0,1,1-1.62,0Zm6.47,0V10.39a.81.81,0,1,1,1.62,0v6.47a.81.81,0,1,1-1.62,0Z"></path>
+                            </svg></div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+{%endfor%}
+</div>
+
+<style>
+.frappe-builder-3b8cab6b {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    flex-shrink: 0;
+    min-height: 300px;
+    overflow: hidden;
+    position: relative;
+}
+.frappe-builder-2555e525 {
+    display: flex;
+    flex-direction: row;
+    flex-shrink: 0;
+    height: fit-content;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    border-color: #f1f5f9;
+    border-width: 0px 0px 1px 0px;
+    border-style: solid;
+    padding: 15px;
+    gap: 15px;
+}
+.frappe-builder-0737d1a5 {
+    object-fit: cover;
+    position: static;
+    width: 80px;
+    height: auto;
+}
+.frappe-builder-f6fb182d {
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    width: calc(100% - 100px);
+    overflow: hidden;
+    position: relative;
+    gap: 15px;
+    justify-content: center;
+    align-items: flex-start;
+    height: 100%;
+}
+.frappe-builder-922eadd3 {
+    font-size: 14px;
+    width: fit-content;
+    height: fit-content;
+    line-height: 24px;
+    min-width: 10px;
+    position: static;
+    top: auto;
+    left: auto;
+}
+.frappe-builder-922eadd3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.frappe-builder-c8039e60 {
+    display: flex;
+    flex-direction: row;
+    flex-shrink: 0;
+    height: fit-content;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    justify-content: space-between;
+}
+.frappe-builder-c8039e60 {
+    flex-shrink: unset;
+}
+.frappe-builder-9b9ea9cf {
+    font-size: 14px;
+    width: fit-content;
+    height: fit-content;
+    line-height: 1.4;
+    min-width: 10px;
+    position: static;
+}
+.frappe-builder-1de0e39e {
+    display: flex;
+    flex-direction: row;
+    flex-shrink: 0;
+    height: fit-content;
+    width: 120px;
+    overflow: hidden;
+    position: relative;
+    gap: 10px;
+    justify-content: space-between;
+}
+.frappe-builder-c748a71b {
+    font-size: 16px;
+    width: fit-content;
+    height: fit-content;
+    line-height: 1.4;
+    min-width: 10px;
+    position: static;
+    background: #ededed;
+    border-radius: 3px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+.frappe-builder-c748a71b {
+    height: 26px;
+    display: flex;
+    width: 28px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 3px;
+    background: #ededed;
+    padding-top: 3px;
+}
+.frappe-builder-720f514a {
+    font-size: 16px;
+    width: fit-content;
+    height: fit-content;
+    line-height: 1.4;
+    min-width: 10px;
+    position: static;
+}
+.frappe-builder-720f514a {
+    display: flex;
+    align-items: center;
+    height: 28px;
+    justify-content: center;
+}
+.frappe-builder-e92f8914 {
+    height: 26px;
+    display: flex;
+    width: 28px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 3px;
+    background: #ededed;
+    padding-top: 3px;
+}
+.frappe-builder-fbea0bf0 {
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    height: fit-content;
+    width: fit-content;
+    overflow: hidden;
+}
+.frappe-builder-f2840283 {
+    height: 25px;
+    width: 25px;
+    background: #ff000014;
+    padding: 4px;
+    border-radius: 3px;
+}
+</style>

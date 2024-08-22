@@ -1,0 +1,173 @@
+<div class="frappe-builder-784810d7">
+{%for cart_item in cart_items%}
+    <div class="frappe-builder-d48c4aa8" data-cart-item="{{cart_item.name}}"><img class="frappe-builder-4a84ea46" src="{{cart_item.image}}">
+        <div class="frappe-builder-d567ff3f">
+            <div class="frappe-builder-c1bf8c88 __text_block__">{{cart_item.item}}</div>
+            <div class="frappe-builder-acbd2271">
+                <div class="frappe-builder-b58be9f4 __text_block__">{{cart_item.formatted_price}}</div>
+                <div class="frappe-builder-f00e92aa" data-item-name="{{cart_item.item}}"><a class="frappe-builder-bd7c138b __text_block__" data-item-id="{{cart_item.name}}" href="#" onclick="update_cart_item('add',this)">Add<div class="frappe-builder-294c0470"><svg aria-hidden="true" class="lucide lucide-shopping-bag h-6 w-6 shrink-0" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+                                <path d="M3 6h18"></path>
+                                <path d="M16 10a4 4 0 0 1-8 0"></path>
+                            </svg></div></a><a class="frappe-builder-d2243c44 __text_block__" data-item-id="{{cart_item.name}}" href="#" onclick="show_delete_cart_item_confirm(this)">
+                        <div class="frappe-builder-6b0c84bc"><svg data-name="Layer 1" id="Layer_1" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <defs>
+                                    <style>
+                                    .cls-1 {
+                                        fill: #c70000;
+                                    }
+                                    </style>
+                                </defs>
+                                <title>delete-icon</title>
+                                <path class="cls-1" d="M20.66,4.72H15.8V3.91a2.43,2.43,0,0,0-2.43-2.43H10.14A2.43,2.43,0,0,0,7.71,3.91v.81H2.85a.81.81,0,0,0,0,1.62h.81V18.48a4.06,4.06,0,0,0,4.05,4.05H15.8a4.06,4.06,0,0,0,4.05-4.05V6.34h.81a.81.81,0,1,0,0-1.62ZM9.33,3.91a.81.81,0,0,1,.81-.81h3.23a.81.81,0,0,1,.81.81v.81H9.33Zm8.9,14.57a2.43,2.43,0,0,1-2.43,2.43H7.71a2.43,2.43,0,0,1-2.43-2.43V6.34h13ZM11,16.86V10.39a.81.81,0,1,1,1.61,0v6.47a.81.81,0,1,1-1.61,0Zm-3.24,0V10.39a.81.81,0,0,1,1.62,0v6.47a.81.81,0,1,1-1.62,0Zm6.47,0V10.39a.81.81,0,1,1,1.62,0v6.47a.81.81,0,1,1-1.62,0Z"></path>
+                            </svg></div>
+                    </a></div>
+            </div>
+        </div>
+    </div>
+    
+    {%endfor%}
+</div>
+<style type="text/css">
+	.frappe-builder-f00e92aa {
+    display: flex;
+    flex-direction: row;
+    flex-shrink: 0;
+    height: fit-content;
+    width: 110px;
+    overflow: hidden;
+    position: relative;
+    gap: 10px;
+    justify-content: space-between;
+}
+	.frappe-builder-4c576876 {
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    overflow: hidden;
+    position: static;
+    background: #fff;
+    width: 100%;
+height: calc(100vh - 110px);
+}
+.frappe-builder-784810d7 {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    flex-shrink: 0;
+    min-height: 300px;
+    overflow: hidden;
+    position: relative;
+}
+.frappe-builder-d48c4aa8 {
+    display: flex;
+    flex-direction: row;
+    flex-shrink: 0;
+    height: fit-content;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    border-color: #f1f5f9;
+    border-width: 0px 0px 1px 0px;
+    border-style: solid;
+    padding: 15px;
+    gap: 15px;
+}
+.frappe-builder-4a84ea46 {
+    object-fit: cover;
+    position: static;
+    width: 80px;
+    height: auto;
+}
+.frappe-builder-d567ff3f {
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    width: calc(100% - 100px);
+    overflow: hidden;
+    position: relative;
+    gap: 15px;
+    justify-content: center;
+    align-items: flex-start;
+    height: 100%;
+}
+.frappe-builder-c1bf8c88 {
+    font-size: 14px;
+    width: fit-content;
+    height: fit-content;
+    line-height: 24px;
+    min-width: 10px;
+    position: static;
+    top: auto;
+    left: auto;
+}
+.frappe-builder-c1bf8c88 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.frappe-builder-acbd2271 {
+    display: flex;
+    flex-direction: row;
+    flex-shrink: unset;
+    height: fit-content;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    justify-content: space-between;
+}
+.frappe-builder-b58be9f4 {
+    font-size: 14px;
+    width: fit-content;
+    height: fit-content;
+    line-height: 1.4;
+    min-width: 10px;
+    position: static;
+}
+.frappe-builder-bd7c138b {
+    font-size: 16px;
+    width: fit-content;
+    line-height: 1.4;
+    min-width: 10px;
+    position: static;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-left: 10px;
+    padding-right: 10px;
+    background: #ededed;
+    border-radius: 3px;
+    display: flex;
+    grid-template-columns: repeat(2, minmax(200px, 1fr));
+    gap: 5px;
+}
+.frappe-builder-bd7c138b {
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 3px;
+    background: #ededed;
+    padding-top: 3px;
+}
+.frappe-builder-294c0470 {
+    height: 15px;
+    width: 15px;
+}
+.frappe-builder-d2243c44 {
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    height: fit-content;
+    width: fit-content;
+    overflow: hidden;
+}
+.frappe-builder-6b0c84bc {
+    height: 25px;
+    width: 25px;
+    background: #ff000014;
+    padding: 4px;
+    border-radius: 3px;
+}
+</style>
