@@ -9,6 +9,7 @@ from frappe.utils import flt
 from frappe.model.naming import make_autoname
 from go1_commerce.utils.setup import get_settings
 from frappe.query_builder import DocType, Field
+from frappe.query_builder.functions import Sum, Count
 
 class ProductReview(Document):
 	def autoname(self):
@@ -30,8 +31,8 @@ class ProductReview(Document):
 		review = (
 			frappe.qb.from_(ProductReview)
 			.select(
-				ProductReview.rating.sum().as_('sum'),
-				frappe.qb.functions.Count(ProductReview.rating).as_('cnt')
+				Sum(ProductReview.rating).as_('sum'),
+				Count(ProductReview.rating).as_('cnt')
 			)
 			.where(
 				(ProductReview.is_approved == 1) &
@@ -76,8 +77,8 @@ class ProductReview(Document):
 		review = (
 			frappe.qb.from_(ProductReview)
 			.select(
-				ProductReview.rating.sum().as_('sum'),
-				frappe.qb.functions.Count(ProductReview.rating).as_('cnt')
+				Sum(ProductReview.rating).as_('sum'),
+				Count(ProductReview.rating).as_('cnt')
 			)
 			.where(
 				(ProductReview.is_approved == 1) &
