@@ -806,10 +806,8 @@ def update_cart():
 			doc.save(ignore_permissions=True)
 
 
-
+@frappe.whitelist()
 def get_products(doctype, txt, searchfield, start, page_len, filters):
-	if txt:
-		condition += ' and (name like "%{txt}%" or item like "%{txt}%")'.format(txt = txt)
 	Product = DocType('Product')
 	query = (
 		frappe.qb.from_(Product)
@@ -817,8 +815,12 @@ def get_products(doctype, txt, searchfield, start, page_len, filters):
 		.where(Product.status == "Approved")
 	)
 	if txt:
-		query.where(Product.name == "Approved")
-	result = query.run(as_dict=True)
+		query = query.where(
+			(Product.name.like(f"%{txt}%")) |
+			(Product.item.like(f"%{txt}%"))
+		)
+	result = query.run()
+	return result
 
 
 def get_query_condition(user):
@@ -953,7 +955,7 @@ def get_shopping_cart_settings():
 	return get_settings('Shopping Cart Settings')
 
 
-
+@frappe.whitelist()
 def get_product_attribute(product):
 	from go1_commerce.go1_commerce.doctype.product.product import get_product_attribute_options
 	attributes=frappe.db.get_all('Product Attribute Mapping',

@@ -32,10 +32,10 @@ class BirthDayClubSetting(Document):
 def update_birthday_club_discount(self):
 	
 	DiscountRequirements = DocType('Discount Requirements')
-	frappe.qb.from_(DiscountRequirements)
+	delt = (frappe.qb.from_(DiscountRequirements)
 		.delete()
 		.where(DiscountRequirements.parent == self.discount_id)
-		.run()
+		.run())
 	frappe.db.commit()
 	frappe.get_doc({
 				'doctype': 'Discount Requirements',

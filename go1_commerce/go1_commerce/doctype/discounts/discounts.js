@@ -766,7 +766,8 @@ frappe.ui.form.on("Discount Products", {
                         option_list.push({"idx": idx, "name": name,"label":label, "product": q.parent})
                     });
                 });
-                 var possible_val = [{
+                if(option_list.length>0){
+                var possible_val = [{
                         "cls": "custom-productattr-name",
                         "tab_html_field": "product_attribute_html",
                         "tab_field": "product_attribute_json",
@@ -790,6 +791,7 @@ frappe.ui.form.on("Discount Products", {
                     settings: possible_val,
                     list_array: option_list
                 })
+                }
             });
        }
     }
