@@ -33,7 +33,7 @@ frappe.ui.form.on('Wallet Withdrawal Request', {
                         if(approve == 1){
                             approve = 0
                             frappe.call({
-                                method: 'go1_commerce.go1_commerce.doctype.wallet_withdrawal_request.wallet_withdrawal_request.update_requested_status',
+                                method: 'go1_commerce.accounts.doctype.wallet_withdrawal_request.wallet_withdrawal_request.update_requested_status',
                                 args: { "status": "Approved", "id": frm.doc.name, 'doctype': cur_frm.doctype },
                                 async: false,
                                 callback: function(data) {
@@ -41,7 +41,7 @@ frappe.ui.form.on('Wallet Withdrawal Request', {
                                     cur_frm.reload_doc();
                                 }
                             })
-                            show_alert('Request Approved!')
+                            frappe.show_alert('Request Approved!')
                         }
                     })
                 
@@ -53,7 +53,7 @@ frappe.ui.form.on('Wallet Withdrawal Request', {
                         if(approve == 1){
                             approve = 0
                             frappe.call({
-                                method: 'go1_commerce.go1_commerce.doctype.wallet_withdrawal_request.wallet_withdrawal_request.update_requested_status',
+                                method: 'go1_commerce.accounts.doctype.wallet_withdrawal_request.wallet_withdrawal_request.update_requested_status',
                                 args: { "status": "Rejected", "id": frm.doc.name, 'doctype': cur_frm.doctype },
                                 async: false,
                                 callback: function(data) {
@@ -61,7 +61,7 @@ frappe.ui.form.on('Wallet Withdrawal Request', {
                                     cur_frm.reload_doc();
                                 }
                             })
-                            show_alert('Request Approved!')
+                            frappe.show_alert('Request Approved!')
                         }
                     })
             }).css({'background-color':"#1d8fdb",'color':"#fff","padding": "5px"})

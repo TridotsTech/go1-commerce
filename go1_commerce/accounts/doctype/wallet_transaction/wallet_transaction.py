@@ -9,7 +9,7 @@ from frappe import _
 from frappe.utils import flt, nowdate
 from frappe.utils import now_datetime
 from go1_commerce.utils.setup import get_settings
-from frappe.query_builder import DocType, Field
+from frappe.query_builder import DocType, Field, Order
 
 current_date=timestamp = now_datetime().strftime(" %Y-%m-%d %H:%M:%S")
 
@@ -49,7 +49,7 @@ class WalletTransaction(Document):
 				create_new_wallet_cod(self)
 		if self.status == "Credited":
 			update_wallet(self)
-			pay=make_recived_payment(self,self.transaction_type)
+			pay=make_recived_payment(self.name,self.transaction_type)
 		if self.status == "Debited" and self.transaction_type=="Pay":
 			pay=make_recived_payment(self.name,self.transaction_type)
 			self.debit_wallet()		
@@ -71,7 +71,7 @@ class WalletTransaction(Document):
 				create_new_wallet_cod(self)
 		if self.status == "Credited":
 			update_wallet(self)
-			pay=make_recived_payment(self,self.transaction_type)
+			pay=make_recived_payment(self.name,self.transaction_type)
 		if self.status == "Debited" and self.transaction_type=="Pay":
 			pay=make_recived_payment(self.name,self.transaction_type)
 			self.debit_wallet()
@@ -87,8 +87,8 @@ class WalletTransaction(Document):
 				.where(wallet_transaction.transaction_type == "Pay")
 				.where(wallet_transaction.party == self.party)
 				.where(wallet_transaction.status == self.status)
-				.where(wallet_transaction.end_date.is_not_null())
-				.orderby(wallet_transaction.end_date.asc())
+				.where(wallet_transaction.end_date.isnotnull())
+				.orderby(wallet_transaction.end_date, order=Order.asc)
 			)
 			query_2 = (
 				frappe.qb.from_(wallet_transaction)
@@ -98,7 +98,7 @@ class WalletTransaction(Document):
 				.where(wallet_transaction.transaction_type == "Pay")
 				.where(wallet_transaction.party == self.party)
 				.where(wallet_transaction.status == self.status)
-				.where(wallet_transaction.end_date.is_null())
+				.where(wallet_transaction.end_date.isnull())
 			)
 			results_1 = query_1.run(as_dict=True)
 			results_2 = query_2.run(as_dict=True)
@@ -140,7 +140,7 @@ class WalletTransaction(Document):
 			total = flt(wallet[0].total_wallet_amount) - flt(amt)
 			cur_amt = flt(wallet[0].current_wallet_amount) - flt(amt)
 			query = (
-				frappe.qb.from_(walletDoc)
+				frappe.qb.update(walletDoc)
 				.set(walletDoc.total_wallet_amount, total)
 				.set(walletDoc.current_wallet_amount, cur_amt)
 				.where(walletDoc.user == self.party)
@@ -460,8 +460,8 @@ def update_walletcancels(self):
 								"Error in accounts.doctype.wallet_entry.wallet_entry.update_walletcancel") 
 
 
-def update_transaction_status(id,doctype,status):
-	trans=frappe.get_doc('Wallet Transaction',id)
+def update_transaction_status(Id,doctype,status):
+	trans=frappe.get_doc('Wallet Transaction',Id)
 	wallet_transaction = DocType('Wallet Transaction')
 	providers = (
 		frappe.qb.from_(wallet_transaction)
@@ -483,7 +483,7 @@ def update_transaction_status(id,doctype,status):
 		wallet_update.is_fund_added = 1
 		wallet_update.flags.ignore_permissions = True
 		wallet_update.db_update()
-	make_recived_payment(id,"Receive")
+	make_recived_payment(Id,"Receive")
 	trans = (
 		frappe.qb.update(wallet_transaction)
 		.set(wallet_transaction.status,'Approved')
@@ -512,9 +512,8 @@ def update_docstatus(docid, doctype, status, field=None):
 
 def make_recived_payment(source_name,payment_type,reference=None):
 	try:
-		frappe.log_error("SO NA",source_name.name)
 		default_currency=get_settings('Catalog Settings')
-		w_sources = frappe.db.get_all("Wallet Transaction",fields=["*"],filters={"name":source_name.name})
+		w_sources = frappe.db.get_all("Wallet Transaction",fields=["*"],filters={"name":source_name})
 		if w_sources:
 			source=w_sources[0]
 			if source.type != "Service Provider":
