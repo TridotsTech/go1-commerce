@@ -520,12 +520,12 @@ class Order(Document):
 			shippingcharge_res = calculate_shipping_charges(self)
 			if shippingcharge_res:
 				self.shipping_charges = shippingcharge_res.get("shipping_charges") if shippingcharge_res.get("shipping_charges") else 0
-				frappe.db.set_value('Order', self.name, 'shipping_charges', shippingcharge_res.get("shipping_charges"))
+				frappe.db.set_value('Order', self.name, 'shipping_charges', shippingcharge_res.get("shipping_charges") if shippingcharge_res.get("shipping_charges") else 0)
 		else:
 			shippingcharge_res = calculate_shipping_charges(self)
 			if shippingcharge_res:
 				self.shipping_charges = shippingcharge_res.get("shipping_charges") if shippingcharge_res.get("shipping_charges") else 0
-				frappe.db.set_value('Order', self.name, 'shipping_charges', shippingcharge_res.get("shipping_charges"))
+				frappe.db.set_value('Order', self.name, 'shipping_charges', shippingcharge_res.get("shipping_charges") if shippingcharge_res.get("shipping_charges") else 0)
 		self.shipping_tax_subtotal(subtotal)
 		tax_template = None
 		tax_val=0
@@ -1032,7 +1032,7 @@ class Order(Document):
 				query = (
 					frappe.qb.from_(OrderItem)
 					.inner_join(Product).on(OrderItem.item == Product.name)
-					.select(OrderItem.star(), Product.inventory_method, Product.stock)
+					.select('*', Product.inventory_method, Product.stock)
 					.where(OrderItem.parent == self.name)
 					.orderby(OrderItem.idx)
 				)
@@ -2604,7 +2604,7 @@ def get_order_item(order_id, coupon_code,coupon_data,msg,status):
 				}
 
 
-
+@frappe.whitelist()
 def update_order_items_status(Products, status, OrderId, doctype, Tracking_Number = None,
 								Tracking_Link = None,create_shipment = None, driver = None):
 	try:
@@ -2649,7 +2649,7 @@ def create_order_shipment(dt, dn, products, tracking_number = None, tracking_lin
 				shipment.business = doc.business
 			for item in doc.order_item:
 				shipment.append('items',{
-											'item_type': item.order_item_type,
+											'item_type': "Product",
 											'item': item.item,
 											'item_name': item.item_name,
 											'quantity': item.quantity,
@@ -2735,22 +2735,18 @@ def get_order_items(OrderId,fntype):
 			status_update.save(ignore_permissions=True)
 			frappe.db.set_value("Order",OrderId,'pre_status',"Delivered")
 			OrderItem = DocType('Order Item')
-			up = (
-				frappe.qb
-				.update(OrderItem)
-				.set({
-					OrderItem.shipping_status: 'Delivered',
-					OrderItem.delivery_date: getdate(nowdate())
-				})
-				.where(OrderItem.parent == OrderId)
-				.run()
+			updt = (
+				frappe.qb.update(OrderItem)
+				.set(OrderItem.shipping_status, 'Delivered')
+				.set(OrderItem.delivery_date, getdate(nowdate()))
+				.where(OrderItem.parent == OrderId).run()
 			)
 			return "Success"
 	except Exception:
 		frappe.log_error("Error in doctype.order.get_order_items", frappe.get_traceback())
 
 
-
+@frappe.whitelist()
 def _get_order_items_(OrderId, fntype):
 	try:
 		OrderItem = DocType('Order Item')
@@ -3080,7 +3076,7 @@ def shipping_by_weight(order_item, order_doc, shipping_rate_method):
 				vo_shipping_charges += float(shipping_charges_list[0].charge_amount)
 
 
-
+@frappe.whitelist()
 def get_product_price(product, customer, attribute = None):
 	try:
 		price = 0

@@ -337,14 +337,12 @@ def check_MOP_and_amount(pe,mode_of_payment, source, amount, total):
 @frappe.whitelist()
 def make_payment(source_name = None, order = None, mode_of_payment = None, amount = None):
 	try:
-		frappe.log_error("source_name",source_name)
 		default_currency = get_settings('Catalog Settings')
 		if source_name:
 			source = frappe.get_all("Order",
 								fields=["name","outstanding_amount","total_amount","customer_name","customer",
 										"customer_type"],
 								filters={"name":source_name})[0]
-		frappe.log_error("source",source)
 		if order:
 			source = frappe.get_all("Order",fields=["*"],filters={"name":order})[0]
 		if flt(source.outstanding_amount) == 0:
