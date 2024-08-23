@@ -1006,7 +1006,7 @@ def get_product_discount_attr_items(disc,product,attribute_id,out):
 		.left_join(ProductAttributeMapping).on(ProductAttributeMapping.name == ProductAttributeOption.attribute_id)
 		.left_join(Product).on(Product.name == ProductAttributeMapping.parent)
 		.select(
-			(frappe.qb.field('IFNULL(O.price_adjustment, 0)') + frappe.qb.field('IFNULL(PDT.price, 0)')).as_('rate'),
+			(IfNull(O.price_adjustment, 0) + IfNull(PDT.price, 0)).as_('rate'),
 			ProductAttributeOption.option_value,
 			ProductAttributeMapping.attribute,
 			ProductAttributeOption.name.as_('optionid'),
@@ -1143,7 +1143,7 @@ def get_product_discount_items(discount,dis_list,out):
 			.left_join(ProductAttributeMapping).on(ProductAttributeMapping.name == ProductAttributeOption.attribute_id)
 			.left_join(Product).on(Product.name == ProductAttributeMapping.parent)
 			.select(
-				(frappe.qb.field('IFNULL(O.price_adjustment, 0)') + frappe.qb.field('IFNULL(PDT.price, 0)')).as_('rate'),
+				(IfNull(O.price_adjustment, 0) + IfNull(PDT.price, 0)).as_('rate'),
 				ProductAttributeOption.option_value,
 				ProductAttributeMapping.attribute,
 				ProductAttributeOption.name.as_('optionid'),
@@ -1504,7 +1504,7 @@ def get_coupon_code_by_apply_discount(products_list,apply_discount):
 		query = (
 			frappe.qb.from_(ProductImage)
 			.select(
-				frappe.qb.func.ifnull(ProductImage.mini_cart, '').as_('image')
+				IfNull(ProductImage.mini_cart, '').as_('image')
 			)
 			.where(
 				ProductImage.parent == disc.product
@@ -1818,7 +1818,7 @@ def get_nonfree_product_item(nonfree_product_item,cart_items,subtotal,out):
 			.left_join(ProductAttributeMapping).on(ProductAttributeOption.attribute_id == ProductAttributeMapping.name)
 			.left_join(Product).on(Product.name == ProductAttributeMapping.parent)
 			.select(
-				(frappe.qb.fn.IFNULL(ProductAttributeOption.price_adjustment, 0) + frappe.qb.fn.IFNULL(Product.price, 0)).as_("rate"),
+				(IfNull(ProductAttributeOption.price_adjustment, 0) + IfNull(Product.price, 0)).as_("rate"),
 				ProductAttributeOption.option_value,
 				ProductAttributeMapping.attribute,
 				ProductAttributeOption.name.as_("optionid"),
@@ -2587,8 +2587,8 @@ def get_coupan_code_query(disc):
 		.left_join(Product)
 		.on(Product.name == ProductAttributeMapping.parent)
 		.select(
-			(frappe.qb.functions.IFNULL(ProductAttributeOption.price_adjustment, 0) +
-			 frappe.qb.functions.IFNULL(Product.price, 0)).as_("rate"),
+			(IfNull(ProductAttributeOption.price_adjustment, 0) +
+			 IfNull(Product.price, 0)).as_("rate"),
 			ProductAttributeOption.option_value,
 			ProductAttributeMapping.attribute,
 			ProductAttributeOption.name.as_("optionid"),
