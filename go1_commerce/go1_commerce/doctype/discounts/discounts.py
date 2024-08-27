@@ -312,6 +312,7 @@ def get_product_discount_rule(product, qty):
 	if rule:
 		return get_product_dixcount_rule_(rule,product)
 
+@frappe.whitelist()
 def get_product_categories(product_id):
 	ProductCategoryMapping = DocType('Product Category Mapping')
 	query = (
@@ -321,9 +322,10 @@ def get_product_categories(product_id):
 	)
 	results = query.run(as_dict=True)
 	categories = [result['category'] for result in results]
-	concatenated_categories = ','.join(f'"{cat}"' for cat in categories)
+	# concatenated_categories = ','.join(f'"{cat}"' for cat in categories)
 	
-	return concatenated_categories or '""'
+	# return concatenated_categories or '""'
+	return categories
 
 
 def get_order_subtotal_discount(subtotal, customer_id, cart_items, total_weight=0,
