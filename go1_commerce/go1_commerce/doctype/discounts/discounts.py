@@ -16,7 +16,7 @@ from urllib.parse import unquote
 from six import string_types
 from frappe.query_builder import DocType,Order, Field, functions as fn
 from frappe.query_builder import Case
-from frappe.query_builder.functions import IfNull, Count
+from frappe.query_builder.functions import IfNull, Count, Date
 from frappe.query_builder.utils import PseudoColumn
 
 class Discounts(Document):
@@ -518,11 +518,6 @@ def validate_requirements(discount, subtotal, customer_id, cart_items, total_wei
 
 def get_usage_history(discount):
 	condition = ''
-	if discount.start_date and discount.end_date:
-		condition += ' AND date(creation) BETWEEN cast("{0}" AS date) AND cast("{1}" AS date)'.\
-								format(discount.start_date, discount.end_date)
-	elif discount.start_date and not discount.end_date:
-		condition += ' AND date(creation) >= cast(%(start_date)s AS date)'
 	DiscountUsageHistory = DocType('Discount Usage History')
 	query = (
 		frappe.qb.from_(DiscountUsageHistory)
@@ -534,9 +529,16 @@ def get_usage_history(discount):
 			(DiscountUsageHistory.parent == discount.name)
 		)
 	)
-	if condition:
-		query = query.where(condition)
+	if discount.start_date and discount.end_date:
+		query = query.where(
+			Date(DiscountUsageHistory.creation).between(discount.start_date, discount.end_date)
+		)
+	elif discount.start_date and not discount.end_date:
+		query = query.where(
+			Date(DiscountUsageHistory.creation) >= discount.start_date
+	)
 	result = query.run(as_dict=True)
+	
 
 def get_coupon_code(coupon_code, subtotal, customer_id, cart_items,discount_type=None, 
 					shipping_method=None, payment_method=None,total_weight=0,shipping_charges=0):
