@@ -3033,7 +3033,7 @@ def get_product_price(product, qty = 1, rate = None,attribute_id = None, custome
 				cart_items = ','.join('"{0}"'.format(r.product) for r in doc.items)
 		from go1_commerce.go1_commerce.doctype.discounts.discounts \
 		import get_product_discount
-		res = get_product_discount(product, qty, rate, customer_id = customer, website_type = web_type,
+		res = get_product_discount(product, qty, rate, customer_id = customer,
 									attribute_id = attribute_id, product_array = cart_items)
 		return res
 	except Exception:

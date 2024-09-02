@@ -215,7 +215,6 @@ def get_free_item(txt):
 	result = query.run(as_dict=True)
 
 
-
 def get_product_discount(product, qty = 1, rate = None, customer_id = None, attribute_id = None, product_array = None):
 	try:
 		product = frappe._dict(product)

@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, print_function
 import frappe, json, requests
 from frappe import _
-from frappe.utils import flt, getdate, nowdate, get_url,add_days
+from frappe.utils import flt, getdate, nowdate, get_url,add_days, today
 from datetime import datetime
 from urllib.parse import unquote, urlencode
 from pytz import timezone
@@ -1042,20 +1042,22 @@ def attribute_options(attribute,x,op,count,attribute_ids,customer,has_attr_stock
 		from go1_commerce.go1_commerce.v2.orders import validate_attributes_stock
 		variant_comb = validate_attributes_stock(x.name,attribute_ids,attribute,x.minimum_order_qty,
 													add_qty=None).get('status') == 'True'
-		op.attr_itemprice = float(variant_comb['price'])
-		op.attr_oldprice = float(variant_comb['old_price'])
-		if variant_comb.get('discount'):
-			if 'rate' in variant_comb['discount']:
-				op.attr_itemprice = float(variant_comb['discount']['rate'])
-				op.attr_oldprice = float(variant_comb['price'])
-		op.status = variant_comb['status']
-		if variant_comb['status'] == "Success":
-			if op.stock and int(op.stock) > 0:
-				op.has_attr_stock = True
+		if isinstance(variant_comb, dict):
+			op.attr_itemprice = float(variant_comb.get('price', 0)) 
+			op.attr_oldprice = float(variant_comb.get('old_price', 0))
+		
+			if variant_comb['discount']:
+				if 'rate' in variant_comb['discount']:
+					op.attr_itemprice = float(variant_comb['discount']['rate'])
+					op.attr_oldprice = float(variant_comb['price'])
+			op.status = variant_comb['status']
+			if variant_comb['status'] == "Success":
+				if op.stock and int(op.stock) > 0:
+					op.has_attr_stock = True
+				else:
+					op.has_attr_stock = False
 			else:
 				op.has_attr_stock = False
-		else:
-			op.has_attr_stock = False
 		if op.is_pre_selected == 1:
 			if op.has_attr_stock  == False:
 				has_attr_stock = False
@@ -1083,9 +1085,9 @@ def get_product_variant(x):
 			ProductVariantCombination.weight
 		)
 		.where(
-			ProductVariantCombination.parent == x.name,
-			ProductVariantCombination.disabled == 0,
-			ProductVariantCombination.show_in_market_place == 1
+			(ProductVariantCombination.parent == x.name) &
+			(ProductVariantCombination.disabled == 0) &
+			(ProductVariantCombination.show_in_market_place == 1)
 		)
 	)
 	product_variants = product_variant_query.run(as_dict=True)
@@ -2024,24 +2026,24 @@ def get_bought_together(customer):
 	OrderItem = DocType('Order Item')
 	Order = DocType('Order')
 	subquery = (
-	    frappe.qb.from_(OrderItem)
-	    .select(OrderItem.parent)
-	    .distinct()
-	    .where(OrderItem.parenttype == 'Order')
+		frappe.qb.from_(OrderItem)
+		.select(OrderItem.parent)
+		.distinct()
+		.where(OrderItem.parenttype == 'Order')
 	)
 	query = (
-	    frappe.qb.from_(Product)
-	    .inner_join(OrderItem).on(Product.name == OrderItem.item)
-	    .left_join(Order).on(Order.name == OrderItem.parent)
-	    .select(*list_columns)
-	    .where(
-	        (Order.docstatus == 1) &
-	        (Order.status != "Cancelled") &
-	        (Order.name.isin(subquery)) &
-	        (OrderItem.is_free_item == 0)
-	    )
-	    .groupby(Product.name)
-	    .limit(10)
+		frappe.qb.from_(Product)
+		.inner_join(OrderItem).on(Product.name == OrderItem.item)
+		.left_join(Order).on(Order.name == OrderItem.parent)
+		.select(*list_columns)
+		.where(
+			(Order.docstatus == 1) &
+			(Order.status != "Cancelled") &
+			(Order.name.isin(subquery)) &
+			(OrderItem.is_free_item == 0)
+		)
+		.groupby(Product.name)
+		.limit(10)
 	)
 	items = query.run(as_dict=True)
 	if items:
