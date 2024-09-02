@@ -11,6 +11,7 @@ from go1_commerce.utils.setup import get_settings_value
 from go1_commerce.utils.utils import role_auth,check_mandatory_exception,\
 	get_customer_from_token,other_exception,doesnotexist_exception,permission_exception
 from frappe.query_builder import DocType, Field, Order
+from frappe.query_builder.functions import IfNull,Function, GroupConcat, Sum
 
 @frappe.whitelist()
 def make_sales_invoice(source_name, target_doc = None, submit = False):
@@ -235,7 +236,7 @@ def get_items(cart,order_sub_total,categories):
 				CartItems.product_name,Product.price,Product.stock,
 				Product.short_description,Product.route,Product.image.as_("image"),
 				frappe.qb.select(
-					frappe.qb.functions.GroupConcat(ProductCategoryMapping.category)
+					GroupConcat(ProductCategoryMapping.category)
 				)
 				.from_(ProductCategoryMapping)
 				.where(ProductCategoryMapping.parent == Product.name)
@@ -244,7 +245,7 @@ def get_items(cart,order_sub_total,categories):
 			.where(CartItems.parent == cart[0].name)
 			.orderby(CartItems.idx)
 		)
-		# items = query.run(as_dict = True)
+		items = query.run(as_dict = True)
 		for cart_item in items:
 			order_sub_total += cart_item.total
 			if cart_item.categories:
@@ -295,7 +296,7 @@ def validate_category_order_amount(categories,cust_id,cart_items,ship_addr=None)
 				'mobile_message': __message
 			}
 	catalog_settings = frappe.get_single('Catalog Settings')
-	if ship_addr and catalog_settings.check_delivery:
+	if ship_addr:
 		pincode_result =  validate_order_pincode_validate(ship_addr)
 		return pincode_result
 	return {
@@ -305,15 +306,14 @@ def validate_category_order_amount(categories,cust_id,cart_items,ship_addr=None)
 
 def validate_category_minimum_order_amount(categories, cart, err_list):
 	for category in categories:
-		category_filter = ""
+		category_filter = [category]
 		category_info = frappe.get_doc("Product Category", category)
 		check_parent = True
 		if category_info.minimum_order_amount > 0:
-			category_filter = "'" + category + "'"
+			category_filter = [category]
 			child_categories = get_child_categories(category)
-			category_filter += ','
-			if child_categories:
-				category_filter = ','.join(['"' + x.name + '"' for x in child_categories])
+			category_filter.extend([x.name for x in child_categories])
+			
 			items_and_discounted_items = fetch_cart_items(
 															cart_parent = cart[0].name, 
 															category_filter = category_filter, 
@@ -361,11 +361,10 @@ def fetch_cart_items(cart_parent, category_filter, category_info=None):
 	items_and_discounted_items = {}
 	CartItems = DocType('Cart Items')
 	ProductCategoryMapping = DocType('Product Category Mapping')
-	category_filter_list = category_filter.split(",")
 	regular_items_query = (
 		frappe.qb.from_(CartItems)
 		.select(
-			frappe.qb.functions.Sum(CartItems.total).as_("order_sub_total"),
+			Sum(CartItems.total).as_("order_sub_total"),
 			CartItems.product_name
 		)
 		.where(CartItems.parent == cart_parent)
@@ -384,7 +383,7 @@ def fetch_cart_items(cart_parent, category_filter, category_info=None):
 		discounted_items_query = (
 			frappe.qb.from_(CartItems)
 			.select(
-				frappe.qb.functions.Sum(CartItems.total).as_("order_sub_total"),
+				Sum(CartItems.total).as_("order_sub_total"),
 				CartItems.product_name
 			)
 			.where(CartItems.parent == cart_parent)

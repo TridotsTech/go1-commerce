@@ -1345,11 +1345,12 @@ def get_product_discount_list(discounts_list,qty,customer_id,rate,product,attrib
 					else:
 						if customer_id:
 							history = get_usage_history(discount)
-							usage_history = list(filter(lambda x: x.customer == customer_id, history))
+							if history:
+								usage_history = list(filter(lambda x: x.customer == customer_id, history))
 
-							if usage_history:
-								if len(usage_history) >= int(discount.limitation_count):
-									allow = False
+								if usage_history:
+									if len(usage_history) >= int(discount.limitation_count):
+										allow = False
 			if allow:
 				allowed_discount = discount
 				if not flt(discount.requirements) > 0:
