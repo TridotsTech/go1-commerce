@@ -109,15 +109,7 @@ def get_shipping_methods():
 			.where(ShippingMethod.show_in_website == 1)
 			.orderby(ShippingMethod.display_order)
 		)
-		data= query.run(as_dict=True)
-		for d in data:
-			if order_settings.shipping_calculated_by=="Shipping Provider":
-				if d.is_deliverable==1 and order_settings.shipping_provider: 
-					shipping_modes = frappe.db.get_all("Shipping Mode List",
-														filters={"parent":order_settings.
-																shipping_provider},
-														fields=["label","shipping_mode"])
-					d.shipping_modes = shipping_modes
+		data = query.run(as_dict=True)
 		return data
 	except Exception:
 		other_exception("Error in v2.checkout.get_shipping_method")

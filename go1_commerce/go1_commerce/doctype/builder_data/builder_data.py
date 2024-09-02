@@ -2,9 +2,13 @@
 # For license information, please see license.txt
 
 import frappe
+
 from frappe.model.document import Document
 from frappe.query_builder import Field,DocType
 from frappe.query_builder.functions import Concat
+
+
+from go1_commerce.utils.utils import role_auth,get_customer_from_token,other_exception
 
 try:
 	catalog_settings = get_settings('Catalog Settings')
@@ -116,3 +120,21 @@ class BuilderData(Document):
 		return _get_customer_address(customer_id = customer_id)
 
 
+	def get_checkout_details(self):
+		result = {}
+		from go1_commerce.go1_commerce.v2.checkout import get_payment_methods as _get_payment_methods, get_shipping_methods as _get_shipping_methods
+		result["payment_methods"] = _get_payment_methods()
+		# result["payment_methods"] = _get_shipping_methods()
+
+
+	def get_country_data(self):
+		try:
+			Country = DocType("Country")
+			query = (
+				frappe.qb.from_(Country)
+				.select(Country.name)
+				.where(Country.enabled == 1)
+			)
+			return query.run(as_dict=True)
+		except Exception:
+			other_exception("Error in v2.cart.get_country_states")
