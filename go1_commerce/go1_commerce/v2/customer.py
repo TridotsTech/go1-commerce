@@ -290,7 +290,7 @@ def get_customer_address(customer_id=None):
 				.select('*')
 				.where(CustomerAddress.parent == customer_id)
 				.orderby(
-					frappe.qb.field(CustomerAddress.is_default).desc(),
+					CustomerAddress.is_default,
 					CustomerAddress.name
 				)
 			)

@@ -124,7 +124,8 @@ class BuilderData(Document):
 		result = {}
 		from go1_commerce.go1_commerce.v2.checkout import get_payment_methods as _get_payment_methods, get_shipping_methods as _get_shipping_methods
 		result["payment_methods"] = _get_payment_methods()
-		# result["payment_methods"] = _get_shipping_methods()
+		result["shipping_methods"] = _get_shipping_methods()
+		return result
 
 
 	def get_country_data(self):
