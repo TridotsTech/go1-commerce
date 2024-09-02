@@ -19,13 +19,13 @@ def on_update_shopping_cart(doc, method):
 			if enable_campaign:
 				if doc.items and doc.naming_series != 'GC- ':
 					EmailCampaign = DocType('Email Campaign')
-				    check_campaign = frappe.qb.select(EmailCampaign.name).from_(EmailCampaign) \
-				        .where(
-				            (EmailCampaign.email_campaign_for == "Shopping Cart") &
-				            (EmailCampaign.recipient == recipient) &
-				            ((EmailCampaign.status == "In Progress") | (EmailCampaign.status == "Scheduled"))
-				        ).run(as_dict=True)
-				    
+					check_campaign = frappe.qb.select(EmailCampaign.name).from_(EmailCampaign) \
+						.where(
+							(EmailCampaign.email_campaign_for == "Shopping Cart") &
+							(EmailCampaign.recipient == recipient) &
+							((EmailCampaign.status == "In Progress") | (EmailCampaign.status == "Scheduled"))
+						).run(as_dict=True)
+					
 					if not check_campaign:
 						campaign = frappe.db.get_value('Email Campaign Settings', None, 'shopping_cart')
 						if campaign:
