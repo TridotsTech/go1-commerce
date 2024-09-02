@@ -173,7 +173,7 @@ def validate_domain_and_ips():
 	if order_settings:
 		hostname = socket.gethostname()
 		IPAddr = socket.gethostbyname(hostname)
-		blocked_ips = frappe.db.get_list("Block IP Address",
+		blocked_ips = frappe.db.get_all("Block IP Address",
 										filters={"parent":order_settings.name,"ip_address":IPAddr})
 		if blocked_ips:
 			return False
