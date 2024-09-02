@@ -244,6 +244,7 @@ def get_items(cart,order_sub_total,categories):
 			.where(CartItems.parent == cart[0].name)
 			.orderby(CartItems.idx)
 		)
+		# items = query.run(as_dict = True)
 		for cart_item in items:
 			order_sub_total += cart_item.total
 			if cart_item.categories:
@@ -637,11 +638,15 @@ def validate_product_cart_qty(ProductId, attributeId = None, add_qty = None, qty
 				return _validate_stock(product, (qty or 1))
 		else:
 			return {
-					'status': False, 
+					'status': "False", 
 					'message': 'Product not exist'
 				}
 	except Exception:
 		frappe.log_error('Error in v2.orders.validate_product_cart_qty', frappe.get_traceback())
+		return {
+				'status': "Failed", 
+				'message': 'Something Went Wrong'
+			}
 
 
 def _validate_stock(product, qty):
@@ -705,13 +710,14 @@ def _validate_stock(product, qty):
 
 def not_check_items(check_items):
 	for x in check_items:
+		frappe.log_error("Product", x.product)
 		if x.attribute_ids:
-			check_stock = validate_product_cart_qty(ProductId = x.product,qty = x.quantity,
-														attributeId = x.attribute_ids)
+			check_stock = validate_product_cart_qty(x.product, qty = x.quantity,attributeId = x.attribute_ids)
 			if check_stock.get("status") == "Failed":
 				return check_stock
 		else:
-			check_stock = validate_product_cart_qty(ProductId = x.product,qty = x.quantity)
+			check_stock = validate_product_cart_qty(x.product, qty = x.quantity)
+			frappe.log_error("check_stock", check_stock)
 			if check_stock.get("status") == "Failed":
 				return check_stock
 
@@ -770,12 +776,12 @@ def insert_order(data):
 				}
 		else:
 			check_items = frappe.db.get_all('Cart Items',
-						filters = {'parent': cart[0].name},fields=['*'])
+					filters = {'parent': cart[0].name},fields=['*'])
 			if not check_items or len(check_items) == 0:
 				return {
-						'status': False,
-						'message': frappe._('Your cart is empty. Please add items to your cart.')
-					}
+					'status': False,
+					'message': frappe._('Your cart is empty. Please add items to your cart.')
+				}
 			else:
 				not_check_items(check_items)
 		check_order_amount = check_min_order_amount(request.get('ship_addr'),
