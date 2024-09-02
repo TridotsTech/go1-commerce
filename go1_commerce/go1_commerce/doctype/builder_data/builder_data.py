@@ -14,14 +14,13 @@ except Exception as e:
 	no_of_records_per_page = 10
 	
 class BuilderData(Document):
-	def get_category_products(self,params):
+	def get_category_products(self,**params):
 		customer = None
 		if not params.get("customer") and frappe.request.cookies.get('customer_id'):
 			customer = frappe.request.cookies.get('customer_id')
 		from go1_commerce.go1_commerce.v2.product import get_category_products as _get_category_products
-		product_list = _get_category_products(params)
+		product_list = _get_category_products(params.get("params"))
 		customer_cart = None
-		frappe.log_error("get_customer_cart_items",customer)
 		if customer:
 			customer_cart = self.get_customer_cart_items(customer)
 		for x in product_list:
@@ -111,5 +110,9 @@ class BuilderData(Document):
 		except Exception:
 			frappe.log_error(title = "Error in builder_data.get_all_settings", 
 								message = frappe.get_traceback())
+
+	def get_customer_address(self, customer_id = None):
+		from go1_commerce.go1_commerce.v2.customer import get_customer_address as _get_customer_address
+		return _get_customer_address(customer_id = customer_id)
 
 
