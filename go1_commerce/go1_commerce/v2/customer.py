@@ -923,7 +923,7 @@ def insert_address(data):
 		if response.get('is_default') == 1:
 			CustomerAddress = DocType("Customer Address")
 			existing_address = (
-				qb.from_(CustomerAddress)
+				frappe.qb.from_(CustomerAddress)
 				.select("*")
 				.where(CustomerAddress.parent == customers[0].name)
 				.run(as_dict=True)
