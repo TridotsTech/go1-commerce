@@ -140,6 +140,7 @@ def get_orders_list(page_no=1,page_length=10,no_subscription_order=0,order_from=
 					status=None,shipping_method=None,date=None,driver=None,allow_draft=1,
 					exclude_order_from=None, customer=None):
 	try:
+		
 		if not customer:
 			customer = get_customer_from_token()
 		
@@ -166,7 +167,7 @@ def get_orders_list(page_no=1,page_length=10,no_subscription_order=0,order_from=
 		query = query.orderby(Orders.creation, order=Order.desc)
 		query = query.limit(page_length).offset((int(page_no) - 1) * int(page_length))
 		orders = query.run(as_dict=True)
-		get_orders_items(orders)
+		orders = get_orders_items(orders)
 		return orders
 	except Exception:
 		other_exception("Error in v2.customer.get_orders_list")
@@ -177,11 +178,7 @@ def get_orders_items(orders):
 		for item in orders:
 			
 			OrderItem = DocType("Order Item")
-			query = (frappe.qb.from_(OrderItem).select(
-				OrderItem.return_created,
-				OrderItem.shipping_status,
-				OrderItem.item_name
-			).where(OrderItem.parent == item.name))
+			query = (frappe.qb.from_(OrderItem).select("*").where(OrderItem.parent == item.name))
 			item.items = query.run(as_dict=True)
 			for it in item['items']:
 				if it.return_created==1:
@@ -210,7 +207,7 @@ def get_orders_items(orders):
 				item.payment_modes = payment_entry
 			else:
 				item.payment_modes = [item.payment_method]
-			get_order_tax(item)
+			item.tax_rate = get_order_tax(item)
 			item.checkout_attributes = frappe.db.get_all('Order Checkout Attributes',
 											fields=['attribute_description','price_adjustment'],
 											filters={'parent': item.name})
@@ -220,8 +217,9 @@ def get_orders_items(orders):
 				item.driver_phone = frappe.db.get_value('Drivers', item.driver, 'driver_phone')
 			if item.docstatus == 2:
 				item.status = "Cancelled"
-			get_order_delivery_slots(item)	
-			get_order_payment_info(item)
+			item.delivery_slot_list = get_order_delivery_slots(item)	
+			item.pay_status, item.redirect_url = get_order_payment_info(item)
+	return orders
 
 def get_order_tax(item):
 	try:
@@ -233,16 +231,20 @@ def get_order_tax(item):
 					tax_type = tax.split(' - ')
 					if tax_type[1] and len(tax_type) == 4:
 						tax_rate = tax_rate + float(tax_type[1].split('%')[0])
+
+
 		try:
-			item.tax_rate = int(tax_rate) if (tax_rate).is_integer() else tax_rate
+			tax_rate = int(tax_rate) if (tax_rate).is_integer() else tax_rate
 		except Exception as e:
-			item.tax_rate = int(tax_rate)
+			tax_rate = int(tax_rate)
+		return tax_rate
 	except Exception as e:
-		item.tax_rate = 0
+		return 0
 
 def get_order_payment_info(item):
 	payment_method = item.payment_method
-	item.pay_status = 1
+	pay_status = 1
+	redirect_url=""
 	if payment_method:
 		payment_type = None
 		redirectController=None
@@ -253,8 +255,9 @@ def get_order_payment_info(item):
 		if payment_type and payment_type!='Cash':
 			if item.docstatus==0:
 				redirect_url="/"+str(redirectController)+"?order_id="+str(item.name)
-				item.redirect_url = redirect_url
-				item.pay_status=0
+				redirect_url = redirect_url
+				pay_status=0
+	return pay_status, redirect_url
 				
 def get_order_delivery_slots(item):
 	delivery_slot = frappe.db.get_all('Order Delivery Slot',
@@ -281,7 +284,7 @@ def get_order_delivery_slots(item):
 							'category':category,
 							}
 			delivery_slot_list.append(delivery_slot)
-	item.delivery_slot_list = delivery_slot_list
+	return delivery_slot_list
 		
 @frappe.whitelist()
 def get_customer_address(customer_id=None):

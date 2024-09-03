@@ -12,6 +12,7 @@ from go1_commerce.utils.utils import role_auth,get_customer_from_token,other_exc
 
 try:
 	catalog_settings = get_settings('Catalog Settings')
+	cart_settings = frappe.get_single('Shopping Cart Settings')
 	no_of_records_per_page = catalog_settings.no_of_records_per_page
 except Exception as e:
 	catalog_settings = None
@@ -45,7 +46,6 @@ class BuilderData(Document):
 					if check_exist:
 						x.in_wishlist = True
 						x.wishlist_item_id = check_exist[0].name
-		frappe.log_error("product_list",product_list)
 		return product_list
 	def get_product_details(self,route):
 		from go1_commerce.go1_commerce.v2.product import get_product_details as _get_product_details
@@ -73,7 +73,7 @@ class BuilderData(Document):
 				)
 				.where(ProductAttributeOption.unique_name.isin(options_filter))
 			)
-			frappe.log_error("get_attributes_data",query)
+			
 			selected_options_data = query.run(as_dict=True)
 			return selected_options_data
 		except Exception:
@@ -82,7 +82,6 @@ class BuilderData(Document):
 
 	def get_customer_cart_items(self,customer=None):
 		cart_obj={}
-		frappe.log_error("cart customer",customer)
 		if customer:
 			from go1_commerce.go1_commerce.v2.cart import get_customer_cart_items as _get_customer_cart
 			cart_obj = _get_customer_cart(customer)
@@ -105,7 +104,7 @@ class BuilderData(Document):
 	
 	def get_customer_dashboard(self, customer_id):
 		from go1_commerce.go1_commerce.v2.customer import get_orders_list, get_list_period_wise
-		recent_orders = get_orders_list(page_no = 1,page_length = 5, no_subscription_order = 1)
+		recent_orders = get_orders_list(page_no = 1,page_length = 10, no_subscription_order = 1, customer=customer_id)
 		dt = 'Order'
 		data = get_list_period_wise(dt,customer_id)
 		week_order_list = data[0]
@@ -143,6 +142,27 @@ class BuilderData(Document):
 		result["shipping_methods"] = _get_shipping_methods()
 		return result
 
+	def get_order_info(self, order_id):
+		order = frappe.get_doc('Order', order_id)
+		delivery_slot = []
+		check_slot = frappe.db.get_all('Order Delivery Slot',
+					 filters={'order': order_id}, 
+					 fields=['order_date', 'from_time', 'to_time', 'product_category'])
+		if check_slot:
+			for deli_slot in check_slot:
+				category = ''
+				if deli_slot.product_category:
+					category = frappe.get_value('Product Category', 
+							   deli_slot.product_category, 'category_name')
+				from_time = datetime.strptime(str(deli_slot.from_time), '%H:%M:%S').time()
+				to_time = datetime.strptime(str(deli_slot.to_time), '%H:%M:%S').time()
+				delivery_slot.append({
+									  'delivery_date': deli_slot.order_date.strftime('%b %d, %Y'),
+									  'from_time'    : from_time.strftime('%I:%M %p'),
+									  'to_time'      : to_time.strftime('%I:%M %p'),
+									  'category'     : category
+									})
+		return {"info":order,"delivery_slot":delivery_slot}
 
 	def get_country_data(self):
 		try:
