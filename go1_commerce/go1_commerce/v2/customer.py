@@ -46,34 +46,39 @@ def login(usr,pwd):
 	except Exception:
 		other_exception("Error in customer login")
 
-def get_list_period_wise(dt, condition, customer_id):
+def get_list_period_wise(dt, customer_id):
+	from frappe.query_builder.functions import CustomFunction
 	Doc = DocType(dt)
+	YEARWEEK = CustomFunction('YEARWEEK', ['field', 'mode'])
+	MONTH = CustomFunction('MONTH', ['field'])
+	CURDATE = CustomFunction('CURDATE', [])
+	DATE = CustomFunction('DATE', ['field'])
 	week_order_list = (frappe.qb.from_(Doc)
 						.select(Doc.name)
 						.where(Doc.customer == customer_id)
-						.where(frappe.qb.func.YEARWEEK(Doc.creation, 1) == frappe.qb.func.YEARWEEK(frappe.qb.func.CURDATE(), 1))
+						.where(YEARWEEK(Doc.creation, 1) == YEARWEEK(CURDATE(), 1))
 						.where(Doc.naming_series != "SUB-ORD-")
-						.where(condition)
+						
 					  ).run(as_dict=True)
 	month_order_list = (frappe.qb.from_(Doc)
 						 .select(Doc.name)
 						 .where(Doc.customer == customer_id)
-						 .where(frappe.qb.func.MONTH(Doc.creation) == frappe.qb.func.MONTH(frappe.qb.func.CURDATE()))
+						 .where(MONTH(Doc.creation) == MONTH(CURDATE()))
 						 .where(Doc.naming_series != "SUB-ORD-")
-						 .where(condition)
+						
 					   ).run(as_dict=True)
 	today_order_list = (frappe.qb.from_(Doc)
 						 .select(Doc.name)
 						 .where(Doc.customer == customer_id)
-						 .where(frappe.qb.func.DATE(Doc.creation) == frappe.qb.func.CURDATE())
+						 .where(DATE(Doc.creation) == CURDATE())
 						 .where(Doc.naming_series != "SUB-ORD-")
-						 .where(condition)
+						 
 					   ).run(as_dict=True)
 	all_order_list = (frappe.qb.from_(Doc)
 					   .select(Doc.name)
 					   .where(Doc.customer == customer_id)
 					   .where(Doc.naming_series != "SUB-ORD-")
-					   .where(condition)
+					  
 					 ).run(as_dict=True)
 
 	return [week_order_list, month_order_list, today_order_list, all_order_list]
@@ -85,9 +90,9 @@ def get_customer_dashboard(customer_id=None):
 			customer_id = get_customer_from_token()
 		if customer_id:
 			recent_orders = get_orders_list(page_no = 1,page_length = 5, no_subscription_order = 1)
-			condition = ''
+			
 			dt = 'Order'
-			data = get_list_period_wise(dt,condition,customer_id)
+			data = get_list_period_wise(dt,customer_id)
 			week_order_list = data[0]
 			month_order_list = data[1]
 			today_order_list = data[2]

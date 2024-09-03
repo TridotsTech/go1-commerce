@@ -101,6 +101,22 @@ class BuilderData(Document):
 			 
 		return cart_obj
 
+
+	
+	def get_customer_dashboard(self, customer_id):
+		from go1_commerce.go1_commerce.v2.customer import get_orders_list, get_list_period_wise
+		recent_orders = get_orders_list(page_no = 1,page_length = 5, no_subscription_order = 1)
+		dt = 'Order'
+		data = get_list_period_wise(dt,customer_id)
+		week_order_list = data[0]
+		month_order_list = data[1]
+		today_order_list = data[2]
+		all_order_list = data[3]
+		return {"all_count":len(all_order_list),
+				"monthly_count": len(month_order_list),
+				"today_orders_count": len(today_order_list),"recent_orders":recent_orders,
+				"week_orders_count":len(week_order_list)}
+
 	def get_all_settings(self):
 		try:
 			import os,json
