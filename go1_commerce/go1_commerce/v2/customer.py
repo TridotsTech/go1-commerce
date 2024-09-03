@@ -175,12 +175,16 @@ def get_orders_list(page_no=1,page_length=10,no_subscription_order=0,order_from=
 def get_orders_items(orders):
 	get_time_log = 1
 	if orders:
+		
 		for item in orders:
-			
+			order_item_qty=0
 			OrderItem = DocType("Order Item")
 			query = (frappe.qb.from_(OrderItem).select("*").where(OrderItem.parent == item.name))
 			item.items = query.run(as_dict=True)
+
 			for it in item['items']:
+				if it.quantity:
+					order_item_qty += it.quantity
 				if it.return_created==1:
 					if it.shipping_status == "Pending":
 						it.return_status = "Request Pending"
@@ -219,6 +223,7 @@ def get_orders_items(orders):
 				item.status = "Cancelled"
 			item.delivery_slot_list = get_order_delivery_slots(item)	
 			item.pay_status, item.redirect_url = get_order_payment_info(item)
+			item.total_item_qty = order_item_qty
 	return orders
 
 def get_order_tax(item):
