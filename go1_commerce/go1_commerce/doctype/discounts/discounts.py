@@ -507,6 +507,7 @@ def validate_requirements(discount, subtotal, customer_id, cart_items, total_wei
 		.orderby(DiscountRequirements.discount_requirement)
 	)
 	requirements = query.run(as_dict=True)
+	frappe.log_error("requirements", requirements)
 	if requirements:
 		return validate_item_requirements(requirements,subtotal,total_weight,customer_id,cart_items,msg,payment_method,currency)
 	return {'status':'success'}
@@ -545,15 +546,11 @@ def get_coupon_code(coupon_code, subtotal, customer_id, cart_items,discount_type
 	cartitems = [i.product for i in cart_items if i.product]
 	cartattrubutes = [i.attribute_ids.replace("\n", "") for i in cart_items if i.attribute_ids]
 	rule = get_coupon_code_from_discount_rule(product_array,coupon_code,today_date)
-
 	if rule:	
 		out = get_coupon_code_by_rule(out,rule, discount_type, subtotal,customer_id, 
 										cart_items,total_weight,shipping_method, 
 										payment_method,cartitems,cartattrubutes)
-		if not out:
-			out={}
-			out['status'] = 'failed'
-			out['message'] = frappe._('Coupon code entered is not valid.')
+		frappe.log_error("out",out)
 
 	else:
 		if shipping_charges:
@@ -1671,6 +1668,7 @@ def get_coupon_code_by_rule(out,rule, discount_type, subtotal, customer_id, cart
 									shipping_method, 
 									payment_method
 								)
+		frappe.log_error("res",res)
 	if discount.is_birthday_club_discount == 1:
 		check_allow = validate_birthday_club(customer_id)
 		if check_allow == 0:
@@ -1734,7 +1732,9 @@ def get_coupon_code_from_discount_rule(product_array,coupon_code,today_date):
 		)
 		.orderby(Discounts.priority, order=Order.desc)
 	)
+	frappe.log_error("query", query)
 	rule = query.run(as_dict=True)
+	frappe.log_error("rule",rule)
 	return rule
 
 
