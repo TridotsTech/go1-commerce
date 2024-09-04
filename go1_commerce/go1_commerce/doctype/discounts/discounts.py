@@ -543,7 +543,8 @@ def get_coupon_code(coupon_code, subtotal, customer_id, cart_items,discount_type
 					shipping_method=None, payment_method=None,total_weight=0,shipping_charges=0):
 	out = {}
 	today_date = get_today_date(replace=True)
-	product_array = ",".join(['"' + i.product + '"' for i in cart_items])
+	# product_array = ",".join(['"' + i.product + '"' for i in cart_items])
+	product_array = [i.product for i in cart_items]
 	cartitems = [i.product for i in cart_items if i.product]
 	cartattrubutes = [i.attribute_ids.replace("\n", "") for i in cart_items if i.attribute_ids]
 	rule = get_coupon_code_from_discount_rule(product_array,coupon_code,today_date)
@@ -1714,7 +1715,7 @@ def get_coupon_code_from_discount_rule(product_array,coupon_code,today_date):
 		frappe.qb.from_(Discounts)
 		.left_join(DiscountProducts).on(Discounts.name == DiscountProducts.parent)
 		.left_join(DiscountAppliedProduct).on(Discounts.name == DiscountAppliedProduct.parent)
-		.select(Discounts)
+		.select("*")
 		.where(
 			(Discounts.start_date <= today_date if Discounts.start_date.isnotnull() else True) &
 			(Discounts.end_date >= today_date if Discounts.end_date.isnotnull() else True) &
