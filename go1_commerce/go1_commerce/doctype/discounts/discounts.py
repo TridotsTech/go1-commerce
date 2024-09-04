@@ -545,11 +545,13 @@ def get_coupon_code(coupon_code, subtotal, customer_id, cart_items,discount_type
 	cartitems = [i.product for i in cart_items if i.product]
 	cartattrubutes = [i.attribute_ids.replace("\n", "") for i in cart_items if i.attribute_ids]
 	rule = get_coupon_code_from_discount_rule(product_array,coupon_code,today_date)
+
 	if rule:	
 		out = get_coupon_code_by_rule(out,rule, discount_type, subtotal,customer_id, 
 										cart_items,total_weight,shipping_method, 
 										payment_method,cartitems,cartattrubutes)
 		if not out:
+			out={}
 			out['status'] = 'failed'
 			out['message'] = frappe._('Coupon code entered is not valid.')
 
