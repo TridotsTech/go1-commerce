@@ -507,9 +507,12 @@ def validate_requirements(discount, subtotal, customer_id, cart_items, total_wei
 		.orderby(DiscountRequirements.discount_requirement)
 	)
 	requirements = query.run(as_dict=True)
-	frappe.log_error("requirements", requirements)
 	if requirements:
-		return validate_item_requirements(requirements,subtotal,total_weight,customer_id,cart_items,msg,payment_method,currency)
+		data = validate_item_requirements(requirements,subtotal,total_weight,customer_id,cart_items,msg,payment_method,currency)
+		if data:
+			return data
+		else:
+			return {'status':'success'}
 	return {'status':'success'}
 
 
@@ -550,7 +553,7 @@ def get_coupon_code(coupon_code, subtotal, customer_id, cart_items,discount_type
 		out = get_coupon_code_by_rule(out,rule, discount_type, subtotal,customer_id, 
 										cart_items,total_weight,shipping_method, 
 										payment_method,cartitems,cartattrubutes)
-		frappe.log_error("out",out)
+		
 
 	else:
 		if shipping_charges:
@@ -1668,7 +1671,6 @@ def get_coupon_code_by_rule(out,rule, discount_type, subtotal, customer_id, cart
 									shipping_method, 
 									payment_method
 								)
-		frappe.log_error("res",res)
 	if discount.is_birthday_club_discount == 1:
 		check_allow = validate_birthday_club(customer_id)
 		if check_allow == 0:
@@ -1732,9 +1734,9 @@ def get_coupon_code_from_discount_rule(product_array,coupon_code,today_date):
 		)
 		.orderby(Discounts.priority, order=Order.desc)
 	)
-	frappe.log_error("query", query)
+
 	rule = query.run(as_dict=True)
-	frappe.log_error("rule",rule)
+
 	return rule
 
 
@@ -2149,7 +2151,7 @@ def validate_requirements_items_list(item,cart_items,customer_id,msg,payment_met
 def validate_item_requirements(requirements,subtotal,total_weight,customer_id,cart_items,msg,
 									payment_method,currency):
 	for item in requirements:
-		
+		print(subtotal)
 		if item.discount_requirement == 'Spend x amount' and float(subtotal) < float(item.amount_to_be_spent):
 			return {
 					'status': 'failed', 
