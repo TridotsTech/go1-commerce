@@ -461,6 +461,7 @@ def get_subtotal_discount():
 def validate_requirements(discount, subtotal, customer_id, cart_items, total_weight, shipping_method=None, payment_method=None):
 	date = get_today_date(replace=True)
 	msg = frappe._('Invalid Coupon Code')
+	print("-----123-----")
 	if discount.start_date and discount.start_date > getdate(date):
 		return {'status': 'failed', 'message': msg}
 	if discount.end_date and discount.end_date < getdate(date):
@@ -505,7 +506,7 @@ def validate_requirements(discount, subtotal, customer_id, cart_items, total_wei
 			(DiscountRequirements.parenttype == "Discounts")
 		)
 		.orderby(
-			frappe.qb.functions.Field('discount_requirement').orderby(order_by_fields)
+			Field('discount_requirement').orderby(order_by_fields)
 		)
 	)
 	requirements = query.run(as_dict=True)
