@@ -47,9 +47,39 @@ class BuilderData(Document):
 						x.in_wishlist = True
 						x.wishlist_item_id = check_exist[0].name
 		return product_list
+		
 	def get_product_details(self,route):
 		from go1_commerce.go1_commerce.v2.product import get_product_details as _get_product_details
-		return _get_product_details(route=route)
+		customer = None
+		customer_cart = None
+		if frappe.request.cookies.get('customer_id'):
+			customer = frappe.request.cookies.get('customer_id')
+		p_details =  _get_product_details(route=route)
+		currency = frappe.db.get_single_value("Catalog Settings","default_currency")
+		currency_symbol = frappe.db.get_value("Currency",currency,"symbol")
+		p_details["formatted_price"] = frappe.utils.fmt_money(p_details["price"],currency=currency_symbol)
+		p_details["formatted_old_price"] = frappe.utils.fmt_money(p_details["old_price"],currency=currency_symbol)
+		if customer:
+			customer_cart = self.get_customer_cart_items(customer)
+		p_details.in_cart = 0
+		p_details.in_wishlist = 0
+		p_details.in_cart_qty = 0
+		p_details.cart_item_id = ""
+		p_details.wishlist_item_id = ""
+		if customer_cart:
+			if customer_cart.get("cart") and customer_cart.get("cart").get("items"):
+				check_exist = list(filter(lambda ci: ci.product == p_details.name, customer_cart.get("cart").get("items")))
+				if check_exist:
+					p_details.in_cart = 1
+					p_details.in_cart_qty = check_exist[0].quantity
+					p_details.cart_item_id = check_exist[0].name
+			if customer_cart.get("wishlist") and customer_cart.get("wishlist").get("items"):
+				check_exist = list(filter(lambda ci: ci.product == p_details.name, customer_cart.get("wishlist").get("items")))
+				if check_exist:
+					p_details.in_wishlist = 1
+					p_details.wishlist_item_id = check_exist[0].name
+		return p_details
+
 	def get_category_filters(self,route):
 		from go1_commerce.go1_commerce.v2.category import get_category_filters as _get_category_filters
 		return _get_category_filters(route=route)
