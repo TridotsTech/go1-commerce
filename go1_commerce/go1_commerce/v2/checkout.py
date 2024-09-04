@@ -306,6 +306,8 @@ def get_validate_coupons_cart_items(coupon_code, subtotal, customer_id, cart_ite
 						}
 		elif response:
 			return {'status': 'failed', 'message': response.get('message')}
+	else:
+		return {'status': 'failed', 'message': "Shopping Cart missing!"}
 
 
 def get_caskback_account(calculate_tax_after_discount,response, subtotal,discount_type,
