@@ -512,7 +512,7 @@ def get_list_product_details(products,customer = None):
 			if float(x.get("old_price")) > 0 and float(x.get("price")) < float(x.get("old_price")):
 				x["discount_percentage"]= int(round((flt(str(x.get("old_price"))) - flt(str(x.get("price")))) / 
 										flt(str(x.get("old_price"))) * 100, 0))
-			x["formatted_price"] = frappe.utils.fmt_money(x["price"],currency=currency_symbol)
+			x["formatted_price"] = frappe.utils.fmt_money(x["product_price"],currency=currency_symbol)
 			x["formatted_old_price"] = frappe.utils.fmt_money(x["old_price"],currency=currency_symbol)
 	return products
 
