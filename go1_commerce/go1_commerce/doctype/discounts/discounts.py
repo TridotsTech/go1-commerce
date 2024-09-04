@@ -252,7 +252,7 @@ def get_product_discount(product, qty = 1, rate = None, customer_id = None, attr
 
 def get_product_discount_rule(product, qty):
 	
-	today_date = get_today_date(replace=True)
+	today_date = getdate(get_today_date(replace=True))
 	categories = get_product_categories(product.name)
 	Discounts = DocType('Discounts')
 	DiscountProducts = DocType('Discount Products')
@@ -428,7 +428,7 @@ def get_ordersubtotal_discount_forfree_item(subtotal,cart_items):
 
 
 def get_subtotal_discount():
-	today_date = get_today_date(replace=True)
+	today_date = getdate(get_today_date(replace=True))
 	Discounts = DocType('Discounts')
 
 	query = (
@@ -461,7 +461,6 @@ def get_subtotal_discount():
 def validate_requirements(discount, subtotal, customer_id, cart_items, total_weight, shipping_method=None, payment_method=None):
 	date = get_today_date(replace=True)
 	msg = frappe._('Invalid Coupon Code')
-	print("-----123-----")
 	if discount.start_date and discount.start_date > getdate(date):
 		return {'status': 'failed', 'message': msg}
 	if discount.end_date and discount.end_date < getdate(date):
@@ -505,12 +504,9 @@ def validate_requirements(discount, subtotal, customer_id, cart_items, total_wei
 			(DiscountRequirements.parent == discount.name) &
 			(DiscountRequirements.parenttype == "Discounts")
 		)
-		.orderby(
-			Field('discount_requirement').orderby(order_by_fields)
-		)
+		.orderby(DiscountRequirements.discount_requirement)
 	)
 	requirements = query.run(as_dict=True)
-
 	if requirements:
 		return validate_item_requirements(requirements,subtotal,total_weight,customer_id,cart_items,msg,payment_method,currency)
 	return {'status':'success'}
@@ -543,7 +539,7 @@ def get_usage_history(discount):
 def get_coupon_code(coupon_code, subtotal, customer_id, cart_items,discount_type=None, 
 					shipping_method=None, payment_method=None,total_weight=0,shipping_charges=0):
 	out = {}
-	today_date = get_today_date(replace=True)
+	today_date = getdate(get_today_date(replace=True))
 	# product_array = ",".join(['"' + i.product + '"' for i in cart_items])
 	product_array = [i.product for i in cart_items]
 	cartitems = [i.product for i in cart_items if i.product]
@@ -1716,15 +1712,15 @@ def get_coupon_code_from_discount_rule(product_array,coupon_code,today_date):
 		frappe.qb.from_(Discounts)
 		.left_join(DiscountProducts).on(Discounts.name == DiscountProducts.parent)
 		.left_join(DiscountAppliedProduct).on(Discounts.name == DiscountAppliedProduct.parent)
-		.select("*")
+		.select(Discounts.star)
 		.where(
-			(Discounts.start_date <= today_date if Discounts.start_date.isnotnull() else True) &
-			(Discounts.end_date >= today_date if Discounts.end_date.isnotnull() else True) &
+			((Discounts.start_date <= today_date) | (Discounts.start_date.isnull())) &
+			((Discounts.end_date >= today_date) | (Discounts.end_date.isnull())) &
 			(
 				(Discounts.discount_type == 'Assigned to Sub Total') |
 				(
-					(Discounts.discount_type == 'Assigned to Products') &
-					(DiscountProducts.items.isin(product_array) | DiscountAppliedProduct.product.isin(product_array))
+					((Discounts.discount_type == 'Assigned to Products') &
+					(DiscountProducts.items.isin(product_array))) | (DiscountAppliedProduct.product.isin(product_array))
 				)
 			) &
 			(Discounts.requires_coupon_code == 1) &
