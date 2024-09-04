@@ -1670,7 +1670,7 @@ def get_coupon_code_by_rule(out,rule, discount_type, subtotal, customer_id, cart
 		if check_allow == 0:
 			res['status'] = 'failed'
 			res['message'] = frappe._('Coupon code entered is not valid.')
-	if res['status'] == 'success':
+	if res and res['status'] == 'success':
 		out['discount_rule'] = discount.name
 		if discount.price_or_product_discount == 'Price':
 			if discount.percent_or_amount == 'Discount Percentage':
