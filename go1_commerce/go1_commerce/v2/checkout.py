@@ -5,7 +5,7 @@ from frappe.utils import getdate,get_datetime
 from datetime import datetime
 from six import string_types
 from go1_commerce.utils.utils import get_today_date
-from go1_commerce.utils.utils import role_auth,get_customer_from_token,other_exception
+from go1_commerce.utils.utils import get_customer_from_token,other_exception
 from frappe.query_builder import DocType, Field, Order
 
 @frappe.whitelist()
@@ -199,7 +199,6 @@ def calculate_tax_for_sh_chrgs(shipping_charges,shopping_cart,catalog_settings):
 
 
 @frappe.whitelist()
-@role_auth(role='Customer',method="POST")	
 def get_order_discount(subtotal,total_weight=0,shipping_method=None,payment_method=None,shipping_charges=0):
 	try:
 		cart_items = None
@@ -247,7 +246,6 @@ def get_order_discount(subtotal,total_weight=0,shipping_method=None,payment_meth
 		other_exception("Error in v2.checkout.get_order_discount")
 
 @frappe.whitelist()
-@role_auth(role='Customer',method="POST")
 def validate_coupon(coupon_code, customer_id, subtotal, total_weight=0, discount_type=None, 
 	shipping_method=None, payment_method=None, ngCart=None,shipping_charges=None):
 	try:
