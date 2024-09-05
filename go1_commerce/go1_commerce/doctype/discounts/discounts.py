@@ -508,6 +508,11 @@ def validate_requirements(discount, subtotal, customer_id, cart_items, total_wei
 	)
 	requirements = query.run(as_dict=True)
 	if requirements:
+		requirements = sorted(
+			requirements,
+			key=lambda x: order_by_fields.index(x['discount_requirement']) if x['discount_requirement'] in order_by_fields else len(order_by_fields)
+		)
+		
 		data = validate_item_requirements(requirements,subtotal,total_weight,customer_id,cart_items,msg,payment_method,currency)
 		if data:
 			return data
@@ -553,8 +558,6 @@ def get_coupon_code(coupon_code, subtotal, customer_id, cart_items,discount_type
 		out = get_coupon_code_by_rule(out,rule, discount_type, subtotal,customer_id, 
 										cart_items,total_weight,shipping_method, 
 										payment_method,cartitems,cartattrubutes)
-		
-
 	else:
 		if shipping_charges:
 			if flt(shipping_charges)>0:
@@ -2102,7 +2105,7 @@ def validate_requirements_items_list(item,cart_items,customer_id,msg,payment_met
 						'message': msg
 					}
 	elif item.discount_requirement == 'Limit to role' and customer_id:
-		
+			
 		userid = frappe.db.get_value("Customers", customer_id, "user_id")
 		if not userid:
 			return {
@@ -2110,6 +2113,7 @@ def validate_requirements_items_list(item,cart_items,customer_id,msg,payment_met
 					'message': frappe._('Invalid User')
 				}
 		else:
+			
 			for itlist in items_list:
 				if itlist not in frappe.get_roles(userid):
 					return {
@@ -2127,9 +2131,7 @@ def validate_requirements_items_list(item,cart_items,customer_id,msg,payment_met
 				shipping_method = frappe.db.get_value("Shipping Method", shipping_method, 'shipping_method_name')
 			return {
 					'status': 'failed', 
-					'message': frappe._('This coupon is not applicable for "{0}"').format(
-																						shipping_method
-																					)}
+					'message': frappe._('This coupon is not applicable for "{0}"').format(shipping_method)}
 	elif item.discount_requirement == 'Specific Payment Method':
 		if not payment_method:
 			return {
@@ -2137,9 +2139,7 @@ def validate_requirements_items_list(item,cart_items,customer_id,msg,payment_met
 					'message': frappe._('Please select payment method and try this coupon again')
 				}
 		if not payment_method in items_list:
-			message = frappe._('This coupon is not applicable for payment by "{0}"').format(
-																						payment_method
-																					)
+			message = frappe._('This coupon is not applicable for payment by "{0}"').format(payment_method)
 			return {
 					'status': 'failed', 
 					'message': message
@@ -2151,7 +2151,6 @@ def validate_requirements_items_list(item,cart_items,customer_id,msg,payment_met
 def validate_item_requirements(requirements,subtotal,total_weight,customer_id,cart_items,msg,
 									payment_method,currency):
 	for item in requirements:
-		print(subtotal)
 		if item.discount_requirement == 'Spend x amount' and float(subtotal) < float(item.amount_to_be_spent):
 			return {
 					'status': 'failed', 
@@ -2186,6 +2185,7 @@ def validate_item_requirements(requirements,subtotal,total_weight,customer_id,ca
 						'status': 'failed', 
 						'message': frappe._('Not valid customer.')
 					}
+		
 		elif item.items_list:
 			return validate_requirements_items_list(
 													item,
