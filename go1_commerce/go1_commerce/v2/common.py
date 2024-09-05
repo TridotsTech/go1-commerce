@@ -1768,33 +1768,33 @@ def boot_session(bootinfo):
 
 
 @frappe.whitelist()
-def insert_doc(doc):
+def insert_doc(data):
 	try:
 		from six import string_types
-		if isinstance(doc, string_types):
-			doc = json.loads(doc)
-		keys = doc.keys()
-		insert_doc = frappe.new_doc(doc.get('doctype'))
+		if isinstance(data, string_types):
+			data = json.loads(data)
+		keys = data.keys()
+		insert_doc = frappe.new_doc(data.get('doctype'))
 		for key in keys:
-			if type(doc.get(key)) != list:
-				setattr(insert_doc, key, doc.get(key))
+			if type(data.get(key)) != list:
+				setattr(insert_doc, key, data.get(key))
 		insert_doc.save(ignore_permissions=True)
 		return insert_doc.as_dict()
 	except Exception as e:
 		frappe.log_error("Error in v2.common.insert_doc",frappe.get_traceback())
 
 @frappe.whitelist()
-def update_doc(doc):
+def update_doc(data):
 	try:
 		from six import string_types
-		if isinstance(doc, string_types):
-			doc = json.loads(doc)
-		keys = doc.keys()
-		if frappe.db.exists(doc.get('doctype'), doc.get('name')):
-			update_doc = frappe.get_doc(doc.get('doctype'), doc.get('name'))
+		if isinstance(data, string_types):
+			data = json.loads(data)
+		keys = data.keys()
+		if frappe.db.exists(data.get('doctype'), data.get('name')):
+			update_doc = frappe.get_doc(data.get('doctype'), data.get('name'))
 			for key in keys:
-				if type(doc.get(key)) != list:
-					setattr(update_doc, key, doc.get(key))
+				if type(data.get(key)) != list:
+					setattr(update_doc, key, data.get(key))
 			update_doc.save(ignore_permissions=True)
 			return update_doc.as_dict()
 	except Exception as e:

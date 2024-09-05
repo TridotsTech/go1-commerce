@@ -1201,22 +1201,18 @@ def set_discount_amount(order,request,order_total,coupon_code,discount_data):
 	order_total = order_total - float(request.get('discount_amount'))
 	if request.get('discount'):
 		(use_type, percent, amount, max_discount,
-		website_type, provided_by, price_or_product_discount) = frappe.db.get_value('Discounts',
+		price_or_product_discount) = frappe.db.get_value('Discounts',
 												request.get('discount'),['percent_or_amount',
 																		'discount_percentage',
 																		'discount_amount',
 																		'max_discount_amount',
-																		'website_type',
-																		'discount_provided_by',
 																		'price_or_product_discount'])
 		if price_or_product_discount == "Price":
 			discount_data.append({
 								'use_type': use_type,
 								'percent': percent,
 								'amount': amount,
-								'max_discount': max_discount,
-								'website_type': website_type,
-								'discount_provided_by': provided_by
+								'max_discount': max_discount
 								})
 	if request.get('coupon_code'):
 		coupon_code = request.get('coupon_code')
@@ -1225,22 +1221,17 @@ def set_discount_amount(order,request,order_total,coupon_code,discount_data):
 	if coupon_code:
 		if frappe.db.get_all("Discounts",filters={"name":coupon_code}):
 			(use_type_c, percent_c, amount_c,
-			max_discount_c,
-			c_web_type, c_provided_by) = frappe.db.get_value('Discounts',
+			max_discount_c) = frappe.db.get_value('Discounts',
 															coupon_code,
 															['percent_or_amount',
 															'discount_percentage',
 															'discount_amount',
-															'max_discount_amount',
-															'website_type',
-															'discount_provided_by'])
+															'max_discount_amount'])
 			discount_data.append({
 								'use_type': use_type_c,
 								'percent': percent_c,
 								'amount': amount_c,
-								'max_discount': max_discount_c,
-								'website_type': c_web_type,
-								'discount_provided_by': c_provided_by
+								'max_discount': max_discount_c
 								})
 	return [order_total,discount_data]
 
