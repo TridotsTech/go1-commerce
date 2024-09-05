@@ -1765,3 +1765,37 @@ def boot_session(bootinfo):
 					bootinfo.sysdefaults[module.module_name] = out
 	except Exception:
 		frappe.log_error('Error in v2.common.boot_session', frappe.get_traceback())
+
+
+@frappe.whitelist()
+def insert_doc(doc):
+	try:
+		from six import string_types
+		if isinstance(doc, string_types):
+			doc = json.loads(doc)
+		keys = doc.keys()
+		insert_doc = frappe.new_doc(doc.get('doctype'))
+		for key in keys:
+			if type(doc.get(key)) != list:
+				setattr(insert_doc, key, doc.get(key))
+		insert_doc.save(ignore_permissions=True)
+		return insert_doc.as_dict()
+	except Exception as e:
+		frappe.log_error("Error in v2.common.insert_doc",frappe.get_traceback())
+
+@frappe.whitelist()
+def update_doc(doc):
+	try:
+		from six import string_types
+		if isinstance(doc, string_types):
+			doc = json.loads(doc)
+		keys = doc.keys()
+		if frappe.db.exists(doc.get('doctype'), doc.get('name')):
+			update_doc = frappe.get_doc(doc.get('doctype'), doc.get('name'))
+			for key in keys:
+				if type(doc.get(key)) != list:
+					setattr(update_doc, key, doc.get(key))
+			update_doc.save(ignore_permissions=True)
+			return update_doc.as_dict()
+	except Exception as e:
+		frappe.log_error("Error in v2.common.update_doc",frappe.get_traceback())
