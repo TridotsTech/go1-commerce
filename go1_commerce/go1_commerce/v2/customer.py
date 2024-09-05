@@ -1103,19 +1103,19 @@ def insert_customers(data):
 			regapproval = 1
 		document = "Customers"
 		exist_reg = None
-		if regapproval==1:
-			document = "Customer Registration"
-			exist_reg = frappe.db.get_value(document,{"phone": responsedata.get("phone"), "customer_status":("!=", "Rejected")})
-			if responsedata.get("email"):
-				if frappe.db.exists("Customer Registration", {"email": responsedata.get("email"), "customer_status":("!=", "Rejected")}):
-					return {'status':'failed','customer':"", 'msg': "Email already registered!"}
-		if regapproval==0:
-			exist_reg = frappe.db.get_value(document,{"phone": responsedata.get("phone"), "customer_status":("!=", "Rejected")})
-			if exist_reg:
-				return {'status':'failed','customer':"", 'message': "Mobile Number already registered!"}
-			if responsedata.get("email"):
-				if frappe.db.exists("Customers", {"email": responsedata.get("email"), "customer_status":("!=", "Rejected")}):
-					return {'status':'failed','customer':"", 'message': "Email already registered!"}
+		# if regapproval==1:
+		# 	document = "Customer Registration"
+		# 	exist_reg = frappe.db.get_value(document,{"phone": responsedata.get("phone"), "customer_status":("!=", "Rejected")})
+		# 	if responsedata.get("email"):
+		# 		if frappe.db.exists("Customer Registration", {"email": responsedata.get("email"), "customer_status":("!=", "Rejected")}):
+		# 			return {'status':'failed','customer':"", 'msg': "Email already registered!"}
+		# if regapproval==0:
+		exist_reg = frappe.db.get_value(document,{"phone": responsedata.get("phone"), "customer_status":("!=", "Rejected")})
+		if exist_reg:
+			return {'status':'failed','customer':"", 'message': "Mobile Number already registered!"}
+		if responsedata.get("email"):
+			if frappe.db.exists("Customers", {"email": responsedata.get("email"), "customer_status":("!=", "Rejected")}):
+				return {'status':'failed','customer':"", 'message': "Email already registered!"}
 		
 		if responsedata.get('name'):
 			customer = frappe.get_doc(document,responsedata.get('name'))
