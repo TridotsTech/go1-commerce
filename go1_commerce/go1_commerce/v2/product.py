@@ -2402,3 +2402,21 @@ def get_product_list_columns():
 			Product.weight, Product.approved_total_reviews,(Concat("/pr/",Product.route)).as_("b_route"),Product.brand_name.as_("brand"),
 			Product.brand_unique_name.as_("brand_route"),Product.route,Product.brand_name.as_("product_brand"))
 
+@frappe.whitelist()
+def insert_product_queries(data):
+	try:
+		if isinstance(data, string_types):
+			data = json.loads(data)
+		result = frappe.get_doc({
+			'doctype': 'Product Enquiry',
+			'email': data.get('sender_email'),
+			'user_name': data.get('sender_name'),
+			'phone': data.get('sender_phone'),
+			'question': data.get('question'),
+			'product': data.get('product'),
+			}).insert()
+		result.creation = getdate(result.creation).strftime('%d %b, %Y')
+		return result
+	except Exception:
+		frappe.log_error('Error in v2.product.insert_product_queries', frappe.get_traceback())
+

@@ -6,8 +6,6 @@ import frappe
 from frappe.model.document import Document
 from frappe.query_builder import Field,DocType
 from frappe.query_builder.functions import Concat
-from frappe.utils import flt, getdate
-from six import string_types
 
 from go1_commerce.utils.utils import role_auth,get_customer_from_token,other_exception
 
@@ -129,22 +127,7 @@ class BuilderData(Document):
 					for c in cart_obj.get("wishlist").get("items"):
 						c.formatted_price = frappe.utils.fmt_money(c["price"],currency=currency_symbol)
 			 
-		return cart_obj
-
-	def insert_product_queries(self, data):
-		if isinstance(data, string_types):
-			data = json.loads(data)
-		result = frappe.get_doc({
-			'doctype': 'Product Enquiry',
-			'email': data.get('sender_email'),
-			'user_name': data.get('sender_name'),
-			'phone': data.get('sender_phone'),
-			'question': data.get('question'),
-			'product': data.get('product'),
-			}).insert()
-		result.creation = getdate(result.creation).strftime('%d %b, %Y')
-		return result
-		
+		return cart_obj		
 
 	def get_customer_dashboard(self, customer_id):
 		from go1_commerce.go1_commerce.v2.customer import get_orders_list, get_list_period_wise
