@@ -6,7 +6,8 @@ import frappe
 from frappe.model.document import Document
 from frappe.query_builder import Field,DocType
 from frappe.query_builder.functions import Concat
-
+from frappe.utils import flt, getdate
+from six import string_types
 
 from go1_commerce.utils.utils import role_auth,get_customer_from_token,other_exception
 
@@ -130,8 +131,21 @@ class BuilderData(Document):
 			 
 		return cart_obj
 
+	def insert_product_queries(self, data):
+		if isinstance(data, string_types):
+			data = json.loads(data)
+		result = frappe.get_doc({
+			'doctype': 'Product Enquiry',
+			'email': data.get('sender_email'),
+			'user_name': data.get('sender_name'),
+			'phone': data.get('sender_phone'),
+			'question': data.get('question'),
+			'product': data.get('product'),
+			}).insert()
+		result.creation = getdate(result.creation).strftime('%d %b, %Y')
+		return result
+		
 
-	
 	def get_customer_dashboard(self, customer_id):
 		from go1_commerce.go1_commerce.v2.customer import get_orders_list, get_list_period_wise
 		recent_orders = get_orders_list(page_no = 1,page_length = 10, no_subscription_order = 1, customer=customer_id)
@@ -205,3 +219,5 @@ class BuilderData(Document):
 			return query.run(as_dict=True)
 		except Exception:
 			other_exception("Error in v2.cart.get_country_states")
+
+	
