@@ -378,8 +378,17 @@ def get_order_subtotal_discount(subtotal, customer_id, cart_items, total_weight=
 def get_ordersubtotal_discount_forfree_item(subtotal,cart_items):
 	out = {}
 	products_list = []
-	assigned = False
+	assigned = True
 	discount = None
+	discounts = get_subtotal_discount()
+	for d in discounts:
+		if d.website_type and website_type and d.website_type not in [website_type, ""]:
+			continue
+		res = validate_requirements(d, subtotal, customer_id, cart_items, total_weight, is_recurring, shipping_method, payment_method)
+		if res['status'] == 'success':			
+			assigned = True
+			discount = d
+			break
 	if assigned:
 		out['discount_rule'] = discount.name
 		if discount.price_or_product_discount == 'Product':
@@ -731,16 +740,10 @@ def check_delivery_charge_discount(
 	today_date = get_today_date(replace=True)
 	Discounts = DocType('Discounts')
 	today = getdate(today_date)
-
+	
 	base_conditions = (
-		(Case()
-			.when(Discounts.start_date.isnotnull(), Discounts.start_date <= today)
-			.else_(True)
-		) &
-		(Case()
-			.when(Discounts.end_date.isnotnull(), Discounts.end_date >= today)
-			.else_(True)
-		) &
+		((Discounts.start_date <= today) | (Discounts.start_date.isnull())) &
+		((Discounts.end_date >= today) | (Discounts.end_date.isnull()))&
 		(Discounts.discount_type == "Assigned to Delivery Charges")
 	)
 
@@ -760,7 +763,6 @@ def check_delivery_charge_discount(
 		.where(base_conditions)
 		.orderby(Discounts.priority, order=Order.desc)
 	)
-
 	discounts = query.run(as_dict=True)
 	if discounts:
 		out = check_delivery_charge_discount_(
