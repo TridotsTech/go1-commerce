@@ -171,6 +171,13 @@ class BuilderData(Document):
 
 	def get_order_info(self, order_id):
 		order = frappe.get_doc('Order', order_id)
+		order_detail = order.as_dict()
+		order_item_qty =0
+		for it in order_detail.order_item:
+			if it.quantity:
+				order_item_qty += it.quantity
+		order_detail.total_item_qty = order_item_qty
+		setattr(order_detail, 'total_item_qty', order_item_qty)
 		delivery_slot = []
 		check_slot = frappe.db.get_all('Order Delivery Slot',
 					 filters={'order': order_id}, 
@@ -189,7 +196,9 @@ class BuilderData(Document):
 									  'to_time'      : to_time.strftime('%I:%M %p'),
 									  'category'     : category
 									})
-		return {"info":order,"delivery_slot":delivery_slot}
+
+		data = {"info":order_detail,"delivery_slot":delivery_slot}
+		return data
 
 	def get_country_data(self):
 		try:

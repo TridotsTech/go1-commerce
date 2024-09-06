@@ -388,6 +388,7 @@ def get_ordersubtotal_discount_forfree_item(subtotal,cart_items,customer_id, tot
 			assigned = True
 			discount = d
 			break
+	print("discount-----------------")
 	print(discount)
 	if assigned:
 		out['discount_rule'] = discount.name
@@ -407,6 +408,8 @@ def get_ordersubtotal_discount_forfree_item(subtotal,cart_items,customer_id, tot
 				)
 			)
 			nonfree_product_item = nonfree_query.run(as_dict=True)
+			print("---nonfree_product_item")
+			print(nonfree_product_item)
 			free_query = (
 				frappe.qb.from_(DiscountAppliedProduct)
 				.select('*')
@@ -419,12 +422,16 @@ def get_ordersubtotal_discount_forfree_item(subtotal,cart_items,customer_id, tot
 				)
 			)
 			free_product_item = free_query.run(as_dict=True)
+			print("---free_product_item")
+			print(free_product_item)
 			out =  get_ordersubtotal_discount_fornonfree_product_item(
 																		nonfree_product_item,
 																		subtotal,
 																		out,
 																		cart_items
 																	)
+			print("----out")
+			print(out)
 			if free_product_item and len(free_product_item) > 0:
 				products_list = get_ordersubtotal_discount_forfree_product_item(
 																				free_product_item,
@@ -446,7 +453,8 @@ def get_subtotal_discount():
 		.where(
 			((Discounts.start_date <= today_date) | (Discounts.start_date.isnull())) &
 		((Discounts.end_date >= today_date) | (Discounts.end_date.isnull()))&
-		(Discounts.discount_type.isin(["Assigned to Sub Total", "Assigned to Delivery Charges"]))
+		((Discounts.discount_type.isin(["Assigned to Sub Total", "Assigned to Delivery Charges"]))|
+		((Discounts.discount_type=="Assigned to Products")&(Discounts.price_or_product_discount=="Product")))
 		)
 		.where(
 			(Discounts.requires_coupon_code == 0) | (Discounts.requires_coupon_code.isnull())
