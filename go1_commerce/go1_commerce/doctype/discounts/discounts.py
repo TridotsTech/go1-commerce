@@ -375,20 +375,20 @@ def get_order_subtotal_discount(subtotal, customer_id, cart_items, total_weight=
 
 
 
-def get_ordersubtotal_discount_forfree_item(subtotal,cart_items):
+def get_ordersubtotal_discount_forfree_item(subtotal,cart_items,customer_id, total_weight=0, shipping_method=None,payment_method=None, shipping_charges=0):
 	out = {}
 	products_list = []
 	assigned = True
 	discount = None
 	discounts = get_subtotal_discount()
+	print(discount)
 	for d in discounts:
-		if d.website_type and website_type and d.website_type not in [website_type, ""]:
-			continue
-		res = validate_requirements(d, subtotal, customer_id, cart_items, total_weight, is_recurring, shipping_method, payment_method)
+		res = validate_requirements(d, subtotal, customer_id, cart_items, total_weight, shipping_method, payment_method)
 		if res['status'] == 'success':			
 			assigned = True
 			discount = d
 			break
+	print(discount)
 	if assigned:
 		out['discount_rule'] = discount.name
 		if discount.price_or_product_discount == 'Product':
@@ -444,25 +444,18 @@ def get_subtotal_discount():
 		frappe.qb.from_(Discounts)
 		.select('*')
 		.where(
-			Case()
-			.when(Discounts.start_date.isnotnull(), Discounts.start_date <= today_date)
-			.else_(True)
-		)
-		.where(
-			Case()
-			.when(Discounts.end_date.isnotnull(), Discounts.end_date >= today_date)
-			.else_(True)
-		)
-		.where(
-			(Discounts.discount_type.isin(["Assigned to Sub Total", "Assigned to Delivery Charges"]))
+			((Discounts.start_date <= today_date) | (Discounts.start_date.isnull())) &
+		((Discounts.end_date >= today_date) | (Discounts.end_date.isnull()))&
+		(Discounts.discount_type.isin(["Assigned to Sub Total", "Assigned to Delivery Charges"]))
 		)
 		.where(
 			(Discounts.requires_coupon_code == 0) | (Discounts.requires_coupon_code.isnull())
 		)
 		.orderby(Discounts.priority, order=Order.desc)
 	)
-	
+	print(query)
 	rule = query.run(as_dict=True)
+	print(rule)
 	return rule
 
 
@@ -522,7 +515,7 @@ def validate_requirements(discount, subtotal, customer_id, cart_items, total_wei
 			key=lambda x: order_by_fields.index(x['discount_requirement']) if x['discount_requirement'] in order_by_fields else len(order_by_fields)
 		)
 		
-		data = validate_item_requirements(requirements,subtotal,total_weight,customer_id,cart_items,msg,payment_method,currency)
+		data = validate_item_requirements(requirements,subtotal,total_weight,customer_id,cart_items,msg,payment_method,currency, shipping_method)
 		if data:
 			return data
 		else:
@@ -2088,7 +2081,7 @@ def get_ordersubtotal_discount_fornonfree_product_item(nonfree_product_item,subt
 	return out
 
 
-def validate_requirements_items_list(item,cart_items,customer_id,msg,payment_method):
+def validate_requirements_items_list(item,cart_items,customer_id,msg,payment_method, shipping_method):
 	items = json.loads(item.items_list)
 	items_list = [i.get('item') for i in items]
 	if item.discount_requirement in ['Has any one product in cart', 'Has all these products in cart']:
@@ -2151,7 +2144,7 @@ def validate_requirements_items_list(item,cart_items,customer_id,msg,payment_met
 	
 	
 def validate_item_requirements(requirements,subtotal,total_weight,customer_id,cart_items,msg,
-									payment_method,currency):
+									payment_method,currency, shipping_method):
 	for item in requirements:
 		if item.discount_requirement == 'Spend x amount' and float(subtotal) < float(item.amount_to_be_spent):
 			return {
@@ -2194,7 +2187,7 @@ def validate_item_requirements(requirements,subtotal,total_weight,customer_id,ca
 													cart_items,
 													customer_id,
 													msg,
-													payment_method
+													payment_method, shipping_method
 												)
 
 

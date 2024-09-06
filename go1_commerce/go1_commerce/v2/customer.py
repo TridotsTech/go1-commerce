@@ -500,7 +500,7 @@ def get_customer_info(user=None, email=None, doctype=None, guest_id=None, phone=
 				doctype = 'Customers'
 			Customer = None
 			filters = []
-			if user and user != '':
+			if customer and customer != '':
 				filters.append(['name','=', customer])
 			elif email and email != '':
 				if doctype == 'Customers':
@@ -515,8 +515,9 @@ def get_customer_info(user=None, email=None, doctype=None, guest_id=None, phone=
 			if len(filters) == 0:
 				return {'status': 'failed', 
 						'message': frappe._('Missing user details')}
+		
 			Customer = frappe.db.get_all(doctype, fields=['*'], filters=filters)
-
+			
 			if Customer:
 				return set_customer(Customer,doctype,guest_id)
 			else:
@@ -542,8 +543,7 @@ def set_customer(Customer,doctype,guest_id):
 		roles_list = (
 			frappe.qb.from_(CustomerRole)
 			.select(CustomerRole.role)
-			.where(CustomerRole.parent == Customer[0].name)
-			.pluck(CustomerRole.role)
+			.where(CustomerRole.parent == Customer[0].name).run(as_dict=True)
 		)
 		
 		if not roles_list or len(roles_list) == 0: roles_list = ['Customer']

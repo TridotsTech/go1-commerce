@@ -215,9 +215,9 @@ class ShoppingCart(Document):
 			return new_item
 
 	def validate_subtotal_discount_for_free_item(self):
-		from go1_commerce.go1_commerce.doctype.\
-			discounts.discounts import get_ordersubtotal_discount_forfree_item
-		price_info = get_ordersubtotal_discount_forfree_item(self.total, self.items)
+		from go1_commerce.go1_commerce.doctype.discounts.discounts import get_ordersubtotal_discount_forfree_item
+		price_info = get_ordersubtotal_discount_forfree_item(subtotal=self.total, cart_items=self.items, customer_id=self.customer, total_weight=0, 
+	shipping_method=None, payment_method=None, shipping_charges=0)
 		if price_info and price_info.get('free_item'):
 			if price_info.get('products_list'):
 				free_items = list(filter(lambda x: x.is_free_item == 1, self.items))
