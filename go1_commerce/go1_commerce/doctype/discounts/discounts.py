@@ -17,7 +17,7 @@ from six import string_types
 from frappe.query_builder import DocType,Order, Field, functions as fn
 from frappe.query_builder import Case
 from frappe.query_builder.functions import IfNull, Count, Date
-from frappe.query_builder.utils import PseudoColumn
+
 
 class Discounts(Document):
 	def validate(self):
@@ -459,7 +459,7 @@ def get_subtotal_discount():
 		.where(
 			(Discounts.requires_coupon_code == 0) | (Discounts.requires_coupon_code.isnull())
 		)
-		.orderby(Discounts.priority, order=PseudoColumn('desc'))
+		.orderby(Discounts.priority, order=Order.desc)
 	)
 	
 	rule = query.run(as_dict=True)
