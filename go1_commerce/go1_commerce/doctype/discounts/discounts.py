@@ -390,7 +390,7 @@ def get_ordersubtotal_discount_forfree_item(subtotal,cart_items,customer_id, tot
 			break
 	print("discount-----------------")
 	print(discount)
-	if assigned:
+	if assigned and discount:
 		out['discount_rule'] = discount.name
 		if discount.price_or_product_discount == 'Product':
 			out['same_product'] = 0
