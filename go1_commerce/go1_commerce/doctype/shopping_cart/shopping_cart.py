@@ -6,7 +6,8 @@ from __future__ import unicode_literals
 import frappe
 from frappe.model.document import Document
 from frappe.utils import flt
-from frappe.query_builder import DocType
+from frappe.query_builder import DocType, Field, Order
+from frappe.query_builder.functions import IfNull,Function, Trim,Avg, Count, Sum, Concat, Coalesce
 
 class ShoppingCart(Document):
 	def validate(self):		
@@ -55,8 +56,7 @@ class ShoppingCart(Document):
 		if item.attribute_ids:
 			attribute_id = item.attribute_ids.replace('\n','')
 		pdt_array = ','.join('"{0}"'.format(r.product) for r in self.items)
-		from go1_commerce.go1_commerce.\
-								doctype.discounts.discounts import get_product_discount
+		from go1_commerce.go1_commerce.doctype.discounts.discounts import get_product_discount
 		after_dis_price_info = get_product_discount(product_info, item.quantity, item.price, self.customer,
 									attribute_id = attribute_id, product_array = pdt_array)
 		if after_dis_price_info.get('discount_amount'):
@@ -85,8 +85,9 @@ class ShoppingCart(Document):
 			attribute_ids = '"' + item.attribute_ids + '"'
 		else:
 			attribute_ids = '"' + '","'.join(item.attribute_ids.split('\n'))[:-2]
+		# cartattrubutes = [item.attribute_ids.replace("\n", "")]
 		ProductAttributeOption = DocType('Product Attribute Option')
-		query = frappe.qb.from_(ProductAttributeOption).select(frappe.qb.func.sum(ProductAttributeOption.price_adjustment).as_("price")).where(ProductAttributeOption.name.isin(attribute_ids))
+		query = frappe.qb.from_(ProductAttributeOption).select(Sum(ProductAttributeOption.price_adjustment).as_("price")).where(ProductAttributeOption.name.isin(attribute_ids))
 		price_adjustment= query.run(as_dict=True)
 		if price_adjustment:
 			product_rate = product_rate + price_adjustment[0].price
