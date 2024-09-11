@@ -985,12 +985,12 @@ def product_attributes_data(x,customer,show_attributes):
 								filters={'parent': x.name, 
 											'attribute': attribute.product_attribute, 
 											'attribute_id': attribute.name},
-								order_by='display_order', limit_page_length=500)
-			if attribute.options:
-				count = 1
-				for op in attribute.options:
-					attribute.options = attribute_options(attribute,x,op,count,attribute_ids,customer,
-															has_attr_stock=x.has_attr_stock)
+								order_by='is_pre_selected DESC,display_order', limit_page_length=500)
+			# if attribute.options:
+			# 	count = 1
+			# 	for op in attribute.options:
+			# 		attribute.options = attribute_options(attribute,x,op,count,attribute_ids,customer,
+															# has_attr_stock=x.has_attr_stock)
 		if show_attributes==1:
 			from go1_commerce.go1_commerce.v2.orders \
 			import validate_attributes_stock

@@ -43,9 +43,7 @@ class CustomerCart:
 				check_data = frappe.db.get_value('Product Variant Combination',{'parent': item_info.name,
 											'attribute_id':attribute_ids},['stock',"name"], as_dict = 1)
 				result = self.check_attr_id_in_stock_min_qty(check_data,item_info,qty)
-
-			else:
-				result = {"status":False,"message":f"The Attribute id is missing for the item {item_info.item}."}
+			result = {'status': True}
 		return result
 	
 	def insert_cart_items(self,item_code, qty, qty_type, rate = 0, cart_type = "Shopping Cart",
@@ -597,7 +595,7 @@ def check_attr_id_in_item(item):
 			frappe.qb.from_(ProductAttributeOption)
 			.select(ProductAttributeOption.image_list)
 			.where(ProductAttributeOption.parent == item.product)
-			.where(ProductAttributeOption.name.isin(attr_id_list))
+			.where(ProductAttributeOption.name.isin(attr_ids))
 			.run(as_dict=True)
 		)
 		for op in options:
