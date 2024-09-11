@@ -597,7 +597,7 @@ def check_attr_id_in_item(item):
 			frappe.qb.from_(ProductAttributeOption)
 			.select(ProductAttributeOption.image_list)
 			.where(ProductAttributeOption.parent == item.product)
-			.where(ProductAttributeOption.name.isin(attr_ids))
+			.where(ProductAttributeOption.name.isin(attr_id_list))
 			.run(as_dict=True)
 		)
 		for op in options:
