@@ -82,9 +82,10 @@ class ShoppingCart(Document):
 		attribute_ids = None
 		product_rate = item.price
 		if '\n' not in item.attribute_ids:
-			attribute_ids = '"' + item.attribute_ids + '"'
+			attribute_ids = [item.attribute_ids]
 		else:
-			attribute_ids = '"' + '","'.join(item.attribute_ids.split('\n'))[:-2]
+			# attribute_ids = '"' + '","'.join(item.attribute_ids.split('\n'))[:-2]
+			attribute_ids = item.attribute_ids.split('\n')
 		# cartattrubutes = [item.attribute_ids.replace("\n", "")]
 		ProductAttributeOption = DocType('Product Attribute Option')
 		query = frappe.qb.from_(ProductAttributeOption).select(Sum(ProductAttributeOption.price_adjustment).as_("price")).where(ProductAttributeOption.name.isin(attribute_ids))
