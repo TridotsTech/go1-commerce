@@ -2856,6 +2856,8 @@ def validate_product_cart_qty_inventory_method(product,qty,attributeId,customer)
 @frappe.whitelist(allow_guest = True)
 def validate_attributes_stock(product, attribute_id, variant_html, cart_qty, add_qty = None, customer = None):
 	try:
+		currency = frappe.db.get_single_value("Catalog Settings","default_currency")
+		currency_symbol = frappe.db.get_value("Currency",currency,"symbol")
 		product_info = frappe.get_doc('Product', product)
 		product_price = product_info.price
 		check_data = frappe.db.get_all('Product Variant Combination',
@@ -2881,7 +2883,22 @@ def validate_attributes_stock(product, attribute_id, variant_html, cart_qty, add
 							qty = (float(cartitem[0].qty) if add_qty == True else 0)
 			qty = flt(qty) + flt(cart_qty)
 			discount = get_product_price(product_info, qty,product_price, attribute_id)
-			return _validate_inventory_product_info(qty,check_data,product_info,discount)
+			attribute_prcing_info =  _validate_inventory_product_info(qty,check_data,product_info,discount)
+			if attribute_prcing_info.get("discount"):
+				attribute_prcing_info["formatted_price"] = frappe.utils.fmt_money(attribute_prcing_info.get("discount")["rate"],currency=currency_symbol)
+				attribute_prcing_info["formatted_old_price"] = frappe.utils.fmt_money(attribute_prcing_info["price"],currency=currency_symbol)
+				attribute_prcing_info["old_price"] = attribute_prcing_info["price"]
+				
+			else:
+				old_price = 0 
+				p_old_price = frappe.db.get_value("Product",product,"old_price")
+				if flt(p_old_price)>flt(attribute_prcing_info["price"]):
+					old_price = p_old_price
+				attribute_prcing_info["formatted_price"] = frappe.utils.fmt_money(attribute_prcing_info["price"],currency=currency_symbol)
+				attribute_prcing_info["formatted_old_price"] = frappe.utils.fmt_money(old_price,currency=currency_symbol)
+				attribute_prcing_info["old_price"] = old_price
+
+			return attribute_prcing_info
 		else:
 			if product_info.inventory_method == 'Track Inventory By Product Attributes':
 				return {
