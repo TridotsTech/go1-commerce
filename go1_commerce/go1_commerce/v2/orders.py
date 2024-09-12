@@ -2897,7 +2897,20 @@ def validate_attributes_stock(product, attribute_id, variant_html, cart_qty, add
 				attribute_prcing_info["formatted_price"] = frappe.utils.fmt_money(attribute_prcing_info["price"],currency=currency_symbol)
 				attribute_prcing_info["formatted_old_price"] = frappe.utils.fmt_money(old_price,currency=currency_symbol)
 				attribute_prcing_info["old_price"] = old_price
-
+			customer_cart = None
+			from go1_commerce.go1_commerce.v2.cart import get_customer_cart_items as _get_customer_cart
+			if customer:
+				customer_cart = _get_customer_cart(customer)
+			attribute_prcing_info["in_cart"] = False
+			attribute_prcing_info["in_cart_qty"] = 0
+			attribute_prcing_info["cart_item_id"] = ""
+			if customer_cart:
+				if customer_cart.get("cart") and customer_cart.get("cart").get("items"):
+					check_exist = list(filter(lambda ci: ci.product == product and ci.attribute_ids==attribute_id, customer_cart.get("cart").get("items")))
+					if check_exist:
+						attribute_prcing_info["in_cart"] = True
+						attribute_prcing_info["in_cart_qty"] = check_exist[0].quantity
+						attribute_prcing_info["cart_item_id"]= check_exist[0].name
 			return attribute_prcing_info
 		else:
 			if product_info.inventory_method == 'Track Inventory By Product Attributes':

@@ -104,23 +104,7 @@ def get_customer_recently_viewed_product(customer=None, isMobile=0):
 			.where(CustomerViewedProduct.parent == customer)
 			.orderby(CustomerViewedProduct.viewed_date, order=Order.desc)
 		).run(as_dict=True)
-
 		
-		apps = frappe.get_installed_apps()
-		books_columns = []
-		books_joins = []
-		
-		if 'book_shop' in apps:
-			books_columns = [
-				Field('AU.author_name'),
-				Field('AU.route').as_('author_route'),
-				Field('PU.publisher_name'),
-				Field('PU.route').as_('publisher_route'),
-			]
-			books_joins = [
-				Product.left_join(Author).on(Author.name == Product.author),
-				Product.left_join(Publisher).on(Publisher.name == Product.publisher),
-			]
 		product_query = (
 			frappe.qb.from_(Product)
 			.select(
@@ -149,7 +133,6 @@ def get_customer_recently_viewed_product(customer=None, isMobile=0):
 					.where((ProductBrandMapping.parent == Product.name) & (ProductBrand.published == 1))
 					.limit(1)
 				).as_('brand_route'),
-				*books_columns
 			)
 			.inner_join(ProductCategoryMapping).on(ProductCategoryMapping.parent == Product.name)
 			.where(
@@ -163,9 +146,7 @@ def get_customer_recently_viewed_product(customer=None, isMobile=0):
 		product_query = (
 			product_query.groupby(Product.name).limit(12)
 			)	
-		for join in books_joins:
-			product_query = product_query.left_join(join)
-
+		
 		products = product_query.run(as_dict=True)
 
 		if products:
@@ -222,33 +203,7 @@ def get_products_bought_together(item, isMobile=0):
 	OrderItem = DocType('Order Item')
 	Order = DocType('Order')
 	ProductImage = DocType('Product Image')
-	ProductBrandMapping = DocType('Product Brand Mapping')
 	ProductCategoryMapping = DocType('Product Category Mapping')
-	ProductBrand = DocType('Product Brand')
-
-	product_image = (
-		frappe.qb.from_(ProductImage)
-		.select(ProductImage.list_image)
-		.where(ProductImage.parent == Product.name)
-		.orderby(ProductImage.is_primary, order=Order.desc)
-		.limit(1)
-	)
-
-	detail_thumbnail = (
-		frappe.qb.from_(ProductImage)
-		.select(ProductImage.detail_thumbnail)
-		.where(ProductImage.parent == Product.name)
-		.orderby(ProductImage.is_primary, order=Order.desc)
-		.limit(1)
-	)
-
-	product_brand = (
-		frappe.qb.from_(ProductBrandMapping)
-		.select(ProductBrandMapping.brand_name)
-		.where(ProductBrandMapping.parent == Product.name)
-		.limit(1)
-	)
-
 	category = (
 		frappe.qb.from_(ProductCategoryMapping)
 		.select(ProductCategoryMapping.category)
@@ -287,11 +242,10 @@ def get_products_bought_together(item, isMobile=0):
 			Product.stock,
 			Product.disable_add_to_cart_button,
 			Product.approved_total_reviews,
-			product_image.as_('product_image'),
-			detail_thumbnail.as_('detail_thumbnail'),
-			product_brand.as_('product_brand'),
+			Product.image.as_('product_image'),
+			Product.brand.as_('product_brand'),
 			category.as_('category'),
-			brand_route.as_('brand_route')
+			Product.brand_unique_name.as_('brand_route')
 		)
 		.where(
 			(OrderItem.order_item_type == "Product") &
@@ -316,45 +270,10 @@ def get_products_bought_together(item, isMobile=0):
 def get_category_based_best_sellers(category, item, isMobile=0):
 	Product = DocType('Product')
 	OrderItem = DocType('Order Item')
-	ProductImage = DocType('Product Image')
 	ProductBrandMapping = DocType('Product Brand Mapping')
 	ProductBrand = DocType('Product Brand')
 	ProductCategoryMapping = DocType('Product Category Mapping')
 
-	product_image = (
-		frappe.qb.from_(ProductImage)
-		.select(ProductImage.list_image)
-		.where(ProductImage.parent == Product.name)
-		.orderby(ProductImage.is_primary, order=Order.desc)
-		.limit(1)
-	)
-
-	# Subquery to fetch detail_thumbnail from Product Image
-	detail_thumbnail = (
-		frappe.qb.from_(ProductImage)
-		.select(ProductImage.detail_thumbnail)
-		.where(ProductImage.parent == Product.name)
-		.orderby(ProductImage.is_primary, order=Order.desc)
-		.limit(1)
-	)
-
-	product_brand = (
-		frappe.qb.from_(ProductBrandMapping)
-		.select(ProductBrandMapping.brand_name)
-		.where(ProductBrandMapping.parent == Product.name)
-		.limit(1)
-	)
-
-	brand_route = (
-		frappe.qb.from_(ProductBrandMapping)
-		.inner_join(ProductBrand).on(ProductBrandMapping.brand == ProductBrand.name)
-		.select(ProductBrand.route)
-		.where(
-			(ProductBrandMapping.parent == Product.name) &
-			(ProductBrand.published == 1)
-		)
-		.limit(1)
-	)
 
 	query = (
 		frappe.qb.from_(Product)
@@ -377,10 +296,10 @@ def get_category_based_best_sellers(category, item, isMobile=0):
 			Product.stock,
 			Product.disable_add_to_cart_button,
 			Product.approved_total_reviews,
-			product_image.as_('product_image'),
-			detail_thumbnail.as_('detail_thumbnail'),
-			product_brand.as_('product_brand'),
-			brand_route.as_('brand_route'),
+			Product.image.as_('product_image'),
+			Product.brand.as_('product_brand'),
+			category.as_('category'),
+			Product.brand_unique_name.as_('brand_route')
 			Sum(OrderItem.quantity).as_('qty'),
 			ProductCategoryMapping.category
 		)
@@ -512,7 +431,10 @@ def get_list_product_details(products,customer = None):
 			if float(x.get("old_price")) > 0 and float(x.get("price")) < float(x.get("old_price")):
 				x["discount_percentage"]= int(round((flt(str(x.get("old_price"))) - flt(str(x.get("price")))) / 
 										flt(str(x.get("old_price"))) * 100, 0))
-			x["formatted_price"] = frappe.utils.fmt_money(x["product_price"],currency=currency_symbol)
+			if x.get("product_price"):	
+				x["formatted_price"] = frappe.utils.fmt_money(x["product_price"],currency=currency_symbol)
+			else:
+				x["formatted_price"] = frappe.utils.fmt_money(x["price"],currency=currency_symbol)
 			x["formatted_old_price"] = frappe.utils.fmt_money(x["old_price"],currency=currency_symbol)
 	return products
 
@@ -1316,8 +1238,6 @@ def get_bestsellers(limit=None, isMobile=0):
 			ProductImage = DocType('Product Image')
 			ProductBrandMapping = DocType('Product Brand Mapping')
 			ProductBrand = DocType('Product Brand')
-
-			apps = frappe.get_installed_apps()
 			query = (
 				frappe.qb.from_(Product)
 				.inner_join(OrderItem).on(OrderItem.item == Product.name)
@@ -1360,15 +1280,7 @@ def get_bestsellers(limit=None, isMobile=0):
 				)
 			)
 			
-			if 'book_shop' in apps:
-				query = query.left_join(Author).on(Author.name == Product.author)
-				query = query.left_join(Publisher).on(Publisher.name == Product.publisher)
-				query = query.select(
-					Author.author_name.as_("author_name"),
-					Author.route.as_("author_route"),
-					Publisher.publisher_name.as_("publisher_name"),
-					Publisher.route.as_("publisher_route")
-				)
+
 			
 			query = (
 				query
@@ -1745,7 +1657,6 @@ def get_search_results(search_text, sort_by, page_no, page_size, brands, ratings
 				else:
 					search_conditions |= Field(item.fieldname).like(f"%{search_text}%")
 			
-		print(conditions)
 		if catalog_settings.enable_full_text_search == 1:
 			search_text = search_text.replace(" ","-")
 			tex1 = []
@@ -1800,8 +1711,6 @@ def get_search_data(search_text,page_no,page_size,customer,brands,attributes,
 
 
 def get_search_result(query, start_with_items,page_size):
-	print(start_with_items)
-	print(query)
 	result = start_with_items.run(as_dict=1)
 	if len(result) < int(page_size) or not result:
 		other_items = query.run(as_dict=1)
@@ -1816,7 +1725,7 @@ def get_search_result(query, start_with_items,page_size):
 			else:
 				if len(result) <= int(page_size):
 					result.append(x)
-		return result
+	return result
 
 
 @frappe.whitelist(allow_guest=True)

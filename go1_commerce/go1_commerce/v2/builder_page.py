@@ -43,3 +43,21 @@ def get_mini_cart_html(cart_type,customer):
 			return {"status":"Success","cart_html":cart_html}
 		else:
 			return {"status":"Failed"}
+
+@frappe.whitelist(allow_guest=True)
+def get_search_data(search_txt,page_no=1,page_len=15):
+	from frappe.query_builder import DocType, Field, Order
+	from go1_commerce.go1_commerce.v2.product import get_search_products
+	ProductCategory = DocType('Product Category')
+	params = {"search_text":search_txt,"page_no":page_no,"page_len":page_len}
+	product_results = get_search_products(params)
+	cat_query  = (
+				frappe.qb.from_(ProductCategory)
+				.select(ProductCategory.category_name,ProductCategory.name,ProductCategory.route) 
+				.where((ProductCategory.is_active == 1) &
+					(ProductCategory.category_name.like(f"%{search_txt}%"))
+					
+				)
+			)
+	category_results = cat_query.run(as_dict=True)
+	return {"product_results":product_results,"category_results":category_results}

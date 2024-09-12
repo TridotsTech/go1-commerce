@@ -2,7 +2,14 @@
 {%for c_item in cart_items%}
     <div class="frappe-builder-2555e525" data-cart-item="{{c_item.name}}"><img class="frappe-builder-0737d1a5" src="{{c_item.image}}">
         <div class="frappe-builder-f6fb182d">
-            <div class="frappe-builder-922eadd3 __text_block__">{{c_item.item}}</div>
+            <div class="frappe-builder-922eadd3 __text_block__">{{c_item.item}}
+                {%if c_item.attribute_description%}
+                    <br/>
+                    <div class="attribute_desc" style="margin-top:0px">
+                    {{c_item.attribute_description}}
+                </div>
+                {%endif%}
+            </div>
             <div class="frappe-builder-c8039e60">
                 <div class="frappe-builder-9b9ea9cf __text_block__">{{c_item.formatted_price}}</div>
                 <div class="frappe-builder-1de0e39e" data-item-name="{{c_item.item}}"><a class="frappe-builder-c748a71b __text_block__" data-item-id="{{c_item.name}}" href="#" onclick="update_cart_item('sub',this)">-</a>

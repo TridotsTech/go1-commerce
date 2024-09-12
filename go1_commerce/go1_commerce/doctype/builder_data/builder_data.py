@@ -212,4 +212,8 @@ class BuilderData(Document):
 		except Exception:
 			other_exception("Error in v2.cart.get_country_states")
 
+	def redirect_login(self,redirect_url=None):
+		frappe.local.flags.redirect_location = '/login'+("?redirect_url="+redirect_url) if redirect_url else ""
+		raise frappe.Redirect
+
 	

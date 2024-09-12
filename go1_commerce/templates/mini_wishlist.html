@@ -2,7 +2,14 @@
 {%for cart_item in cart_items%}
     <div class="frappe-builder-d48c4aa8" data-cart-item="{{cart_item.name}}"><img class="frappe-builder-4a84ea46" src="{{cart_item.image}}">
         <div class="frappe-builder-d567ff3f">
-            <div class="frappe-builder-c1bf8c88 __text_block__">{{cart_item.item}}</div>
+            <div class="frappe-builder-c1bf8c88 __text_block__">{{cart_item.item}}
+                {%if c_item.attribute_description%}
+                    <br/>
+                    <div class="attribute_desc" style="margin-top:0px">
+                    {{c_item.attribute_description}}
+                </div>
+                {%endif%}
+            </div>
             <div class="frappe-builder-acbd2271">
                 <div class="frappe-builder-b58be9f4 __text_block__">{{cart_item.formatted_price}}</div>
                 <div class="frappe-builder-f00e92aa" data-item-name="{{cart_item.item}}"><a class="frappe-builder-bd7c138b __text_block__" data-item-id="{{cart_item.name}}" href="#" onclick="update_cart_item('add',this)">Add<div class="frappe-builder-294c0470"><svg aria-hidden="true" class="lucide lucide-shopping-bag h-6 w-6 shrink-0" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
