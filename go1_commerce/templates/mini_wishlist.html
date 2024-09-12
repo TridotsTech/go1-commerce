@@ -3,10 +3,10 @@
     <div class="frappe-builder-d48c4aa8" data-cart-item="{{cart_item.name}}"><img class="frappe-builder-4a84ea46" src="{{cart_item.image}}">
         <div class="frappe-builder-d567ff3f">
             <div class="frappe-builder-c1bf8c88 __text_block__">{{cart_item.item}}
-                {%if c_item.attribute_description%}
+                {%if cart_item.attribute_description%}
                     <br/>
                     <div class="attribute_desc" style="margin-top:0px">
-                    {{c_item.attribute_description}}
+                    {{cart_item.attribute_description}}
                 </div>
                 {%endif%}
             </div>

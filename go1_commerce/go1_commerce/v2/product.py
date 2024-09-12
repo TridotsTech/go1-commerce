@@ -150,7 +150,7 @@ def get_customer_recently_viewed_product(customer=None, isMobile=0):
 		products = product_query.run(as_dict=True)
 
 		if products:
-			products = get_product_details(products)
+			products = get_list_product_details(products)
 	return products
 
 
@@ -190,7 +190,10 @@ def get_product_other_info(item, isMobile=0):
 			best_sellers = get_category_based_best_sellers(categories_list[0].category, item, isMobile=isMobile)
 	if catalog_settings.enable_related_products:
 		if categories_list:
-			related_products = get_category_products(categories_list[0].category, productsid=item, page_size=18, isMobile=isMobile)
+			related_products = get_category_products({"category":categories_list[0].category,
+													  "productsid":item, 
+													  "page_size":12, 
+													  "isMobile":isMobile})
 	return {
 		'best_seller_category': best_sellers,
 		'related_products': related_products,
@@ -211,16 +214,6 @@ def get_products_bought_together(item, isMobile=0):
 		.limit(1)
 	)
 
-	brand_route = (
-		frappe.qb.from_(ProductBrandMapping)
-		.inner_join(ProductBrand).on(ProductBrandMapping.brand == ProductBrand.name)
-		.select(ProductBrand.route)
-		.where(
-			(ProductBrandMapping.parent == Product.name) &
-			(ProductBrand.published == 1)
-		)
-		.limit(1)
-	)
 	query = (
 		frappe.qb.from_(Product)
 		.inner_join(OrderItem).on(Product.name == OrderItem.item)
@@ -230,7 +223,6 @@ def get_products_bought_together(item, isMobile=0):
 			Product.tax_category,
 			Product.price,
 			Product.old_price,
-			Product.restaurant,
 			Product.short_description,
 			Product.full_description,
 			Product.sku,
@@ -248,14 +240,13 @@ def get_products_bought_together(item, isMobile=0):
 			Product.brand_unique_name.as_('brand_route')
 		)
 		.where(
-			(OrderItem.order_item_type == "Product") &
 			(Order.docstatus == 1) &
 			(Order.status != "Cancelled") &
 			(Product.name != item) &
 			(OrderItem.is_free_item == 0) &
 			(Order.name.isin(
 				frappe.qb.from_(OrderItem)
-				.select(OrderItem.parent.distinct())
+				.select(OrderItem.parent)
 				.where((OrderItem.item == item) & (OrderItem.parenttype == "Order"))
 			))
 		)
@@ -264,7 +255,7 @@ def get_products_bought_together(item, isMobile=0):
 	)
 	items = query.run(as_dict=True)
 	if items:
-		items = get_product_details(items)
+		items = get_list_product_details(items)
 	return items
 
 def get_category_based_best_sellers(category, item, isMobile=0):
@@ -284,7 +275,6 @@ def get_category_based_best_sellers(category, item, isMobile=0):
 			Product.tax_category,
 			Product.price,
 			Product.old_price,
-			Product.restaurant,
 			Product.short_description,
 			Product.full_description,
 			Product.sku,
@@ -298,7 +288,6 @@ def get_category_based_best_sellers(category, item, isMobile=0):
 			Product.approved_total_reviews,
 			Product.image.as_('product_image'),
 			Product.brand.as_('product_brand'),
-			category.as_('category'),
 			Product.brand_unique_name.as_('brand_route'),
 			Sum(OrderItem.quantity).as_('qty'),
 			ProductCategoryMapping.category
@@ -313,7 +302,7 @@ def get_category_based_best_sellers(category, item, isMobile=0):
 
 	best_sellers = query.run(as_dict=True)
 	if best_sellers:
-		best_sellers = get_product_details(best_sellers)
+		best_sellers = get_list_product_details(best_sellers)
 	return best_sellers
 
 def get_category_products_count(category):
@@ -1292,7 +1281,7 @@ def get_bestsellers(limit=None, isMobile=0):
 			
 			Items = query.run(as_dict=True)
 			if Items:
-				Items = get_product_details_(Items, isMobile)
+				Items = get_list_product_details(Items, isMobile)
 			return Items
 		else:
 			return []
@@ -1811,7 +1800,7 @@ def get_sorted_category_products(category, sort_by, page_no, page_size, brands,
 			child_categories = get_child_categories(category)
 			if child_categories:
 				category_filter.extend([x.name for x in child_categories])
-
+		conditions = ""
 		if productsid:
 			conditions += Product.name != productsid
 		list_columns = get_product_list_columns()
