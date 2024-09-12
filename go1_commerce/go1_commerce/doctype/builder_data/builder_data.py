@@ -77,6 +77,63 @@ class BuilderData(Document):
 				if check_exist:
 					p_details.in_wishlist = 1
 					p_details.wishlist_item_id = check_exist[0].name
+		from go1_commerce.go1_commerce.v2.product import get_product_other_info
+		p_details.other_data = get_product_other_info(p_details.name)
+		if customer_cart:
+			if p_details.other_data.get("best_seller_category"):
+				for x in p_details.other_data.get("best_seller_category"):
+					x.in_cart = False
+					x.in_wishlist = False
+					x.in_cart_qty = 0
+					x.cart_item_id = ""
+					x.wishlist_item_id = ""
+					if customer_cart.get("cart") and customer_cart.get("cart").get("items"):
+						check_exist = list(filter(lambda ci: ci.product == x.name, customer_cart.get("cart").get("items")))
+						if check_exist:
+							x.in_cart = 1
+							x.in_cart_qty = check_exist[0].quantity
+							x.cart_item_id = check_exist[0].name
+					if customer_cart.get("wishlist") and customer_cart.get("wishlist").get("items"):
+						check_exist = list(filter(lambda ci: ci.product == x.name, customer_cart.get("wishlist").get("items")))
+						if check_exist:
+							x.in_wishlist = 1
+							x.wishlist_item_id = check_exist[0].name
+			if p_details.other_data.get("products_purchased_together"):
+				for x in p_details.other_data.get("products_purchased_together"):
+					x.in_cart = False
+					x.in_wishlist = False
+					x.in_cart_qty = 0
+					x.cart_item_id = ""
+					x.wishlist_item_id = ""
+					if customer_cart.get("cart") and customer_cart.get("cart").get("items"):
+						check_exist = list(filter(lambda ci: ci.product == x.name, customer_cart.get("cart").get("items")))
+						if check_exist:
+							x.in_cart = 1
+							x.in_cart_qty = check_exist[0].quantity
+							x.cart_item_id = check_exist[0].name
+					if customer_cart.get("wishlist") and customer_cart.get("wishlist").get("items"):
+						check_exist = list(filter(lambda ci: ci.product == x.name, customer_cart.get("wishlist").get("items")))
+						if check_exist:
+							p_details.in_wishlist = 1
+							p_details.wishlist_item_id = check_exist[0].name
+			if p_details.other_data.get("related_products"):
+				for x in p_details.other_data.get("related_products"):
+					x.in_cart = False
+					x.in_wishlist = False
+					x.in_cart_qty = 0
+					x.cart_item_id = ""
+					x.wishlist_item_id = ""
+					if customer_cart.get("cart") and customer_cart.get("cart").get("items"):
+						check_exist = list(filter(lambda ci: ci.product == x.name, customer_cart.get("cart").get("items")))
+						if check_exist:
+							x.in_cart = 1
+							x.in_cart_qty = check_exist[0].quantity
+							x.cart_item_id = check_exist[0].name
+					if customer_cart.get("wishlist") and customer_cart.get("wishlist").get("items"):
+						check_exist = list(filter(lambda ci: ci.product == x.name, customer_cart.get("wishlist").get("items")))
+						if check_exist:
+							x.in_wishlist = 1
+							x.wishlist_item_id = check_exist[0].name
 		return p_details
 
 	def get_category_filters(self,route):
