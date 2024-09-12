@@ -100,7 +100,7 @@ class BuilderData(Document):
 					ProductAttributeOption.option_value,
 					ProductAttributeOption.unique_name
 				)
-				.where(ProductAttributeOption.unique_name.isin(options_filter))
+				.where(ProductAttributeOption.unique_name.isin(options_data))
 			)
 			
 			selected_options_data = query.run(as_dict=True)

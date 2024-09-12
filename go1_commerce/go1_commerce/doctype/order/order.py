@@ -460,7 +460,7 @@ class Order(Document):
 							frappe.qb.from_(ProductAttributeOption)
 							.select('*')
 							.where(ProductAttributeOption.parent == item.item)
-							.where(ProductAttributeOption.name.isin(ids))
+							.where(ProductAttributeOption.name.isin(id_list))
 						)
 						options = query.run(as_dict=True)
 						title = ''
