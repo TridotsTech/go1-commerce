@@ -9,7 +9,7 @@
  "field_order": [
   "general",
   "website_logo",
-  "login_image",
+  "favicon",
   "wishlist_empty_image",
   "column_break_3",
   "email_logo",
@@ -48,7 +48,6 @@
   "email_a_friend_enabled",
   "enable_recently_viewed_products",
   "enable_best_sellers",
-  "enable_customers_who_bought",
   "customers_who_bought",
   "search_settings",
   "enable_full_text_search",
@@ -90,11 +89,6 @@
    "fieldname": "website_logo",
    "fieldtype": "Attach Image",
    "label": "Website Logo"
-  },
-  {
-   "fieldname": "login_image",
-   "fieldtype": "Attach Image",
-   "label": "Login Image"
   },
   {
    "fieldname": "email_logo",
@@ -462,12 +456,6 @@
   },
   {
    "default": "0",
-   "fieldname": "enable_customers_who_bought",
-   "fieldtype": "Check",
-   "label": "Enable Customers Who Bought"
-  },
-  {
-   "default": "0",
    "fieldname": "upload_review_images",
    "fieldtype": "Check",
    "label": " Upload Review Images"
@@ -483,12 +471,17 @@
    "default": "0",
    "fieldname": "customers_who_bought",
    "fieldtype": "Check",
-   "label": "Customers Who Bought"
+   "label": "Enable Customers Who Bought"
+  },
+  {
+   "fieldname": "favicon",
+   "fieldtype": "Attach Image",
+   "label": "Favicon"
   }
  ],
  "issingle": 1,
  "links": [],
- "modified": "2024-08-20 11:20:37.887981",
+ "modified": "2024-09-12 17:20:54.988197",
  "modified_by": "Administrator",
  "module": "Go1 Commerce",
  "name": "Catalog Settings",

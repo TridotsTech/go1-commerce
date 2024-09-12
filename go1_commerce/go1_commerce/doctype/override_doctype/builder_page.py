@@ -170,10 +170,36 @@ class BuilderPage(WebsiteGenerator):
 
 		metatags = {
 			"title": self.page_title or "My Page",
-			"description": self.meta_description or self.page_title,
-			"image": self.meta_image or self.preview,
+			"description": self.meta_description,
+			"image": self.meta_image,
 		}
 		metatags.update(page_data.get("metatags", {}))
+		if not metatags.get("title"):
+			metatags["title"] = frappe.db.get_single_value("Catalog Settings","meta_title")
+		if not metatags.get("description"):
+			metatags["description"] = frappe.db.get_single_value("Catalog Settings","meta_description")
+		if not metatags.get("image"):
+			metatags["image"] = frappe.db.get_single_value("Catalog Settings","default_sharing_logo")
+		metatags["keyword"] = frappe.db.get_single_value("Catalog Settings","meta_keywords")
+		if self.route.startswith("pr/"):
+			if frappe.form_dict.route:
+				check_exist = frappe.db.get_all("Product",filters={"route":frappe.form_dict.route})
+				if check_exist:
+					metatags["title"] = frappe.db.get_value("Product",check_exist[0].name,"meta_title")
+					context.title = frappe.db.get_value("Product",check_exist[0].name,"meta_title")
+					metatags["description"] = frappe.db.get_value("Product",check_exist[0].name,"meta_description")
+					p_image = frappe.db.get_value("Product",check_exist[0].name,"image")
+					if p_image:
+						metatags["image"] = p_image
+					metatags["keyword"] = frappe.db.get_value("Product",check_exist[0].name,"meta_keywords") 
+		if self.route.startswith("products/"):
+			if frappe.form_dict.route:
+				check_exist = frappe.db.get_all("Product Category",filters={"route":frappe.form_dict.route})
+				if check_exist:
+					metatags["title"] = frappe.db.get_value("Product Category",check_exist[0].name,"meta_title")
+					context.title = frappe.db.get_value("Product Category",check_exist[0].name,"meta_title")
+					metatags["description"] = frappe.db.get_value("Product Category",check_exist[0].name,"meta_description")
+					metatags["keyword"] = frappe.db.get_value("Product Category",check_exist[0].name,"meta_keywords")
 		context.metatags = metatags
 
 	def set_favicon(self, context):
@@ -181,7 +207,8 @@ class BuilderPage(WebsiteGenerator):
 			context.favicon = self.favicon
 		if not context.get("favicon"):
 			context.favicon = frappe.get_cached_value("Builder Settings", None, "favicon")
-
+		if frappe.db.get_single_value("Catalog Settings","favicon"):
+			context.favicon = frappe.db.get_single_value("Catalog Settings","favicon")
 	def is_component_used(self, component_id):
 		if self.blocks and is_component_used(self.blocks, component_id):
 			return True
@@ -208,7 +235,6 @@ class BuilderPage(WebsiteGenerator):
 			args = frappe.parse_json(args)
 			frappe.form_dict.update(args)
 		page_data = frappe._dict()
-		frappe.log_error("page_data_script",self.page_data_script)
 		if self.page_data_script:
 			_locals = dict(data=frappe._dict())
 			if is_safe_exec_enabled():

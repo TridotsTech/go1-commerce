@@ -58,7 +58,6 @@ has_website_permission = {
 
 override_doctype_class = {
 	'File': 'go1_commerce.go1_commerce.override.CustomFile',
-	'PageSection': 'go1_commerce.go1_commerce.override.PageSection',
 	'Builder Page':'go1_commerce.go1_commerce.doctype.override_doctype.builder_page.BuilderPage'
 }
 
