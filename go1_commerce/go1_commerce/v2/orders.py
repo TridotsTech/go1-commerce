@@ -1619,12 +1619,13 @@ def set_customer_shipping_address(request,order):
 
 @frappe.whitelist()
 @role_auth(role='Customer')
-def get_return_request_info(order_id=None,return_type="Return"):
+def get_return_request_info(order_id=None, customer_id=None,return_type="Return"):
 	try:
 		if not order_id:
 			return {"status":"Failed",
 					"message":"order_id parameter is missing."}
-		customer_id = get_customer_from_token()
+		if not customer_id:
+			customer_id = get_customer_from_token()
 		if customer_id:
 			if customer_id!=frappe.db.get_value("Order",order_id,"customer"):
 				return {"status":"Failed",
@@ -3112,8 +3113,9 @@ def get_email_from_token():
 
 @frappe.whitelist()
 @role_auth(role='Customer', method="POST")
-def edit_order(order_id):
-	customer = get_customer_from_token()
+def edit_order(order_id, customer=None):
+	if not customer:
+		customer = get_customer_from_token()
 	order = frappe.get_doc('Order',order_id)
 	if customer and customer == order.customer:
 		OrderItem = DocType('Order Item')
@@ -3462,8 +3464,9 @@ def get_value_cart_item(cart_item):
 
 @frappe.whitelist()
 @role_auth(role='Customer',method="POST")
-def post_order_feedback(order_id, ratings, message):
-	customer = get_customer_from_token()
+def post_order_feedback(order_id, ratings, message, customer=None):
+	if not customer:
+		customer = get_customer_from_token()
 	var = frappe.db.get_value("Order", order_id, "customer")
 	if var == customer:
 		if not frappe.db.get_all("Order Feedback",filters = {"order" : order_id}):
@@ -3587,23 +3590,18 @@ def get_checkout_attributes():
 
 
 @frappe.whitelist()
-def reorder(order_id):
+def reorder(order_id, customer=None):
 	try:
 		order = frappe.get_doc('Order',order_id)
-		customer = get_customer_from_token()
+		if not customer:
+			customer = get_customer_from_token()
 		if customer:
-			cart = frappe.db.get_all('Shopping Cart',
-									filters = {'customer': customer,'cart_type':'Shopping Cart'},
-									fields = ['name'])
-			cart_doc = frappe.new_doc('Shopping Cart')
-			if cart:
-				CartItems = DocType('Cart Items')
-				det = (frappe.qb.from_(CartItems) 
-					.where(CartItems.parent == cart[0].name) 
-					.delete())
-				
-				frappe.db.commit()
-				cart_doc = frappe.get_doc('Shopping Cart', cart[0].name)
+			if frappe.db.exists("Shopping Cart",{'customer': customer,'cart_type':'Shopping Cart'}):
+				cart_doc = frappe.get_doc('Shopping Cart',{'customer': customer,'cart_type':'Shopping Cart'})
+				cart_doc.items=[]
+				cart_doc.save()
+			else:
+				cart_doc = frappe.new_doc('Shopping Cart')
 			cart_doc.cart_type = "Shopping Cart"
 			cart_doc.customer = customer
 			return get_reorder_list(order,cart_doc)
@@ -3621,7 +3619,6 @@ def get_reorder_list(order,cart_doc):
 	for x in order.order_item:
 		if x.is_free_item != 1:
 			price = 0
-			is_allowed = 1
 			if not x.attribute_ids:
 				Product = DocType('Product')
 				p_price = (frappe.qb.from_(Product) 
@@ -3629,13 +3626,9 @@ def get_reorder_list(order,cart_doc):
 					.where(Product.name == x.item) 
 					.orderby(Product.price) 
 					.run(as_dict=True))
-				
-				if not p_price:
-					no_stock = 1
-					is_allowed = 0
-				if p_price:
-					price = p_price[0].price
-			cart_items_append(cart_doc,x,price,is_allowed,allowed_prdts)
+				if not p_price:no_stock = 1
+				if p_price:price = p_price[0].price
+			allowed_prdts = cart_items_append(cart_doc,x,price,no_stock,allowed_prdts)
 	frappe.db.commit()
 	message = "Successfully added into your Cart"
 	if no_stock == 1:
@@ -3646,8 +3639,8 @@ def get_reorder_list(order,cart_doc):
 		}
 
 
-def cart_items_append(cart_doc,x,price,is_allowed,allowed_prdts):
-	if is_allowed==1:
+def cart_items_append(cart_doc,x,price,no_stock,allowed_prdts):
+	if no_stock==0:
 		allowed_prdts = allowed_prdts+1
 		cart_doc.append('items',{   
 									'product': x.item,
@@ -3664,6 +3657,7 @@ def cart_items_append(cart_doc,x,price,is_allowed,allowed_prdts):
 									'sender_message': x.sender_message,
 									'sender_name': x.sender_name,
 								}).save(ignore_permissions=True)
+	return allowed_prdts
 
 
 def calculate_tax_from_template(tax_template, amount, tax_splitup):
@@ -3788,8 +3782,9 @@ def create_return_request(**kwargs):
 
 
 @frappe.whitelist()
-def get_order_invoices(order_id):
-	customer_id = get_customer_from_token()
+def get_order_invoices(order_id, customer_id=None):
+	if not customer_id:
+		customer_id = get_customer_from_token()
 	if customer_id == frappe.db.get_value("Order",order_id,"customer"):
 		import random
 		import string
