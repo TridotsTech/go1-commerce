@@ -299,7 +299,7 @@ def get_category_based_best_sellers(category, item, isMobile=0):
 			Product.image.as_('product_image'),
 			Product.brand.as_('product_brand'),
 			category.as_('category'),
-			Product.brand_unique_name.as_('brand_route')
+			Product.brand_unique_name.as_('brand_route'),
 			Sum(OrderItem.quantity).as_('qty'),
 			ProductCategoryMapping.category
 		)
