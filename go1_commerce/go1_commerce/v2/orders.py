@@ -3587,7 +3587,6 @@ def get_checkout_attributes():
 
 
 @frappe.whitelist()
-@role_auth(role = 'Customer',method = "POST")
 def reorder(order_id):
 	try:
 		order = frappe.get_doc('Order',order_id)
