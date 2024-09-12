@@ -913,8 +913,8 @@ def validate_insert_order(res,order_settings,cart,customer_id,catalog_settings,r
 						frappe.qb.from_(ProductVariantCombination)
 						.select(ProductVariantCombination.weight, ProductVariantCombination.sku)
 						.where(
-							ProductVariantCombination.parent == cart_item.product,
-							ProductVariantCombination.attributes_json == attribute_id.replace(" ","")
+							(ProductVariantCombination.parent == cart_item.product) &
+							(ProductVariantCombination.attributes_json == attribute_id.replace(" ",""))
 						)
 					)
 					combination_weight = query.run(as_dict=True)

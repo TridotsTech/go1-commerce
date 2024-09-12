@@ -170,6 +170,7 @@ class BuilderData(Document):
 		return result
 
 	def get_order_info(self, order_id):
+		frappe.log_error("order_id",order_id)
 		order = frappe.get_doc('Order', order_id)
 		order_detail = order.as_dict()
 		order_item_qty =0
