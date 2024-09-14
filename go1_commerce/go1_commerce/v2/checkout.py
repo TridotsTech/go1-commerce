@@ -115,33 +115,42 @@ def get_shipping_methods():
 		other_exception("Error in v2.checkout.get_shipping_method")
 
 @frappe.whitelist()	
-def calculate_shipping_charges(shipping_method,shipping_addr,cart_id):
+def calculate_shipping_charges(shipping_method,shipping_addr,cart_id=None):
 	try:
-		from go1_commerce.utils.setup import get_settings
-		ShippingRateMethod = DocType("Shipping Rate Method")
-		query = (
-			frappe.qb.from_(ShippingRateMethod)
-			.select(
-				ShippingRateMethod.name.as_("id"),
-				ShippingRateMethod.shipping_rate_method.as_("shipping_category")
+		cart_items = customer_id = None
+		if frappe.request.cookies.get('customer_id'):
+			customer_id = frappe.request.cookies.get('customer_id')
+		if not customer_id:
+			customer_id = get_customer_from_token()
+		if not cart_id:
+			cart_id = frappe.db.get_all("Shopping Cart",filters={"customer":customer_id,'cart_type':"Shopping Cart"})[0].name
+		if cart_id:
+			from go1_commerce.utils.setup import get_settings
+			ShippingRateMethod = DocType("Shipping Rate Method")
+			query = (
+				frappe.qb.from_(ShippingRateMethod)
+				.select(
+					ShippingRateMethod.name.as_("id"),
+					ShippingRateMethod.shipping_rate_method.as_("shipping_category")
+				)
+				.where(ShippingRateMethod.is_active == 1)
 			)
-			.where(ShippingRateMethod.is_active == 1)
-		)
-		active_shipping_rate_method_info= query.run(as_dict=True)
-		if active_shipping_rate_method_info:
-			active_shipping_rate_method_info = active_shipping_rate_method_info[0]
-			catalog_settings = get_settings('Catalog Settings')
-			shopping_cart = frappe.get_doc('Shopping Cart', cart_id)
-			shipping_address_info = frappe.get_doc('Customer Address', shipping_addr)
-			shipping_charges_resp = get_sh_charges_by_sh_method(active_shipping_rate_method_info,shipping_method,
-														shipping_address_info,shopping_cart)
-			if shipping_charges_resp.get("status") == "success":
-				final_shipping_charges = shipping_charges_resp.get("shipping_charges")
-				return calculate_tax_for_sh_chrgs(final_shipping_charges,shopping_cart,catalog_settings)
+			active_shipping_rate_method_info= query.run(as_dict=True)
+			if active_shipping_rate_method_info:
+				active_shipping_rate_method_info = active_shipping_rate_method_info[0]
+				catalog_settings = get_settings('Catalog Settings')
+				shopping_cart = frappe.get_doc('Shopping Cart', cart_id)
+				shipping_address_info = frappe.get_doc('Customer Address', shipping_addr)
+				shipping_charges_resp = get_sh_charges_by_sh_method(active_shipping_rate_method_info,shipping_method,
+															shipping_address_info,shopping_cart)
+				if shipping_charges_resp.get("status") == "success":
+					final_shipping_charges = shipping_charges_resp.get("shipping_charges")
+					return calculate_tax_for_sh_chrgs(final_shipping_charges,shopping_cart,catalog_settings)
+				else:
+					return shipping_charges_resp
 			else:
-				return shipping_charges_resp
-		else:
-			return {"status":"failed","message":"Default Shipping Rate Method is not found."}
+				return {"status":"failed","message":"Default Shipping Rate Method is not found."}
+		return {"status":"Failed","message":"Customer not found."}
 	except Exception:
 		other_exception("Error in v2.checkout.calculate_shipping_charges")
 
@@ -402,7 +411,7 @@ def get_checkout_totals(customer_id,discount,order_subtotal,shipping_charges):
 		customer_id = frappe.request.cookies.get('customer_id')
 	if not customer_id:
 		customer_id = get_customer_from_token()
-	from go1_commerce.go1_commerce.v2.orders import calculate_tax_after_discount , calculate_tax_without_discount
+	from go1_commerce.go1_commerce.v2.orders import calculate_tax_from_template
 	customer_cart = frappe.db.get_all('Shopping Cart', 
 					filters={'cart_type': 'Shopping Cart', 
 							 'customer': customer_id}, 
@@ -413,25 +422,37 @@ def get_checkout_totals(customer_id,discount,order_subtotal,shipping_charges):
 					 fields=['product', 'quantity', 'parent', 'price', 
 							 'attribute_ids', 'attribute_description',
 							 'is_free_item', 'total', 'discount_rule'])
-	(tax, tax_splitup) = calculate_tax_after_discount(customer_id, 
-						 discount,
-						 "", 
-						 subtotal_discount, cart_items)
-	if tax:
-		total_amount = total_amount + tax
-	return {
-		'formatted_order_subtotal':frappe.utils.fmt_money(order_subtotal,currency=currency_symbol),
-		'formatted_shipping_charges':frappe.utils.fmt_money(shipping_charges,currency=currency_symbol),
-		'formatted_discount_amount':frappe.utils.fmt_money(discount,currency=currency_symbol),
-		'formatted_tax_amount':frappe.utils.fmt_money(tax,currency=currency_symbol),
-		'formatted_total_amount':frappe.utils.fmt_money(total_amount,currency=currency_symbol),
-		'order_subtotal': order_subtotal,
-		'discount': discount,
-		'shipping_charges': shipping_charges,
-		'tax': tax,
-		'total_amount': total_amount,
+		tax = tax_amt = 0
+		tax_splitup = []
+		for x in cart_items:
+			item_tax = 0
+			product_tax = None
+			if frappe.db.get_value('Product', item.get('product')):
+				product_tax = frappe.db.get_value('Product',
+							item.get('product'), 'tax_category')
+			if product_tax:
+				tax_template = frappe.get_doc('Product Tax Template', product_tax)
+				(item_tax, tax_splitup) = calculate_tax_from_template(tax_template,
+										total, tax_splitup)
+			tax_amt = tax_amt + item_tax
+		if tax:
+			total_amount = total_amount + tax
+		return {
+			'formatted_order_subtotal':frappe.utils.fmt_money(order_subtotal,currency=currency_symbol),
+			'formatted_shipping_charges':frappe.utils.fmt_money(shipping_charges,currency=currency_symbol),
+			'formatted_discount_amount':frappe.utils.fmt_money(discount,currency=currency_symbol),
+			'formatted_tax_amount':frappe.utils.fmt_money(tax,currency=currency_symbol),
+			'formatted_total_amount':frappe.utils.fmt_money(total_amount,currency=currency_symbol),
+			'order_subtotal': order_subtotal,
+			'discount': discount,
+			'shipping_charges': shipping_charges,
+			'tax': tax,
+			'total_amount': total_amount,
+			"status":"Success"
 
-	}
+		}
+	else:
+		return {"status":"Failed","message":"No items in the cart."}
 
 
 @frappe.whitelist()

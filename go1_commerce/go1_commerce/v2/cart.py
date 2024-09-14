@@ -506,6 +506,8 @@ def clear_cartitem(customer=None):
 	try:
 		if not customer:
 			customer = get_customer_from_token()
+		if not customer:
+			customer = frappe.request.cookies.get('customer_id')
 		cart = frappe.db.get_value('Shopping Cart',{'customer': customer,
 											'cart_type': 'Shopping Cart'},"name")
 		if cart:

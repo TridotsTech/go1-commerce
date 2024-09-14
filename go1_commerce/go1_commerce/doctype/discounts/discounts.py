@@ -1969,6 +1969,7 @@ def get_order_subtotal_discount_assigned(discount,subtotal,cart_items):
 		else:
 			cashback = flt(discount.cashback_amount)
 		out['cashback_amount'] = cashback
+	out['discount_rule'] = discount.name
 	return out
 
 

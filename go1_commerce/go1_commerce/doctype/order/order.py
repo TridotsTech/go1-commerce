@@ -225,6 +225,9 @@ class Order(Document):
 					
 
 	def set_item_info(self,catalog_settings):
+		subtotal = 0
+		for item in self.order_item:
+			subtotal = subtotal + (item.price*item.quantity)
 		for item in self.order_item:
 			item.weight = frappe.db.get_value("Product",item.item,"weight")
 			item.ordered_weight = frappe.db.get_value("Product",item.item,"weight")
@@ -251,6 +254,14 @@ class Order(Document):
 
 			if not item.tax:
 				tax_value = 0
+				discount = 0
+				if self.discount:
+					price_weightage = item.amount / subtotal * 100
+					price_weightage = math.ceil(price_weightage * 100) / 100
+					new_discount = float(price_weightage)* float(self.discount) / 100
+					new_discount = math.ceil(new_discount * 100) / 100
+					discount = discount + new_discount
+				item.d_amount = discount
 				p_tax = frappe.db.get_value("Product",item.item,"tax_category")
 				if p_tax:
 					tax_template = frappe.get_doc('Product Tax Template',p_tax)
@@ -425,8 +436,8 @@ class Order(Document):
 		catalog_settings = frappe.get_single('Catalog Settings')
 		order_settings = frappe.get_single('Order Settings')
 		tax = subtotal = 0
+		
 		if self.order_item:
-
 			self.set_item_info(catalog_settings)
 			if self.order_item:
 				for item in self.order_item:
@@ -498,6 +509,15 @@ class Order(Document):
 					if not item.is_free_item:
 						total = 0
 						amount = 0
+						# discount = 0
+						# frappe.log_error("discount",self.discount)
+						# if self.discount:
+						# 	price_weightage = item.amount / subtotal * 100
+						# 	price_weightage = math.ceil(price_weightage * 100) / 100
+						# 	new_discount = float(price_weightage)* float(amount) / 100
+						# 	new_discount = math.ceil(new_discount * 100) / 100
+						# 	discount = discount + new_discount
+						# item.d_amount = discount
 						if self.docstatus==1:
 							frappe.db.set_value(item.doctype,item.name,'amount',item.amount)
 						total += flt(item.amount) if item.amount else 0
@@ -521,11 +541,11 @@ class Order(Document):
 			if shippingcharge_res:
 				self.shipping_charges = shippingcharge_res.get("shipping_charges") if shippingcharge_res.get("shipping_charges") else 0
 				frappe.db.set_value('Order', self.name, 'shipping_charges', shippingcharge_res.get("shipping_charges") if shippingcharge_res.get("shipping_charges") else 0)
-		else:
-			shippingcharge_res = calculate_shipping_charges(self)
-			if shippingcharge_res:
-				self.shipping_charges = shippingcharge_res.get("shipping_charges") if shippingcharge_res.get("shipping_charges") else 0
-				frappe.db.set_value('Order', self.name, 'shipping_charges', shippingcharge_res.get("shipping_charges") if shippingcharge_res.get("shipping_charges") else 0)
+		# else:
+		# 	shippingcharge_res = calculate_shipping_charges(self)
+		# 	if shippingcharge_res:
+		# 		self.shipping_charges = shippingcharge_res.get("shipping_charges") if shippingcharge_res.get("shipping_charges") else 0
+		# 		frappe.db.set_value('Order', self.name, 'shipping_charges', shippingcharge_res.get("shipping_charges") if shippingcharge_res.get("shipping_charges") else 0)
 		self.shipping_tax_subtotal(subtotal)
 		tax_template = None
 		tax_val=0

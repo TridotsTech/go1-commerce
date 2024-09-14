@@ -226,11 +226,11 @@ class BuilderData(Document):
 		from go1_commerce.go1_commerce.v2.checkout import get_payment_methods as _get_payment_methods, get_shipping_methods as _get_shipping_methods
 		result["payment_methods"] = _get_payment_methods()
 		result["shipping_methods"] = _get_shipping_methods()
-		frappe.log_error("checkout data",result)
+		customer = frappe.request.cookies.get('customer_id')
+		result['cart_id'] = frappe.db.get_all("Shopping Cart",filters={"customer":customer,'cart_type':"Shopping Cart"})[0].name
 		return result
 
 	def get_order_info(self, order_id):
-		frappe.log_error("order_id",order_id)
 		order = frappe.get_doc('Order', order_id)
 		order_detail = order.as_dict()
 		order_item_qty =0

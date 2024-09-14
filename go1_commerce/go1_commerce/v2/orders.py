@@ -727,7 +727,7 @@ def insert_order(data):
 	if not data.get("customer"):
 		customer_id = get_customer_from_token()
 	else:
-		customer_id = data.get("customer")
+		customer_id = frappe.request.cookies.get('customer_id')
 	catalog_settings = frappe.get_single('Catalog Settings')
 	order_settings = frappe.get_single('Order Settings')
 	val_ip = validate_domain_and_ips()
