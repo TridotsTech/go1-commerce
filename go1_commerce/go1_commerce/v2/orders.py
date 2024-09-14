@@ -1698,6 +1698,9 @@ def calculate_shipping_charges_from_list(shipping_charges,shipping_charges_list,
 					if zipcode_range:
 						if shipping_zip_matches(shipping_addr.zipcode, zipcode_range):
 							matched_sh_charges.append(item)
+		else:
+			shipping_charges = item.charge_amount
+
 	if not matched_sh_charges:
 		for x in shipping_charges_list:
 			if x.shipping_zone:
@@ -1761,7 +1764,7 @@ def validate_and_calculate_additional_shipping_charges(shopping_cart):
 				if not free_shipping:
 					if additional_shipping_cost > 0:
 						additional_shipping_charges += additional_shipping_cost * citem.quantity
-					order_subtotal += citem.total
+				order_subtotal += citem.total
 			else:
 				shipping_not_allowd_products.append(product_name)
 	if shipping_not_allowd_products:
@@ -2425,7 +2428,7 @@ def calculate_tax_after_discount(customer_id, discount_amount, discount, subtota
 				if discount_type != 'remove':
 					if discount:
 						new_discount = _calculate_item_discount(dis, subtotal, item)
-					if response.get('product_discount'):
+					if response and response.get('product_discount'):
 						new_discount = new_discount  + _calculate_item_wise_discount(item.get('product'), response)
 					discount_amout = discount_amout + float(new_discount)
 				if prev_discount:

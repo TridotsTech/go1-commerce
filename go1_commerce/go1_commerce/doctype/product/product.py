@@ -1948,7 +1948,8 @@ def get_category_attributes(reference_doc, reference_fields, filters=None,page_n
 
 	list_name_query = (
 		list_name_query.groupby(ProductAttribute.name, ProductAttribute.attribute_name)
-		.limit(start, int(page_len))
+		.limit(int(page_len))
+		.offset(start)
 	)
 
 	list_name = list_name_query.run(as_dict=True)
@@ -2621,7 +2622,7 @@ def product_detail_onscroll(productid, layout):
 						"/templates/pages/DetailPage/additional_product_info.html", contexts)
 	return template
 
-
+@frappe.whitelist()
 def insert_product_attribute_and_options(doc):
 	try:
 		if isinstance(doc, string_types):

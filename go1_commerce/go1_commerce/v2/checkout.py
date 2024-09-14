@@ -180,10 +180,13 @@ def get_sh_charges_by_sh_method(SRM_info,shipping_method,shipping_addr,shopping_
 	elif SRM_info.shipping_category == 'Shipping By Group By Distance and Weight':
 		sh_charges_resp = calculate_shipping_charges_distance_and_weight_group(SRM_info.get("id"),shipping_addr,
 																			   shopping_cart)
+	# frappe.log_error("sh_charges_resp",sh_charges_resp)
 	return sh_charges_resp
 
 def calculate_tax_for_sh_chrgs(shipping_charges,shopping_cart,catalog_settings):
 	tax_percent = total_tax_amount = 0
+	currency = catalog_settings.default_currency
+	currency_symbol = frappe.db.get_value("Currency",catalog_settings.default_currency,"symbol")
 	if shipping_charges and catalog_settings.shipping_is_taxable and catalog_settings.shipping_tax_class:
 		tax_template = frappe.get_doc('Product Tax Template',catalog_settings.shipping_tax_class)
 		for item in tax_template.tax_rates:
@@ -192,21 +195,40 @@ def calculate_tax_for_sh_chrgs(shipping_charges,shopping_cart,catalog_settings):
 				total_tax_amount += round(shipping_charges * item.rate / (100 + item.rate), 2)
 			else:
 				total_tax_amount += round(shipping_charges * item.rate / 100, 2)
-	return {'status':'success','shipping_charges': shipping_charges,
+	total_amount = shopping_cart.total
+	if not catalog_settings.included_tax:
+		total_amount += shopping_cart.tax
+	if shipping_charges:
+		total_amount += shipping_charges
+	return {'status':'success',
+			'shipping_charges': shipping_charges,
 			'shipping_tax_rate': total_tax_amount,
 			'shipping_tax_percent': tax_percent,
-			'item_tax_rate': shopping_cart.tax if shopping_cart else 0}
+			'order_subtotal':shopping_cart.total,
+			'total_amount':total_amount,
+			'item_tax_rate': shopping_cart.tax if shopping_cart else 0,
+			'formatted_total_amount':frappe.utils.fmt_money(total_amount,currency=currency_symbol),
+			'formatted_tax_amount':frappe.utils.fmt_money(shopping_cart.tax,currency=currency_symbol),
+			'formatted_order_subtotal':frappe.utils.fmt_money(shopping_cart.total,currency=currency_symbol),
+			'formatted_shipping_charges':frappe.utils.fmt_money(shipping_charges,currency=currency_symbol),
+			}
 
 
 @frappe.whitelist()
 def get_order_discount(subtotal,total_weight=0,shipping_method=None,payment_method=None,shipping_charges=0):
 	try:
-		cart_items = None
-		customer_id = get_customer_from_token()
+		cart_items = customer_id = None
+		if frappe.request.cookies.get('customer_id'):
+			customer_id = frappe.request.cookies.get('customer_id')
+		if not customer_id:
+			customer_id = get_customer_from_token()
 		from go1_commerce.go1_commerce.doctype.discounts.discounts \
 		import get_order_subtotal_discount
 		from go1_commerce.go1_commerce.v2.orders\
 		import calculate_tax_after_discount , calculate_tax_without_discount
+		catalog_settings = frappe.get_single("Catalog Settings")
+		currency = catalog_settings.default_currency
+		currency_symbol = frappe.db.get_value("Currency",catalog_settings.default_currency,"symbol")
 		customer_cart = frappe.db.get_all('Shopping Cart', 
 						filters={'cart_type': 'Shopping Cart', 
 								 'customer': customer_id}, 
@@ -222,14 +244,26 @@ def get_order_discount(subtotal,total_weight=0,shipping_method=None,payment_meth
 					   total_weight,shipping_method, payment_method,shipping_charges)
 			if response and (response.get('discount_rule') or \
 				response.get('product_discount')) or response.get('shipping_discount'):
+				
 				(tax, tax_splitup) = calculate_tax_after_discount(customer_id, 
 									 response.get('discount_amount'),
 									 response.get('discount_rule'), 
-									 subtotal, cart_items, response=response)
+									 response.get("subtotal"), cart_items, response=response)
+				
+				total_amount = response.get("subtotal")
+				if not catalog_settings.included_tax:
+					 total_amount += tax
+				if shipping_charges:
+					 total_amount += float(shipping_charges)
+					
 				return {'status': 'Success',
 						'discount_amount': response.get('discount_amount'),
 						'discount': response.get('discount_rule'),
 						'tax': tax,
+						'formatted_total_amount':frappe.utils.fmt_money(total_amount,currency=currency_symbol),
+						'formatted_tax_amount':frappe.utils.fmt_money(tax,currency=currency_symbol),
+						'formatted_order_subtotal':frappe.utils.fmt_money(response.get("subtotal"),currency=currency_symbol),
+						'formatted_discount':frappe.utils.fmt_money(response.get('discount_amount'),currency=currency_symbol),
 						'tax_splitup': tax_splitup,
 						'discount_response': response}
 			else:
@@ -312,6 +346,9 @@ def get_validate_coupons_cart_items(coupon_code, subtotal, customer_id, cart_ite
 
 def get_caskback_account(calculate_tax_after_discount,response, subtotal,discount_type,
 							cart_items, prev_discount,customer_id,cashback_amount):
+	
+	currency = frappe.db.get_single_value("Catalog Settings","default_currency")
+	currency_symbol = frappe.db.get_value("Currency",currency,"symbol")
 	if cashback_amount > 0:
 		if response.get('cashback'):
 			response['cashback_amount'] = float(response['cashback_amount']) + cashback_amount
@@ -327,6 +364,7 @@ def get_caskback_account(calculate_tax_after_discount,response, subtotal,discoun
 			'tax': tax,
 			'tax_splitup': tax_splitup,
 			'discount_response': response,
+			'formatted_tax_amount':frappe.utils.fmt_money(tax,currency=currency_symbol),
 			'prev_discount': prev_discount}
 
 
@@ -347,6 +385,54 @@ def val_shipping_discount(response,total_weight, shipping_method, payment_method
 	return get_caskback_account(calculate_tax_after_discount,response,subtotal, \
 										discount_type,cart_items,prev_discount, \
 										customer_id,cashback_amount)
+
+@frappe.whitelist()
+def get_checkout_totals(customer_id,discount,order_subtotal,shipping_charges):
+	currency = frappe.db.get_single_value("Catalog Settings","default_currency")
+	currency_symbol = frappe.db.get_value("Currency",currency,"symbol")
+	total_amount = order_subtotal
+	subtotal_discount = order_subtotal
+	if discount:
+		total_amount = total_amount - discount
+		subtotal_discount = subtotal_discount - discount
+	if shipping_charges:
+		total_amount = total_amount + shipping_charges
+	cart_items = customer_id = None
+	if frappe.request.cookies.get('customer_id'):
+		customer_id = frappe.request.cookies.get('customer_id')
+	if not customer_id:
+		customer_id = get_customer_from_token()
+	from go1_commerce.go1_commerce.v2.orders import calculate_tax_after_discount , calculate_tax_without_discount
+	customer_cart = frappe.db.get_all('Shopping Cart', 
+					filters={'cart_type': 'Shopping Cart', 
+							 'customer': customer_id}, 
+					fields=['*'])
+	if customer_cart:
+		cart_items = frappe.db.get_all('Cart Items', 
+					 filters={'parent': customer_cart[0].name, 'is_free_item': 0}, 
+					 fields=['product', 'quantity', 'parent', 'price', 
+							 'attribute_ids', 'attribute_description',
+							 'is_free_item', 'total', 'discount_rule'])
+	(tax, tax_splitup) = calculate_tax_after_discount(customer_id, 
+						 discount,
+						 "", 
+						 subtotal_discount, cart_items)
+	if tax:
+		total_amount = total_amount + tax
+	return {
+		'formatted_order_subtotal':frappe.utils.fmt_money(order_subtotal,currency=currency_symbol),
+		'formatted_shipping_charges':frappe.utils.fmt_money(shipping_charges,currency=currency_symbol),
+		'formatted_discount_amount':frappe.utils.fmt_money(discount,currency=currency_symbol),
+		'formatted_tax_amount':frappe.utils.fmt_money(tax,currency=currency_symbol),
+		'formatted_total_amount':frappe.utils.fmt_money(total_amount,currency=currency_symbol),
+		'order_subtotal': order_subtotal,
+		'discount': discount,
+		'shipping_charges': shipping_charges,
+		'tax': tax,
+		'total_amount': total_amount,
+
+	}
+
 
 @frappe.whitelist()
 def get_cart_delivery_slots(shipping_method=None):
