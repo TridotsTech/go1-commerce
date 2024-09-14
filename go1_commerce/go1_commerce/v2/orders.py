@@ -607,9 +607,7 @@ def validate_product_cart_qty(ProductId, attributeId = None, add_qty = None, qty
 						)
 					)
 					query = query.where(
-						CartItem.parent == cart[0].name,
-						CartItem.product == ProductId,
-						Product.name == CartItem.product
+						CartItem.parent == cart[0].name & CartItem.product == ProductId & Product.name == CartItem.product
 					)
 
 					if attributeId:
@@ -1223,6 +1221,21 @@ def set_discount_amount(order,request,order_total,coupon_code,discount_data):
 			(use_type_c, percent_c, amount_c,
 			max_discount_c) = frappe.db.get_value('Discounts',
 															coupon_code,
+															['percent_or_amount',
+															'discount_percentage',
+															'discount_amount',
+															'max_discount_amount'])
+			discount_data.append({
+								'use_type': use_type_c,
+								'percent': percent_c,
+								'amount': amount_c,
+								'max_discount': max_discount_c
+								})
+		if frappe.db.get_all("Discounts",filters={"coupon_code":coupon_code}):
+			dicounts = frappe.db.get_all("Discounts",filters={"coupon_code":coupon_code})
+			(use_type_c, percent_c, amount_c,
+			max_discount_c) = frappe.db.get_value('Discounts',
+															dicounts[0].name,
 															['percent_or_amount',
 															'discount_percentage',
 															'discount_amount',

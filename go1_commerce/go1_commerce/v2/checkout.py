@@ -7,6 +7,7 @@ from six import string_types
 from go1_commerce.utils.utils import get_today_date
 from go1_commerce.utils.utils import get_customer_from_token,other_exception
 from frappe.query_builder import DocType, Field, Order
+import frappe, json, math, os
 
 @frappe.whitelist()
 def check_cartitems_stock_mob(customer_id=None):
@@ -340,12 +341,18 @@ def get_validate_coupons_cart_items(coupon_code, subtotal, customer_id, cart_ite
 				return val_shipping_discount(response,total_weight, shipping_method, payment_method,subtotal,
 										discount_type,cart_items,customer_id)
 			else:
+				currency = frappe.db.get_single_value("Catalog Settings","default_currency")
+				currency_symbol = frappe.db.get_value("Currency",currency,"symbol")
 				return {
 						'status': 'success',
 						'shipping_charges': response.get('shipping_charges'),
 						'shipping_discount':response.get('shipping_discount'),
 						'shipping_label':response.get('shipping_label'),
-						'shipping_discount_id':response.get('discount_rule')
+						'shipping_discount_id':response.get('discount_rule'),
+						'actual_shipping_charges':shipping_charges,
+						'discount_amount':shipping_charges - response.get('shipping_charges'),
+						'formatted_shipping_charges':frappe.utils.fmt_money(response.get('shipping_charges'),currency=currency_symbol),
+						'formatted_actual_shipping_charges':frappe.utils.fmt_money((shipping_charges),currency=currency_symbol),
 						}
 		elif response:
 			return {'status': 'failed', 'message': response.get('message')}
@@ -424,17 +431,24 @@ def get_checkout_totals(customer_id,discount,order_subtotal,shipping_charges):
 							 'is_free_item', 'total', 'discount_rule'])
 		tax = tax_amt = 0
 		tax_splitup = []
-		for x in cart_items:
-			item_tax = 0
+		for item in cart_items:
+			item_tax = i_discount = 0
 			product_tax = None
 			if frappe.db.get_value('Product', item.get('product')):
 				product_tax = frappe.db.get_value('Product',
 							item.get('product'), 'tax_category')
+			price_weightage = item.get("total") / order_subtotal * 100
+			price_weightage = math.ceil(price_weightage * 100) / 100
+			new_discount = float(price_weightage)* float(discount) / 100
+			new_discount = math.ceil(new_discount * 100) / 100
+			i_discount = i_discount + new_discount
+			total = item.get("total") - i_discount
 			if product_tax:
 				tax_template = frappe.get_doc('Product Tax Template', product_tax)
 				(item_tax, tax_splitup) = calculate_tax_from_template(tax_template,
 										total, tax_splitup)
 			tax_amt = tax_amt + item_tax
+		tax = tax_amt
 		if tax:
 			total_amount = total_amount + tax
 		return {

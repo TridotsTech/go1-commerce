@@ -1464,6 +1464,8 @@ def check_delivery_charge_discount_(
 										shipping_charges,
 										out
 									):
+	currency = frappe.db.get_single_value("Catalog Settings","default_currency")
+	currency_symbol = frappe.db.get_value("Currency",currency,"symbol")
 	for discount in discounts:
 		condition_passed = 0
 		reqs = frappe.db.get_all('Discount Requirements', 
@@ -1504,6 +1506,10 @@ def check_delivery_charge_discount_(
 			out['shipping_discount'] = 1
 			out['shipping_charges'] = math.ceil(charges * 100) / 100
 			out['shipping_discount_id'] = discount.name
+			out['formatted_shipping_charges'] = frappe.utils.fmt_money(out['shipping_charges'],currency=currency_symbol)
+			out['formatted_discount_amount'] = frappe.utils.fmt_money(float(shipping_charges) - out['shipping_charges'],currency=currency_symbol)
+			out['actual_shipping_charges']= shipping_charges
+			out['formatted_actual_shipping_charges'] = frappe.utils.fmt_money((shipping_charges),currency=currency_symbol)
 			if charges == 0:
 				out['shipping_label'] = _('Free Delivery')
 			tax = 0
