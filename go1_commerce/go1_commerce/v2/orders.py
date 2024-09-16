@@ -607,7 +607,7 @@ def validate_product_cart_qty(ProductId, attributeId = None, add_qty = None, qty
 						)
 					)
 					query = query.where(
-						CartItem.parent == cart[0].name & CartItem.product == ProductId & Product.name == CartItem.product
+						(CartItem.parent == cart[0].name) & (CartItem.product == ProductId) & (Product.name == CartItem.product)
 					)
 
 					if attributeId:
