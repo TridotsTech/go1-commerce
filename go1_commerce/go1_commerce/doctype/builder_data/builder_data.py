@@ -259,6 +259,18 @@ class BuilderData(Document):
 									})
 
 		data = {"info":order_detail,"delivery_slot":delivery_slot}
+		currency = frappe.db.get_single_value("Catalog Settings","default_currency")
+		currency_symbol = frappe.db.get_value("Currency",currency,"symbol")
+		data["formatted_total"] = frappe.utils.fmt_money(order_detail.total_amount,currency=currency_symbol)
+		data["formatted_subtotal"] = frappe.utils.fmt_money(order_detail.order_subtotal,currency=currency_symbol)
+		data["formatted_shipping_charges"] = frappe.utils.fmt_money(order_detail.shipping_charges,currency=currency_symbol)
+		data["formatted_total_tax"] = frappe.utils.fmt_money(order_detail.total_tax_amount,currency=currency_symbol)
+		data["formatted_outstanding"] = frappe.utils.fmt_money(order_detail.outstanding_amount,currency=currency_symbol)
+		data["formatted_paid_amount"] = frappe.utils.fmt_money(order_detail.paid_amount,currency=currency_symbol)
+		data["formatted_discount"] = "-"+frappe.utils.fmt_money(order_detail.discount,currency=currency_symbol)
+		for x in order_detail.order_item:
+			x["formatted_price"] = frappe.utils.fmt_money(x.price,currency=currency_symbol)
+			x["formatted_total"] = frappe.utils.fmt_money(x.amount,currency=currency_symbol)
 		return data
 
 	def get_country_data(self):
@@ -277,4 +289,15 @@ class BuilderData(Document):
 		frappe.local.flags.redirect_location = '/login'+("?redirect_url="+redirect_url) if redirect_url else ""
 		raise frappe.Redirect
 
-	
+	def get_product_enquiry_details(self, p_route = None, limit = 20):
+		product_id = frappe.db.get_value("Product", {"route": p_route}, "name")
+		if product_id:
+			enquiry_details = frappe.db.get_all("Product Enquiry", 
+											filters = {"is_approved": 1, "product": product_id}, 
+											fields = ["name", "question"],
+											start = 0, 
+											page_length = limit)
+			if enquiry_details:
+				for enquiry in enquiry_details:
+					enquiry["enquiry_answers"] = frappe.db.get_all("Product Enquiry Answers", filters = {"parent": enquiry.name}, fields = ["answer"])
+			return enquiry_details
