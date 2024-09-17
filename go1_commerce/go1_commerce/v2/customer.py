@@ -649,7 +649,10 @@ def insert_contact_enquiry(**info):
 def cancel_order(**kwargs):
 	try:
 		customer_id = frappe.db.get_value("Order",kwargs.get("order_id"),"customer")
-		customer = get_customer_from_token()
+		if not kwargs.get("customer"):
+			customer = get_customer_from_token()
+		else:
+			customer = kwargs.get("customer")
 		if customer and customer == customer_id:
 			Orders = frappe.get_doc("Order", kwargs.get("order_id"))
 			if Orders:
