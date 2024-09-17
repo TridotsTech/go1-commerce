@@ -373,7 +373,6 @@ def get_customer_order_details(order_id, customer_id=None):
 
 
 @frappe.whitelist()
-@role_auth(role='Customer',method="POST")
 def update_password(new_password, logout_all_sessions=0, key=None, old_password=None, user=None):
 	try:
 		from go1_commerce.go1_commerce.doctype.order_settings.order_settings import validate_password
@@ -428,7 +427,6 @@ def _get_user_for_update_password(key,new_password, old_password, user):
 
 
 @frappe.whitelist()
-@role_auth(role='Customer',method="POST")
 def update_address(data):
 	try:
 		response = json.loads(data)
@@ -648,7 +646,6 @@ def insert_contact_enquiry(**info):
 	return result
 
 @frappe.whitelist()
-@role_auth(role='Customer',method="POST")
 def cancel_order(**kwargs):
 	try:
 		customer_id = frappe.db.get_value("Order",kwargs.get("order_id"),"customer")
@@ -879,7 +876,6 @@ def update_registration_details(**kwargs):
 		return {"status":"Failed","message":"Something went wrong."}
 
 @frappe.whitelist()
-@role_auth(role='Customer',method="GET")
 def get_wallet_details(customer=None):
 	try:
 		if not customer:
@@ -897,7 +893,6 @@ def get_wallet_details(customer=None):
 		frappe.log_error(message = frappe.get_traceback(), title = 'Error in wallet_details')
 
 @frappe.whitelist()
-@role_auth(role='Customer',method="PUT")
 def update_device_id(device_id, customer=None):
 	try:
 		if not customer:
