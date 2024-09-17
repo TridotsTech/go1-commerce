@@ -197,6 +197,10 @@ class BuilderData(Document):
 		month_order_list = data[1]
 		today_order_list = data[2]
 		all_order_list = data[3]
+		currency = frappe.db.get_single_value("Catalog Settings","default_currency")
+		currency_symbol = frappe.db.get_value("Currency",currency,"symbol")
+		for x in recent_orders:
+			x['formatted_total'] = frappe.utils.fmt_money(x.total_amount,currency=currency_symbol)
 		return {"all_count":len(all_order_list),
 				"monthly_count": len(month_order_list),
 				"today_orders_count": len(today_order_list),"recent_orders":recent_orders,
