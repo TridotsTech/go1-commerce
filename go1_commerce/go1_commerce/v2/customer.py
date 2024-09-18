@@ -375,6 +375,7 @@ def get_customer_order_details(order_id, customer_id=None):
 @frappe.whitelist()
 def update_password(new_password, logout_all_sessions=0, key=None, old_password=None, user=None):
 	try:
+		
 		from go1_commerce.go1_commerce.doctype.order_settings.order_settings import validate_password
 		from frappe.utils.password import update_password as _update_password
 		password_res = validate_password(new_password)
