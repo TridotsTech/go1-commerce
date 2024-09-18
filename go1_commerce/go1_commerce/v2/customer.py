@@ -375,7 +375,6 @@ def get_customer_order_details(order_id, customer_id=None):
 @frappe.whitelist()
 def update_password(new_password, logout_all_sessions=0, key=None, old_password=None, user=None):
 	try:
-		
 		from go1_commerce.go1_commerce.doctype.order_settings.order_settings import validate_password
 		from frappe.utils.password import update_password as _update_password
 		password_res = validate_password(new_password)
@@ -649,18 +648,17 @@ def insert_contact_enquiry(**info):
 @frappe.whitelist()
 def cancel_order(**kwargs):
 	try:
+		frappe.log_error("kwargs", kwargs)
 		customer_id = frappe.db.get_value("Order",kwargs.get("order_id"),"customer")
-		if not kwargs.get("customer"):
-			customer = get_customer_from_token()
-		else:
-			customer = kwargs.get("customer")
+		customer = kwargs.get("customer") if kwargs.get("customer") else get_customer_from_token()
+		frappe.log_error("Customer Details", [customer, customer_id])
 		if customer and customer == customer_id:
 			Orders = frappe.get_doc("Order", kwargs.get("order_id"))
 			if Orders:
 				if Orders.docstatus == 2:
 					return {"Order": kwargs.get("order_id"),"message": "Already Order cancelled"}
 				else:
-					return validate_cancel_order(Orders,customer_id,customer,**kwargs)
+					return validate_cancel_order(Orders,customer_id,**kwargs)
 			else: 
 				return {"status":"Failed",
 						"message": "Order id Not Found"}
@@ -679,24 +677,21 @@ def cancel_order(**kwargs):
 	except Exception:
 		other_exception("customer cancel_order")
 
-def validate_cancel_order(Orders,customer_id,customer,**kwargs):
+def validate_cancel_order(Orders,customer_id,**kwargs):
 	if Orders.docstatus == 1:
 		from frappe.desk.form.linked_with import get_linked_docs, get_linked_doctypes
 		linkinfo = get_linked_doctypes(Orders.doctype)
+		frappe.log_error("linkinfo",linkinfo)
 		docs = get_linked_docs(Orders.doctype, Orders.name, linkinfo)
 		for key in docs:
 			for item in docs[key]:
 				if item.get("docstatus")==1:
 					frappe.db.set_value(key,item.get("name"),"docstatus",2)
-					if key == "Vendor Orders":
-						frappe.db.set_value(key,item.get("name"),"status","Cancelled")
-					frappe.db.commit()
 		Orders.docstatus = 2
 		Orders.cancel_reason = kwargs.get("cancel_reason")
+		Orders.status = "Cancelled"
 		Orders.update(kwargs)
 		Orders.save(ignore_permissions=True)
-		centre = frappe.db.get_value("Customers",Orders.customer,"center")
-		
 		OrderItem = DocType("Order Item")
 		old_items = (
 			frappe.qb.from_(OrderItem)
@@ -704,7 +699,6 @@ def validate_cancel_order(Orders,customer_id,customer,**kwargs):
 			.where(OrderItem.parent == kwargs.get("order_id"))
 			.run(as_dict=True)
 		)
-		frappe.db.commit()
 		if Orders.paid_using_wallet>0:
 			wallet = frappe.db.get_all("Wallet",filters={"user":Orders.customer})
 			if wallet:
@@ -716,11 +710,9 @@ def validate_cancel_order(Orders,customer_id,customer,**kwargs):
 				wallet_doc.locked_in_amount=locked_in
 				wallet_doc.total_wallet_amount=total_wallet
 				wallet_doc.save(ignore_permissions=True)
-			return {"status":"Success",
-				"message": "Order Cancel Successfully"}
-		else:
-			return {"status":"Failed",
-					"message": "Order Not Found"}
+		frappe.db.commit()
+		return {"status":"Success",
+			"message": "Order Cancel Successfully"}
 
 def generate_random_nos(n):
 	from random import randint

@@ -140,6 +140,8 @@ class Order(Document):
 				tax_splitup = insert_order_tax_template(total,cart_item,included_tax,item_tax,
 														tax_splitup,tax_type)
 				if tax_splitup:
+					if not self.tax_breakup:
+						self.tax_breakup = ""
 					for s in tax_splitup: 
 						tax_json.append(s)
 						self.tax_breakup += str(s['type']) + ' - ' + str('{0:.2f}'.

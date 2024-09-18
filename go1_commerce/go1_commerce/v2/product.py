@@ -377,6 +377,7 @@ def get_list_product_details(products,customer = None):
 		currency = catalog_settings.default_currency
 		currency_symbol = frappe.db.get_value("Currency",catalog_settings.default_currency,"symbol")
 		for x in products:
+			x["discount_percentage"] = 0
 			x["actual_price"] = x.get("price")
 			x["actual_old_price"] = x.get("old_price")
 			x["item_title"] = x.get("item")
@@ -425,7 +426,54 @@ def get_list_product_details(products,customer = None):
 			else:
 				x["formatted_price"] = frappe.utils.fmt_money(x["price"],currency=currency_symbol)
 			x["formatted_old_price"] = frappe.utils.fmt_money(x["old_price"],currency=currency_symbol)
+			if not x.get("product_image"):
+				default_image = frappe.db.get_single_value("Media Settings","default_image")
+				x.product_image = default_image if default_image else ""
+			if frappe.request.cookies.get('customer_id'):
+				customer = frappe.request.cookies.get('customer_id')
+			customer_cart = None
+			if customer:
+				customer_cart = get_customer_cart_items(customer)
+			x.in_cart = False
+			x.in_wishlist = False
+			x.in_cart_qty = 0
+			x.cart_item_id = ""
+			x.wishlist_item_id = ""
+			if customer_cart:
+				if customer_cart.get("cart") and customer_cart.get("cart").get("items"):
+					check_exist = list(filter(lambda ci: ci.product == x.name, customer_cart.get("cart").get("items")))
+					if check_exist:
+						x.in_cart = True
+						x.in_cart_qty = check_exist[0].quantity
+						x.cart_item_id = check_exist[0].name
+				if customer_cart.get("wishlist") and customer_cart.get("wishlist").get("items"):
+					check_exist = list(filter(lambda ci: ci.product == x.name, customer_cart.get("wishlist").get("items")))
+					if check_exist:
+						x.in_wishlist = True
+						x.wishlist_item_id = check_exist[0].name
+			
 	return products
+
+def get_customer_cart_items(customer=None):
+	cart_obj={}
+	if customer:
+		from go1_commerce.go1_commerce.v2.cart import get_customer_cart_items as _get_customer_cart
+		cart_obj = _get_customer_cart(customer)
+		currency = frappe.db.get_single_value("Catalog Settings","default_currency")
+		currency_symbol = frappe.db.get_value("Currency",currency,"symbol")
+		if cart_obj.get("status") == "success":
+			if cart_obj.get("cart"):
+				total_amount = 0
+				for c in cart_obj.get("cart").get("items"):
+					c.formatted_price = frappe.utils.fmt_money(c["price"],currency=currency_symbol)
+					total_amount = c["total"] + total_amount
+				cart_obj.get("cart")["formatted_total"] = frappe.utils.fmt_money(total_amount,currency=currency_symbol)
+			if cart_obj.get("wishlist"):
+				for c in cart_obj.get("wishlist").get("items"):
+					c.formatted_price = frappe.utils.fmt_money(c["price"],currency=currency_symbol)
+		 
+	return cart_obj		
+
 
 def get_customer_recently_viewed_products(customer=None):
 	products = []
