@@ -90,13 +90,13 @@ class BuilderData(Document):
 					if customer_cart.get("cart") and customer_cart.get("cart").get("items"):
 						check_exist = list(filter(lambda ci: ci.product == x.name, customer_cart.get("cart").get("items")))
 						if check_exist:
-							x.in_cart = 1
+							x.in_cart = True
 							x.in_cart_qty = check_exist[0].quantity
 							x.cart_item_id = check_exist[0].name
 					if customer_cart.get("wishlist") and customer_cart.get("wishlist").get("items"):
 						check_exist = list(filter(lambda ci: ci.product == x.name, customer_cart.get("wishlist").get("items")))
 						if check_exist:
-							x.in_wishlist = 1
+							x.in_wishlist = True
 							x.wishlist_item_id = check_exist[0].name
 		if p_details.other_data.get("products_purchased_together"):
 			for x in p_details.other_data.get("products_purchased_together"):
@@ -109,7 +109,7 @@ class BuilderData(Document):
 					if customer_cart.get("cart") and customer_cart.get("cart").get("items"):
 						check_exist = list(filter(lambda ci: ci.product == x.name, customer_cart.get("cart").get("items")))
 						if check_exist:
-							x.in_cart = 1
+							x.in_cart = True
 							x.in_cart_qty = check_exist[0].quantity
 							x.cart_item_id = check_exist[0].name
 					if customer_cart.get("wishlist") and customer_cart.get("wishlist").get("items"):
@@ -128,13 +128,13 @@ class BuilderData(Document):
 					if customer_cart.get("cart") and customer_cart.get("cart").get("items"):
 						check_exist = list(filter(lambda ci: ci.product == x.name, customer_cart.get("cart").get("items")))
 						if check_exist:
-							x.in_cart = 1
+							x.in_cart = True
 							x.in_cart_qty = check_exist[0].quantity
 							x.cart_item_id = check_exist[0].name
 					if customer_cart.get("wishlist") and customer_cart.get("wishlist").get("items"):
 						check_exist = list(filter(lambda ci: ci.product == x.name, customer_cart.get("wishlist").get("items")))
 						if check_exist:
-							x.in_wishlist = 1
+							x.in_wishlist = True
 							x.wishlist_item_id = check_exist[0].name
 		return p_details
 
