@@ -477,13 +477,13 @@ def move_all_tocart(customer_id = None):
 		other_exception("Error in v2.cart.move_all_tocart")
 
 @frappe.whitelist(allow_guest = True)
-def delete_cart_items(name,customer_id = None):
+def delete_cart_items(cname,customer_id = None):
 	try:
 		if not customer_id:
 			customer = get_customer_from_token()
 		else:
 			customer = customer_id
-		if doc := frappe.db.get_value('Cart Items',{'name':name},['name','parent','discount_rule'],as_dict = 1):
+		if doc := frappe.db.get_value('Cart Items',{'name':cname},['name','parent','discount_rule'],as_dict = 1):
 			check_free_doc = frappe.db.get_all('Cart Items',{'parent': doc.parent, 'is_free_item': 1,
 															'discount_rule': doc.discount_rule})
 			if check_free_doc:

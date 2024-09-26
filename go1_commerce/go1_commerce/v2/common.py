@@ -1585,6 +1585,19 @@ def login_customer(login_manager):
 	except Exception:
 		frappe.log_error('Error in v2.common.login_customer', frappe.get_traceback())
 
+def logout_customer(login_manager):
+	try:
+		sid = frappe.local.session.sid
+		frappe.cache().hdel(sid, 'locations_list')
+		frappe.cache().hdel(sid, 'destinations_list')
+		frappe.cache().hdel(sid, 'user_location')
+		frappe.local.cookie_manager.delete_cookie('customer_id')
+		frappe.local.cookie_manager.delete_cookie('guest_customer')
+		frappe.local.cookie_manager.delete_cookie('addressId')
+		frappe.local.cookie_manager.delete_cookie('guest_customer_phone')
+		frappe.local.cookie_manager.delete_cookie('guest_customer_name')
+	except Exception:
+		frappe.log_error('Error in v2.common.logout_customer', frappe.get_traceback())	
 
 
 @frappe.whitelist()

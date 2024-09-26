@@ -23,6 +23,8 @@ has_website_permission = {
 after_install = "go1_commerce.go1_commerce.after_install.after_install"
 # on login
 on_session_creation = "go1_commerce.go1_commerce.v2.common.login_customer"
+# on logout
+on_logout = "go1_commerce.go1_commerce.v2.common.logout_customer"
 
 app_include_css = [
 	"/assets/go1_commerce/css/console.css",
