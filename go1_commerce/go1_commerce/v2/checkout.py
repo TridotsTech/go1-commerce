@@ -260,20 +260,22 @@ def get_order_discount(subtotal,total_weight=0,shipping_method=None,payment_meth
 									 response.get('discount_rule'), 
 									 response.get("subtotal"), cart_items, response=response)
 				
-				total_amount = response.get("subtotal")
+				total_amount = float(subtotal)
 				if not catalog_settings.included_tax:
-					 total_amount += tax
+					if tax:
+						total_amount += tax
 				if shipping_charges:
-					 total_amount += float(shipping_charges)
-					
+					if shipping_charges:
+						total_amount += float(shipping_charges)
+				d_amount = response.get('discount_amount')
 				return {'status': 'Success',
-						'discount_amount': response.get('discount_amount'),
+						'discount_amount': d_amount if d_amount else 0,
 						'discount': response.get('discount_rule'),
 						'tax': tax,
 						'formatted_total_amount':frappe.utils.fmt_money(total_amount,currency=currency_symbol),
 						'formatted_tax_amount':frappe.utils.fmt_money(tax,currency=currency_symbol),
 						'formatted_order_subtotal':frappe.utils.fmt_money(response.get("subtotal"),currency=currency_symbol),
-						'formatted_discount':frappe.utils.fmt_money(response.get('discount_amount'),currency=currency_symbol),
+						'formatted_discount':frappe.utils.fmt_money(d_amount,currency=currency_symbol),
 						'tax_splitup': tax_splitup,
 						'discount_response': response}
 			else:
