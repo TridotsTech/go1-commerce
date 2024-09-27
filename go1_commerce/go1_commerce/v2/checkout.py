@@ -262,7 +262,8 @@ def get_order_discount(subtotal,total_weight=0,shipping_method=None,payment_meth
 				
 				total_amount = response.get("subtotal")
 				if not catalog_settings.included_tax:
-					 total_amount += tax
+					if tax:
+						total_amount += tax
 				if shipping_charges:
 					 total_amount += float(shipping_charges)
 					
