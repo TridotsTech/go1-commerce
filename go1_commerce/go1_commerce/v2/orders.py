@@ -1787,6 +1787,7 @@ def validate_and_calculate_additional_shipping_charges(shopping_cart):
 										{','.join(shipping_not_allowd_products)}.".rstrip(','))
 				}
 	else:
+		frappe.log_error("additional_shipping_charges",additional_shipping_charges)
 		return {
 				"status":"success",
 				"additional_shipping_charges" : additional_shipping_charges,
