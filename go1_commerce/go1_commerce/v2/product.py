@@ -1201,9 +1201,9 @@ def get_sub_conditions_sort(ratings,sort_by,min_price,max_price, attributes,quer
 		elif sort_by.lower() == 'relevance':
 			query = query.orderby(Product.stock, order=Order.desc).orderby(Product.modified, order=Order.desc)
 		elif sort_by.lower() in ['name asc', 'name_asc']:
-			query = query.orderby(Product.item.trim(), order=Order.asc)
+			query = query.orderby(Product.item, order=Order.asc)
 		elif sort_by.lower() in ['name desc', 'name_desc']:
-			query = query.orderby(Product.item.trim(), order=Order.desc)
+			query = query.orderby(Product.item, order=Order.desc)
 		elif sort_by.lower() in ['price asc', 'price_asc']:
 			query = query.orderby(Product.price, order=Order.asc)
 		elif sort_by.lower() in ['price desc', 'price_desc']:
