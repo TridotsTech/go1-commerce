@@ -208,14 +208,13 @@ class BuilderData(Document):
 
 	def get_all_settings(self):
 		try:
-			import os,json
-			path = frappe.utils.get_files_path()
-			file_path = os.path.join(path, "settings/all_settings.json")
-			all_categories = None
-			if os.path.exists(file_path):
-					f = open(file_path)
-					all_categories = json.load(f)
-			return all_categories
+			return {
+						"catalog_settings":(frappe.get_single("Catalog Settings")).as_dict(),
+						"order_settings":(frappe.get_single("Order Settings")).as_dict(),
+						"cart_settings":(frappe.get_single("Shopping Cart Settings")).as_dict(),
+						"wallet_settings":(frappe.get_single("Wallet Settings")).as_dict(),
+						"social_tracking_codes":(frappe.get_single("Social Tracking Codes")).as_dict()
+					}
 		except Exception:
 			frappe.log_error(title = "Error in builder_data.get_all_settings", 
 								message = frappe.get_traceback())
@@ -298,7 +297,7 @@ class BuilderData(Document):
 		if product_id:
 			enquiry_details = frappe.db.get_all("Product Enquiry", 
 											filters = {"is_approved": 1, "product": product_id}, 
-											fields = ["name", "question"],
+											fields = ["name", "question","user_name"],
 											start = 0, 
 											page_length = limit)
 			if enquiry_details:

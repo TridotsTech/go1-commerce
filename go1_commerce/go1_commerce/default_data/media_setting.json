@@ -7,7 +7,7 @@
 		"mini_cart_image_size": "100",
 		"email_thumbnail_size": "100",
 		"cart_thumbnail_size": "100",
-		"default_image": "/assets/go1_commerce/images/no-product.png",
+		"default_image": "/assets/go1_commerce/images/go1commerce_product_logo.png",
 		"mini_cart_thumbnail": "/assets/go1_commerce/images/no-product.png",
 		"cart_thumbnail": "/assets/go1_commerce/images/no-product.png",
 		"detail_thumbnail": "/assets/go1_commerce/images/no-product.png",

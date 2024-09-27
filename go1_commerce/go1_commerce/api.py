@@ -78,3 +78,64 @@ def create_email_campaign(campaign, email_campaign_for, recipient):
 	doc.recipient = recipient
 	doc.start_date = getdate(nowdate())
 	doc.save(ignore_permissions=True)
+
+@frappe.whitelist(allow_guest=True)
+def get_builder_page_data(page_title= None):
+	filters={}
+	if page_title:
+		filters["page_title"]= page_title
+	doc = frappe.db.get_all("Builder Page",fields = ["published","page_name","route",
+													"dynamic_route","blocks","page_data_script","preview","page_title"],
+													filters=filters)
+	for i in doc:
+		client_scripts = frappe.db.get_all("Builder Page Client Script",fields = ["builder_script"], filters = {"parent":i.page_name})
+		i["client_scripts"] = client_scripts
+		i['doctype']="Builder Page"
+	return doc
+ 
+ 
+@frappe.whitelist(allow_guest=True)
+def get_all_data(doctype = None, docname=None):
+	filters={}
+	if doctype:
+		if docname:
+			filters["name"]= docname
+		doc = frappe.db.get_all(doctype,fields = ["*"],filters=filters)
+		return doc
+ 
+ 
+@frappe.whitelist(allow_guest=True)
+def get_builder_component_data(component_name = None, component_id= None):
+	filters={}
+	if component_name:
+		filters["component_name"] = component_name
+	if component_id:
+		filters["component_id"] = component_id
+	doc = frappe.db.get_all("Builder Component",fields = ["component_name","block","component_id"],
+							filters=filters)
+	for x in doc:
+		x['doctype']='Builder Component'
+	return doc
+ 
+@frappe.whitelist(allow_guest=True)
+def get_builder_script_data(name = None):
+	filters={}
+	if name:
+		filters["name"] = name
+	doc = frappe.db.get_all("Builder Client Script",fields = ["name","script_type","script","public_url"],
+						 filters=filters)
+	for x in doc:
+		x['doctype']='Builder Client Script'
+	return doc
+ 
+@frappe.whitelist(allow_guest=True)
+def get_builder_settings_data():
+	doc = frappe.get_doc("Builder Settings","Builder Settings",fields = ["script","script_public_url","style","custom_server_script","style_public_url"])
+	return doc
+ 
+@frappe.whitelist(allow_guest=True)
+def update_builder_page_data_script(doc_name, data_script = None):
+	doc = frappe.get_doc("Builder Page", doc_name)
+	doc.page_data_script = data_script
+	doc.save(ignore_permissions = True)
+ 

@@ -101,10 +101,9 @@ def get_all_website_settings_data():
 	media_settings = frappe.get_single('Media Settings')
 	cart_settings = frappe.get_single('Shopping Cart Settings')
 	order_settings = frappe.get_single('Order Settings')
-	app_settings = frappe.get_single('Mobile App Setting')
 	wallet_settings = frappe.get_single('Wallet Settings')
 	res_data = {}
-	if catalog_settings and media_settings and cart_settings and order_settings and app_settings:
+	if catalog_settings and media_settings and cart_settings and order_settings:
 		locations = []
 		location_areas = []
 		default_location = None
@@ -124,21 +123,6 @@ def get_all_website_settings_data():
 					
 		enable_left_panel = 1
 		default_header = default_footer = website_logo = login_image = None
-		if app_settings:
-			if app_settings.default_header:
-				if 'go1_cms' in frappe.get_installed_apps():
-					from go1_cms.go1_cms.api import get_header_info as go1_get_header_info
-					default_header = go1_get_header_info(app_settings.default_header)
-				else:
-					default_header = get_header_info(app_settings.default_header)
-			if app_settings.default_footer:
-				if 'go1_cms' in frappe.get_installed_apps():
-					from go1_cms.go1_cms.api import get_footer_info as go1_get_footer_info
-					default_footer = go1_get_footer_info(app_settings.default_footer)
-				else:
-					default_footer = get_header_info(app_settings.default_footer)
-			website_logo = app_settings.website_logo
-			login_image = app_settings.login_image
 		from go1_commerce.go1_commerce.v2.category import get_parent_categories
 		res_data={
 			"default_header":default_header,
@@ -214,7 +198,6 @@ def get_all_website_settings_data():
 			"enable_zipcode":order_settings.enable_zipcode,
 			"location_areas":location_areas,
 			"default_location":default_location,
-			"app_settings":app_settings,
 			"social_tracking_codes":tracking_codes.as_dict() if tracking_codes else None,
 			"default_meta_title":catalog_settings.meta_title,
 			"default_meta_description":catalog_settings.meta_description,

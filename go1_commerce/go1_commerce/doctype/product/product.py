@@ -2025,21 +2025,21 @@ def get_specification_list(reference_doc, reference_fields, filters=None,page_no
 		condition += f'{search_field} LIKE {frappe.qb.text(searchKey)}'
 
 	Doc = DocType(reference_doc)
-	fields = [Doc.field(x) for x in reference_field]
+	# fields = [Doc.field(x) for x in reference_field]
 	list_name_query = (
 		frappe.qb.from_(Doc)
-		.select(*fields)
+		.select(Doc.name,Doc.attribute_name)
 		.where(Doc.name != "")
 	)
 
 	if condition:
 		list_name_query = list_name_query.where(frappe.qb.text(condition))
 
-	list_name_query = list_name_query.limit(start, int(page_len))
+	list_name_query = list_name_query.limit(int(page_len)).offset(start)
 	list_name = list_name_query.run(as_dict=True)
 	list_len_query = (
 		frappe.qb.from_(Doc)
-		.select(*fields)
+		.select(Doc.name,Doc.attribute_name)
 		.where(Doc.name != "")
 	)
 
@@ -2272,14 +2272,6 @@ def get_role_list(doctype, txt, searchfield, start, page_len, filters):
 	results = query.run(as_dict=True)
 
 	return results
-	
-
-
-def get_models(reference_doc, reference_fields):
-	reference_field = json.loads(reference_fields)
-	list_name = frappe.db.get_all(reference_doc,fields=reference_field,filters={"is_active":1},
-																limit_page_length=2000)
-	return {"list_name":list_name}
 
 
 def get_all_products_with_attributes(category=None, brand=None, item_name=None, active=None, featured=None,):

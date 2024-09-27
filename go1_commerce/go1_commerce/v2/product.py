@@ -1085,7 +1085,7 @@ def product_specification_attribute(x):
 		for item in specification_attribute:
 			groups = frappe.db.get_all('Product Specification Attribute Mapping',
 						fields=['specification_attribute','options'], 
-						filters={"parent":x.name,'spec_group_name':item},
+						filters={"parent":x.name,'spec_group_name':item.spec_group_name},
 						order_by='idx')
 			specification_group.append({"name":item, "groups":groups})
 	else:
