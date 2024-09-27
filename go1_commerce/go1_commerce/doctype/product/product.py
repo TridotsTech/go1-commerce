@@ -1984,8 +1984,9 @@ def get_returnpolicy_list(reference_doc, reference_fields, filters=None,page_no=
 	if filters:
 		condition += ' AND ' + filters
 
+	# fields = ','.join([x for x in reference_field])
 	Doc = DocType(reference_doc)
-	fields = [Doc.field(x) for x in reference_field]
+	fields = [x for x in reference_field]
 
 	if reference_doc == "Product":
 		condition += ' AND is_active = 1 AND status = "Approved"'
@@ -1999,7 +2000,7 @@ def get_returnpolicy_list(reference_doc, reference_fields, filters=None,page_no=
 		list_name_query = list_name_query.where(frappe.qb.text(condition))
 
 	list_name_query = (
-		list_name_query.limit(start, int(page_len))
+		list_name_query.limit(int(page_len)).offset(start)
 	)
 
 	list_name = list_name_query.run(as_dict=True)
