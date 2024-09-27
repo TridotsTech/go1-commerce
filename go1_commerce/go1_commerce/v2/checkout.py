@@ -265,7 +265,8 @@ def get_order_discount(subtotal,total_weight=0,shipping_method=None,payment_meth
 					if tax:
 						total_amount += tax
 				if shipping_charges:
-					 total_amount += float(shipping_charges)
+					if shipping_charges:
+						total_amount += float(shipping_charges)
 					
 				return {'status': 'Success',
 						'discount_amount': response.get('discount_amount'),
