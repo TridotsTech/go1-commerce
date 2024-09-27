@@ -1712,7 +1712,7 @@ def calculate_shipping_charges_from_list(shipping_charges,shipping_charges_list,
 						if shipping_zip_matches(shipping_addr.zipcode, zipcode_range):
 							matched_sh_charges.append(item)
 		else:
-			shipping_charges = item.charge_amount
+			shipping_charges += item.charge_amount
 
 	if not matched_sh_charges:
 		for x in shipping_charges_list:
@@ -1787,7 +1787,7 @@ def validate_and_calculate_additional_shipping_charges(shopping_cart):
 										{','.join(shipping_not_allowd_products)}.".rstrip(','))
 				}
 	else:
-		frappe.log_error("additional_shipping_charges",additional_shipping_charges)
+		# frappe.log_error("additional_shipping_charges",additional_shipping_charges)
 		return {
 				"status":"success",
 				"additional_shipping_charges" : additional_shipping_charges,
