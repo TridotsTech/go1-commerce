@@ -260,7 +260,7 @@ def get_order_discount(subtotal,total_weight=0,shipping_method=None,payment_meth
 									 response.get('discount_rule'), 
 									 response.get("subtotal"), cart_items, response=response)
 				
-				total_amount = response.get("subtotal")
+				total_amount = subtotal
 				if not catalog_settings.included_tax:
 					if tax:
 						total_amount += tax
