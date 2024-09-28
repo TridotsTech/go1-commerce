@@ -194,6 +194,7 @@ def get_category_filters_json(category=None, brands='', ratings='', min_price=''
 			category_filter = "'" + category + "'"
 			if catalog_settings.include_products_from_subcategories == 1:
 				child_categories = get_child_categories(category)
+				frappe.log_error("child_categories",child_categories)
 				if child_categories:
 					category_filter = ','.join(['"' + x.name + '"' for x in child_categories])
 			p_ids = get_category_product_ids(child_categories)
