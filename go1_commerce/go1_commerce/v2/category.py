@@ -196,7 +196,8 @@ def get_category_filters_json(category=None, brands='', ratings='', min_price=''
 				child_categories = get_child_categories(category)
 				frappe.log_error("child_categories",child_categories)
 				if child_categories:
-					category_filter = ','.join(['"' + x.name + '"' for x in child_categories])
+					if len(child_categories)>0:
+						category_filter = ','.join(['"' + x.name + '"' for x in child_categories])
 			p_ids = get_category_product_ids(child_categories)
 			brand_filters = get_category_brands_filter(p_ids)
 			attribute_filters = get_category_item_attribute_filter(p_ids)
@@ -346,7 +347,7 @@ def get_category_product_ids(category_filter):
 	category_filter_list = []
 	for x in category_filter:
 		category_filter_list.append(x.name)
-	frappe.log_error("category_filter",category_filter_list)
+	# frappe.log_error("category_filter",category_filter_list)
 	product = DocType('Product')
 	category_mapping = DocType('Product Category Mapping')
 	category = DocType('Product Category')
@@ -362,7 +363,7 @@ def get_category_product_ids(category_filter):
 		.where(category.name.isin(category_filter_list))
 	)
 	results = query.run(as_dict=1)
-	frappe.log_error("results_pids",results)
+	# frappe.log_error("results_pids",results)
 	return results
 
 def get_category_brands_filter(product_ids):
