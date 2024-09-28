@@ -348,7 +348,7 @@ def get_category_item_attribute_filter(product_ids):
 def get_category_product_ids(category_filter):
 	category_filter_list = []
 	for x in category_filter:
-		category_filter_list.append(x.name)
+		category_filter_list.append(x.get("name"))
 	# frappe.log_error("category_filter",category_filter_list)
 	product = DocType('Product')
 	category_mapping = DocType('Product Category Mapping')
