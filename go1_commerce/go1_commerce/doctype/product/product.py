@@ -2775,7 +2775,7 @@ def create_product(source_name, target_doc=None):
 	}, target_doc)
 	return doc
 
-
+@frappe.whitelist()
 def delete_current_img(childname, doctype):
 	try:
 		image_doc = 'Product Image'
