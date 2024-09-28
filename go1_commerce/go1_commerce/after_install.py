@@ -114,6 +114,13 @@ def install_builder_data():
 	file_name = "builder_settings.json"
 	install_builder_data_from_file(file_name)
 	install_builder_files()
+	# frappe.db.set_value("Country","India","enabled",1)
+	state_doc = frappe.new_doc("State")
+	state_doc.country = "India"
+	state_doc.state = "Tamil Nadu"
+	state_doc.save(ignore_permissions=True)
+	frappe.db.commit()
+
 def install_builder_data_from_file(file_name):
 	path = frappe.get_module_path("go1_commerce")
 	file_path = os.path.join(path,"default_data/builder_data",file_name)
@@ -121,18 +128,18 @@ def install_builder_data_from_file(file_name):
 		with open(file_path, 'r') as f:
 			out = json.load(f)
 		for i in out:
-			try:
-				doc = frappe.get_doc(i).insert()
+			# try:
+			doc = frappe.get_doc(i).insert()
+			frappe.db.commit()
+			if doc.doctype =="Builder Page":
+				frappe.log_error(doc.doctype ,doc.name)
+				frappe.db.set_value("Builder Page",doc.name,"route",i.get("route"))
 				frappe.db.commit()
-				if doc.doctype =="Builder Page":
-					frappe.log_error(doc.doctype ,doc.name)
-					frappe.db.set_value("Builder Page",doc.name,"route",i.get("route"))
-					frappe.db.commit()
 					
-			except frappe.NameError:
-				pass
-			except Exception as e:
-				frappe.log_error(f"Error in install_builder_data_from_file", frappe.get_traceback())
+			# except frappe.NameError:
+			# 	pass
+			# except Exception as e:
+			# 	frappe.log_error(f"Error in install_builder_data_from_file", frappe.get_traceback())
 
 def install_builder_files():
 	from urllib.request import urlopen

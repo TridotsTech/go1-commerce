@@ -11,7 +11,7 @@
 	{
 		"shipping_by_weight_charges":[],
 		"display_order":0,
-		"is_active":0,
+		"is_active":1,
 		"shipping_rate_method":"Fixed Rate Shipping",
 		"shipping_by_total":[],
 		"doctype":"Shipping Rate Method",

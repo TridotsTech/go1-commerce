@@ -2881,6 +2881,7 @@ def validate_attributes_stock(product, attribute_id, variant_html, cart_qty, add
 		check_data = frappe.db.get_all('Product Variant Combination',
 										filters = {'parent': product, 'attribute_id': attribute_id},
 										fields = ['stock', 'price', 'weight', 'sku', 'role_based_pricing'])
+		frappe.log_error("check_data",check_data)
 		if check_data:
 			if check_data[0].price > 0:
 				product_price = check_data[0].price
@@ -2929,6 +2930,7 @@ def validate_attributes_stock(product, attribute_id, variant_html, cart_qty, add
 						attribute_prcing_info["in_cart"] = True
 						attribute_prcing_info["in_cart_qty"] = check_exist[0].quantity
 						attribute_prcing_info["cart_item_id"]= check_exist[0].name
+			
 			return attribute_prcing_info
 		else:
 			if product_info.inventory_method == 'Track Inventory By Product Attributes':

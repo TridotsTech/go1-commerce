@@ -3,7 +3,7 @@
 		"doctype":"Shipping Method", 
 		"shipping_method_name":"Delivery", 
 		"display_order":0, 
-		"show_in_website": 0
+		"show_in_website": 1
 	},
 	{
 		"doctype":"Shipping Method", 

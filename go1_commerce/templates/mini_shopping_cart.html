@@ -1,6 +1,11 @@
 <div class="frappe-builder-3b8cab6b">
 {%for c_item in cart_items%}
-    <div class="frappe-builder-2555e525" data-cart-item="{{c_item.name}}"><img class="frappe-builder-0737d1a5" src="{{c_item.image}}">
+    <div class="frappe-builder-2555e525" data-cart-item="{{c_item.name}}">
+        {%if c_item.image%}
+        <img class="frappe-builder-0737d1a5" src="{{c_item.image}}">
+        {%else%}
+        <img class="frappe-builder-0737d1a5" src="/assets/go1_commerce/images/go1commerce_product_logo.png"/>
+        {%endif%}
         <div class="frappe-builder-f6fb182d">
             <div class="frappe-builder-922eadd3 __text_block__">{{c_item.item}}
                 {%if c_item.attribute_description%}
