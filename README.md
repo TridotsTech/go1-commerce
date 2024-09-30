@@ -15,19 +15,22 @@ Go1Commerce is a comprehensive e-commerce solution designed to empower businesse
 
 ## Installation
 
-1.[Install Bench](https://github.com/frappe/bench#installation)
+1. [Install Bench](https://github.com/frappe/bench#installation).
 
 2. Once bench is installed, add the Go1 Commerce app to your bench by running
 
-    ```bash
+    ```sh
     $ bench get-app https://github.com/TridotsTech/Go1-Commerce
+    ```
 
-3.Then you have to install the Go1 Commerce app on the required site by running
+3. Then you have to install the Go1 Commerce app on the required site by running
 
-    ```bash
+    ```sh
     $ bench --site sitename install-app go1_commerce
+    ```
     
 4. Enable the server by running
     
-     ```bash
+     ```sh
     $ bench set-config -g server_script_enabled 1
+    ```
