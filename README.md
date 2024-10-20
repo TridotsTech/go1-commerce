@@ -3,7 +3,7 @@
 Go1Commerce is a comprehensive e-commerce solution designed to empower businesses to build and manage their online stores with ease and flexibility. This open-source platform provides a range of features for managing products, orders, payments, and marketing, along with powerful SEO tools and analytics for optimizing your store's performance.
 
 
-**Note: It's a standalone frappe E-commerce application and not compatible with ERPnext. 
+**Note:** It's a standalone frappe E-commerce application and not compatible with ERPnext. 
 
 
 ## Key Features
