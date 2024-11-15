@@ -40,7 +40,7 @@ def get_data(filters):
 			(Order.docstatus == 1) &
 			(Order.status != 'Cancelled') &
 			(Order.restaurant_status != 'Declined') &
-			*conditions
+			(frappe.qb.terms.and_(*conditions) if conditions else True)
 		)
 		.groupby(Order.customer_name, Order.customer_email)
 		.orderby(Count('*'), order="Order.desc")

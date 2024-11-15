@@ -108,6 +108,8 @@ def get_products(category=None, brand=None, cat_doctype=None, brand_doctype=None
 			item['image'] = image_html
 
 		return products
+	except Exception:
+		frappe.log_error(frappe.get_traceback(), "go1_commerce.go1_commerce.page.products_bulk_update.get_products") 
 
 
 
