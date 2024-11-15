@@ -317,8 +317,8 @@ def delete_linked_docs(doctype, name, linkinfo=None, for_doctype=None):
 					confield=link.get("fieldname")[0] 
 					fieldval=name
 					
-				    Doctype = DocType(link.get('child_doctype'))
-				    frappe.qb.update(Doctype).set({setfield: ""}).where(Doctype[confield] == fieldval).run()
+					Doctype = DocType(link.get('child_doctype'))
+					frappe.qb.update(Doctype).set({setfield: ""}).where(Doctype[confield] == fieldval).run()
 				else:
 					link_fieldnames = link.get("fieldname")
 					if link_fieldnames:
@@ -328,7 +328,7 @@ def delete_linked_docs(doctype, name, linkinfo=None, for_doctype=None):
 						confield=link_fieldnames[0]
 						fieldval=name
 						Doctype = DocType(dt)
-					    frappe.qb.update(Doctype).set({setfield: ""}).where(Doctype[confield] == fieldval).run()
+						frappe.qb.update(Doctype).set({setfield: ""}).where(Doctype[confield] == fieldval).run()
 					else:
 						ret = None
 
