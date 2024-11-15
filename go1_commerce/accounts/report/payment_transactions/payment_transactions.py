@@ -73,12 +73,12 @@ def get_columns():
 # 	return frappe.db.sql(query,as_dict=1)
 
 def get_data(filters):
-	query = frappe.qb.from_("tabPayment Reference").as_("PR")
-		.inner_join("tabPayment Entry").as_("PE")
-		.on("PE.name = PR.parent")
-		.inner_join("tabCustomers").as_("C")
-		.on("C.name = PE.party")
-		.select(
+	query = frappe.qb.from_("tabPayment Reference").as_("PR") \
+		.inner_join("tabPayment Entry").as_("PE") \
+		.on("PE.name = PR.parent") \
+		.inner_join("tabCustomers").as_("C") \
+		.on("C.name = PE.party") \
+		.select( 
 			frappe.qb.function("DATE", "PE.creation").as_("posted_date"),
 			frappe.qb.function("DATE_FORMAT", "PE.creation", "%h:%i %p").as_("posted_time"),
 			frappe.qb.case(

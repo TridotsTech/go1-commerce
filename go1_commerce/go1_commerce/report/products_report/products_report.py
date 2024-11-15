@@ -6,20 +6,20 @@ import frappe
 from frappe.query_builder import DocType, Count
 
 def execute(filters=None):
-	columns, data = [], []
-	columns = get_columns()
-	data = products_report()
-	return columns, data
+    columns, data = [], []
+    columns = get_columns()
+    data = products_report()
+    return columns, data
 
 def get_columns():
-	return[
-		"Vendor Name" + ":Link/Business:120",
-		"Product" + ":Data:120",	
-		"Quantity" + ":Int:120"
-	]
+    return[
+        "Vendor Name" + ":Link/Business:120",
+        "Product" + ":Data:120",	
+        "Quantity" + ":Int:120"
+    ]
 
 def products_report():
-	Product = DocType('Product')
+    Product = DocType('Product')
     OrderItem = DocType('Order Item')
     query = (
         frappe.qb.from_(Product)
@@ -36,4 +36,4 @@ def products_report():
         .groupby(Product.name)
     )
     results = query.run(as_dict=True)
-	return results
+    return results
